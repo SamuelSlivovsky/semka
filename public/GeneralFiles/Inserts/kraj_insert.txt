@@ -1,8 +1,8 @@
-insert into kraj(id_kraja, nazov) values ('BC', 'Banskobystrickı');
-insert into kraj(id_kraja, nazov) values ('TA', 'Trnavskı');
-insert into kraj(id_kraja, nazov) values ('PV', 'Prešovskı');
-insert into kraj(id_kraja, nazov) values ('ZI', 'ilinskı');
-insert into kraj(id_kraja, nazov) values ('TC', 'Trenèiansky');
+insert into kraj(id_kraja, nazov) values ('BC', 'BanskobystrickÃ½');
+insert into kraj(id_kraja, nazov) values ('TA', 'TrnavskÃ½');
+insert into kraj(id_kraja, nazov) values ('PV', 'PreÅ¡ovskÃ½');
+insert into kraj(id_kraja, nazov) values ('ZI', 'Å½ilinskÃ½');
+insert into kraj(id_kraja, nazov) values ('TC', 'TrenÄiansky');
 insert into kraj(id_kraja, nazov) values ('NI', 'Nitriansky');
-insert into kraj(id_kraja, nazov) values ('KI', 'Košickı');
-insert into kraj(id_kraja, nazov) values ('BL', 'Bratislavskı');
+insert into kraj(id_kraja, nazov) values ('KI', 'KoÅ¡ickÃ½');
+insert into kraj(id_kraja, nazov) values ('BL', 'BratislavskÃ½');
