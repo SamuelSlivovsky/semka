@@ -10,7 +10,7 @@ function Menu() {
   ];
 
   return (
-    <div className="card" style={{ backgroundColor: "#071426" }}>
+    <div className="card" >
       <TabMenu model={items} style={{}} />
     </div>
   );
