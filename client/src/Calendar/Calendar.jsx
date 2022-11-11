@@ -84,24 +84,25 @@ function EventCalendar() {
 
   return (
     <div className="kalendar">
-      <FullCalendar
-        plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-        ref={calendarRef}
-        headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: "dayGridMonth,timeGridWeek,timeGridDay",
-        }}
-        initialView="dayGridMonth"
-        editable={true}
-        selectable={true}
-        weekends={true}
-        initialEvents={currentEvents}
-        select={handleDateSelect}
-        eventClick={handleEventClick}
-        eventsSet={handleEvents}
-      />
-
+      <div className="kalendar-obal">
+        <FullCalendar
+          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          ref={calendarRef}
+          headerToolbar={{
+            left: "prev,next today",
+            center: "title",
+            right: "dayGridMonth,timeGridWeek,timeGridDay",
+          }}
+          initialView="dayGridMonth"
+          editable={true}
+          selectable={true}
+          weekends={true}
+          initialEvents={currentEvents}
+          select={handleDateSelect}
+          eventClick={handleEventClick}
+          eventsSet={handleEvents}
+        />
+      </div>
       <Dialog
         header="Zmena udalosti"
         visible={showDialog}
