@@ -1,10 +1,22 @@
 ﻿/*
 Created: 29. 10. 2022
-Modified: 9. 11. 2022
+Modified: 11. 11. 2022
 Model: semka_final_3
 Database: Oracle 19c
 */
 
+
+-- Create user data types section -------------------------------------------------
+
+CREATE TYPE Log_Type
+AS OBJECT
+(
+    id_zamestnanca INTEGER,
+    datum DATE,
+    zmena_poctu INTEGER
+)
+
+/
 
 -- Create tables section -------------------------------------------------
 
@@ -81,8 +93,9 @@ ALTER TABLE zamestnanec ADD CONSTRAINT PK_zamestnanec PRIMARY KEY (id_zamestnanc
 
 CREATE TABLE pacient(
   id_pacienta Integer NOT NULL,
-  rod_cislo Char(11 ),
-  id_poistenca Integer
+  rod_cislo Char(11 ) NOT NULL,
+  id_poistenca Integer,
+  id_typu_krvnej_skupiny Integer NOT NULL
 )
 /
 
@@ -94,31 +107,12 @@ CREATE INDEX IX_Relationship19 ON pacient (rod_cislo)
 CREATE INDEX IX_Relationship112 ON pacient (id_poistenca)
 /
 
+CREATE INDEX IX_Relationship123 ON pacient (id_typu_krvnej_skupiny)
+/
+
 -- Add keys for table pacient
 
 ALTER TABLE pacient ADD CONSTRAINT PK_pacient PRIMARY KEY (id_pacienta)
-/
-
--- Table zdravotna_karta
-
-CREATE TABLE zdravotna_karta(
-  id_pacienta Integer NOT NULL,
-  id_typu_krvnej_skupiny Integer NOT NULL,
-  datum_zalozenia Date NOT NULL
-)
-/
-
--- Create indexes for table zdravotna_karta
-
-CREATE INDEX IX_Relationship5 ON zdravotna_karta (id_pacienta)
-/
-
-CREATE INDEX IX_Relationship113 ON zdravotna_karta (id_typu_krvnej_skupiny)
-/
-
--- Add keys for table zdravotna_karta
-
-ALTER TABLE zdravotna_karta ADD CONSTRAINT PK_zdravotna_karta PRIMARY KEY (id_pacienta)
 /
 
 -- Table zdravotny_zaznam
@@ -134,10 +128,10 @@ CREATE TABLE zdravotny_zaznam(
 
 -- Create indexes for table zdravotny_zaznam
 
-CREATE INDEX IX_Relationship16 ON zdravotny_zaznam (id_pacienta)
+CREATE INDEX IX_Relationship109 ON zdravotny_zaznam (id_prilohy)
 /
 
-CREATE INDEX IX_Relationship109 ON zdravotny_zaznam (id_prilohy)
+CREATE INDEX IX_Relationship124 ON zdravotny_zaznam (id_pacienta)
 /
 
 -- Add keys for table zdravotny_zaznam
@@ -273,30 +267,12 @@ CREATE INDEX IX_Relationship45 ON sklad (id_oddelenia)
 ALTER TABLE sklad ADD CONSTRAINT PK_sklad PRIMARY KEY (id_skladu)
 /
 
--- Table liek
-
-CREATE TABLE liek(
-  id_lieku Integer NOT NULL,
-  id_sarze Integer NOT NULL
-)
-/
-
--- Create indexes for table liek
-
-CREATE INDEX IX_Relationship52 ON liek (id_sarze)
-/
-
--- Add keys for table liek
-
-ALTER TABLE liek ADD CONSTRAINT PK_liek PRIMARY KEY (id_lieku)
-/
-
 -- Table recept
 
 CREATE TABLE recept(
   id_receptu Integer NOT NULL,
-  id_pacienta Integer NOT NULL,
   id_lieku Integer NOT NULL,
+  id_pacienta Integer NOT NULL,
   id_lekara Integer NOT NULL,
   datum Date NOT NULL,
   datum_vyzdvihnutia Date
@@ -308,10 +284,10 @@ CREATE TABLE recept(
 CREATE INDEX IX_Relationship30 ON recept (id_pacienta)
 /
 
-CREATE INDEX IX_Relationship31 ON recept (id_lieku)
+CREATE INDEX IX_Relationship32 ON recept (id_lekara)
 /
 
-CREATE INDEX IX_Relationship32 ON recept (id_lekara)
+CREATE INDEX IX_Relationship119 ON recept (id_lieku)
 /
 
 -- Add keys for table recept
@@ -379,9 +355,9 @@ CREATE TABLE hospitalizacia(
   id_hospitalizacie Integer NOT NULL,
   id_pacienta Integer NOT NULL,
   id_lekara Integer NOT NULL,
+  id_zaznamu Integer NOT NULL,
   id_lozka Integer NOT NULL,
   id_sestricky Integer,
-  dat_od Date NOT NULL,
   dat_do Date
 )
 /
@@ -397,22 +373,25 @@ CREATE INDEX IX_Relationship107 ON hospitalizacia (id_sestricky)
 CREATE INDEX IX_Relationship118 ON hospitalizacia (id_lekara)
 /
 
+CREATE INDEX IX_Relationship121 ON hospitalizacia (id_zaznamu)
+/
+
 -- Add keys for table hospitalizacia
 
 ALTER TABLE hospitalizacia ADD CONSTRAINT PK_hospitalizacia PRIMARY KEY (id_hospitalizacie)
 /
 
--- Table typ_lieku
+-- Table liek
 
-CREATE TABLE typ_lieku(
-  id_typu_lieku Integer NOT NULL,
+CREATE TABLE liek(
+  id_lieku Integer NOT NULL,
   nazov Varchar2(150 ) NOT NULL
 )
 /
 
--- Add keys for table typ_lieku
+-- Add keys for table liek
 
-ALTER TABLE typ_lieku ADD CONSTRAINT PK_typ_lieku PRIMARY KEY (id_typu_lieku)
+ALTER TABLE liek ADD CONSTRAINT PK_liek PRIMARY KEY (id_lieku)
 /
 
 -- Table sarza
@@ -420,7 +399,7 @@ ALTER TABLE typ_lieku ADD CONSTRAINT PK_typ_lieku PRIMARY KEY (id_typu_lieku)
 CREATE TABLE sarza(
   id_sarze Integer NOT NULL,
   id_skladu Integer NOT NULL,
-  id_typu_lieku Integer NOT NULL,
+  id_lieku Integer NOT NULL,
   dat_expiracie Date NOT NULL,
   pocet_liekov Integer NOT NULL
 )
@@ -428,7 +407,7 @@ CREATE TABLE sarza(
 
 -- Create indexes for table sarza
 
-CREATE INDEX IX_Relationship50 ON sarza (id_typu_lieku)
+CREATE INDEX IX_Relationship50 ON sarza (id_lieku)
 /
 
 CREATE INDEX IX_Relationship53 ON sarza (id_skladu)
@@ -476,18 +455,17 @@ CREATE TABLE typ_ockovania(
 ALTER TABLE typ_ockovania ADD CONSTRAINT PK_typ_ockovania PRIMARY KEY (id_typu_ockovania)
 /
 
--- Table pacient_ockovanie
+-- Table ockovanie
 
-CREATE TABLE pacient_ockovanie(
-  dat_ockovania Date NOT NULL,
-  id_ockovania Integer NOT NULL,
-  id_pacienta Integer NOT NULL
+CREATE TABLE ockovanie(
+  id_typu_ockovania Integer NOT NULL,
+  id_zaznamu Integer NOT NULL
 )
 /
 
--- Add keys for table pacient_ockovanie
+-- Add keys for table ockovanie
 
-ALTER TABLE pacient_ockovanie ADD CONSTRAINT PK_pacient_ockovanie PRIMARY KEY (id_ockovania,id_pacienta,dat_ockovania)
+ALTER TABLE ockovanie ADD CONSTRAINT PK_ockovanie PRIMARY KEY (id_typu_ockovania,id_zaznamu)
 /
 
 -- Table vysetrenie
@@ -543,7 +521,7 @@ CREATE TABLE zoznam_chorob(
 
 -- Add keys for table zoznam_chorob
 
-ALTER TABLE zoznam_chorob ADD CONSTRAINT PK_zoznam_chorob PRIMARY KEY (id_pacienta,id_choroby,datum_od)
+ALTER TABLE zoznam_chorob ADD CONSTRAINT PK_zoznam_chorob PRIMARY KEY (id_choroby,datum_od,id_pacienta)
 /
 
 -- Table typ_ZTP
@@ -571,7 +549,7 @@ CREATE TABLE pacient_ZTP(
 
 -- Add keys for table pacient_ZTP
 
-ALTER TABLE pacient_ZTP ADD CONSTRAINT PK_pacient_ZTP PRIMARY KEY (id_pacienta,id_typu_ztp,dat_od)
+ALTER TABLE pacient_ZTP ADD CONSTRAINT PK_pacient_ZTP PRIMARY KEY (id_typu_ztp,dat_od,id_pacienta)
 /
 
 -- Table sestricka
@@ -701,17 +679,31 @@ CREATE TABLE typ_miestnosti(
 ALTER TABLE typ_miestnosti ADD CONSTRAINT PK_typ_miestnosti PRIMARY KEY (id_typu_miestnosti)
 /
 
+-- Table log_liekov
+
+CREATE TABLE log_liekov(
+  id_logu Integer NOT NULL,
+  id_sarze Integer NOT NULL,
+  Log Log_Type NOT NULL
+)
+/
+
+-- Create indexes for table log_liekov
+
+CREATE INDEX IX_Relationship130 ON log_liekov (id_sarze)
+/
+
+-- Add keys for table log_liekov
+
+ALTER TABLE log_liekov ADD CONSTRAINT PK_log_liekov PRIMARY KEY (id_logu)
+/
+
 
 
 
 -- Create foreign keys (relationships) section ------------------------------------------------- 
 
 ALTER TABLE os_udaje ADD CONSTRAINT Relationship1 FOREIGN KEY (PSC) REFERENCES obec (PSC)
-/
-
-
-
-ALTER TABLE zdravotna_karta ADD CONSTRAINT Relationship5 FOREIGN KEY (id_pacienta) REFERENCES pacient (id_pacienta)
 /
 
 
@@ -732,11 +724,6 @@ ALTER TABLE okres ADD CONSTRAINT Relationship14 FOREIGN KEY (id_kraja) REFERENCE
 
 
 ALTER TABLE obec ADD CONSTRAINT Relationship15 FOREIGN KEY (id_okresu) REFERENCES okres (id_okresu)
-/
-
-
-
-ALTER TABLE zdravotny_zaznam ADD CONSTRAINT Relationship16 FOREIGN KEY (id_pacienta) REFERENCES zdravotna_karta (id_pacienta)
 /
 
 
@@ -771,11 +758,6 @@ ALTER TABLE recept ADD CONSTRAINT Relationship30 FOREIGN KEY (id_pacienta) REFER
 
 
 
-ALTER TABLE recept ADD CONSTRAINT Relationship31 FOREIGN KEY (id_lieku) REFERENCES liek (id_lieku)
-/
-
-
-
 ALTER TABLE recept ADD CONSTRAINT Relationship32 FOREIGN KEY (id_lekara) REFERENCES lekar (id_lekara)
 /
 
@@ -806,12 +788,7 @@ ALTER TABLE sklad ADD CONSTRAINT Relationship45 FOREIGN KEY (id_oddelenia) REFER
 
 
 
-ALTER TABLE sarza ADD CONSTRAINT Relationship50 FOREIGN KEY (id_typu_lieku) REFERENCES typ_lieku (id_typu_lieku)
-/
-
-
-
-ALTER TABLE liek ADD CONSTRAINT Relationship52 FOREIGN KEY (id_sarze) REFERENCES sarza (id_sarze)
+ALTER TABLE sarza ADD CONSTRAINT Relationship50 FOREIGN KEY (id_lieku) REFERENCES liek (id_lieku)
 /
 
 
@@ -836,12 +813,7 @@ ALTER TABLE operacia ADD CONSTRAINT Relationship57 FOREIGN KEY (id_zaznamu) REFE
 
 
 
-ALTER TABLE pacient_ockovanie ADD CONSTRAINT Relationship58 FOREIGN KEY (id_ockovania) REFERENCES typ_ockovania (id_typu_ockovania)
-/
-
-
-
-ALTER TABLE pacient_ockovanie ADD CONSTRAINT Relationship59 FOREIGN KEY (id_pacienta) REFERENCES zdravotna_karta (id_pacienta)
+ALTER TABLE ockovanie ADD CONSTRAINT Relationship58 FOREIGN KEY (id_typu_ockovania) REFERENCES typ_ockovania (id_typu_ockovania)
 /
 
 
@@ -856,17 +828,7 @@ ALTER TABLE vysetrenie ADD CONSTRAINT Relationship64 FOREIGN KEY (id_zaznamu) RE
 
 
 
-ALTER TABLE zoznam_chorob ADD CONSTRAINT Relationship100 FOREIGN KEY (id_pacienta) REFERENCES zdravotna_karta (id_pacienta)
-/
-
-
-
 ALTER TABLE zoznam_chorob ADD CONSTRAINT Relationship101 FOREIGN KEY (id_choroby) REFERENCES choroba (id_choroby)
-/
-
-
-
-ALTER TABLE pacient_ZTP ADD CONSTRAINT Relationship102 FOREIGN KEY (id_pacienta) REFERENCES zdravotna_karta (id_pacienta)
 /
 
 
@@ -916,11 +878,6 @@ ALTER TABLE pacient ADD CONSTRAINT Relationship112 FOREIGN KEY (id_poistenca) RE
 
 
 
-ALTER TABLE zdravotna_karta ADD CONSTRAINT Relationship113 FOREIGN KEY (id_typu_krvnej_skupiny) REFERENCES krvna_skupina (id_typu_krvnej_skupiny)
-/
-
-
-
 ALTER TABLE oddelenie ADD CONSTRAINT Relationship115 FOREIGN KEY (id_typu_oddelenia) REFERENCES typ_oddelenia (id_typu_oddelenia)
 /
 
@@ -937,6 +894,46 @@ ALTER TABLE miestnost ADD CONSTRAINT Relationship117 FOREIGN KEY (id_typu_miestn
 
 
 ALTER TABLE hospitalizacia ADD CONSTRAINT Relationship118 FOREIGN KEY (id_lekara) REFERENCES lekar (id_lekara)
+/
+
+
+
+ALTER TABLE recept ADD CONSTRAINT Relationship119 FOREIGN KEY (id_lieku) REFERENCES liek (id_lieku)
+/
+
+
+
+ALTER TABLE hospitalizacia ADD CONSTRAINT Relationship121 FOREIGN KEY (id_zaznamu) REFERENCES zdravotny_zaznam (id_zaznamu)
+/
+
+
+
+ALTER TABLE pacient ADD CONSTRAINT Relationship123 FOREIGN KEY (id_typu_krvnej_skupiny) REFERENCES krvna_skupina (id_typu_krvnej_skupiny)
+/
+
+
+
+ALTER TABLE zdravotny_zaznam ADD CONSTRAINT Relationship124 FOREIGN KEY (id_pacienta) REFERENCES pacient (id_pacienta)
+/
+
+
+
+ALTER TABLE pacient_ZTP ADD CONSTRAINT Relationship126 FOREIGN KEY (id_pacienta) REFERENCES pacient (id_pacienta)
+/
+
+
+
+ALTER TABLE zoznam_chorob ADD CONSTRAINT Relationship127 FOREIGN KEY (id_pacienta) REFERENCES pacient (id_pacienta)
+/
+
+
+
+ALTER TABLE ockovanie ADD CONSTRAINT Relationship129 FOREIGN KEY (id_zaznamu) REFERENCES zdravotny_zaznam (id_zaznamu)
+/
+
+
+
+ALTER TABLE log_liekov ADD CONSTRAINT Relationship130 FOREIGN KEY (id_sarze) REFERENCES sarza (id_sarze)
 /
 
 
