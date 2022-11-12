@@ -1,22 +1,10 @@
-/*
-Created: 29. 10. 2022
-Modified: 11. 11. 2022
+﻿/*
+Created: 29/10/2022
+Modified: 12/11/2022
 Model: semka_final_3
 Database: Oracle 19c
 */
 
-
--- Create user data types section -------------------------------------------------
-
-CREATE TYPE Log_Type
-AS OBJECT
-(
-    id_zamestnanca INTEGER,
-    datum DATE,
-    zmena_poctu INTEGER
-)
-
-/
 
 -- Create tables section -------------------------------------------------
 
@@ -186,17 +174,13 @@ ALTER TABLE oddelenie ADD CONSTRAINT PK_oddelenie PRIMARY KEY (id_oddelenia)
 
 CREATE TABLE lekar(
   id_lekara Integer NOT NULL,
-  id_zamestnanca Integer NOT NULL,
-  id_typu_lekara Integer NOT NULL
+  id_zamestnanca Integer NOT NULL
 )
 /
 
 -- Create indexes for table lekar
 
 CREATE INDEX IX_Relationship11 ON lekar (id_zamestnanca)
-/
-
-CREATE INDEX IX_Relationship104 ON lekar (id_typu_lekara)
 /
 
 -- Add keys for table lekar
@@ -422,7 +406,6 @@ ALTER TABLE sarza ADD CONSTRAINT PK_sarza PRIMARY KEY (id_sarze)
 
 CREATE TABLE operacia(
   id_operacie Integer NOT NULL,
-  id_lekara Integer NOT NULL,
   id_miestnosti Integer NOT NULL,
   id_zaznamu Integer,
   trvanie Integer NOT NULL
@@ -439,7 +422,7 @@ CREATE INDEX IX_Relationship57 ON operacia (id_zaznamu)
 
 -- Add keys for table operacia
 
-ALTER TABLE operacia ADD CONSTRAINT PK_operacia PRIMARY KEY (id_operacie,id_lekara)
+ALTER TABLE operacia ADD CONSTRAINT PK_operacia PRIMARY KEY (id_operacie)
 /
 
 -- Table typ_ockovania
@@ -570,19 +553,6 @@ CREATE INDEX IX_Relationship106 ON sestricka (id_zamestnanca)
 ALTER TABLE sestricka ADD CONSTRAINT PK_sestricka PRIMARY KEY (id_sestricky)
 /
 
--- Table typ_lekara
-
-CREATE TABLE typ_lekara(
-  id_typu_lekara Integer NOT NULL,
-  nazov Varchar2(50 ) NOT NULL
-)
-/
-
--- Add keys for table typ_lekara
-
-ALTER TABLE typ_lekara ADD CONSTRAINT PK_typ_lekara PRIMARY KEY (id_typu_lekara)
-/
-
 -- Table priloha
 
 CREATE TABLE priloha(
@@ -698,6 +668,19 @@ CREATE INDEX IX_Relationship130 ON log_liekov (id_sarze)
 ALTER TABLE log_liekov ADD CONSTRAINT PK_log_liekov PRIMARY KEY (id_logu)
 /
 
+-- Table operacia_lekar
+
+CREATE TABLE operacia_lekar(
+  id_operacie Integer NOT NULL,
+  id_lekara Integer NOT NULL
+)
+/
+
+-- Add keys for table operacia_lekar
+
+ALTER TABLE operacia_lekar ADD CONSTRAINT PK_operacia_lekar PRIMARY KEY (id_operacie,id_lekara)
+/
+
 
 
 
@@ -798,11 +781,6 @@ ALTER TABLE sarza ADD CONSTRAINT Relationship53 FOREIGN KEY (id_skladu) REFERENC
 
 
 
-ALTER TABLE operacia ADD CONSTRAINT Relationship54 FOREIGN KEY (id_lekara) REFERENCES lekar (id_lekara)
-/
-
-
-
 ALTER TABLE operacia ADD CONSTRAINT Relationship56 FOREIGN KEY (id_miestnosti) REFERENCES miestnost (id_miestnosti)
 /
 
@@ -834,11 +812,6 @@ ALTER TABLE zoznam_chorob ADD CONSTRAINT Relationship101 FOREIGN KEY (id_choroby
 
 
 ALTER TABLE pacient_ZTP ADD CONSTRAINT Relationship103 FOREIGN KEY (id_typu_ztp) REFERENCES typ_ZTP (id_typu_ztp)
-/
-
-
-
-ALTER TABLE lekar ADD CONSTRAINT Relationship104 FOREIGN KEY (id_typu_lekara) REFERENCES typ_lekara (id_typu_lekara)
 /
 
 
@@ -934,6 +907,16 @@ ALTER TABLE ockovanie ADD CONSTRAINT Relationship129 FOREIGN KEY (id_zaznamu) RE
 
 
 ALTER TABLE log_liekov ADD CONSTRAINT Relationship130 FOREIGN KEY (id_sarze) REFERENCES sarza (id_sarze)
+/
+
+
+
+ALTER TABLE operacia_lekar ADD CONSTRAINT Relationship131 FOREIGN KEY (id_operacie) REFERENCES operacia (id_operacie)
+/
+
+
+
+ALTER TABLE operacia_lekar ADD CONSTRAINT Relationship132 FOREIGN KEY (id_lekara) REFERENCES lekar (id_lekara)
 /
 
 
