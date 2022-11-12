@@ -7,13 +7,14 @@ import { INITIAL_EVENTS, createEventId } from "./event-utils";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-
+import { InputText } from "primereact/inputtext";
 function EventCalendar() {
   const [currentEvents, setCurrentEvents] = useState(INITIAL_EVENTS);
   const [showDialog, setShowDialog] = useState(false);
   const [eventDateStart, setEventDateStart] = useState(null);
   const [eventDateEnd, setEventDateEnd] = useState(null);
   const [currEventId, setCurrEventId] = useState(null);
+  const [currEventTitle, setCurrEventTitle] = useState(null);
   const calendarRef = useRef(null);
 
   const handleDateSelect = (selectInfo) => {
@@ -46,6 +47,7 @@ function EventCalendar() {
     setCurrEventId(clickInfo.event._def.publicId);
     setEventDateStart(new Date(clickInfo.event._instance.range.start));
     setEventDateEnd(new Date(clickInfo.event._instance.range.end));
+    setCurrEventTitle(clickInfo.event._def.title);
   };
 
   const onHide = () => {
@@ -111,6 +113,12 @@ function EventCalendar() {
         onHide={() => onHide()}
       >
         <div className="p-fluid grid formgrid">
+          <label htmlFor="basic">Názov udalosti</label>
+          <InputText
+            value={currEventTitle}
+            onChange={(e) => setCurrEventTitle(e.target.value)}
+          />
+          <span className="ml-2">{currEventTitle}</span>
           <div className="field col-12 md:col-4">
             <label htmlFor="basic">Začiatok udalosti</label>
             <Calendar
