@@ -21,11 +21,8 @@ function Home() {
         <div
           style={{
             backgroundImage: `url(${calendarIcon})`,
-            backgroundSize: "65%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            height: "180px",
           }}
+          className="card-content"
         >
           <p className="m-0 calendar-card-day">
             {new Date().toLocaleString("en-US", { day: "2-digit" })}
@@ -39,56 +36,41 @@ function Home() {
         onClick={() => navigate("/patients")}
       >
         <div
+          className="card-content"
           style={{
             backgroundImage: `url(${patientIcon})`,
-            backgroundSize: "65%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            height: "180px",
           }}
         ></div>
       </Card>
       <Card title="Lekári" className="card-shadow">
         <div
+          className="card-content"
           style={{
             backgroundImage: `url(${doctorsIcon})`,
-            backgroundSize: "65%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            height: "180px",
           }}
         ></div>
       </Card>
       <Card title="Hospitalizácie" className="card-shadow">
         <div
+          className="card-content"
           style={{
             backgroundImage: `url(${hospitalizationIcon})`,
-            backgroundSize: "65%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            height: "180px",
           }}
         ></div>
       </Card>
       <Card title="Vyšetrenia" className="card-shadow">
         <div
+          className="card-content"
           style={{
             backgroundImage: `url(${examinationIcon})`,
-            backgroundSize: "65%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            height: "180px",
           }}
         ></div>
       </Card>
       <Card title="Operácie" className="card-shadow">
         <div
+          className="card-content"
           style={{
             backgroundImage: `url(${operationIcon})`,
-            backgroundSize: "65%",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center",
-            height: "180px",
           }}
         ></div>
       </Card>

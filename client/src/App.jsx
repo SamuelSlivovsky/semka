@@ -7,13 +7,12 @@ import { Button } from "primereact/button";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { Avatar } from "primereact/avatar";
 import hospitalImage from "./images/hospital.png";
+import Patients from "./Views/Patients";
 import Patient from "./Views/Patient";
 function App() {
   const navigate = useNavigate();
   const location = useLocation();
   const [visibleLeft, setVisibleLeft] = useState(false);
-
-  
 
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
@@ -26,7 +25,6 @@ function App() {
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
-        
         <img
           src={hospitalImage}
           className={`hospital-logo ${
@@ -71,7 +69,8 @@ function App() {
             path="/calendar"
             element={<EventCalendar></EventCalendar>}
           ></Route>
-          <Route path="/patients" element={<Patient></Patient>}></Route>
+          <Route path="/patients" element={<Patients></Patients>}></Route>
+          <Route path="/patient" element={<Patient></Patient>}></Route>
         </Routes>
       </div>
     </div>

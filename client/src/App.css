@@ -98,6 +98,14 @@ code {
 
 .card-shadow:hover {
   background-color: #0d9488;
+  transform: scale(1.05);
+}
+
+.card-content {
+  background-size: 65%;
+  background-repeat: no-repeat;
+  background-position: center;
+  height: 180px;
 }
 
 .calendar-card-day {
@@ -136,6 +144,5 @@ code {
 }
 
 .fc-day:hover {
-  background-color: #0d9488;
-  opacity: 0.4;
+  background: rgba(20, 184, 166, 0.3);
 }
