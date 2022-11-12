@@ -8,9 +8,14 @@ import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
+import { Checkbox } from "primereact/checkbox";
+
 function EventCalendar() {
   const [currentEvents, setCurrentEvents] = useState(INITIAL_EVENTS);
+  const [allDay, setAllDay] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
+  const [showAddEvent, setShowAddEvent] = useState(false);
+  const [showConfirmChanges, setShowConfirmChanges] = useState(false);
   const [eventDateStart, setEventDateStart] = useState(null);
   const [eventDateEnd, setEventDateEnd] = useState(null);
   const [currEventId, setCurrEventId] = useState(null);
@@ -18,31 +23,13 @@ function EventCalendar() {
   const calendarRef = useRef(null);
 
   const handleDateSelect = (selectInfo) => {
-    let title = prompt("Please enter a new title for your event");
-    let calendarApi = selectInfo.view.calendar;
-
-    calendarApi.unselect(); // clear date selection
-
-    if (title) {
-      calendarApi.addEvent({
-        id: createEventId(),
-        title,
-        start: selectInfo.startStr,
-        end: selectInfo.endStr,
-        allDay: selectInfo.allDay,
-      });
-    }
+    //let title = prompt("Please enter a new title for your event");
+    setShowAddEvent(true);
+    setShowDialog(true);
+    // let calendarApi = selectInfo.view.calendar;
   };
 
   const handleEventClick = (clickInfo) => {
-    /* if (
-      window.confirm(
-        `Are you sure you want to delete the event '${clickInfo.event.title}'`
-      )
-    ) {
-      clickInfo.event.remove();
-    }*/
-
     setShowDialog(true);
     setCurrEventId(clickInfo.event._def.publicId);
     setEventDateStart(new Date(clickInfo.event._instance.range.start));
@@ -52,28 +39,81 @@ function EventCalendar() {
 
   const onHide = () => {
     setShowDialog(false);
+    setShowAddEvent(false);
+  };
+
+  const onConfirmDialogHide = (hideDialog) => {
+    setShowConfirmChanges(false);
+    hideDialog ? setShowDialog(false) : setShowDialog(true);
   };
 
   const onSubmit = () => {
-    let calendarApi = calendarRef.current.getApi();
-    let currentEvent = calendarApi.getEventById(currEventId);
-    currentEvent.setDates(eventDateStart, eventDateEnd);
-    setShowDialog(false);
+    setShowConfirmChanges(true);
   };
 
   const renderDialogFooter = () => {
     return (
       <div>
         <Button
-          label="No"
+          label="Nie"
           icon="pi pi-times"
+          className="p-button-danger"
           onClick={() => onHide()}
+        />
+        <Button
+          label="Áno"
+          icon="pi pi-check"
+          onClick={() => onSubmit()}
+          autoFocus
+        />
+      </div>
+    );
+  };
+
+  const onSubmitChanges = (addEvent) => {
+    if (!addEvent) {
+      let calendarApi = calendarRef.current.getApi();
+      let currentEvent = calendarApi.getEventById(currEventId);
+      allDay
+        ? currentEvent.setDates(eventDateStart, eventDateEnd, { allDay: true })
+        : currentEvent.setDates(eventDateStart, eventDateEnd, {
+            allDay: false,
+          });
+
+      currentEvent.setProp("title", currEventTitle);
+      setShowConfirmChanges(false);
+      setShowDialog(false);
+    } else {
+      let calendarApi = calendarRef.current.getApi();
+      calendarApi.unselect(); // clear date selection
+      calendarApi.addEvent({
+        id: createEventId(),
+        title: currEventTitle,
+        start: eventDateStart,
+        end: eventDateEnd,
+        allDay: allDay,
+      });
+    }
+  };
+
+  const renderConfirmChangesFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Zrušiť"
+          onClick={() => onConfirmDialogHide(false)}
           className="p-button-text"
         />
         <Button
-          label="Yes"
+          label="Nie"
+          icon="pi pi-times"
+          className="p-button-danger"
+          onClick={() => onConfirmDialogHide(true)}
+        />
+        <Button
+          label="Áno"
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          onClick={() => onSubmitChanges(showAddEvent)}
           autoFocus
         />
       </div>
@@ -106,7 +146,7 @@ function EventCalendar() {
         />
       </div>
       <Dialog
-        header="Zmena udalosti"
+        header={!showAddEvent ? "Zmena udalosti" : "Pridať udalosť"}
         visible={showDialog}
         style={{ width: "50vw" }}
         footer={renderDialogFooter()}
@@ -118,12 +158,11 @@ function EventCalendar() {
             value={currEventTitle}
             onChange={(e) => setCurrEventTitle(e.target.value)}
           />
-          <span className="ml-2">{currEventTitle}</span>
           <div className="field col-12 md:col-4">
             <label htmlFor="basic">Začiatok udalosti</label>
             <Calendar
               id="basic"
-              value={eventDateStart}
+              value={!showAddEvent ? eventDateStart : ""}
               onChange={(e) => setEventDateStart(e.value)}
               showTime
               showIcon
@@ -134,14 +173,32 @@ function EventCalendar() {
             <label htmlFor="basic">Koniec udalosti</label>
             <Calendar
               id="basic"
-              value={eventDateEnd}
+              value={!showAddEvent ? eventDateEnd : ""}
               onChange={(e) => setEventDateEnd(e.value)}
               showTime
               showIcon
               dateFormat="dd.mm.yy"
             />
           </div>
+          <div className="field-checkbox" style={{ marginTop: "10px" }}>
+            <Checkbox
+              inputId="binary"
+              checked={allDay}
+              onChange={(e) => setAllDay(e.checked)}
+            />
+            <label htmlFor="binary" style={{ marginLeft: "10px" }}>
+              Celodenná udalosť
+            </label>
+          </div>
         </div>
+
+        <Dialog
+          header="Prajete si uložiť zmeny?"
+          visible={showConfirmChanges}
+          style={{ width: "50vw" }}
+          footer={renderConfirmChangesFooter()}
+          onHide={() => onConfirmDialogHide()}
+        />
       </Dialog>
     </div>
   );

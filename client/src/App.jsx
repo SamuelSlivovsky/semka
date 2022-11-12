@@ -13,6 +13,8 @@ function App() {
   const location = useLocation();
   const [visibleLeft, setVisibleLeft] = useState(false);
 
+  
+
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
@@ -24,6 +26,7 @@ function App() {
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
+        
         <img
           src={hospitalImage}
           className={`hospital-logo ${
@@ -36,6 +39,17 @@ function App() {
           icon={`${visibleLeft ? "pi pi-arrow-left" : "pi pi-arrow-right"}`}
           onClick={() => handleShowSidebar()}
           className="mr-2"
+          style={{
+            marginTop: "1rem",
+            marginRight: "8px",
+            marginLeft: "auto",
+            display: "block",
+          }}
+        />
+        <Button
+          icon="pi pi-user"
+          className="p-button-rounded p-button-info"
+          iconPos="right"
           style={{
             marginTop: "1rem",
             marginRight: "8px",
