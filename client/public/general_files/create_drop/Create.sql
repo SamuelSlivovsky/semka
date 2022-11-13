@@ -1,10 +1,22 @@
-﻿/*
+/*
 Created: 29/10/2022
-Modified: 12/11/2022
+Modified: 13/11/2022
 Model: semka_final_3
 Database: Oracle 19c
 */
 
+
+-- Create user data types section -------------------------------------------------
+
+CREATE TYPE Log_Type
+AS OBJECT
+(
+    id_zamestnanca INTEGER,
+    datum DATE,
+    zmena_poctu INTEGER
+)
+
+/
 
 -- Create tables section -------------------------------------------------
 

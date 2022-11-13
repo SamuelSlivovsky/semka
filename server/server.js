@@ -11,13 +11,7 @@ const port = 5000;
 
 const oracledb = require('oracledb');
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-// try {
-//     oracledb.initOracleClient({ libDir: 'C://oracle//instantclient_21_7' });
-// } catch (err) {
-//     console.error('Whoops!');
-//     console.error(err);
-//     process.exit(1);
-// }
+
 async function fun() {
     try {
         con = await oracledb.getConnection({
@@ -28,25 +22,18 @@ async function fun() {
         const data = await con.execute(
             'SELECT * FROM kraj'
         );
-        console.log(data.rows);
+        return data;
     } catch (err) {
         console.log(err);
     }
 }
-fun();
-// app.get("/", (req, res) => {
-//     res.send("Hello world!");
-// })
+const data = fun();
 
-// const results = sequelize.query('SELECT * FROM kraj');
-// console.log(results);
-// console.log("a");
-// app.get("/kraj", (req, res) => {
-//     const results = sequelize.query("SELECT * FROM kraj");
-//     res.send(results);
-// })
 
-// sequelize.sync({ force: true });
+app.get("/api", (req, res) => {
+    res.json(data)
+})
+
 
 app.listen(port, () => {
     console.log(`Aplikacia bezi na porte ${port}`);

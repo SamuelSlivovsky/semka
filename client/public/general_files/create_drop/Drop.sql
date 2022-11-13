@@ -1,6 +1,6 @@
-﻿/*
+/*
 Created: 29/10/2022
-Modified: 12/11/2022
+Modified: 13/11/2022
 Model: semka_final_3
 Database: Oracle 19c
 */
@@ -335,6 +335,10 @@ DROP TABLE zamestnanec CASCADE CONSTRAINTS PURGE
 DROP TABLE obec CASCADE CONSTRAINTS PURGE
 /
 DROP TABLE os_udaje CASCADE CONSTRAINTS PURGE
+/
+-- Drop user data types section --------------------------------------------------- 
+
+DROP TYPE Log_Type
 /
 
 

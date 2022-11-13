@@ -2221,7 +2221,7 @@ insert into liek values(2220, 'OPTIRAY 350');
 insert into liek values(2221, 'Optivate 1 000 IU');
 insert into liek values(2222, 'Optivate 250 IU');
 insert into liek values(2223, 'Optivate 500 IU');
-insert into liek values(2224, 'Oralair 100 IR & 300 IR');
+insert into liek values(2224, 'Oralair 100 IR 300 IR');
 insert into liek values(2225, 'Oralair 300 IR');
 insert into liek values(2226, 'Oramellox 15 mg');
 insert into liek values(2227, 'ORENCIA 250 mg');
