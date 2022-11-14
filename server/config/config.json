@@ -1,0 +1,26 @@
+{
+  "development": {
+    "username": "labat_sp",
+    "password": "heslo1234",
+    "database": "orcl.fri.uniza.sk",
+    "host": "oracle.fri.uniza.sk",
+    "dialect": "oracle",
+    "port": 1521
+  },
+  "test": {
+    "username": "labat_sp",
+    "password": "heslo1234",
+    "database": "orcl.fri.uniza.sk",
+    "host": "oracle.fri.uniza.sk",
+    "dialect": "oracle",
+    "port": 1521
+  },
+  "production": {
+    "username": "labat_sp",
+    "password": "heslo1234",
+    "database": "orcl.fri.uniza.sk",
+    "host": "oracle.fri.uniza.sk",
+    "dialect": "oracle",
+    "port": 1521
+  }
+}
