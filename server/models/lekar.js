@@ -1,24 +1,24 @@
 const oracledb = require("../config/Database");
 const oracleConnection = oracledb.getConn;
-class Kraj {
+class Lekar {
 
     constructor() {
-        console.log('Kraj vytvoreny');
+        console.log('Lekar vytvoreny');
         console.log(oracleConnection);
         this.x;
     }
 
     static makeObject() {
         if (!this.x) {
-            this.x = new Kraj();
+            this.x = new Lekar();
         }
         return this.x;
     }
 
-    async getAll() {
+    async getPacienti() {
         let conn = await oracleConnection();
         const result = await conn.execute(
-            `SELECT * FROM kraj`,
+            `SELECT * FROM os_udaje join pacient using(rod_cislo) join lekar_pacient using(id_pacienta) where id_lekara = 1`,
         );
 
         console.log(result.rows);
@@ -29,4 +29,4 @@ class Kraj {
     }
 }
 
-module.exports = Kraj;
+module.exports = Lekar;
