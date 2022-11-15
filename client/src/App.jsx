@@ -9,6 +9,7 @@ import Patients from './Views/Patients';
 import Patient from './Views/Patient';
 import { Register } from './Auth/Register';
 import { Login } from './Auth/Login';
+import Doctors from './Views/Doctors';
 import './App.css';
 import './icons.css';
 import './styles/sidebar.css';
@@ -76,6 +77,7 @@ function App() {
           <Route path='/patient' element={<Patient></Patient>}></Route>
           <Route path='/register' element={<Register></Register>}></Route>
           <Route path='/login' element={<Login></Login>}></Route>
+          <Route path='/doctors' element={<Doctors></Doctors>}></Route>
         </Routes>
       </div>
     </div>

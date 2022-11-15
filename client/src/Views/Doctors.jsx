@@ -7,7 +7,7 @@ import { InputText } from 'primereact/inputtext';
 import mockDataJson from '../mock/mock-data.json';
 import { FilterMatchMode, FilterOperator } from 'primereact/api';
 import { useNavigate } from 'react-router';
-function Patient() {
+export default function Doctors() {
   const [mockData, setMockData] = useState([]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState('');
   const [filters1, setFilters1] = useState(null);
@@ -134,5 +134,3 @@ function Patient() {
     </div>
   );
 }
-
-export default Patient;

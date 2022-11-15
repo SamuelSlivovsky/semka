@@ -1,5 +1,4 @@
 import React from 'react';
-
 import calendarIcon from '../images/calendar.png';
 import patientIcon from '../images/patient.png';
 import doctorsIcon from '../images/doctors.png';
@@ -18,33 +17,33 @@ function Home() {
       icon={calendarIcon}
     ></HomeCard>,
     <HomeCard
-      title='Kalendár'
+      title='Pacienti'
       isCalendar={false}
-      path='/calendar'
+      path='/patients'
       icon={patientIcon}
     ></HomeCard>,
     <HomeCard
-      title='Kalendár'
+      title='Lekári'
       isCalendar={false}
-      path='/calendar'
+      path='/doctors'
       icon={doctorsIcon}
     ></HomeCard>,
     <HomeCard
-      title='Kalendár'
+      title='Vyšetrenia'
       isCalendar={false}
-      path='/calendar'
+      path='/examinations'
       icon={examinationIcon}
     ></HomeCard>,
     <HomeCard
-      title='Kalendár'
+      title='Hospitalizácie'
       isCalendar={false}
-      path='/calendar'
+      path='/hospitalizations'
       icon={hospitalizationIcon}
     ></HomeCard>,
     <HomeCard
-      title='Kalendár'
+      title='Operácie'
       isCalendar={false}
-      path='/calendar'
+      path='/operations'
       icon={operationIcon}
     ></HomeCard>,
   ];
