@@ -1,10 +1,15 @@
 const port = 5000;
 
 const express = require("express");
+//ROUTES
+const routeKraje = require("./routes/krajeRoute");
+const routeLekar = require("./routes/lekarRoute");
+
 const app = express();
 
-const routeKraje = require("./routes/krajeRoute");
+
 app.use("/kraje", routeKraje);
+app.use("/lekar", routeLekar);
 
 const database = require("./config/database.js");
 async function testInit() {

@@ -1,4 +1,5 @@
 const oracledb = require("oracledb");
+oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 
 async function initialize() {
     try {
@@ -18,7 +19,7 @@ async function initialize() {
 module.exports.initialize = initialize;
 
 async function close() {
-    await oracledb.getPool('hrPool').close();
+    await oracledb.getPool().close();
 }
 
 async function getConn() {
