@@ -1,0 +1,32 @@
+.auth-form-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 90vh;
+}
+
+.auth-form-container h5 {
+  text-align: center;
+  font-size: 2rem;
+}
+
+.auth-form-container .card {
+  min-width: 450px;
+}
+.auth-form-container .card form {
+  margin-top: 2rem;
+}
+.auth-form-container .card .field {
+  margin-bottom: 1.5rem;
+}
+@media screen and (max-width: 960px) {
+  .auth-form-container .card {
+    width: 80%;
+  }
+}
+@media screen and (max-width: 640px) {
+  .auth-form-container .card {
+    width: 100%;
+    min-width: 0;
+  }
+}
