@@ -2,16 +2,17 @@ const port = 5000;
 
 const express = require("express");
 //ROUTES
-const routeKraje = require("./routes/krajeRoute");
-const routeLekar = require("./routes/lekarRoute");
+const krajeRoute = require("./routes/KrajeRoute");
+const lekarRoute = require("./routes/LekarRoute");
+
+const database = require("./database/Database");
 
 const app = express();
 
+app.use("/kraje", krajeRoute);
+app.use("/lekar", lekarRoute);
 
-app.use("/kraje", routeKraje);
-app.use("/lekar", routeLekar);
 
-const database = require("./config/database.js");
 async function testInit() {
     try {
         console.log("Initializing database module");

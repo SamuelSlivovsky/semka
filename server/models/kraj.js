@@ -1,5 +1,5 @@
-const oracledb = require("../config/Database");
-const oracleConnection = oracledb.getConn;
+const database = require("../database/Database");
+const oracleConnection = database.oracledb;
 class Kraj {
 
     constructor() {
@@ -16,7 +16,7 @@ class Kraj {
     }
 
     async getAll() {
-        let conn = await oracleConnection();
+        let conn = await oracleConnection.getConnection();
         const result = await conn.execute(
             `SELECT * FROM kraj`,
         );

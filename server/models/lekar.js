@@ -1,5 +1,5 @@
-const oracledb = require("../config/Database");
-const oracleConnection = oracledb.getConn;
+const database = require("../database/Database");
+const oracleConnection = database.oracledb;
 class Lekar {
 
     constructor() {
@@ -16,7 +16,7 @@ class Lekar {
     }
 
     async getPacienti() {
-        let conn = await oracleConnection();
+        let conn = await oracleConnection.getConnection();
         const result = await conn.execute(
             `SELECT * FROM os_udaje join pacient using(rod_cislo) join lekar_pacient using(id_pacienta) where id_lekara = 1`,
         );
