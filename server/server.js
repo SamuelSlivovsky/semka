@@ -30,15 +30,18 @@ app.use("/lekar", lekarRoute);
 
 const oracledb = database.oracledb;
 
+const sqlStatement = `BEGIN
+get_pacient_json(1, :ret);
+END;`;
 
 async function testJSON() {
     try {
         var bindvars = {
             ret: { dir: oracledb.BIND_OUT, type: oracledb.JSON }
         };
-        const conn = await database.getOracleConnection();
-        let json = await conn.execute("begin :ret := get_pacient_json(2);", bindvars);
-        console.log(json);
+        const conn = await database.getConnection();
+        let json = await conn.execute(sqlStatement, bindvars)
+        console.log(json.outBinds.ret);
     } catch (err) {
         console.error(err);
 

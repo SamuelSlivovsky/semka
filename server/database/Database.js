@@ -30,7 +30,7 @@ async function close() {
 //     return await oracledb.getConnection();
 // }
 
-async function getOracleConnection() {
+async function getConnection() {
     try {
         return await oracledb.getConnection(
             {
@@ -44,6 +44,6 @@ async function getOracleConnection() {
 }
 
 module.exports.oracledb = oracledb;
-module.exports.getOracleConnection = getOracleConnection;
+module.exports.getConnection = getConnection;
 
 module.exports.close = close;
