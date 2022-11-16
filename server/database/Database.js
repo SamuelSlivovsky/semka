@@ -7,29 +7,6 @@ const configFilePath = path.join(__dirname, './config.json');
 
 const dbConfig = JSON.parse(fs.readFileSync(configFilePath, 'UTF-8'));
 
-// async function initialize() {
-//     try {
-//         await oracledb.createPool(
-//             {
-//                 user: dbConfig.username,
-//                 password: dbConfig.password,
-//                 connectString: dbConfig.connectString
-//             });
-//     } catch (err) {
-//         console.log(err);
-//     }
-// }
-
-//module.exports.initialize = initialize;
-
-async function close() {
-    await oracledb.getPool().close();
-}
-
-// async function getConnection() {
-//     return await oracledb.getConnection();
-// }
-
 async function getConnection() {
     try {
         return await oracledb.getConnection(
@@ -43,7 +20,7 @@ async function getConnection() {
     }
 }
 
-module.exports.oracledb = oracledb;
-module.exports.getConnection = getConnection;
-
-module.exports.close = close;
+module.exports = {
+    oracledb,
+    getConnection
+}

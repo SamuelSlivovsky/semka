@@ -15,19 +15,6 @@ app.use("/kraje", krajeRoute);
 app.use("/lekar", lekarRoute);
 
 
-// async function testInit() {
-//     try {
-//         console.log("Initializing database module");
-
-//         await database.initialize();
-//     } catch (err) {
-//         console.error(err);
-
-//         process.exit(1); // Non-zero failure code
-//     }
-// }
-// testInit();
-
 const oracledb = database.oracledb;
 
 const sqlStatement = `BEGIN
