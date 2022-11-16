@@ -4,7 +4,7 @@ module.exports = {
     },
 
     getPacienti: (req, res) => {
-        const lekar = require("../models/lekar").makeObject();
+        const lekar = require("../models/lekar");
 
         let pacienti;
         (async () => {

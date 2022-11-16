@@ -3,6 +3,6 @@ const router = express.Router()
 const controller = require("../controllers/KrajeController")
 
 router.get("/", controller.get);
-router.get("/all/", controller.getAll);
+router.get("/all/", controller.getKraje);
 
 module.exports = router;

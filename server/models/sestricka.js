@@ -1,10 +1,10 @@
 const database = require("../database/Database");
 
-async function getKraje() {
+async function getSestricky() {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
-            `SELECT * FROM kraj`,
+            `SELECT * FROM sestricka`,
         );
 
         return result.rows;
@@ -15,5 +15,5 @@ async function getKraje() {
 }
 
 module.exports = {
-    getKraje
+    getSestricky
 }
