@@ -14,19 +14,19 @@ async function getLekari() {
     }
 }
 
-async function getPacienti() {
+async function getPacienti(pid_lekara) {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
-            `SELECT * FROM os_udaje join pacient using(rod_cislo) join lekar_pacient using(id_pacienta) where id_lekara = 1`,
+            `SELECT * FROM os_udaje join pacient using(rod_cislo) join lekar_pacient using(id_pacienta) where id_lekara = :idaa_lekara`, { idaa_lekara: pid_lekara }
         );
 
         //console.log(result.rows);
         return result.rows;
 
-    } catch(err) {
+    } catch (err) {
         console.log(err);
-    }   
+    }
 }
 
 module.exports = {
