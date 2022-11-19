@@ -203,12 +203,14 @@ function EventCalendar() {
         onHide={() => onHide()}
       >
         <div className="p-fluid grid formgrid">
-          <label htmlFor="basic">Názov udalosti</label>
-          <InputText
-            value={currEventTitle !== null ? currEventTitle : ""}
-            onChange={(e) => setCurrEventTitle(e.target.value)}
-          />
-          <div className="field col-12 md:col-4">
+          <div className="field col-12">
+            <label htmlFor="basic">Názov udalosti</label>
+            <InputText
+              value={currEventTitle !== null ? currEventTitle : ""}
+              onChange={(e) => setCurrEventTitle(e.target.value)}
+            />
+          </div>
+          <div className="field col-12 ">
             <label htmlFor="basic">Začiatok udalosti</label>
             <Calendar
               id="basic"
@@ -219,7 +221,7 @@ function EventCalendar() {
               dateFormat="dd.mm.yy"
             />
           </div>
-          <div className="field col-12 md:col-4">
+          <div className="field col-12 ">
             <label htmlFor="basic">Koniec udalosti</label>
             <Calendar
               id="basic"
@@ -230,14 +232,16 @@ function EventCalendar() {
               dateFormat="dd.mm.yy"
             />
           </div>
-          <label htmlFor="basic">Typ udalosti</label>
-          <Dropdown
-            value={eventType}
-            options={eventTypes}
-            onChange={onEventTypeChange}
-            optionLabel="name"
-          />
-          <div className="field-checkbox" style={{ marginTop: "10px" }}>
+          <div className="field col-12 ">
+            <label htmlFor="basic">Typ udalosti</label>
+            <Dropdown
+              value={eventType}
+              options={eventTypes}
+              onChange={onEventTypeChange}
+              optionLabel="name"
+            />
+          </div>
+          <div className="field-checkbox col-12" style={{ marginTop: "10px" }}>
             <Checkbox
               inputId="binary"
               checked={allDay}
