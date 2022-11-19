@@ -3,16 +3,18 @@ import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import examinationIcon from "../images/examination.png";
-import hospitalizationIcon from "../images/hospit.png";
-import operationIcon from "../images/operation.png";
+import "../icons.css";
 
 function Patient() {
   return (
     <div>
-      <div className="flex col-12">
-        <Card className="col-5" style={{ height: "100%" }} title="Pepega Omega">
-          <div className="flex">
+      <div className="flex col-12 ">
+        <Card
+          className="col-5 shadow-4"
+          style={{ height: "100%" }}
+          title="Pepega Omega"
+        >
+          <div className="flex ">
             <div className="col-5 text-center m-0">
               <h4>Rok narodenia</h4>
               <div>15.9.1985</div>
@@ -50,7 +52,11 @@ function Patient() {
           </div>
         </Card>
 
-        <Card className="col-4" title="Recepty" style={{ height: "100%" }}>
+        <Card
+          className="col-4 shadow-4"
+          title="Recepty"
+          style={{ height: "100%" }}
+        >
           <DataTable responsiveLayout="scroll" selectionMode="single">
             <Column field="Názov lieku" header="Názov lieku"></Column>
           </DataTable>
@@ -59,7 +65,7 @@ function Patient() {
 
       <div className="col-12 flex">
         <Card
-          className="col-5"
+          className="col-5 shadow-4"
           title="Zdravotné záznamy"
           style={{ height: "100%" }}
         >
@@ -76,21 +82,21 @@ function Patient() {
             <Button
               style={{ width: "100%" }}
               label="Nové vyšetrenie"
-              icon={examinationIcon}
+              icon="examination-icon"
             />
           </div>
           <div className="p-3">
             <Button
               style={{ width: "100%" }}
               label="Nová operácia"
-              icon={operationIcon}
+              icon="operation-icon"
             />
           </div>
           <div className="p-3">
             <Button
               style={{ width: "100%" }}
               label="Nová hospitalizácia"
-              icon={hospitalizationIcon}
+              icon="hospit-icon"
             />
           </div>
         </div>
