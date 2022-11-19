@@ -1,0 +1,8 @@
+.divider {
+    position: relative;
+    min-width:2px;
+    max-width:2px;
+    background-color:#000;
+    display:inline-block;
+    margin:0 0.25%;
+  }
