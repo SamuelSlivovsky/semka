@@ -1,6 +1,6 @@
-/*
-Created: 29/10/2022
-Modified: 13/11/2022
+﻿/*
+Created: 29. 10. 2022
+Modified: 17. 11. 2022
 Model: semka_final_3
 Database: Oracle 19c
 */
@@ -71,8 +71,6 @@ ALTER TABLE sarza DROP CONSTRAINT Relationship50
 ALTER TABLE sklad DROP CONSTRAINT Relationship45
 /
 ALTER TABLE hospitalizacia DROP CONSTRAINT Relationship99
-/
-ALTER TABLE hospitalizacia DROP CONSTRAINT Relationship38
 /
 ALTER TABLE lozko DROP CONSTRAINT Relationship37
 /
@@ -206,8 +204,6 @@ DROP INDEX IX_Relationship50
 /
 DROP INDEX IX_Relationship53
 /
-DROP INDEX IX_Relationship38
-/
 DROP INDEX IX_Relationship107
 /
 DROP INDEX IX_Relationship118
@@ -336,6 +332,7 @@ DROP TABLE obec CASCADE CONSTRAINTS PURGE
 /
 DROP TABLE os_udaje CASCADE CONSTRAINTS PURGE
 /
+
 -- Drop user data types section --------------------------------------------------- 
 
 DROP TYPE Log_Type

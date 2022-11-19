@@ -1,6 +1,6 @@
-/*
-Created: 29/10/2022
-Modified: 13/11/2022
+﻿/*
+Created: 29. 10. 2022
+Modified: 17. 11. 2022
 Model: semka_final_3
 Database: Oracle 19c
 */
@@ -349,7 +349,6 @@ ALTER TABLE lozko ADD CONSTRAINT PK_lozko PRIMARY KEY (id_lozka)
 
 CREATE TABLE hospitalizacia(
   id_hospitalizacie Integer NOT NULL,
-  id_pacienta Integer NOT NULL,
   id_lekara Integer NOT NULL,
   id_zaznamu Integer NOT NULL,
   id_lozka Integer NOT NULL,
@@ -359,9 +358,6 @@ CREATE TABLE hospitalizacia(
 /
 
 -- Create indexes for table hospitalizacia
-
-CREATE INDEX IX_Relationship38 ON hospitalizacia (id_pacienta)
-/
 
 CREATE INDEX IX_Relationship107 ON hospitalizacia (id_sestricky)
 /
@@ -764,11 +760,6 @@ ALTER TABLE miestnost ADD CONSTRAINT Relationship36 FOREIGN KEY (id_oddelenia) R
 
 
 ALTER TABLE lozko ADD CONSTRAINT Relationship37 FOREIGN KEY (id_miestnosti) REFERENCES miestnost (id_miestnosti)
-/
-
-
-
-ALTER TABLE hospitalizacia ADD CONSTRAINT Relationship38 FOREIGN KEY (id_pacienta) REFERENCES pacient (id_pacienta)
 /
 
 
