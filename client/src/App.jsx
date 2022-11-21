@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import EventCalendar from './Calendar/Calendar';
-import Home from './Home/Home';
-import { Button } from 'primereact/button';
-import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
-import { Avatar } from 'primereact/avatar';
-import hospitalImage from './images/hospital.png';
-import Patients from './Views/Patients';
-import Patient from './Views/Patient';
-import { Register } from './Auth/Register';
-import { Login } from './Auth/Login';
-import Doctors from './Views/Doctors';
-import './App.css';
-import './icons.css';
-import './styles/sidebar.css';
+import React, { useState } from "react";
+import EventCalendar from "./Calendar/Calendar";
+import Home from "./Home/Home";
+import { Button } from "primereact/button";
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Avatar } from "primereact/avatar";
+import hospitalImage from "./images/hospital.png";
+import Patients from "./Views/Patients";
+import Patient from "./Views/Patient";
+import { Register } from "./Auth/Register";
+import { Login } from "./Auth/Login";
+import Doctors from "./Views/Doctors";
+import Combobox from "./Views/Combobox";
+import "./App.css";
+import "./icons.css";
+import "./styles/sidebar.css";
 
 function App() {
   const navigate = useNavigate();
@@ -23,12 +24,12 @@ function App() {
   };
 
   const handleLogoClick = () => {
-    navigate('/');
+    navigate("/");
   };
 
   return (
     <div>
-      <div className={`side-box ${visibleLeft ? 'side-box-opened' : ''}`}>
+      {/* <div className={`side-box ${visibleLeft ? 'side-box-opened' : ''}`}>
         <img
           src={hospitalImage}
           className={`hospital-logo ${
@@ -79,7 +80,8 @@ function App() {
           <Route path='/login' element={<Login></Login>}></Route>
           <Route path='/doctors' element={<Doctors></Doctors>}></Route>
         </Routes>
-      </div>
+      </div> */}
+      <Combobox></Combobox>
     </div>
   );
 }
