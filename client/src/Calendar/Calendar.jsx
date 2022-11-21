@@ -236,11 +236,25 @@ function EventCalendar() {
         </div>
         <div className="field col-12 ">
           <h3 htmlFor="basic">Začiatok udalosti</h3>
-          <p>{eventDateStart !== null ? eventDateStart.toString() : ""}</p>
+          <p>
+            {eventDateStart !== null
+              ? eventDateStart
+                  .toLocaleDateString()
+                  .replace(". ", ".")
+                  .replace(" ", "")
+              : ""}
+          </p>
         </div>
         <div className="field col-12 ">
           <h3 htmlFor="basic">Koniec udalosti</h3>
-          <p>{eventDateEnd !== null ? eventDateEnd.toString() : ""}</p>
+          <p>
+            {eventDateEnd !== null
+              ? eventDateEnd
+                  .toLocaleDateString()
+                  .replace(". ", ".")
+                  .replace(" ", "")
+              : ""}
+          </p>
         </div>
         <div className="field col-12 ">
           <h3 htmlFor="basic">Typ udalosti</h3>
