@@ -1,6 +1,6 @@
-﻿/*
-Created: 29. 10. 2022
-Modified: 17. 11. 2022
+/*
+Created: 29/10/2022
+Modified: 18/11/2022
 Model: semka_final_3
 Database: Oracle 19c
 */
