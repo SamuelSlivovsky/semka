@@ -18,7 +18,7 @@ app.use("/lekar", lekarRoute);
 const oracledb = database.oracledb;
 
 const sqlStatement = `BEGIN
-get_pacient_json(1, :ret);
+    get_pacient_json(1, :ret);
 END;`;
 
 async function testJSON() {

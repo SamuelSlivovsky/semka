@@ -5,11 +5,11 @@ module.exports = {
 
     getPacienti: (req, res) => {
         const lekar = require("../models/lekar");
-
-        let pacienti;
+        console.log(req.params);
         (async () => {
-            pacienti = await lekar.getPacienti();
-            res.send(pacienti);
+            pacienti = await lekar.getPacienti(req.params.id_lekara);
+            //res.setHeader("Access-Control-Allow-Origin", "*");
+            res.status(200).json(pacienti);
             //res.send(kraje[0]["ID_KRAJA"]);
             //console.log(kraje[0]["ID_KRAJA"]);
         })();

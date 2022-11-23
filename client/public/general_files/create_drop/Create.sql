@@ -1,6 +1,6 @@
-﻿/*
-Created: 29. 10. 2022
-Modified: 17. 11. 2022
+/*
+Created: 29/10/2022
+Modified: 18/11/2022
 Model: semka_final_3
 Database: Oracle 19c
 */
@@ -415,7 +415,7 @@ ALTER TABLE sarza ADD CONSTRAINT PK_sarza PRIMARY KEY (id_sarze)
 CREATE TABLE operacia(
   id_operacie Integer NOT NULL,
   id_miestnosti Integer NOT NULL,
-  id_zaznamu Integer,
+  id_zaznamu Integer NOT NULL,
   trvanie Integer NOT NULL
 )
 /
