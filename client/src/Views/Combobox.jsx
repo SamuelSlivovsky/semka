@@ -1,27 +1,29 @@
-import React, { useState, useEffect } from "react";
-import { Dropdown } from "primereact/dropdown";
-import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+import React, { useState, useEffect } from 'react';
+import { Dropdown } from 'primereact/dropdown';
+import { Button } from 'primereact/button';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 export default function Combobox() {
   const [select, setSelect] = useState(null);
-  const [valuesInTable, setValuesInTable] = useState(null);
+  const [valuesInTable, setValuesInTable] = useState([]);
   const [columnHeaders, setColumnHeaders] = useState([]);
   const [columns, setColumns] = useState([]);
   const selects = [
-    { name: "Pacienti", path: "PA" },
-    { name: "Lekári", path: "LE" },
-    { name: "Operácie", path: "OPE" },
-    { name: "Vyšetrena", path: "VY" },
-    { name: "Hospitalizácie", path: "HO" },
+    { name: 'Pacienti', path: 'PA' },
+    { name: 'Lekári', path: 'LE' },
+    { name: 'Operácie', path: 'OPE' },
+    { name: 'Vyšetrena', path: 'VY' },
+    { name: 'Hospitalizácie', path: 'HO' },
   ];
-  let json = {
-    Dribbble: "a",
-    Behance: "",
-    Blog: "http://blog.invisionapp.com/reimagine-web-design-process/",
-    Youtube: "",
-    Vimeo: "",
-  };
+  let json = [
+    {
+      Dribbble: 'a',
+      Behance: '',
+      Blog: 'http://blog.invisionapp.com/reimagine-web-design-process/',
+      Youtube: '',
+      Vimeo: '',
+    },
+  ];
   const onSelectChange = (e) => {
     setSelect(e.value);
   };
@@ -33,18 +35,18 @@ export default function Combobox() {
         setValuesInTable(result);
       });*/
     loadColumnsHeaders();
+    setValuesInTable(json);
   };
 
   const loadColumnsHeaders = () => {
-    // get the results (useful data) somewhere
-    // get the first result set, or you can loop trhrough all, assuming that each reuslt set is the same.
-    if (Object.keys(json).length > 0) {
-      loadColumns(Object.keys(json));
+    console.log(Object.keys(...json));
+    if (Object.keys(...json).length > 0) {
+      loadColumns(Object.keys(...json));
     }
   };
 
   const loadColumns = (keys) => {
-    let array = "";
+    let array = '';
     keys.forEach((element) => {
       array = [
         ...array,
@@ -55,22 +57,19 @@ export default function Combobox() {
   };
 
   return (
-    <div className="card">
+    <div className='card'>
       <Dropdown
         value={select}
         options={selects}
         onChange={onSelectChange}
-        optionLabel="name"
-        placeholder="Vyber select"
+        optionLabel='name'
+        placeholder='Vyber select'
       />
-      <Button icon="pi pi-check" label="Zadaj" onClick={handleSubmit}></Button>
-      <div className="card">
-        <DataTable value={valuesInTable} responsiveLayout="scroll">
-          {/* <Column field="code" header="Code"></Column>
-          <Column field="name" header="Name"></Column>
-          <Column field="category" header="Category"></Column>
-          <Column field="quantity" header="Quantity"></Column> */}
+      <Button icon='pi pi-check' label='Zadaj' onClick={handleSubmit}></Button>
+      <div className='card'>
+        <DataTable value={valuesInTable} responsiveLayout='scroll'>
           {columns}
+          <Column body={<Button></Button>}></Column>
         </DataTable>
       </div>
     </div>
