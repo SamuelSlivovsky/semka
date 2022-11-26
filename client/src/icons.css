@@ -1,5 +1,51 @@
-.hospital-logo-icon {
-  content: url("./images/hospital.png");
-  height: 48px;
-  width: 48px;
+.home-icon {
+  content: url("./images/home.png");
+  height: 44px;
+  width: 44px;
+}
+.calendar-icon {
+  content: url("./images/calendar-black.png");
+  height: 44px;
+  width: 44px;
+}
+.patient-icon {
+  content: url("./images/patient-black.png");
+  height: 44px;
+  width: 44px;
+}
+.doctor-icon {
+  content: url("./images/doctors-black.png");
+  height: 44px;
+  width: 44px;
+}
+.examination-icon {
+  content: url("./images/examination-black.png");
+  height: 44px;
+  width: 44px;
+}
+.hospit-icon {
+  content: url("./images/hospit-black.png");
+  height: 44px;
+  width: 44px;
+}
+.operation-icon {
+  content: url("./images/operation-black.png");
+  height: 44px;
+  width: 44px;
+}
+.stat-icon {
+  content: url("./images/statistics-black.png");
+  height: 44px;
+  width: 44px;
+}
+.plus-icon {
+  content: url("./images/plus-black.png");
+  height: 44px;
+  width: 44px;
+}
+
+.user-icon {
+  content: url("./images/user.png");
+  height: 44px;
+  width: 44px;
 }
