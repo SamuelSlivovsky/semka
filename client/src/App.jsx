@@ -11,6 +11,7 @@ import Doctors from './Views/Doctors';
 import Statistics from './Views/Statistics';
 import Add from './Views/Add';
 import SidebarButton from './Sidebar/SidebarButton';
+import Combobox from './Views/Combobox';
 import './App.css';
 import './styles/sidebar.css';
 import '../node_modules/primeflex/primeflex.css';
@@ -29,7 +30,7 @@ function App() {
       label='Domov'
       icon='home-icon'
     />,
-    <SidebarButton
+    /* <SidebarButton
       key='2'
       visibleLeft={visibleLeft}
       path='/calendar'
@@ -70,7 +71,7 @@ function App() {
       path='/operations'
       label='Operácie'
       icon='operation-icon'
-    />,
+    />,*/
     <SidebarButton
       key='8'
       visibleLeft={visibleLeft}
@@ -78,7 +79,7 @@ function App() {
       label='Štatistiky'
       icon='stat-icon'
     />,
-    <SidebarButton
+    /*<SidebarButton
       key='9'
       visibleLeft={visibleLeft}
       path='/add'
@@ -91,7 +92,7 @@ function App() {
       path='/user'
       label='Meno usera'
       icon='user-icon'
-    />,
+    />,*/
   ];
 
   return (
@@ -116,7 +117,8 @@ function App() {
         className={`page-content ${visibleLeft ? 'page-content-opened' : ''}`}
       >
         <Routes>
-          <Route path='/' element={<Home></Home>}></Route>
+          {/* <Route path='/' element={<Home></Home>}></Route> */}
+          <Route path='/' element={<Combobox></Combobox>}></Route>
           <Route
             path='/calendar'
             element={<EventCalendar></EventCalendar>}
@@ -130,7 +132,6 @@ function App() {
           <Route path='/add' element={<Add></Add>}></Route>
         </Routes>
       </div>
-      <Combobox></Combobox>
     </div>
   );
 }

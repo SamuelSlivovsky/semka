@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
@@ -6,42 +6,51 @@ import { Column } from 'primereact/column';
 export default function Combobox() {
   const [select, setSelect] = useState(null);
   const [valuesInTable, setValuesInTable] = useState([]);
-  const [columnHeaders, setColumnHeaders] = useState([]);
   const [columns, setColumns] = useState([]);
   const selects = [
-    { name: 'Pacienti', path: 'PA' },
-    { name: 'Lekári', path: 'LE' },
-    { name: 'Operácie', path: 'OPE' },
-    { name: 'Vyšetrena', path: 'VY' },
-    { name: 'Hospitalizácie', path: 'HO' },
+    //{ name: 'Pacienti', path: 'PA' },
+    //{ name: 'Lekári', path: 'LE' },
+    { name: 'Operácie', path: 'operacia/operacie' },
+    //{ name: 'Vyšetrena', path: 'VY' },
+    //{ name: 'Hospitalizácie', path: 'HO' },
   ];
-  let json = [
-    {
-      Dribbble: 'a',
-      Behance: '',
-      Blog: 'http://blog.invisionapp.com/reimagine-web-design-process/',
-      Youtube: '',
-      Vimeo: '',
-    },
-  ];
+
   const onSelectChange = (e) => {
     setSelect(e.value);
   };
 
   const handleSubmit = () => {
-    /* fetch(`http://localhost:5000/${select.path}`)
+    fetch(`http://localhost:5000/${select.path}`)
       .then((res) => res.json())
       .then((result) => {
+        loadColumnsHeaders(result);
         setValuesInTable(result);
-      });*/
-    loadColumnsHeaders();
-    setValuesInTable(json);
+        console.log(valuesInTable);
+      });
   };
 
-  const loadColumnsHeaders = () => {
-    console.log(Object.keys(...json));
-    if (Object.keys(...json).length > 0) {
-      loadColumns(Object.keys(...json));
+  const loadColumnsHeaders = (data) => {
+    if (Object.keys(...data).length > 0) {
+      loadColumns(Object.keys(...data));
+    }
+  };
+
+  const handleClick = (rowData) => {
+    console.log(rowData);
+  };
+
+  const actionBodyTemplate = (rowData) => {
+    if (rowData.key !== 'empty') {
+      return (
+        <React.Fragment>
+          <Button
+            label='XML'
+            style={{ marginRight: '10px' }}
+            onClick={() => handleClick(rowData)}
+          />
+          <Button label='JSON' onClick={() => handleClick(rowData)} />
+        </React.Fragment>
+      );
     }
   };
 
@@ -53,6 +62,10 @@ export default function Combobox() {
         <Column field={element} header={element} key={element}></Column>,
       ];
     });
+    array = [
+      ...array,
+      <Column key='button' body={actionBodyTemplate}></Column>,
+    ];
     setColumns(array);
   };
 
@@ -67,9 +80,13 @@ export default function Combobox() {
       />
       <Button icon='pi pi-check' label='Zadaj' onClick={handleSubmit}></Button>
       <div className='card'>
-        <DataTable value={valuesInTable} responsiveLayout='scroll'>
+        <DataTable
+          value={valuesInTable}
+          scrollable
+          scrollHeight='600px'
+          responsiveLayout='scroll'
+        >
           {columns}
-          <Column body={<Button></Button>}></Column>
         </DataTable>
       </div>
     </div>
