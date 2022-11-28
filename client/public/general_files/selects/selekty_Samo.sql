@@ -62,7 +62,7 @@ select count(*), trunc(months_between(sysdate, to_date('19' || substr(rod_cislo,
 
 select count(*), nazov from pacient join zoznam_chorob using(id_pacienta)
                                      join choroba using(id_choroby)
-                                        group by nazov
+                                        group by nazov, id_choroby
                                          order by 1 desc;
 
 --select ktory vypise cloveka s najviac chorobami

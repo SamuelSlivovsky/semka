@@ -4,7 +4,7 @@
                           ), version '1.0'
               ) as hospitalizacie_nemocnice_XML
       from (select (select XMLAgg(XMLElement("vysetrenie",
-                                                        XMLElement("datum_vysetrenie", datum),
+                                                        XMLElement("datum_vysetrenia", datum),
                                                         XMLElement("popis", popis),
                                                         XMLElement("pacient", XMLAttributes(krvna_skupina as "typ_krvnej_skupiny",
                                                                                     pou.rod_cislo as "rodne_cislo"),
