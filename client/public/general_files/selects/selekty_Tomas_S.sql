@@ -22,7 +22,7 @@ join os_udaje using(PSC)
 join pacient using(rod_cislo)
 join zdravotny_zaznam using(id_pacienta)
 join operacia using(id_zaznamu)
-group by kraj.nazov
+group by kraj.nazov, id_kraja
 order by poradie;
 
 --vypis pacientov, ktorym bola diagnostikovana choroba v piatok 13. a nazov tejto choroby

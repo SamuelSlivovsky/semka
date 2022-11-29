@@ -1,4 +1,5 @@
 const database = require("../database/Database");
+const oracledb = database.oracledb;
 
 async function getLieky() {
     try {
@@ -21,9 +22,12 @@ async function getNajviacPredpisovaneLiekyRoka(rok) {
             `select nazov_lieku, pocet_predpisani, poradie from
             (select l.nazov as nazov_lieku, count(*) as pocet_predpisani, rank() over(order by count(*) desc) as poradie 
                     from liek l join recept r on(l.id_lieku = r.id_lieku)
-                        where to_char(datum, 'YYYY') = '2020'
+                        where to_char(datum, 'YYYY') = :rok
                             group by l.nazov, l.id_lieku
-                    ) where poradie <= 0.10*(select count(*) from liek join recept using(id_lieku)  where to_char(datum, 'YYYY') = ':rok')`, [rok]
+                    ) where poradie <= 0.10*(select count(*) from liek join recept using(id_lieku)  where to_char(datum, 'YYYY') = :rok)`,
+            {
+                rok: { val: rok, dir: oracledb.BIND_IN, type: oracledb.STRING }
+            }
         );
 
         return result.rows;

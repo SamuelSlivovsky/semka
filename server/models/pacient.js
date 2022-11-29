@@ -132,7 +132,7 @@ async function getPocetPacientiPodlaVeku() {
             `select count(*), trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as vek
             from pacient join os_udaje using(rod_cislo)
              group by trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-              order by 2;`
+              order by 2`
         );
 
         return result.rows;
@@ -147,7 +147,7 @@ module.exports = {
     getNajviacChoriPocet,
     getNajviacOckovaniPercenta,
     getNajviacHospitalizovaniPercenta,
-    getTypyOckovaniaPacienti, 
+    getTypyOckovaniaPacienti,
     getPacientiChorobaP13,
     getPocetPacientiPodlaVeku
 }

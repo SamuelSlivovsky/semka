@@ -25,7 +25,7 @@ async function getKrajePodlaPoctuOperovanych() {
                 join pacient using(rod_cislo)
                 join zdravotny_zaznam using(id_pacienta)
                 join operacia using(id_zaznamu)
-                group by kraj.nazov
+                group by kraj.nazov, id_kraja
                 order by poradie`,
         );
 

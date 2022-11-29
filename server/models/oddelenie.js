@@ -19,7 +19,7 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
         let conn = await database.getConnection();
         const result = await conn.execute(
             `select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
-            within group(order by zarobok desc)
+            within group(order by zarobok desc) as top_zamestnanci
                 from (select nazov_nemocnice, nazov_oddelenia, mpz, zarobok 
                     from (select nem.nazov as nazov_nemocnice,
                              tod.nazov as nazov_oddelenia, meno || ' ' || priezvisko || ' - ' || sum(suma) || ' eur' as mpz, sum(suma) as zarobok,

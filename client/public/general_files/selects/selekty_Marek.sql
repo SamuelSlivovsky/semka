@@ -34,7 +34,7 @@ select meno, priezvisko, pocet_hospitalizacii from
 --oddelenia a ich zamestnanci s celkovymi vyplatami
 
 select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
-                            within group(order by zarobok desc)
+                            within group(order by zarobok desc) 
                                 from (select nem.nazov as nazov_nemocnice,
                                              tod.nazov as nazov_oddelenia, meno || ' ' || priezvisko || ' - ' || sum(suma) || ' eur' as mpz, sum(suma) as zarobok        
                                                 from os_udaje osu join zamestnanec zam on(osu.rod_cislo = zam.rod_cislo)
@@ -48,7 +48,7 @@ select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
 --oddelenia a x zamestnancov s najvyssou sumou vyplat                                                                     
                                                                         
 select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
-                            within group(order by zarobok desc)
+                            within group(order by zarobok desc) as top_zamestnanci
                                 from (select nazov_nemocnice, nazov_oddelenia, mpz, zarobok 
                                     from (select nem.nazov as nazov_nemocnice,
                                              tod.nazov as nazov_oddelenia, meno || ' ' || priezvisko || ' - ' || sum(suma) || ' eur' as mpz, sum(suma) as zarobok,
