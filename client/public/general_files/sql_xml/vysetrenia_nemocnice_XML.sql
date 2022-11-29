@@ -24,6 +24,5 @@
                                              join os_udaje lou on(lou.rod_cislo = z.rod_cislo)
                                               join oddelenie od on(z.id_oddelenia = od.id_oddelenia)
                                                where od.id_nemocnice = nem_out.id_nemocnice
-                                                group by nem_out.id_nemocnice
                                                     
-                    ) as vysetrenia, nem_out.nazov as nazov_nemocnice from nemocnica nem_out where nem_out.id_nemocnice = 1);
+                    ) as vysetrenia, nem_out.nazov as nazov_nemocnice from nemocnica nem_out where nem_out.id_nemocnice = x);

@@ -19,5 +19,9 @@ router.get("/krajePodlaPoctuOperovanych", controller.getKrajePodlaPoctuOperovany
 router.get("/priemernyVek/", controller.getPriemernyVek);
 router.get("/pocetPacientiPodlaVeku/", controller.getPocetPacientiPodlaVeku);
 router.get("/pomerMuziZeny/", controller.getPomerMuziZeny);
+router.get("/hospitalizacieNemocniceXML/:id_nemocnice", controller.getHospitalizacieNemocniceXML);
+router.get("/operacieNemocnice/:id_nemocnice", controller.getOperacieNemocniceXML);
+router.get("/ockovaniaNemocnice/:id_nemocnice", controller.getOckovaniaNemocniceXML);
+router.get("/vysetreniaNemocniceXML/:id_nemocnice", controller.getVysetreniaNemocniceXML);
 
 module.exports = router;

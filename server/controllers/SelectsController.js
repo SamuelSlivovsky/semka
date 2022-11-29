@@ -76,7 +76,7 @@ module.exports = {
         const choroba = require("../models/choroba");
         console.log(req.params);
         (async () => {
-            ret_val = await choroba.getNajcastejsieChorobyRokaPocet(req.params.id_nemocnice, req.params.rok);
+            ret_val = await choroba.getNajcastejsieChorobyRokaPocet(req.params.pocet, req.params.rok);
             res.status(200).json(ret_val);
         })();
     },
@@ -159,6 +159,46 @@ module.exports = {
         (async () => {
             ret_val = await os_udaje.getPomerMuziZeny();
             res.status(200).json(ret_val);
+        })();
+    },
+
+    getHospitalizacieNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getHospitalizacieNemocniceXML(req.params.id_nemocnice);
+            res.status(200).send(ret_val);
+        })();
+    },
+
+    getOperacieNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getOperacieNemocniceXML(req.params.id_nemocnice);
+            res.status(200).send(ret_val);
+        })();
+    },
+
+    getOckovaniaNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getOckovaniaNemocniceXML(req.params.id_nemocnice);
+            res.status(200).send(ret_val);
+        })();
+    },
+
+    getVysetreniaNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getVysetreniaNemocniceXML(req.params.id_nemocnice);
+            res.status(200).send(ret_val);
         })();
     },
 }
