@@ -42,7 +42,28 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
     }
 }
 
+async function getZamestnanciOddeleni() {
+    try {
+        let conn = await database.getConnection();
+        const result = await conn.execute(
+            `select n.nazov as nazov_nemocnice, typ.nazov as nazov_oddelenia,
+                    listagg(ou.meno || ' ' || ou.priezvisko, ', ') within group (order by ou.priezvisko) as "Zamestnanci"
+            from oddelenie o join typ_oddelenia typ on (typ.id_typu_oddelenia = o.id_typu_oddelenia)
+                            join nemocnica n on (n.id_nemocnice = o.id_nemocnice)
+                            join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
+                            join os_udaje ou on (z.rod_cislo = ou.rod_cislo)
+            group by n.nazov, n.id_nemocnice, typ.nazov, o.id_oddelenia`
+        );
+
+        return result.rows;
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 module.exports = {
     getOddelenia,
-    getTopZamestnanciVyplatyPocet
+    getTopZamestnanciVyplatyPocet,
+    getZamestnanciOddeleni
 }

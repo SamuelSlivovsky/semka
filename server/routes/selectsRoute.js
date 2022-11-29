@@ -8,5 +8,16 @@ router.get("/najviacHospitalizovaniPercenta/:percent", controller.getNajviacHosp
 router.get("/topZamestnanciVyplaty/:pocet", controller.getTopZamestnanciVyplatyPocet);
 router.get("/najviacPredpisovaneLiekyRoka/:rok", controller.getNajviacPredpisovaneLiekyRoka);
 router.get("/sumaVyplatRoka/:id_nemocnice", controller.getSumaVyplatRoka);
+router.get("/typyOckovaniaPacienti", controller.getTypyOckovaniaPacienti);
+router.get("/zamestnanciOddeleni", controller.getZamestnanciOddeleni);
+router.get("/najcastejsieChorobyRokaPocet/:pocet/:rok", controller.getNajcastejsieChorobyRokaPocet);
+router.get("/neobsadeneLozkaOddeleniaTyzden/:id_oddelenia", controller.getNeobsadeneLozkaOddeleniaTyzden);
+router.get("/liekyMenejAkoPocet/:pocet", controller.getLiekyMenejAkoPocet);
+router.get("/menovciPacientLekar", controller.getMenovciPacientLekar);
+router.get("/operaciePocetLekarovTrvanie/:pocetLekarov/:trvanie", controller.getOperaciePocetLekarovTrvanie);
+router.get("/krajePodlaPoctuOperovanych", controller.getKrajePodlaPoctuOperovanych);
+router.get("/priemernyVek/", controller.getPriemernyVek);
+router.get("/pocetPacientiPodlaVeku/", controller.getPocetPacientiPodlaVeku);
+router.get("/pomerMuziZeny/", controller.getPomerMuziZeny);
 
 module.exports = router;
