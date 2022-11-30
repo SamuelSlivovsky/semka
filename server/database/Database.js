@@ -1,11 +1,11 @@
 const oracledb = require("oracledb");
-try {
+/*try {
   oracledb.initOracleClient({ libDir: "C:\\oracle\\instantclient_21_7" });
 } catch (err) {
   console.error("Whoops!");
   console.error(err);
   process.exit(1);
-}
+}*/
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 const fs = require("fs");
 const path = require("path");
