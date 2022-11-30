@@ -1,6 +1,6 @@
-/*
+﻿/*
 Created: 29/10/2022
-Modified: 13/11/2022
+Modified: 25/11/2022
 Model: semka_final_3
 Database: Oracle 19c
 */
@@ -349,7 +349,6 @@ ALTER TABLE lozko ADD CONSTRAINT PK_lozko PRIMARY KEY (id_lozka)
 
 CREATE TABLE hospitalizacia(
   id_hospitalizacie Integer NOT NULL,
-  id_pacienta Integer NOT NULL,
   id_lekara Integer NOT NULL,
   id_zaznamu Integer NOT NULL,
   id_lozka Integer NOT NULL,
@@ -358,18 +357,15 @@ CREATE TABLE hospitalizacia(
 )
 /
 
--- Create indexes for table hospitalizacia
-
-CREATE INDEX IX_Relationship38 ON hospitalizacia (id_pacienta)
+ALTER TABLE hospitalizacia ADD CONSTRAINT hospitalizacia_zaznam_uc UNIQUE (id_zaznamu);
 /
+
+-- Create indexes for table hospitalizacia
 
 CREATE INDEX IX_Relationship107 ON hospitalizacia (id_sestricky)
 /
 
 CREATE INDEX IX_Relationship118 ON hospitalizacia (id_lekara)
-/
-
-CREATE INDEX IX_Relationship121 ON hospitalizacia (id_zaznamu)
 /
 
 -- Add keys for table hospitalizacia
@@ -419,17 +415,17 @@ ALTER TABLE sarza ADD CONSTRAINT PK_sarza PRIMARY KEY (id_sarze)
 CREATE TABLE operacia(
   id_operacie Integer NOT NULL,
   id_miestnosti Integer NOT NULL,
-  id_zaznamu Integer,
+  id_zaznamu Integer NOT NULL,
   trvanie Integer NOT NULL
 )
+/
+
+ALTER TABLE operacia ADD CONSTRAINT operacia_zaznam_uc UNIQUE (id_zaznamu);
 /
 
 -- Create indexes for table operacia
 
 CREATE INDEX IX_Relationship56 ON operacia (id_miestnosti)
-/
-
-CREATE INDEX IX_Relationship57 ON operacia (id_zaznamu)
 /
 
 -- Add keys for table operacia
@@ -450,19 +446,6 @@ CREATE TABLE typ_ockovania(
 ALTER TABLE typ_ockovania ADD CONSTRAINT PK_typ_ockovania PRIMARY KEY (id_typu_ockovania)
 /
 
--- Table ockovanie
-
-CREATE TABLE ockovanie(
-  id_typu_ockovania Integer NOT NULL,
-  id_zaznamu Integer NOT NULL
-)
-/
-
--- Add keys for table ockovanie
-
-ALTER TABLE ockovanie ADD CONSTRAINT PK_ockovanie PRIMARY KEY (id_typu_ockovania,id_zaznamu)
-/
-
 -- Table vysetrenie
 
 CREATE TABLE vysetrenie(
@@ -472,12 +455,12 @@ CREATE TABLE vysetrenie(
 )
 /
 
+ALTER TABLE vysetrenie ADD CONSTRAINT vysetrenie_zaznam_uc UNIQUE (id_zaznamu);
+/
+
 -- Create indexes for table vysetrenie
 
 CREATE INDEX IX_Relationship62 ON vysetrenie (id_lekara)
-/
-
-CREATE INDEX IX_Relationship64 ON vysetrenie (id_zaznamu)
 /
 
 -- Add keys for table vysetrenie
@@ -693,6 +676,32 @@ CREATE TABLE operacia_lekar(
 ALTER TABLE operacia_lekar ADD CONSTRAINT PK_operacia_lekar PRIMARY KEY (id_operacie,id_lekara)
 /
 
+-- Table ockovanie
+
+CREATE TABLE ockovanie(
+  id_ockovania Integer NOT NULL,
+  id_zaznamu Integer NOT NULL,
+  id_typu_ockovania Integer NOT NULL,
+  id_nemocnice Integer NOT NULL
+)
+/
+
+ALTER TABLE ockovanie ADD CONSTRAINT ockovanie_zaznam_uc UNIQUE (id_zaznamu);
+/
+
+-- Create indexes for table ockovanie
+
+CREATE INDEX IX_Relationship134 ON ockovanie (id_typu_ockovania)
+/
+
+CREATE INDEX IX_Relationship135 ON ockovanie (id_nemocnice)
+/
+
+-- Add keys for table ockovanie
+
+ALTER TABLE ockovanie ADD CONSTRAINT PK_ockovanie PRIMARY KEY (id_ockovania)
+/
+
 
 
 
@@ -768,11 +777,6 @@ ALTER TABLE lozko ADD CONSTRAINT Relationship37 FOREIGN KEY (id_miestnosti) REFE
 
 
 
-ALTER TABLE hospitalizacia ADD CONSTRAINT Relationship38 FOREIGN KEY (id_pacienta) REFERENCES pacient (id_pacienta)
-/
-
-
-
 ALTER TABLE hospitalizacia ADD CONSTRAINT Relationship99 FOREIGN KEY (id_lozka) REFERENCES lozko (id_lozka)
 /
 
@@ -799,11 +803,6 @@ ALTER TABLE operacia ADD CONSTRAINT Relationship56 FOREIGN KEY (id_miestnosti) R
 
 
 ALTER TABLE operacia ADD CONSTRAINT Relationship57 FOREIGN KEY (id_zaznamu) REFERENCES zdravotny_zaznam (id_zaznamu)
-/
-
-
-
-ALTER TABLE ockovanie ADD CONSTRAINT Relationship58 FOREIGN KEY (id_typu_ockovania) REFERENCES typ_ockovania (id_typu_ockovania)
 /
 
 
@@ -913,11 +912,6 @@ ALTER TABLE zoznam_chorob ADD CONSTRAINT Relationship127 FOREIGN KEY (id_pacient
 
 
 
-ALTER TABLE ockovanie ADD CONSTRAINT Relationship129 FOREIGN KEY (id_zaznamu) REFERENCES zdravotny_zaznam (id_zaznamu)
-/
-
-
-
 ALTER TABLE log_liekov ADD CONSTRAINT Relationship130 FOREIGN KEY (id_sarze) REFERENCES sarza (id_sarze)
 /
 
@@ -929,6 +923,21 @@ ALTER TABLE operacia_lekar ADD CONSTRAINT Relationship131 FOREIGN KEY (id_operac
 
 
 ALTER TABLE operacia_lekar ADD CONSTRAINT Relationship132 FOREIGN KEY (id_lekara) REFERENCES lekar (id_lekara)
+/
+
+
+
+ALTER TABLE ockovanie ADD CONSTRAINT Relationship133 FOREIGN KEY (id_zaznamu) REFERENCES zdravotny_zaznam (id_zaznamu)
+/
+
+
+
+ALTER TABLE ockovanie ADD CONSTRAINT Relationship134 FOREIGN KEY (id_typu_ockovania) REFERENCES typ_ockovania (id_typu_ockovania)
+/
+
+
+
+ALTER TABLE ockovanie ADD CONSTRAINT Relationship135 FOREIGN KEY (id_nemocnice) REFERENCES nemocnica (id_nemocnice)
 /
 
 

@@ -1,6 +1,6 @@
-/*
+﻿/*
 Created: 29/10/2022
-Modified: 13/11/2022
+Modified: 25/11/2022
 Model: semka_final_3
 Database: Oracle 19c
 */
@@ -8,13 +8,17 @@ Database: Oracle 19c
 
 -- Drop relationships section -------------------------------------------------
 
+ALTER TABLE ockovanie DROP CONSTRAINT Relationship135
+/
+ALTER TABLE ockovanie DROP CONSTRAINT Relationship134
+/
+ALTER TABLE ockovanie DROP CONSTRAINT Relationship133
+/
 ALTER TABLE operacia_lekar DROP CONSTRAINT Relationship132
 /
 ALTER TABLE operacia_lekar DROP CONSTRAINT Relationship131
 /
 ALTER TABLE log_liekov DROP CONSTRAINT Relationship130
-/
-ALTER TABLE ockovanie DROP CONSTRAINT Relationship129
 /
 ALTER TABLE zoznam_chorob DROP CONSTRAINT Relationship127
 /
@@ -58,8 +62,6 @@ ALTER TABLE vysetrenie DROP CONSTRAINT Relationship64
 /
 ALTER TABLE vysetrenie DROP CONSTRAINT Relationship62
 /
-ALTER TABLE ockovanie DROP CONSTRAINT Relationship58
-/
 ALTER TABLE operacia DROP CONSTRAINT Relationship57
 /
 ALTER TABLE operacia DROP CONSTRAINT Relationship56
@@ -71,8 +73,6 @@ ALTER TABLE sarza DROP CONSTRAINT Relationship50
 ALTER TABLE sklad DROP CONSTRAINT Relationship45
 /
 ALTER TABLE hospitalizacia DROP CONSTRAINT Relationship99
-/
-ALTER TABLE hospitalizacia DROP CONSTRAINT Relationship38
 /
 ALTER TABLE lozko DROP CONSTRAINT Relationship37
 /
@@ -108,6 +108,10 @@ ALTER TABLE os_udaje DROP CONSTRAINT Relationship1
 
 -- Drop keys for tables section -------------------------------------------------
 
+ALTER TABLE ockovanie DROP CONSTRAINT PK_ockovanie
+/
+ALTER TABLE ockovanie DROP CONSTRAINT ockovanie_zaznam_uc
+/
 ALTER TABLE operacia_lekar DROP CONSTRAINT PK_operacia_lekar
 /
 ALTER TABLE log_liekov DROP CONSTRAINT PK_log_liekov
@@ -138,17 +142,21 @@ ALTER TABLE choroba DROP CONSTRAINT PK_choroba
 /
 ALTER TABLE vysetrenie DROP CONSTRAINT PK_vysetrenie
 /
-ALTER TABLE ockovanie DROP CONSTRAINT PK_ockovanie
+ALTER TABLE vysetrenie DROP CONSTRAINT vysetrenie_zaznam_uc
 /
 ALTER TABLE typ_ockovania DROP CONSTRAINT PK_typ_ockovania
 /
 ALTER TABLE operacia DROP CONSTRAINT PK_operacia
+/
+ALTER TABLE operacia DROP CONSTRAINT operacia_zaznam_uc
 /
 ALTER TABLE sarza DROP CONSTRAINT PK_sarza
 /
 ALTER TABLE liek DROP CONSTRAINT PK_liek
 /
 ALTER TABLE hospitalizacia DROP CONSTRAINT PK_hospitalizacia
+/
+ALTER TABLE hospitalizacia DROP CONSTRAINT hospitalizacia_zaznam_uc
 /
 ALTER TABLE lozko DROP CONSTRAINT PK_lozko
 /
@@ -186,6 +194,12 @@ ALTER TABLE os_udaje DROP CONSTRAINT PK_os_udaje
 
 -- Drop indexes section -------------------------------------------------
 
+DROP INDEX IX_Relationship133
+/
+DROP INDEX IX_Relationship134
+/
+DROP INDEX IX_Relationship135
+/
 DROP INDEX IX_Relationship130
 /
 DROP INDEX IX_Relationship111
@@ -205,8 +219,6 @@ DROP INDEX IX_Relationship57
 DROP INDEX IX_Relationship50
 /
 DROP INDEX IX_Relationship53
-/
-DROP INDEX IX_Relationship38
 /
 DROP INDEX IX_Relationship107
 /
@@ -262,6 +274,8 @@ DROP INDEX IX_Relationship1
 
 -- Drop tables section ---------------------------------------------------
 
+DROP TABLE ockovanie CASCADE CONSTRAINTS PURGE
+/
 DROP TABLE operacia_lekar CASCADE CONSTRAINTS PURGE
 /
 DROP TABLE log_liekov CASCADE CONSTRAINTS PURGE
@@ -291,8 +305,6 @@ DROP TABLE zoznam_chorob CASCADE CONSTRAINTS PURGE
 DROP TABLE choroba CASCADE CONSTRAINTS PURGE
 /
 DROP TABLE vysetrenie CASCADE CONSTRAINTS PURGE
-/
-DROP TABLE ockovanie CASCADE CONSTRAINTS PURGE
 /
 DROP TABLE typ_ockovania CASCADE CONSTRAINTS PURGE
 /
@@ -336,6 +348,7 @@ DROP TABLE obec CASCADE CONSTRAINTS PURGE
 /
 DROP TABLE os_udaje CASCADE CONSTRAINTS PURGE
 /
+
 -- Drop user data types section --------------------------------------------------- 
 
 DROP TYPE Log_Type

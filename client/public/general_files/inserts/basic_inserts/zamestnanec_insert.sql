@@ -1,7 +1,7 @@
 insert into zamestnanec values(1, '945318/1100', 46, NULL, to_date('01.01.2018','DD.MM.YYYY') + 23.82, NULL);
 insert into zamestnanec values(2, '810117/5434', 35, NULL, to_date('01.01.2015','DD.MM.YYYY') + 82.75, NULL);
 insert into zamestnanec values(3, '865811/3332', 89, NULL, to_date('01.01.2019','DD.MM.YYYY') + 35.4, NULL);
-insert into zamestnanec values(4, '680226/0696', 124, NULL, to_date('01.01.2015','DD.MM.YYYY') + 73.85, NULL);
+insert into zamestnanec values(4, '680226/0696', 90, NULL, to_date('01.01.2015','DD.MM.YYYY') + 73.85, NULL);
 insert into zamestnanec values(5, '695618/5720', 85, NULL, to_date('01.01.2018','DD.MM.YYYY') + 62.38, NULL);
 insert into zamestnanec values(6, '960327/8916', 107, NULL, to_date('01.01.2020','DD.MM.YYYY') + 98.37, NULL);
 insert into zamestnanec values(7, '615320/8820', 90, NULL, to_date('01.01.2017','DD.MM.YYYY') + 78.03, NULL);
@@ -54,7 +54,7 @@ insert into zamestnanec values(53, '585627/1751', 83, NULL, to_date('01.01.2016'
 insert into zamestnanec values(54, '950111/3237', 121, NULL, to_date('01.01.2017','DD.MM.YYYY') + 81.73, NULL);
 insert into zamestnanec values(55, '665712/5222', 50, NULL, to_date('01.01.2015','DD.MM.YYYY') + 56.29, NULL);
 insert into zamestnanec values(56, '790808/0873', 16, NULL, to_date('01.01.2016','DD.MM.YYYY') + 7.31, NULL);
-insert into zamestnanec values(57, '685826/4787', 124, NULL, to_date('01.01.2015','DD.MM.YYYY') + 71.09, NULL);
+insert into zamestnanec values(57, '685826/4787', 123, NULL, to_date('01.01.2015','DD.MM.YYYY') + 71.09, NULL);
 insert into zamestnanec values(58, '700521/4117', 52, NULL, to_date('01.01.2017','DD.MM.YYYY') + 1.03, NULL);
 insert into zamestnanec values(59, '685815/4204', 79, NULL, to_date('01.01.2015','DD.MM.YYYY') + 70.64, NULL);
 insert into zamestnanec values(60, '780607/5860', 105, NULL, to_date('01.01.2017','DD.MM.YYYY') + 69.89, NULL);
@@ -296,7 +296,7 @@ insert into zamestnanec values(295, '875621/8977', 8, NULL, to_date('01.01.2016'
 insert into zamestnanec values(296, '650827/3310', 85, NULL, to_date('01.01.2019','DD.MM.YYYY') + 0.69, NULL);
 insert into zamestnanec values(297, '615520/3296', 7, NULL, to_date('01.01.2018','DD.MM.YYYY') + 8.58, NULL);
 insert into zamestnanec values(298, '670323/6529', 30, NULL, to_date('01.01.2020','DD.MM.YYYY') + 72.96, NULL);
-insert into zamestnanec values(299, '735523/5030', 124, NULL, to_date('01.01.2018','DD.MM.YYYY') + 1.42, NULL);
+insert into zamestnanec values(299, '735523/5030', 123, NULL, to_date('01.01.2018','DD.MM.YYYY') + 1.42, NULL);
 insert into zamestnanec values(300, '780625/6689', 54, NULL, to_date('01.01.2019','DD.MM.YYYY') + 40.12, NULL);
 insert into zamestnanec values(301, '805726/7779', 87, NULL, to_date('01.01.2019','DD.MM.YYYY') + 90.84, NULL);
 insert into zamestnanec values(302, '920227/8294', 83, NULL, to_date('01.01.2019','DD.MM.YYYY') + 6.67, NULL);
@@ -699,7 +699,7 @@ insert into zamestnanec values(698, '670820/0356', 21, NULL, to_date('01.01.2017
 insert into zamestnanec values(699, '885217/4584', 66, NULL, to_date('01.01.2018','DD.MM.YYYY') + 58.73, NULL);
 insert into zamestnanec values(700, '550120/4038', 14, NULL, to_date('01.01.2016','DD.MM.YYYY') + 92.76, NULL);
 insert into zamestnanec values(701, '865422/0652', 11, NULL, to_date('01.01.2017','DD.MM.YYYY') + 89.39, NULL);
-insert into zamestnanec values(702, '780516/8657', 124, NULL, to_date('01.01.2018','DD.MM.YYYY') + 43.58, NULL);
+insert into zamestnanec values(702, '780516/8657', 123, NULL, to_date('01.01.2018','DD.MM.YYYY') + 43.58, NULL);
 insert into zamestnanec values(703, '825809/6528', 123, NULL, to_date('01.01.2016','DD.MM.YYYY') + 10.71, NULL);
 insert into zamestnanec values(704, '990310/8292', 105, NULL, to_date('01.01.2017','DD.MM.YYYY') + 4.6, NULL);
 insert into zamestnanec values(705, '675306/2129', 57, NULL, to_date('01.01.2015','DD.MM.YYYY') + 31.48, NULL);
@@ -754,7 +754,7 @@ insert into zamestnanec values(753, '575117/4979', 36, NULL, to_date('01.01.2015
 insert into zamestnanec values(754, '890707/6035', 7, NULL, to_date('01.01.2015','DD.MM.YYYY') + 65.04, NULL);
 insert into zamestnanec values(755, '565225/6863', 20, NULL, to_date('01.01.2015','DD.MM.YYYY') + 96.84, NULL);
 insert into zamestnanec values(756, '870705/0407', 89, NULL, to_date('01.01.2015','DD.MM.YYYY') + 16.25, NULL);
-insert into zamestnanec values(757, '755723/5202', 124, NULL, to_date('01.01.2019','DD.MM.YYYY') + 68.87, NULL);
+insert into zamestnanec values(757, '755723/5202', 123, NULL, to_date('01.01.2019','DD.MM.YYYY') + 68.87, NULL);
 insert into zamestnanec values(758, '860716/3290', 57, NULL, to_date('01.01.2016','DD.MM.YYYY') + 46.72, NULL);
 insert into zamestnanec values(759, '685308/8121', 34, NULL, to_date('01.01.2020','DD.MM.YYYY') + 67.13, NULL);
 insert into zamestnanec values(760, '960807/6467', 20, NULL, to_date('01.01.2016','DD.MM.YYYY') + 16.3, NULL);
@@ -787,7 +787,7 @@ insert into zamestnanec values(786, '720310/1037', 33, NULL, to_date('01.01.2019
 insert into zamestnanec values(787, '985719/3379', 18, NULL, to_date('01.01.2018','DD.MM.YYYY') + 36.55, NULL);
 insert into zamestnanec values(788, '690319/9710', 71, NULL, to_date('01.01.2015','DD.MM.YYYY') + 45.86, NULL);
 insert into zamestnanec values(789, '995714/1832', 96, NULL, to_date('01.01.2018','DD.MM.YYYY') + 29.68, NULL);
-insert into zamestnanec values(790, '620720/9151', 124, NULL, to_date('01.01.2018','DD.MM.YYYY') + 49.73, NULL);
+insert into zamestnanec values(790, '620720/9151', 123, NULL, to_date('01.01.2018','DD.MM.YYYY') + 49.73, NULL);
 insert into zamestnanec values(791, '815322/2957', 25, NULL, to_date('01.01.2020','DD.MM.YYYY') + 87.2, NULL);
 insert into zamestnanec values(792, '700608/0070', 98, NULL, to_date('01.01.2019','DD.MM.YYYY') + 67.13, NULL);
 insert into zamestnanec values(793, '655527/7498', 95, NULL, to_date('01.01.2017','DD.MM.YYYY') + 32.46, NULL);
@@ -1082,7 +1082,7 @@ insert into zamestnanec values(1081, '685517/2115', 20, NULL, to_date('01.01.202
 insert into zamestnanec values(1082, '960123/3906', 119, NULL, to_date('01.01.2019','DD.MM.YYYY') + 98.85, NULL);
 insert into zamestnanec values(1083, '815717/9503', 94, NULL, to_date('01.01.2018','DD.MM.YYYY') + 39.8, NULL);
 insert into zamestnanec values(1084, '810723/2496', 44, NULL, to_date('01.01.2018','DD.MM.YYYY') + 68.16, NULL);
-insert into zamestnanec values(1085, '615401/6638', 124, NULL, to_date('01.01.2016','DD.MM.YYYY') + 91.43, NULL);
+insert into zamestnanec values(1085, '615401/6638', 123, NULL, to_date('01.01.2016','DD.MM.YYYY') + 91.43, NULL);
 insert into zamestnanec values(1086, '820315/7677', 104, NULL, to_date('01.01.2016','DD.MM.YYYY') + 97.0, NULL);
 insert into zamestnanec values(1087, '735503/5226', 123, NULL, to_date('01.01.2017','DD.MM.YYYY') + 50.51, NULL);
 insert into zamestnanec values(1088, '570307/7050', 81, NULL, to_date('01.01.2017','DD.MM.YYYY') + 27.59, NULL);
@@ -1215,7 +1215,7 @@ insert into zamestnanec values(1214, '600622/5533', 94, NULL, to_date('01.01.201
 insert into zamestnanec values(1215, '675525/5573', 31, NULL, to_date('01.01.2018','DD.MM.YYYY') + 41.47, NULL);
 insert into zamestnanec values(1216, '680120/8304', 65, NULL, to_date('01.01.2016','DD.MM.YYYY') + 22.84, NULL);
 insert into zamestnanec values(1217, '715703/6040', 64, NULL, to_date('01.01.2016','DD.MM.YYYY') + 45.71, NULL);
-insert into zamestnanec values(1218, '910625/4718', 124, NULL, to_date('01.01.2019','DD.MM.YYYY') + 5.57, NULL);
+insert into zamestnanec values(1218, '910625/4718', 123, NULL, to_date('01.01.2019','DD.MM.YYYY') + 5.57, NULL);
 insert into zamestnanec values(1219, '735313/6197', 90, NULL, to_date('01.01.2018','DD.MM.YYYY') + 44.24, NULL);
 insert into zamestnanec values(1220, '680703/3200', 24, NULL, to_date('01.01.2020','DD.MM.YYYY') + 48.56, NULL);
 insert into zamestnanec values(1221, '815806/5861', 77, NULL, to_date('01.01.2015','DD.MM.YYYY') + 42.91, NULL);
@@ -1284,7 +1284,7 @@ insert into zamestnanec values(1283, '845507/8533', 62, NULL, to_date('01.01.202
 insert into zamestnanec values(1284, '620716/3105', 86, NULL, to_date('01.01.2020','DD.MM.YYYY') + 24.67, NULL);
 insert into zamestnanec values(1285, '805405/4195', 99, NULL, to_date('01.01.2019','DD.MM.YYYY') + 13.34, NULL);
 insert into zamestnanec values(1286, '950302/9041', 45, NULL, to_date('01.01.2017','DD.MM.YYYY') + 1.2, NULL);
-insert into zamestnanec values(1287, '615805/6883', 124, NULL, to_date('01.01.2016','DD.MM.YYYY') + 15.24, NULL);
+insert into zamestnanec values(1287, '615805/6883', 123, NULL, to_date('01.01.2016','DD.MM.YYYY') + 15.24, NULL);
 insert into zamestnanec values(1288, '850503/0072', 2, NULL, to_date('01.01.2015','DD.MM.YYYY') + 20.08, NULL);
 insert into zamestnanec values(1289, '775602/9600', 120, NULL, to_date('01.01.2016','DD.MM.YYYY') + 39.94, NULL);
 insert into zamestnanec values(1290, '910319/3132', 101, NULL, to_date('01.01.2020','DD.MM.YYYY') + 57.59, NULL);
@@ -1465,7 +1465,7 @@ insert into zamestnanec values(1464, '780812/6337', 52, NULL, to_date('01.01.201
 insert into zamestnanec values(1465, '675519/5535', 122, NULL, to_date('01.01.2015','DD.MM.YYYY') + 53.02, NULL);
 insert into zamestnanec values(1466, '730522/9481', 43, NULL, to_date('01.01.2020','DD.MM.YYYY') + 90.33, NULL);
 insert into zamestnanec values(1467, '805216/0292', 77, NULL, to_date('01.01.2015','DD.MM.YYYY') + 41.67, NULL);
-insert into zamestnanec values(1468, '710123/4745', 124, NULL, to_date('01.01.2019','DD.MM.YYYY') + 79.63, NULL);
+insert into zamestnanec values(1468, '710123/4745', 123, NULL, to_date('01.01.2019','DD.MM.YYYY') + 79.63, NULL);
 insert into zamestnanec values(1469, '915107/7837', 101, NULL, to_date('01.01.2019','DD.MM.YYYY') + 6.08, NULL);
 insert into zamestnanec values(1470, '740407/7901', 111, NULL, to_date('01.01.2019','DD.MM.YYYY') + 0.31, NULL);
 insert into zamestnanec values(1471, '705318/0992', 61, NULL, to_date('01.01.2017','DD.MM.YYYY') + 31.9, NULL);
@@ -1486,7 +1486,7 @@ insert into zamestnanec values(1485, '875511/6106', 32, NULL, to_date('01.01.201
 insert into zamestnanec values(1486, '630703/6087', 78, NULL, to_date('01.01.2019','DD.MM.YYYY') + 52.07, NULL);
 insert into zamestnanec values(1487, '975821/4521', 82, NULL, to_date('01.01.2019','DD.MM.YYYY') + 72.96, NULL);
 insert into zamestnanec values(1488, '730404/7795', 66, NULL, to_date('01.01.2020','DD.MM.YYYY') + 41.36, NULL);
-insert into zamestnanec values(1489, '945313/0841', 124, NULL, to_date('01.01.2018','DD.MM.YYYY') + 88.97, NULL);
+insert into zamestnanec values(1489, '945313/0841', 123, NULL, to_date('01.01.2018','DD.MM.YYYY') + 88.97, NULL);
 insert into zamestnanec values(1490, '840509/6293', 104, NULL, to_date('01.01.2020','DD.MM.YYYY') + 82.1, NULL);
 insert into zamestnanec values(1491, '765124/9386', 88, NULL, to_date('01.01.2019','DD.MM.YYYY') + 1.02, NULL);
 insert into zamestnanec values(1492, '550504/2532', 84, NULL, to_date('01.01.2020','DD.MM.YYYY') + 9.33, NULL);
@@ -1541,7 +1541,7 @@ insert into zamestnanec values(1540, '800426/2156', 31, NULL, to_date('01.01.201
 insert into zamestnanec values(1541, '665314/8997', 12, NULL, to_date('01.01.2020','DD.MM.YYYY') + 63.47, to_date('01.01.2020','DD.MM.YYYY') + 63.47 + 154.39);
 insert into zamestnanec values(1542, '700607/2293', 11, NULL, to_date('01.01.2019','DD.MM.YYYY') + 30.0, to_date('01.01.2019','DD.MM.YYYY') + 30.0 + 371.25);
 insert into zamestnanec values(1543, '995320/6879', 120, NULL, to_date('01.01.2016','DD.MM.YYYY') + 15.97, to_date('01.01.2016','DD.MM.YYYY') + 15.97 + 120.99);
-insert into zamestnanec values(1544, '870112/7314', 124, NULL, to_date('01.01.2017','DD.MM.YYYY') + 61.82, to_date('01.01.2017','DD.MM.YYYY') + 61.82 + 482.41);
+insert into zamestnanec values(1544, '870112/7314', 123, NULL, to_date('01.01.2017','DD.MM.YYYY') + 61.82, to_date('01.01.2017','DD.MM.YYYY') + 61.82 + 482.41);
 insert into zamestnanec values(1545, '565209/8892', 123, NULL, to_date('01.01.2020','DD.MM.YYYY') + 2.43, to_date('01.01.2020','DD.MM.YYYY') + 2.43 + 209.7);
 insert into zamestnanec values(1546, '610416/3230', 32, NULL, to_date('01.01.2018','DD.MM.YYYY') + 76.36, to_date('01.01.2018','DD.MM.YYYY') + 76.36 + 68.35);
 insert into zamestnanec values(1547, '615801/9857', 18, NULL, to_date('01.01.2016','DD.MM.YYYY') + 62.33, to_date('01.01.2016','DD.MM.YYYY') + 62.33 + 342.13);
@@ -1788,7 +1788,7 @@ insert into zamestnanec values(1787, '935324/2140', 47, NULL, to_date('01.01.201
 insert into zamestnanec values(1788, '920122/8872', 16, NULL, to_date('01.01.2019','DD.MM.YYYY') + 86.25, to_date('01.01.2019','DD.MM.YYYY') + 86.25 + 13.08);
 insert into zamestnanec values(1789, '905316/0831', 38, NULL, to_date('01.01.2020','DD.MM.YYYY') + 90.78, to_date('01.01.2020','DD.MM.YYYY') + 90.78 + 330.69);
 insert into zamestnanec values(1790, '750822/0071', 77, NULL, to_date('01.01.2017','DD.MM.YYYY') + 14.06, to_date('01.01.2017','DD.MM.YYYY') + 14.06 + 5.63);
-insert into zamestnanec values(1791, '555805/1213', 124, NULL, to_date('01.01.2017','DD.MM.YYYY') + 95.94, to_date('01.01.2017','DD.MM.YYYY') + 95.94 + 299.06);
+insert into zamestnanec values(1791, '555805/1213', 123, NULL, to_date('01.01.2017','DD.MM.YYYY') + 95.94, to_date('01.01.2017','DD.MM.YYYY') + 95.94 + 299.06);
 insert into zamestnanec values(1792, '890507/3210', 15, NULL, to_date('01.01.2019','DD.MM.YYYY') + 11.36, to_date('01.01.2019','DD.MM.YYYY') + 11.36 + 240.09);
 insert into zamestnanec values(1793, '915523/9126', 64, NULL, to_date('01.01.2017','DD.MM.YYYY') + 14.98, to_date('01.01.2017','DD.MM.YYYY') + 14.98 + 378.5);
 insert into zamestnanec values(1794, '890803/4509', 76, NULL, to_date('01.01.2015','DD.MM.YYYY') + 25.95, to_date('01.01.2015','DD.MM.YYYY') + 25.95 + 279.14);
