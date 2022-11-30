@@ -39,4 +39,4 @@ select XMLRoot(XMLElement("nemocnica",
                                          join nemocnica nem_in on(nem_in.id_nemocnice = odd.id_nemocnice)
                                           where nem_in.id_nemocnice = nem_out.id_nemocnice
                          )
-                    ) as operacie, nem_out.nazov as nazov_nemocnice from nemocnica nem_out where nem_out.id_nemocnice = 1);
+                    ) as operacie, nem_out.nazov as nazov_nemocnice from nemocnica nem_out where nem_out.id_nemocnice = x);

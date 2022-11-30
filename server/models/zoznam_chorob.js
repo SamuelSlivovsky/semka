@@ -15,5 +15,6 @@ async function getZoznamChorob() {
 }
 
 module.exports = {
-    getZoznamChorob
+    getZoznamChorob,
+    getNajviacChori
 }
