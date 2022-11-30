@@ -22,7 +22,7 @@ join os_udaje using(PSC)
 join pacient using(rod_cislo)
 join zdravotny_zaznam using(id_pacienta)
 join operacia using(id_zaznamu)
-group by kraj.nazov
+group by kraj.nazov, id_kraja
 order by poradie;
 
 --vypis pacientov, ktorym bola diagnostikovana choroba v piatok 13. a nazov tejto choroby
@@ -30,7 +30,7 @@ select meno, priezvisko, nazov
 from os_udaje join pacient using(rod_cislo)
 join zoznam_chorob using(id_pacienta)
 join choroba using(id_choroby)
-where to_char(datum_od, 'D') = '5' and to_char(datum_od, 'MM') = '09'
+where to_char(datum_od, 'D') = '5' and to_char(datum_od, 'DD') = '13'
 order by meno, priezvisko;
 
 --aky je priemerny vek lekara

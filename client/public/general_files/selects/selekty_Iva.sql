@@ -1,14 +1,14 @@
 --Vypisat pocet jednotlivych typov ockovani ku kazdemu pacientovi
 select  meno || ' ' || priezvisko as meno,
-        sum(case when id_typu_ockovania=1 then 1 else 0 end) as "Záškrt",
+        sum(case when id_typu_ockovania=1 then 1 else 0 end) as "ZÃ¡Å¡krt",
         sum(case when id_typu_ockovania=2 then 1 else 0 end) as "Tetanus",
-        sum(case when id_typu_ockovania=3 then 1 else 0 end) as "Èierny kaše¾",
-        sum(case when id_typu_ockovania=4 then 1 else 0 end) as "Vírusovı zápal peèene typu B (ltaèka typu B)",
-        sum(case when id_typu_ockovania=5 then 1 else 0 end) as "Hemofilové invazívne nákazy",
-        sum(case when id_typu_ockovania=6 then 1 else 0 end) as "Detská obrna",
-        sum(case when id_typu_ockovania=7 then 1 else 0 end) as "Pneumokokové invazívne ochorenia",
-        sum(case when id_typu_ockovania=8 then 1 else 0 end) as "Osıpky",
-        sum(case when id_typu_ockovania=9 then 1 else 0 end) as "Ruienka",
+        sum(case when id_typu_ockovania=3 then 1 else 0 end) as "Äierny kaÅ¡eÄ¾",
+        sum(case when id_typu_ockovania=4 then 1 else 0 end) as "VÃ­rusovÃ½ zÃ¡pal peÄene typu B (Å¾ltaÄka typu B)",
+        sum(case when id_typu_ockovania=5 then 1 else 0 end) as "HemofilovÃ© invazÃ­vne nÃ¡kazy",
+        sum(case when id_typu_ockovania=6 then 1 else 0 end) as "DetskÃ¡ obrna",
+        sum(case when id_typu_ockovania=7 then 1 else 0 end) as "PneumokokovÃ© invazÃ­vne ochorenia",
+        sum(case when id_typu_ockovania=8 then 1 else 0 end) as "OsÃ½pky",
+        sum(case when id_typu_ockovania=9 then 1 else 0 end) as "RuÅ¾ienka",
         sum(case when id_typu_ockovania=10 then 1 else 0 end) as "Mumps"
 from os_udaje join pacient using(rod_cislo)
               join zdravotny_zaznam using(id_pacienta)

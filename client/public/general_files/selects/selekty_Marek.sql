@@ -1,11 +1,11 @@
 --select ktory vypise x pacientov s najviac chorobami
                  	               
 select meno, priezvisko, pocet_chorob from 
-    (select meno, priezvisko, count(*) as pocet_chorob, dense_rank() over(order by count(*) desc) as poradie
+    (select meno, priezvisko, count(*) as pocet_chorob, rank() over(order by count(*) desc) as poradie
         from os_udaje join pacient using(rod_cislo)
                         join zoznam_chorob zo using(id_pacienta)
                             group by meno, priezvisko, rod_cislo) s_out
-                            where poradie <= 5;
+                            where poradie <= x;
 
 --x % najviac ockovanych pacientov
                             
@@ -15,7 +15,7 @@ select meno, priezvisko, pocet_operacii from
                         join zdravotny_zaznam using(id_pacienta)
                          join operacia using(id_zaznamu)
                           group by meno, priezvisko, rod_cislo)
-                           where poradie <= 0.01*(select count(*) from os_udaje join pacient using(rod_cislo)
+                           where poradie <= x*(select count(*) from os_udaje join pacient using(rod_cislo)
                                                                                  join zdravotny_zaznam using(id_pacienta)
                                                                                   join operacia using(id_zaznamu));
 
@@ -27,14 +27,14 @@ select meno, priezvisko, pocet_hospitalizacii from
                         join zdravotny_zaznam using(id_pacienta)
                          join hospitalizacia using(id_zaznamu)
                           group by meno, priezvisko, rod_cislo)
-                           where poradie <= 0.01*(select count(*) from os_udaje join pacient using(rod_cislo)
+                           where poradie <= x*(select count(*) from os_udaje join pacient using(rod_cislo)
                                                                                  join zdravotny_zaznam using(id_pacienta)
                                                                                   join hospitalizacia using(id_zaznamu));
 
 --oddelenia a ich zamestnanci s celkovymi vyplatami
 
 select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
-                            within group(order by zarobok desc)
+                            within group(order by zarobok desc) 
                                 from (select nem.nazov as nazov_nemocnice,
                                              tod.nazov as nazov_oddelenia, meno || ' ' || priezvisko || ' - ' || sum(suma) || ' eur' as mpz, sum(suma) as zarobok        
                                                 from os_udaje osu join zamestnanec zam on(osu.rod_cislo = zam.rod_cislo)
@@ -48,7 +48,7 @@ select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
 --oddelenia a x zamestnancov s najvyssou sumou vyplat                                                                     
                                                                         
 select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
-                            within group(order by zarobok desc)
+                            within group(order by zarobok desc) as top_zamestnanci
                                 from (select nazov_nemocnice, nazov_oddelenia, mpz, zarobok 
                                     from (select nem.nazov as nazov_nemocnice,
                                              tod.nazov as nazov_oddelenia, meno || ' ' || priezvisko || ' - ' || sum(suma) || ' eur' as mpz, sum(suma) as zarobok,
@@ -60,7 +60,7 @@ select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
                                                                       join vyplata@db_link_vyplaty vyp on(vyp.id_zamestnanca = zam.id_zamestnanca)
                                                                        where zam.id_zamestnanca in(select id_zamestnanca from lekar)
                                                                         group by nem.id_nemocnice, nem.nazov, tod.nazov, meno, priezvisko, osu.rod_cislo, od.id_oddelenia)
-                                                  where poradie <= 5)                               
+                                                  where poradie <= x)                               
                                  group by nazov_nemocnice, nazov_oddelenia;
 
 
@@ -71,7 +71,7 @@ select nazov_lieku, pocet_predpisani, poradie from
             from liek l join recept r on(l.id_lieku = r.id_lieku)
                 where to_char(datum, 'YYYY') = '2020'
                     group by l.nazov, l.id_lieku
-            ) where poradie <= 0.10*(select count(*) from liek join recept using(id_lieku)  where to_char(datum, 'YYYY') = '2020');
+            ) where poradie <= 0.10*(select count(*) from liek join recept using(id_lieku)  where to_char(datum, 'YYYY') = 'XXXX');
 
 
 --sumy vyplat za jednotlive mesiace vybraneho roka pre nemocnice
@@ -91,7 +91,7 @@ select sum(case when to_char(datum, 'MM') = '01' then suma else 0 end) as Januar
         from nemocnica join oddelenie using(id_nemocnice)
                         join zamestnanec using(id_oddelenia)
                          join vyplata@db_link_vyplaty using(id_zamestnanca)
-                            where id_nemocnice = 1;
+                            where id_nemocnice = x;
 
 
 
