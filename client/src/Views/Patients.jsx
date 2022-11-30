@@ -20,6 +20,13 @@ function Patient() {
 
   const navigate = useNavigate();
 
+  useEffect(() => {
+    fetch(`/lekar/pacienti/${2}`).then(
+      response => response.json()
+    ).then(
+      (data) => console.log(data));
+  }, []);
+
   const onHide = () => {
     setShowDialog(false);
     setSelectedRow(null);

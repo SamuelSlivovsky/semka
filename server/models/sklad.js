@@ -14,6 +14,29 @@ async function getSklady() {
     }
 }
 
+async function getLiekyMenejAkoPocet(pocet) {
+    try {
+        let conn = await database.getConnection();
+        const result = await conn.execute(
+            `select n.nazov as nazov_nemocnice, typ.nazov nazov_oddelenia,
+                    l.nazov nazov_lieku, sum(pocet_liekov) as celkovy_pocet
+            from liek l join sarza sa on(l.id_lieku = sa.id_lieku)
+                    join sklad sk on(sk.id_skladu = sa.id_skladu )
+                    join oddelenie o on(o.id_oddelenia = sk.id_oddelenia)
+                    join typ_oddelenia typ on (typ.id_typu_oddelenia = o.id_typu_oddelenia)
+                    join nemocnica n on(n.id_nemocnice = o.id_nemocnice)
+            group by n.nazov, typ.nazov,l.nazov
+            having sum(pocet_liekov) < :pocet`, [pocet]
+        );
+
+        return result.rows;
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 module.exports = {
-    getSklady
+    getSklady,
+    getLiekyMenejAkoPocet
 }
