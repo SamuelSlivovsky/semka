@@ -5,6 +5,7 @@ const express = require("express");
 const krajeRoute = require("./routes/krajeRoute");
 const lekarRoute = require("./routes/lekarRoute");
 const selectsRoute = require("./routes/selectsRoute");
+const operaciaRoute = require("./routes/operaciaroute");
 
 const database = require("./database/Database");
 
@@ -14,6 +15,7 @@ app.use(express.json());
 app.use("/kraje", krajeRoute);
 app.use("/lekar", lekarRoute);
 app.use("/selects", selectsRoute);
+app.use("/operacia", operaciaRoute);
 
 const oracledb = database.oracledb;
 
