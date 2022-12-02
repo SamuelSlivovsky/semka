@@ -23,5 +23,6 @@ router.get("/hospitalizacieNemocniceXML/:id_nemocnice", controller.getHospitaliz
 router.get("/operacieNemocnice/:id_nemocnice", controller.getOperacieNemocniceXML);
 router.get("/ockovaniaNemocnice/:id_nemocnice", controller.getOckovaniaNemocniceXML);
 router.get("/vysetreniaNemocniceXML/:id_nemocnice", controller.getVysetreniaNemocniceXML);
+router.get("/krvneSkupinyOddelenia/:id_oddelenia", controller.getKrvneSkupinyOddelenia);
 
 module.exports = router;

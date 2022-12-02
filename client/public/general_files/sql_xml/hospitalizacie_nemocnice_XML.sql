@@ -1,11 +1,11 @@
- select XMLRoot(XMLElement("nemocnica", 
+select XMLRoot(XMLElement("nemocnica", 
                           XMLElement("nazov_nemocnice", nazov_nemocnice),
                           XMLElement("hospitalizacie", hospitalizacie)
                           ), version '1.0'
               ) as hospitalizacie_nemocnice_XML
       from (select (select XMLAgg(XMLElement("hospitalizacia",
-                                             XMLElement("datum_hospitalizacie", zz.datum),
-                                             XMLElement("datum_ukoncenia", h.dat_do),
+                                             XMLElement("datum_hospitalizacie", to_char(zz.datum, 'DD.MM.YYYY')),
+                                             XMLElement("datum_ukoncenia", to_char(h.dat_do, 'DD.MM.YYYY')),
                                              XMLElement("pacient", XMLAttributes(pks.krvna_skupina as "typ_krvnej_skupiny",
                                                                         pou.rod_cislo as "rodne_cislo"),
                                                                    XMLElement("meno", pou.meno || ' ' || pou.priezvisko)
