@@ -51,7 +51,7 @@ export default function Combobox() {
       attribute1: "",
     },
     {
-      name: "Zamestanci oddeleni",
+      name: "Zamestnanci oddeleni",
       path: "selects/zamestnanciOddeleni",
       fotka: false,
     },

@@ -34,13 +34,13 @@ async function getPomerMuziZeny(id_oddelenia) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select round(zeny) as zeny, round(100-zeny) as muzi from
-            (select count(case when (substr(os.rod_cislo, 3, 1)) in ('5','6') then 1 else null end)/count(*)*100 as zeny
-                from os_udaje os join pacient p on(p.rod_cislo = os.rod_cislo)
-                join lekar_pacient lp on (lp.id_pacienta = p.id_pacienta)
-                join lekar l on (l.id_lekara = lp.id_lekara)
-                join zamestnanec z on (z.id_zamestnanca = l.id_zamestnanca)
-                where z.id_oddelenia = :id_oddelenia )`,
+      `select trunc(zeny, 2) as zeny, trunc(100-zeny, 2) as muzi from
+          (select count(case when (substr(os.rod_cislo, 3, 1)) in ('5','6') then 1 else null end)/count(*)*100 as zeny
+              from os_udaje os join pacient p on(p.rod_cislo = os.rod_cislo)
+              join lekar_pacient lp on (lp.id_pacienta = p.id_pacienta)
+              join lekar l on (l.id_lekara = lp.id_lekara)
+              join zamestnanec z on (z.id_zamestnanca = l.id_zamestnanca)
+              where z.id_oddelenia = :id_oddelenia)`,
       [id_oddelenia]
     );
 

@@ -26,7 +26,6 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
                                                     join typ_oddelenia tod on(od.id_typu_oddelenia = tod.id_typu_oddelenia)
                                                      join nemocnica nem on(nem.id_nemocnice = od.id_nemocnice)
                                                       join vyplaty_mw vyp on(vyp.id_zamestnanca = zam.id_zamestnanca)
-                                                       where zam.id_zamestnanca in(select id_zamestnanca from lekar)
                                                         group by nem.id_nemocnice, nem.nazov, tod.nazov, meno, priezvisko, osu.rod_cislo, od.id_oddelenia)
                                   where poradie <= :pocet)                               
                  group by nazov_nemocnice, nazov_oddelenia`,
@@ -44,17 +43,16 @@ async function getTopZamestnanciVyplatyOddelenie(id_oddelenia, rok) {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `select  poradie, Zamestnanec, zarobok "Zárobok"
-      from (select meno || ' ' || priezvisko as Zamestnanec ,nazov_nemocnice, nazov_oddelenia, mpz, zarobok, poradie 
+        from (select meno || ' ' || priezvisko as Zamestnanec ,nazov_nemocnice, nazov_oddelenia, zarobok, poradie 
           from (select meno, priezvisko, nem.nazov as nazov_nemocnice,
-                   tod.nazov as nazov_oddelenia, meno || ' ' || priezvisko || ' - ' || sum(suma) || ' eur' as mpz, sum(suma) as zarobok,
-                      dense_rank() over(partition by od.id_oddelenia order by sum(suma) desc) as poradie
+                   tod.nazov as nazov_oddelenia, sum(suma) as zarobok,
+                      dense_rank() over(order by sum(suma) desc) as poradie
                           from os_udaje osu join zamestnanec zam on(osu.rod_cislo = zam.rod_cislo)
                                          join oddelenie od on(od.id_oddelenia = zam.id_oddelenia)
                                           join typ_oddelenia tod on(od.id_typu_oddelenia = tod.id_typu_oddelenia)
                                            join nemocnica nem on(nem.id_nemocnice = od.id_nemocnice)
                                             join vyplaty_mw vyp on(vyp.id_zamestnanca = zam.id_zamestnanca)
-                                             where zam.id_zamestnanca in(select id_zamestnanca from lekar)
-                                             and od.id_oddelenia = :id_oddelenia and to_char(datum, 'YYYY') = :rok
+                                             where od.id_oddelenia = :id_oddelenia and to_char(datum, 'YYYY') = :rok
                                               group by nem.id_nemocnice, nem.nazov, tod.nazov, meno, priezvisko, osu.rod_cislo, od.id_oddelenia)
                         where poradie <= 5)`,
       [id_oddelenia, rok]
@@ -111,10 +109,9 @@ async function getPocetZamOddelenia(id_oddelenia, rok) {
       `select count(id_zamestnanca) as pocet_zamestnancov from oddelenie o 
         join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
         where z.id_oddelenia = :id_oddelenia
-        and (to_char(dat_od,'YYYY') <= :rok 
+        and (to_char(dat_od, 'YYYY') <= :rok 
           or to_char(dat_do, 'YYYY') >= :rok
-        )
-            `,
+        )`,
       [id_oddelenia, rok]
     );
     console.log(result);
@@ -123,6 +120,7 @@ async function getPocetZamOddelenia(id_oddelenia, rok) {
     console.log(err);
   }
 }
+
 async function getPocetPacientovOddelenia(id_oddelenia) {
   try {
     let conn = await database.getConnection();
@@ -131,8 +129,7 @@ async function getPocetPacientovOddelenia(id_oddelenia) {
           join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
           join lekar l on (l.id_zamestnanca = z.id_zamestnanca)
           join lekar_pacient lp on (lp.id_lekara = l.id_lekara)
-          where z.id_oddelenia = :id_oddelenia
-              `,
+          where z.id_oddelenia = :id_oddelenia`,
       [id_oddelenia]
     );
     console.log(result);
@@ -141,6 +138,7 @@ async function getPocetPacientovOddelenia(id_oddelenia) {
     console.log(err);
   }
 }
+
 async function getPocetOperaciiOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
@@ -159,6 +157,7 @@ async function getPocetOperaciiOddelenia(id_oddelenia, rok) {
     console.log(err);
   }
 }
+
 async function getPocetHospitalizaciiOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
@@ -178,6 +177,7 @@ async function getPocetHospitalizaciiOddelenia(id_oddelenia, rok) {
     console.log(err);
   }
 }
+
 async function getPocetVysetreniOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
@@ -217,6 +217,36 @@ async function getKrvneSkupinyOddelenia(id_oddelenia) {
   }
 }
 
+async function getSumaVyplatRoka(id_oddelenia, rok) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select sum(case when to_char(datum, 'MM') = '01' then suma else 0 end) as Januar,
+                sum(case when to_char(datum, 'MM') = '02' then suma else 0 end) as Februar,
+                sum(case when to_char(datum, 'MM') = '03' then suma else 0 end) as Marec,
+                sum(case when to_char(datum, 'MM') = '04' then suma else 0 end) as April,
+                sum(case when to_char(datum, 'MM') = '05' then suma else 0 end) as Maj,
+                sum(case when to_char(datum, 'MM') = '06' then suma else 0 end) as Jun,
+                sum(case when to_char(datum, 'MM') = '07' then suma else 0 end) as Jul,
+                sum(case when to_char(datum, 'MM') = '08' then suma else 0 end) as August,
+                sum(case when to_char(datum, 'MM') = '09' then suma else 0 end) as September,
+                sum(case when to_char(datum, 'MM') = '10' then suma else 0 end) as Oktober,
+                sum(case when to_char(datum, 'MM') = '11' then suma else 0 end) as November,
+                sum(case when to_char(datum, 'MM') = '12' then suma else 0 end) as December
+                from nemocnica join oddelenie using(id_nemocnice)
+                             join zamestnanec using(id_oddelenia)
+                              join vyplaty_mw using(id_zamestnanca)
+                                 where id_oddelenia = :id_oddelenia and to_char(datum, 'YYYY') = :rok`,
+      [id_oddelenia, rok]
+    );
+    console.log(result.rows);
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
 module.exports = {
   getOddelenia,
   getTopZamestnanciVyplatyPocet,
@@ -229,4 +259,5 @@ module.exports = {
   getPocetPacientovOddelenia,
   getKrvneSkupinyOddelenia,
   getTopZamestnanciVyplatyOddelenie,
+  getSumaVyplatRoka
 };
