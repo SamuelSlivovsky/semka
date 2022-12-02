@@ -298,4 +298,13 @@ module.exports = {
       res.status(200).json(ret_val);
     })();
   },
+
+  getKrvneSkupinyOddelenia: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+    console.log(req.params);
+    (async () => {
+        ret_val = await oddelenie.getKrvneSkupinyOddelenia(req.params.id_oddelenia);
+        res.status(200).json(ret_val);
+    })();
+},
 };

@@ -93,7 +93,14 @@ select sum(case when to_char(datum, 'MM') = '01' then suma else 0 end) as Januar
                          join vyplata@db_link_vyplaty using(id_zamestnanca)
                             where id_nemocnice = x;
 
+-- pocty typov krvnej skupiny podla pacientov oddelenia (vztah medzi lekarom oddelenia a pacientom)
 
+select krvna_skupina, count(id_typu_krvnej_skupiny) from krvna_skupina join pacient using(id_typu_krvnej_skupiny)
+                                                                        join lekar_pacient using(id_pacienta)
+                                                                         join lekar using(id_lekara)
+                                                                          join zamestnanec using(id_zamestnanca)
+                                                                           where id_oddelenia = 3
+                                                                            group by krvna_skupina;
 
 
 

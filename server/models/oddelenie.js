@@ -25,7 +25,7 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
                                                    join oddelenie od on(od.id_oddelenia = zam.id_oddelenia)
                                                     join typ_oddelenia tod on(od.id_typu_oddelenia = tod.id_typu_oddelenia)
                                                      join nemocnica nem on(nem.id_nemocnice = od.id_nemocnice)
-                                                      join vyplata@db_link_vyplaty vyp on(vyp.id_zamestnanca = zam.id_zamestnanca)
+                                                      join vyplaty_mw vyp on(vyp.id_zamestnanca = zam.id_zamestnanca)
                                                        where zam.id_zamestnanca in(select id_zamestnanca from lekar)
                                                         group by nem.id_nemocnice, nem.nazov, tod.nazov, meno, priezvisko, osu.rod_cislo, od.id_oddelenia)
                                   where poradie <= :pocet)                               
@@ -171,6 +171,25 @@ async function getPocetVysetreniOddelenia(id_oddelenia, rok) {
   }
 }
 
+async function getKrvneSkupinyOddelenia(id_oddelenia) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select krvna_skupina, count(id_typu_krvnej_skupiny) from krvna_skupina join pacient using(id_typu_krvnej_skupiny)
+                                                                                    join lekar_pacient using(id_pacienta)
+                                                                                    join lekar using(id_lekara)
+                                                                                    join zamestnanec using(id_zamestnanca)
+                                                                                    where id_oddelenia = :id_oddelenia
+                                                                                        group by krvna_skupina`,
+      [id_oddelenia]
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getOddelenia,
   getTopZamestnanciVyplatyPocet,
@@ -181,4 +200,5 @@ module.exports = {
   getPocetOperaciiOddelenia,
   getPocetVysetreniOddelenia,
   getPocetPacientovOddelenia,
+  getKrvneSkupinyOddelenia,
 };

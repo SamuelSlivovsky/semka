@@ -84,5 +84,9 @@ router.get(
   "/pocetVyseOddelenia/:id_oddelenia/:rok",
   controller.getPocetVysetreniOddelenia
 );
+router.get(
+  "/krvneSkupinyOddelenia/:id_oddelenia",
+  controller.getKrvneSkupinyOddelenia
+);
 
 module.exports = router;

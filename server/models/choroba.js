@@ -24,6 +24,7 @@ async function getNajcastejsieChorobyRokaPocet(pocet, rok) {
                         or to_char(datum_od,'YYYY')= :rok
                         group by nazov, id_choroby
                 )
+<<<<<<< HEAD
             where poradie <= :pocet`,
       {
         rok: { val: rok, dir: oracledb.BIND_IN, type: oracledb.STRING },
@@ -35,6 +36,21 @@ async function getNajcastejsieChorobyRokaPocet(pocet, rok) {
   } catch (err) {
     console.log(err);
   }
+=======
+            where rank <= :pocet
+                order by rank`,
+            {
+                rok: { val: rok, dir: oracledb.BIND_IN, type: oracledb.STRING },
+                pocet: pocet
+            }
+        );
+        console.log(result);
+        return result.rows;
+
+    } catch (err) {
+        console.log(err);
+    }
+>>>>>>> origin/Marek_general
 }
 
 module.exports = {

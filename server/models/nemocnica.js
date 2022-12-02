@@ -30,8 +30,8 @@ async function getSumaVyplatRoka(id_nemocnice, rok) {
                 sum(case when to_char(datum, 'MM') = '12' then suma else 0 end) as December
                 from nemocnica join oddelenie using(id_nemocnice)
                              join zamestnanec using(id_oddelenia)
-                              join vyplata@db_link_vyplaty using(id_zamestnanca)
-                                 where id_oddelenia = :id_nemocnice and to_char(datum, 'YYYY') = :rok`,
+                              join vyplaty_mw using(id_zamestnanca)
+                                 where id_nemocnice = :id_nemocnice and to_char(datum, 'YYYY') = :rok`,
       [id_nemocnice, rok]
     );
 
