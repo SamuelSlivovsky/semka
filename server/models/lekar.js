@@ -31,12 +31,15 @@ async function getPriemernyVek() {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
-            `select sum(vek / (select count(distinct id_zamestnanca) from lekar)) as priemerny_vek from
+            `select 
+                (select sum(vek) from
                 (select extract(year from sysdate) - extract(year from datum_narodenia) as vek
                 from (select to_date(substr(rod_cislo, 5, 2) || '.' || (case when substr(rod_cislo, 3, 1) = '5' then '0' when substr(rod_cislo, 3, 1) = '6' then '1' end) 
                 || substr(rod_cislo, 4, 1) ||  '.19' || substr(rod_cislo, 1, 2), 'DD.MM.YYYY') as datum_narodenia
                 from os_udaje join zamestnanec using(rod_cislo)
-                join lekar using(id_zamestnanca)))`
+                join lekar using(id_zamestnanca)))) /
+                (select count(distinct id_zamestnanca) from lekar) as priemerny_vek
+             from dual`
         );
         return result.rows;
 
