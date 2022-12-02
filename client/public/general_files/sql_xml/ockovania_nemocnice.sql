@@ -4,7 +4,7 @@ select XMLRoot(XMLElement("nemocnica",
                           ), version '1.0'
               ) as ockovania_nemocnice_XML
       from (select (select XMLAgg(XMLElement("ockovanie",
-                                                        XMLElement("datum_ockovania", datum),                   
+                                                        XMLElement("datum_ockovania", to_char(datum, 'DD.MM.YYYY')),                   
                                                         XMLElement("typ_ockovania", nazov),
                                                         XMLElement("pacient", XMLAttributes(krvna_skupina as "typ_krvnej_skupiny",
                                                                                     pou.rod_cislo as "rodne_cislo"),

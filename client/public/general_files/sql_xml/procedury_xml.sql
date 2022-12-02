@@ -9,8 +9,8 @@ begin
                           ), version '1.0'
               ).getclobval() into nemxml
       from (select (select XMLAgg(XMLElement("hospitalizacia",
-                                             XMLElement("datum_hospitalizacie", zz.datum),
-                                             XMLElement("datum_ukoncenia", h.dat_do),
+                                             XMLElement("datum_hospitalizacie", to_char(zz.datum, 'DD.MM.YYYY')),
+                                             XMLElement("datum_ukoncenia", to_char(h.dat_do, 'DD.MM.YYYY')),
                                              XMLElement("pacient", XMLAttributes(pks.krvna_skupina as "typ_krvnej_skupiny",
                                                                         pou.rod_cislo as "rodne_cislo"),
                                                                    XMLElement("meno", pou.meno || ' ' || pou.priezvisko)
@@ -57,7 +57,7 @@ begin
                           ), version '1.0'
               ).getclobval() into nemxml
       from (select (select XMLAgg(XMLElement("operacia",
-                                             XMLElement("datum_operacie", datum),
+                                             XMLElement("datum_operacie", to_char(datum, 'DD.MM.YYYY')),
                                              XMLElement("lekari", lekari),
                                              XMLElement("miestnost", nazov_miestnosti),    
                                              XMLElement("trvanie_v_minutach", trvanie), 
@@ -109,7 +109,7 @@ begin
                           ), version '1.0'
               ).getclobval() into nemxml
       from (select (select XMLAgg(XMLElement("ockovanie",
-                                                        XMLElement("datum_ockovania", datum),                   
+                                                        XMLElement("datum_ockovania", to_char(datum, 'DD.MM.YYYY')),                   
                                                         XMLElement("typ_ockovania", nazov),
                                                         XMLElement("pacient", XMLAttributes(krvna_skupina as "typ_krvnej_skupiny",
                                                                                     pou.rod_cislo as "rodne_cislo"),
@@ -141,7 +141,7 @@ begin
                           ), version '1.0'
               ).getclobval() into nemxml
       from (select (select XMLAgg(XMLElement("vysetrenie",
-                                                        XMLElement("datum_vysetrenia", datum),
+                                                        XMLElement("datum_vysetrenia", to_char(datum, 'DD.MM.YYYY')),
                                                         XMLElement("pacient", XMLAttributes(krvna_skupina as "typ_krvnej_skupiny",
                                                                                     pou.rod_cislo as "rodne_cislo"),
                                                                   XMLElement("meno", pou.meno || ' ' || pou.priezvisko)
