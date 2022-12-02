@@ -1,17 +1,14 @@
-const database = require("../database/Database");
+const database = require('../database/Database');
 
 async function getLekari() {
-    try {
-        let conn = await database.getConnection();
-        const result = await conn.execute(
-            `SELECT * FROM lekar`,
-        );
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(`SELECT * FROM lekar`);
 
-        return result.rows;
-
-    } catch (err) {
-        console.log(err);
-    }
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 async function getPacienti(pid_lekara) {
