@@ -93,5 +93,6 @@ router.get(
   "/krvneSkupinyOddelenia/:id_oddelenia",
   controller.getKrvneSkupinyOddelenia
 );
+router.get("/zamestnanec/:id_zamestnanca", controller.getZamestnanec);
 
 module.exports = router;

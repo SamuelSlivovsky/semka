@@ -1,4 +1,4 @@
-const database = require('../database/Database');
+const database = require("../database/Database");
 
 async function getOperacie() {
   try {
@@ -17,10 +17,10 @@ async function getOperacie() {
 }
 
 async function getOperaciePocetLekarovTrvanie(pocetLekarov, trvanie) {
-    try {
-        let conn = await database.getConnection();
-        const result = await conn.execute(
-            `select datum, meno_pacienta, trvanie, lekari, id_operacie
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select to_char(datum,'DD.MM.YYYY') "Dátum operácie", meno_pacienta "Pacient", trvanie "Trvanie", lekari "Lekári", id_operacie "Id operácie"
                     from (select datum, pou.meno || ' ' || pou.priezvisko as meno_pacienta, trvanie, op.id_operacie, 
                             (select listagg(meno || ' ' || priezvisko, ', ') within group(order by priezvisko) 
                                 from operacia_lekar ol join lekar l on(l.id_lekara = ol.id_lekara)
@@ -32,17 +32,17 @@ async function getOperaciePocetLekarovTrvanie(pocetLekarov, trvanie) {
                                                 join os_udaje pou on(pou.rod_cislo = p.rod_cislo)
                                 group by datum, pou.meno, pou.priezvisko, trvanie, op.id_operacie
                             having count(id_lekara) > :pocet_lekarov and trvanie > :trvanie)
-                        order by trvanie desc`, [pocetLekarov, trvanie]
-        );
+                        order by trvanie desc`,
+      [pocetLekarov, trvanie]
+    );
 
-        return result.rows;
-
-    } catch (err) {
-        console.log(err);
-    }
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 module.exports = {
-    getOperacie,
-    getOperaciePocetLekarovTrvanie
-}
+  getOperacie,
+  getOperaciePocetLekarovTrvanie,
+};

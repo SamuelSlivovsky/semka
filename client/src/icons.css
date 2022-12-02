@@ -49,3 +49,24 @@
   height: 44px;
   width: 44px;
 }
+
+.examination-icon-small {
+  content: url("./images/examination-black.png");
+  height: 20px;
+  width: 20px;
+}
+.hospit-icon-small {
+  content: url("./images/hospit-black.png");
+  height: 20px;
+  width: 20px;
+}
+.operation-icon-small {
+  content: url("./images/operation-black.png");
+  height: 20px;
+  width: 20px;
+}
+.vax-icon-small {
+  content: url("./images/ock.png");
+  height: 20px;
+  width: 20px;
+}

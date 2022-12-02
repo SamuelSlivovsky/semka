@@ -15,7 +15,7 @@ async function getNajviacChoriPocet(pocet) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select meno "Meno", priezvisko "Priezvisko", pocet_chorob "Počet chorôb" from 
+      `select poradie "Poradie", meno "Meno", priezvisko "Priezvisko", pocet_chorob "Počet chorôb" from 
                     (select meno, priezvisko, count(*) as pocet_chorob, rank() over(order by count(*) desc) as poradie
                         from os_udaje join pacient using(rod_cislo)
                                 join zoznam_chorob zo using(id_pacienta)
