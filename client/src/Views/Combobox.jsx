@@ -28,8 +28,8 @@ export default function Combobox() {
       fotka: false,
     },
     {
-      name: "Pacienti s najviac očkovaniami",
-      path: "selects/najviacOckovaniPercenta",
+      name: "Pacienti s najviac operáciami",
+      path: "selects/najviacOperovanyPercenta",
       attribute1: "percent",
       fotka: false,
     },

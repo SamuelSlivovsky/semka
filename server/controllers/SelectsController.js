@@ -8,11 +8,11 @@ module.exports = {
     })();
   },
 
-  getNajviacOckovaniPercenta: (req, res) => {
+  getNajviacOperovanyPercenta: (req, res) => {
     const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
-      ret_val = await pacient.getNajviacOckovaniPercenta(req.params.percent);
+      ret_val = await pacient.getNajviacOperovanyPercenta(req.params.percent);
       res.status(200).json(ret_val);
     })();
   },
@@ -50,7 +50,10 @@ module.exports = {
     const nemocnica = require("../models/nemocnica");
     console.log(req.params);
     (async () => {
-      ret_val = await nemocnica.getSumaVyplatRoka(req.params.id_nemocnice);
+      ret_val = await nemocnica.getSumaVyplatRoka(
+        req.params.id_nemocnice,
+        req.params.rok
+      );
       res.status(200).json(ret_val);
     })();
   },
@@ -256,7 +259,8 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetOperaciiOddelenia(
-        req.params.id_oddelenia
+        req.params.id_oddelenia,
+        req.params.rok
       );
       res.status(200).json(ret_val);
     })();
@@ -266,7 +270,8 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetHospitalizaciiOddelenia(
-        req.params.id_oddelenia
+        req.params.id_oddelenia,
+        req.params.rok
       );
       res.status(200).json(ret_val);
     })();
@@ -276,7 +281,8 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetVysetreniOddelenia(
-        req.params.id_oddelenia
+        req.params.id_oddelenia,
+        req.params.rok
       );
       res.status(200).json(ret_val);
     })();
@@ -285,7 +291,10 @@ module.exports = {
     const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
-      ret_val = await oddelenie.getPocetZamOddelenia(req.params.id_oddelenia);
+      ret_val = await oddelenie.getPocetZamOddelenia(
+        req.params.id_oddelenia,
+        req.params.rok
+      );
       res.status(200).json(ret_val);
     })();
   },

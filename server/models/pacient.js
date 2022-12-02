@@ -30,11 +30,11 @@ async function getNajviacChoriPocet(pocet) {
   }
 }
 
-async function getNajviacOckovaniPercenta(percent) {
+async function getNajviacOperovanyPercenta(percent) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select meno, priezvisko, pocet_operacii from
+      `select meno "Meno", priezvisko "Priezvisko", pocet_operacii "Počet operácií" from
                 (select meno, priezvisko, count(*) as pocet_operacii, rank() over(order by count(*) desc) as poradie
                      from os_udaje join pacient using(rod_cislo)
                                 join zdravotny_zaznam using(id_pacienta)
@@ -56,7 +56,7 @@ async function getNajviacHospitalizovaniPercenta(percent) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select meno, priezvisko, pocet_hospitalizacii from
+      `select meno "Meno", priezvisko "Priezvisko", pocet_hospitalizacii "Počet hospitalizácií" from
                 (select meno, priezvisko, count(*) as pocet_hospitalizacii, rank() over(order by count(*) desc) as poradie
                     from os_udaje join pacient using(rod_cislo)
                                 join zdravotny_zaznam using(id_pacienta)
@@ -78,7 +78,7 @@ async function getTypyOckovaniaPacienti() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select  meno || ' ' || priezvisko as meno,
+      `select  meno || ' ' || priezvisko as Meno,
                     sum(case when id_typu_ockovania=1 then 1 else 0 end) as "Záškrt",
                     sum(case when id_typu_ockovania=2 then 1 else 0 end) as "Tetanus",
                     sum(case when id_typu_ockovania=3 then 1 else 0 end) as "čierny kašeľ",
@@ -105,7 +105,7 @@ async function getPacientiChorobaP13() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select meno, priezvisko, nazov
+      `select meno "Meno", priezvisko "Priezvisko", nazov "Názov choroby"
                 from os_udaje join pacient using(rod_cislo)
                 join zoznam_chorob using(id_pacienta)
                 join choroba using(id_choroby)
@@ -123,7 +123,7 @@ async function getPocetPacientiPodlaVeku() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(*) as pocet, trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as vek
+      `select count(*) as "Počet", trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek
             from pacient join os_udaje using(rod_cislo)
              group by trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
               order by 2`
@@ -138,7 +138,7 @@ async function getPocetPacientiPodlaVeku() {
 module.exports = {
   getPacienti,
   getNajviacChoriPocet,
-  getNajviacOckovaniPercenta,
+  getNajviacOperovanyPercenta,
   getNajviacHospitalizovaniPercenta,
   getTypyOckovaniaPacienti,
   getPacientiChorobaP13,

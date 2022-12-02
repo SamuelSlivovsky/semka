@@ -4,8 +4,8 @@ const controller = require("../controllers/SelectsController");
 
 router.get("/najviacChoriPocet/:pocet", controller.getNajviacChoriPocet);
 router.get(
-  "/najviacOckovaniPercenta/:percent",
-  controller.getNajviacOckovaniPercenta
+  "/najviacOperovanyPercenta/:percent",
+  controller.getNajviacOperovanyPercenta
 );
 router.get(
   "/najviacHospitalizovaniPercenta/:percent",
@@ -19,7 +19,7 @@ router.get(
   "/najviacPredpisovaneLiekyRoka/:rok",
   controller.getNajviacPredpisovaneLiekyRoka
 );
-router.get("/sumaVyplatRoka/:id_nemocnice", controller.getSumaVyplatRoka);
+router.get("/sumaVyplatRoka/:id_nemocnice/:rok", controller.getSumaVyplatRoka);
 router.get("/typyOckovaniaPacienti", controller.getTypyOckovaniaPacienti);
 router.get("/zamestnanciOddeleni", controller.getZamestnanciOddeleni);
 router.get(
@@ -64,10 +64,25 @@ router.get(
   "/zamestnanciOddelenia/:id_oddelenia",
   controller.getZamestnanciOddelenia
 );
-router.get("/pocetZamOddelenia/:id_oddelenia", controller.getPocetZamOddelenia);
-router.get("/pocetPacOddelenia/:id_oddelenia", controller.getPocetPacientovOddelenia);
-router.get("/pocetOperOddelenia/:id_oddelenia", controller.getPocetOperaciiOddelenia);
-router.get("/pocetHospitOddelenia/:id_oddelenia", controller.getPocetHospitalizaciiOddelenia);
-router.get("/pocetVyseOddelenia/:id_oddelenia", controller.getPocetVysetreniOddelenia);
+router.get(
+  "/pocetZamOddelenia/:id_oddelenia/:rok",
+  controller.getPocetZamOddelenia
+);
+router.get(
+  "/pocetPacOddelenia/:id_oddelenia",
+  controller.getPocetPacientovOddelenia
+);
+router.get(
+  "/pocetOperOddelenia/:id_oddelenia/:rok",
+  controller.getPocetOperaciiOddelenia
+);
+router.get(
+  "/pocetHospitOddelenia/:id_oddelenia/:rok",
+  controller.getPocetHospitalizaciiOddelenia
+);
+router.get(
+  "/pocetVyseOddelenia/:id_oddelenia/:rok",
+  controller.getPocetVysetreniOddelenia
+);
 
 module.exports = router;

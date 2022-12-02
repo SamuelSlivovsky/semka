@@ -15,8 +15,8 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select nazov_nemocnice, nazov_oddelenia, listagg(mpz, ', ')
-            within group(order by zarobok desc) as top_zamestnanci
+      `select nazov_nemocnice "Nemocnica", nazov_oddelenia "Oddelenie", listagg(mpz, ', ')
+            within group(order by zarobok desc) as "Najlepšie zarábajúci"
                 from (select nazov_nemocnice, nazov_oddelenia, mpz, zarobok 
                     from (select nem.nazov as nazov_nemocnice,
                              tod.nazov as nazov_oddelenia, meno || ' ' || priezvisko || ' - ' || sum(suma) || ' eur' as mpz, sum(suma) as zarobok,
@@ -77,15 +77,18 @@ async function getZamestnanciOddelenia(id_oddelenia) {
   }
 }
 
-async function getPocetZamOddelenia(id_oddelenia) {
+async function getPocetZamOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `select count(id_zamestnanca) as pocet_zamestnancov from oddelenie o 
         join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
         where z.id_oddelenia = :id_oddelenia
+        and (to_char(dat_od,'YYYY') <= :rok 
+          or to_char(dat_do, 'YYYY') >= :rok
+        )
             `,
-      [id_oddelenia]
+      [id_oddelenia, rok]
     );
     console.log(result);
     return result.rows;
@@ -111,15 +114,17 @@ async function getPocetPacientovOddelenia(id_oddelenia) {
     console.log(err);
   }
 }
-async function getPocetOperaciiOddelenia(id_oddelenia) {
+async function getPocetOperaciiOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(id_zamestnanca) as pocet_zamestnancov from oddelenie o 
-          join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
-          where z.id_oddelenia = :id_oddelenia
+      `select count(id_operacie) as poc_operacii from operacia o 
+          join zdravotny_zaznam z on (z.id_zaznamu = o.id_zaznamu)
+          join miestnost m on (m.id_miestnosti = o.id_miestnosti)
+          where m.id_oddelenia = :id_oddelenia
+          and to_char(z.datum,'YYYY') = :rok
               `,
-      [id_oddelenia]
+      [id_oddelenia, rok]
     );
     console.log(result);
     return result.rows;
@@ -127,15 +132,18 @@ async function getPocetOperaciiOddelenia(id_oddelenia) {
     console.log(err);
   }
 }
-async function getPocetHospitalizaciiOddelenia(id_oddelenia) {
+async function getPocetHospitalizaciiOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(id_zamestnanca) as pocet_zamestnancov from oddelenie o 
-          join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
-          where z.id_oddelenia = :id_oddelenia
+      `select count(id_hospitalizacie) as poc_hospit from hospitalizacia h 
+          join zdravotny_zaznam z on (z.id_zaznamu = h.id_zaznamu)
+          join lozko l on (l.id_lozka = h.id_lozka)
+          join miestnost m on (m.id_miestnosti = l.id_miestnosti)
+          where m.id_oddelenia = :id_oddelenia
+          and to_char(z.datum,'YYYY') = :rok
               `,
-      [id_oddelenia]
+      [id_oddelenia, rok]
     );
     console.log(result);
     return result.rows;
@@ -143,15 +151,18 @@ async function getPocetHospitalizaciiOddelenia(id_oddelenia) {
     console.log(err);
   }
 }
-async function getPocetVysetreniOddelenia(id_oddelenia) {
+async function getPocetVysetreniOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(id_zamestnanca) as pocet_zamestnancov from oddelenie o 
-          join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
-          where z.id_oddelenia = :id_oddelenia
+      `select count(id_vysetrenia) as poc_vys from vysetrenie v 
+      join zdravotny_zaznam z on (z.id_zaznamu = v.id_zaznamu)
+      join lekar l on (l.id_lekara = v.id_lekara)
+      join zamestnanec zam on (zam.id_zamestnanca = l.id_zamestnanca)
+      where zam.id_oddelenia = :id_oddelenia
+      and to_char(z.datum,'YYYY') = :rok
               `,
-      [id_oddelenia]
+      [id_oddelenia, rok]
     );
     console.log(result);
     return result.rows;
