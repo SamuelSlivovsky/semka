@@ -316,4 +316,13 @@ module.exports = {
             res.status(200).json(ret_val);
         })();
     },
+
+    getZamestnanec: (req, res) => {
+        const zamestnanec = require("../models/zamestnanec");
+        console.log(req.params);
+        (async () => {
+          ret_val = await zamestnanec.getZamestnanec(req.params.id_zamestnanca);
+          res.status(200).json(ret_val);
+        })();
+      },
 };
