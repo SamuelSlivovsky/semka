@@ -62,8 +62,28 @@ async function getZamestnanciOddeleni() {
     }
 }
 
+async function getKrvneSkupinyOddelenia(id_oddelenia) {
+    try {
+        let conn = await database.getConnection();
+        const result = await conn.execute(
+            `select krvna_skupina, count(id_typu_krvnej_skupiny) from krvna_skupina join pacient using(id_typu_krvnej_skupiny)
+                                                                                    join lekar_pacient using(id_pacienta)
+                                                                                    join lekar using(id_lekara)
+                                                                                    join zamestnanec using(id_zamestnanca)
+                                                                                    where id_oddelenia = :id_oddelenia
+                                                                                        group by krvna_skupina`, [id_oddelenia]
+        );
+
+        return result.rows;
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 module.exports = {
     getOddelenia,
     getTopZamestnanciVyplatyPocet,
-    getZamestnanciOddeleni
+    getZamestnanciOddeleni,
+    getKrvneSkupinyOddelenia
 }

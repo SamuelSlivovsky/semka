@@ -25,7 +25,8 @@ async function getNajcastejsieChorobyRokaPocet(pocet, rok) {
                         where to_char(datum_od,'YYYY')= :rok
                         group by nazov, id_choroby
                 )
-            where rank <= :pocet`,
+            where rank <= :pocet
+                order by rank`,
             {
                 rok: { val: rok, dir: oracledb.BIND_IN, type: oracledb.STRING },
                 pocet: pocet
