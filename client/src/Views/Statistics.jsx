@@ -302,24 +302,24 @@ export default function Statistics() {
           <>
             <div className="xl:col-12">
               <div className="grid">
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-2xl count-card">
+                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
                   Počet pacientov
                   <p>{pocetPac}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-2xl count-card">
+                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
                   Počet zamestnancov
                   <p>{pocetZam}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-2xl count-card">
+                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
                   Počet vykonaných operácií
                   <p>{pocetOpe}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-2xl count-card">
+                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
                   Počet vykonaných hospitalizácií
                   <p>{pocetHosp}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-2xl count-card">
-                  Počet vykonaných vysetrení
+                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                  Počet vykonaných vyšetrení
                   <p>{pocetVys}</p>
                 </div>
               </div>

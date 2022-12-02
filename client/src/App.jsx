@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import EventCalendar from './Calendar/Calendar';
-import Home from './Home/Home';
-import { Button } from 'primereact/button';
-import { Routes, Route } from 'react-router-dom';
-import Patients from './Views/Patients';
-import Patient from './Views/Patient';
-import { Register } from './Auth/Register';
-import { Login } from './Auth/Login';
-import Doctors from './Views/Doctors';
-import Statistics from './Views/Statistics';
-import Add from './Views/Add';
-import SidebarButton from './Sidebar/SidebarButton';
-import Combobox from './Views/Combobox';
-import './App.css';
-import './styles/sidebar.css';
-import '../node_modules/primeflex/primeflex.css';
+import React, { useState } from "react";
+import EventCalendar from "./Calendar/Calendar";
+import Home from "./Home/Home";
+import { Button } from "primereact/button";
+import { Routes, Route } from "react-router-dom";
+import Patients from "./Views/Patients";
+import Patient from "./Views/Patient";
+import { Register } from "./Auth/Register";
+import { Login } from "./Auth/Login";
+import Doctors from "./Views/Doctors";
+import Statistics from "./Views/Statistics";
+import Add from "./Views/Add";
+import SidebarButton from "./Sidebar/SidebarButton";
+import Combobox from "./Views/Combobox";
+import "./App.css";
+import "./styles/sidebar.css";
+import "../node_modules/primeflex/primeflex.css";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -24,11 +24,11 @@ function App() {
 
   const sidebarButtons = [
     <SidebarButton
-      key='1'
+      key="1"
       visibleLeft={visibleLeft}
-      path='/'
-      label='Domov'
-      icon='home-icon'
+      path="/"
+      label="Domov"
+      icon="home-icon"
     />,
     /* <SidebarButton
       key='2'
@@ -73,11 +73,18 @@ function App() {
       icon='operation-icon'
     />,*/
     <SidebarButton
-      key='8'
+      key="8"
       visibleLeft={visibleLeft}
-      path='/statistics'
-      label='Štatistiky'
-      icon='stat-icon'
+      path="/statistics"
+      label="Štatistiky"
+      icon="stat-icon"
+    />,
+    <SidebarButton
+      key="9"
+      visibleLeft={visibleLeft}
+      path="/xml"
+      label="XML výstupy"
+      icon="xml-icon"
     />,
     /*<SidebarButton
       key='9'
@@ -97,39 +104,39 @@ function App() {
 
   return (
     <div>
-      <div className={`side-box ${visibleLeft ? 'side-box-opened' : ''}`}>
+      <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
         <Button
-          icon={`${visibleLeft ? 'pi pi-times' : 'pi pi-bars'}`}
+          icon={`${visibleLeft ? "pi pi-times" : "pi pi-bars"}`}
           onClick={() => handleShowSidebar()}
-          iconPos='right'
+          iconPos="right"
           style={{
-            marginTop: '1rem',
-            marginRight: '8px',
-            marginLeft: 'auto',
-            display: 'flex',
-            background: 'none',
-            border: 'none',
+            marginTop: "1rem",
+            marginRight: "8px",
+            marginLeft: "auto",
+            display: "flex",
+            background: "none",
+            border: "none",
           }}
         />
         {sidebarButtons}
       </div>
       <div
-        className={`page-content ${visibleLeft ? 'page-content-opened' : ''}`}
+        className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
       >
         <Routes>
           {/* <Route path='/' element={<Home></Home>}></Route> */}
-          <Route path='/' element={<Combobox></Combobox>}></Route>
+          <Route path="/" element={<Combobox></Combobox>}></Route>
           <Route
-            path='/calendar'
+            path="/calendar"
             element={<EventCalendar></EventCalendar>}
           ></Route>
-          <Route path='/patients' element={<Patients></Patients>}></Route>
-          <Route path='/patient' element={<Patient></Patient>}></Route>
-          <Route path='/register' element={<Register></Register>}></Route>
-          <Route path='/login' element={<Login></Login>}></Route>
-          <Route path='/doctors' element={<Doctors></Doctors>}></Route>
-          <Route path='/statistics' element={<Statistics></Statistics>}></Route>
-          <Route path='/add' element={<Add></Add>}></Route>
+          <Route path="/patients" element={<Patients></Patients>}></Route>
+          <Route path="/patient" element={<Patient></Patient>}></Route>
+          <Route path="/register" element={<Register></Register>}></Route>
+          <Route path="/login" element={<Login></Login>}></Route>
+          <Route path="/doctors" element={<Doctors></Doctors>}></Route>
+          <Route path="/statistics" element={<Statistics></Statistics>}></Route>
+          <Route path="/add" element={<Add></Add>}></Route>
         </Routes>
       </div>
     </div>

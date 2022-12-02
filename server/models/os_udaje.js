@@ -15,7 +15,7 @@ async function getMenovciPacientLekar() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select p.meno, p.priezvisko as priezvisko_pacient, l.priezvisko as priezvisko_lekar 
+      `select p.meno "Meno", p.priezvisko as "Pacientovo priezvisko", l.priezvisko as "Lekárovo priezvisko" 
                     from lekar_pacient join pacient using(id_pacienta)
                     join os_udaje p on(p.rod_cislo = pacient.rod_cislo)
                     join lekar using(id_lekara)

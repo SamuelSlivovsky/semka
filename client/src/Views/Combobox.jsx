@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Dropdown } from "primereact/dropdown";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
@@ -6,7 +6,11 @@ import { Column } from "primereact/column";
 import { InputNumber } from "primereact/inputnumber";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
+import { SplitButton } from "primereact/splitbutton";
+import { Toast } from "primereact/toast";
+import "../styles/combobox.css";
 export default function Combobox() {
+  const toast = useRef(null);
   const [select, setSelect] = useState(null);
   const [valuesInTable, setValuesInTable] = useState([]);
   const [columns, setColumns] = useState([]);
@@ -19,6 +23,44 @@ export default function Combobox() {
   const [input2, setInput2] = useState(null);
   const [imgUrl, setImgUrl] = useState("");
   const [showDialog, setShowDialog] = useState(false);
+  const [showXmlDialog, setShowXmlDialog] = useState(false);
+  const [xmlPath, setXmlPath] = useState(null);
+  const [id, setId] = useState(null);
+  const [zamestnanec, setZamestnanec] = useState(null);
+  const splitItems = [
+    {
+      label: "Hospitalizácie",
+      icon: "hospit-icon-small",
+      command: () => {
+        setShowXmlDialog(true);
+        setXmlPath("http://localhost:5000/selects/operacieNemocnice/");
+      },
+    },
+    {
+      label: "Vyšetrenia",
+      icon: "examination-icon-small",
+      command: () => {
+        setShowXmlDialog(true);
+        setXmlPath("http://localhost:5000/selects/operacieNemocnice/");
+      },
+    },
+    {
+      label: "Operácie",
+      icon: "operation-icon-small",
+      command: () => {
+        setShowXmlDialog(true);
+        setXmlPath("http://localhost:5000/selects/vysetreniaNemocnice/");
+      },
+    },
+    {
+      label: "Očkovania",
+      icon: "vax-icon-small",
+      command: () => {
+        setShowXmlDialog(true);
+        setXmlPath("http://localhost:5000/selects/ockovaniaNemocnice/");
+      },
+    },
+  ];
 
   const selects = [
     {
@@ -48,7 +90,6 @@ export default function Combobox() {
     {
       name: "Typy očkovaní pacientov",
       path: "selects/typyOckovaniaPacienti",
-      attribute1: "",
     },
     {
       name: "Zamestnanci oddeleni",
@@ -74,6 +115,35 @@ export default function Combobox() {
       attribute1: "id",
       fotka: true,
     },
+    {
+      name: "Najviac predpisované lieky roka",
+      path: "selects/najviacPredpisovaneLiekyRoka",
+      attribute1: "year",
+      fotka: false,
+    },
+    {
+      name: "Lieky s počtom menej ako",
+      path: "selects/liekyMenejAkoPocet",
+      attribute1: "count",
+      fotka: false,
+    },
+    {
+      name: "Menovci medzi pacientami a lekármi",
+      path: "selects/menovciPacientLekar",
+      fotka: false,
+    },
+    {
+      name: "Operácie podľa počtu lekárov a trvania",
+      path: "selects/operaciePocetLekarovTrvanie",
+      attribute1: "count",
+      attribute2: "count",
+      fotka: false,
+    },
+    {
+      name: "Kraje podľa počtu operovaných pacientov",
+      path: "selects/krajePodlaPoctuOperovanych",
+      fotka: false,
+    },
   ];
 
   const onSelectChange = (e) => {
@@ -81,19 +151,24 @@ export default function Combobox() {
     setIsDates(false);
     setInput1(null);
     setInput2(null);
-    setInputVal1("");
-    setInputVal2("");
+    console.log(e.value);
     if (
       typeof e.value.attribute1 !== "undefined" &&
       e.value.attribute1 != null
     ) {
       renderInput(e.value.attribute1, 1);
+    } else {
+      console.log("nullujem");
+      setInputVal1("");
     }
     if (
       typeof e.value.attribute2 !== "undefined" &&
       e.value.attribute2 != null
     ) {
       renderInput(e.value.attribute2, 2);
+    } else {
+      console.log("nullujem");
+      setInputVal2("");
     }
   };
 
@@ -102,7 +177,7 @@ export default function Combobox() {
     switch (attr) {
       case "count":
         input = (
-          <div className="field col-4 md:col-3">
+          <>
             <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
               Zadajte pocet
             </label>
@@ -115,13 +190,13 @@ export default function Combobox() {
               mode="decimal"
               useGrouping={false}
             />
-          </div>
+          </>
         );
         level === 1 ? setInput1(input) : setInput2(input);
         break;
       case "id":
         input = (
-          <div className="field col-4 md:col-3">
+          <>
             <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
               Zadajte id
             </label>
@@ -134,13 +209,13 @@ export default function Combobox() {
               mode="decimal"
               useGrouping={false}
             />
-          </div>
+          </>
         );
         level === 1 ? setInput1(input) : setInput2(input);
         break;
       case "date":
         input = (
-          <div className="field col-4 md:col-3">
+          <>
             <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
               Zadajte rozsah datumov{" "}
             </label>
@@ -154,13 +229,13 @@ export default function Combobox() {
               }
               readOnlyInput
             />
-          </div>
+          </>
         );
         level === 1 ? setInput1(input) : setInput2(input);
         break;
       case "percent":
         input = (
-          <div className="field col-4 md:col-3">
+          <>
             <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
               Zadajte percento
             </label>
@@ -174,13 +249,13 @@ export default function Combobox() {
               suffix="%"
               useGrouping={false}
             />
-          </div>
+          </>
         );
         level === 1 ? setInput1(input) : setInput2(input);
         break;
       case "year":
         input = (
-          <div className="field col-4 md:col-3">
+          <>
             <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
               Zadajte rok
             </label>
@@ -196,7 +271,7 @@ export default function Combobox() {
               dateFormat="yy"
               readOnlyInput
             />
-          </div>
+          </>
         );
         level === 1 ? setInput1(input) : setInput2(input);
         break;
@@ -209,7 +284,6 @@ export default function Combobox() {
   };
 
   const handleSubmit = () => {
-    console.log(inputVal1);
     fetch(`/${select.path}/${inputVal1}/${inputVal2}`)
       .then((res) => res.json())
       .then((result) => {
@@ -221,30 +295,6 @@ export default function Combobox() {
   const loadColumnsHeaders = (data) => {
     if (Object.keys(...data).length > 0) {
       loadColumns(Object.keys(...data));
-    }
-  };
-
-  const handleClick = (rowData) => {
-    //console.log(rowData);
-    window.open(
-      "http://localhost:5000/selects/operacieNemocnice/1",
-      "_blank",
-      "noopener,noreferrer"
-    );
-  };
-
-  const actionBodyTemplate = (rowData) => {
-    if (rowData.key !== "empty") {
-      return (
-        <React.Fragment>
-          <Button
-            label="XML"
-            style={{ marginRight: "10px" }}
-            onClick={() => handleClick(rowData)}
-          />
-          <Button label="JSON" onClick={() => handleClick(rowData)} />
-        </React.Fragment>
-      );
     }
   };
 
@@ -261,10 +311,6 @@ export default function Combobox() {
         ></Column>,
       ];
     });
-    /*array = [
-      ...array,
-      <Column key="button" body={actionBodyTemplate}></Column>,
-    ];*/
     setColumns(array);
   };
 
@@ -287,18 +333,56 @@ export default function Combobox() {
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
       });
+    fetch(`selects/zamestnanec/${employee.Id}`)
+      .then((res) => res.json())
+      .then((result) => {
+        console.log(result);
+        setZamestnanec(result);
+      });
   };
 
   const onHide = () => {
     setShowDialog(false);
+    setShowXmlDialog(false);
+    setImgUrl(null);
+    setZamestnanec(null);
     setSelectedRow(null);
+    setXmlPath(null);
+    setId(null);
     setImgUrl("");
+  };
+
+  const renderFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Zavrieť"
+          icon="pi pi-times"
+          onClick={() => onHide()}
+          className="p-button-text"
+        />
+        <Button
+          icon="pi pi-check"
+          label="Zadaj"
+          onClick={() => {
+            id !== null
+              ? window.open(`${xmlPath}${id}`, "_blank", "noopener,noreferrer")
+              : toast.current.show({
+                  severity: "error",
+                  summary: "Zadajte ID nemocnice",
+                  life: 3000,
+                });
+          }}
+        ></Button>
+      </div>
+    );
   };
 
   return (
     <div className="card" style={{ marginTop: 10 }}>
-      <div className="grid">
-        <div className="field col-4 md:col-3" style={{ maxWidth: "400px" }}>
+      <Toast ref={toast} />
+      <div className="parent">
+        <div className="div1">
           <Dropdown
             value={select}
             options={selects}
@@ -307,10 +391,10 @@ export default function Combobox() {
             placeholder="Vyber select"
           />
         </div>
-        {input1}
-        {input2}
+        <div className="div2">{input1}</div>
+        <div className="div3">{input2}</div>
         {isDates ? (
-          <div className="field col-4 md:col-3">
+          <div className="div3">
             <label htmlFor="withoutgrouping">Zadajte rozsah datumov</label>
             <Calendar
               id="range"
@@ -323,12 +407,19 @@ export default function Combobox() {
         ) : (
           ""
         )}
-        <div className="field col-4 md:col-3">
+        <div className="div4">
           <Button
             icon="pi pi-check"
             label="Zadaj"
             onClick={handleSubmit}
           ></Button>
+        </div>
+        <div className="div5">
+          <SplitButton
+            style={{ height: "30px" }}
+            label="Xml výstupy"
+            model={splitItems}
+          ></SplitButton>
         </div>
       </div>
       <div className="card">
@@ -368,8 +459,35 @@ export default function Combobox() {
         style={{ width: "50vw" }}
         onHide={() => onHide()}
       >
-        <h1>{selectedRow != null ? selectedRow.Zamestnanec : ""}</h1>
+        <h1>{zamestnanec !== null ? zamestnanec.MENO : ""}</h1>
         <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
+        <p>{`Vek: ${zamestnanec !== null ? zamestnanec.VEK : ""} rokov`} </p>
+        <p>{`Pohlavie: ${
+          zamestnanec !== null
+            ? zamestnanec.ROD_CISLO.substring(2, 3) === "5" ||
+              zamestnanec.ROD_CISLO.substring(2, 3) === "6"
+              ? "Žena"
+              : "Muž"
+            : ""
+        }`}</p>
+        <p>{`Adresa: ${zamestnanec !== null ? zamestnanec.ADRESA : ""}`}</p>
+      </Dialog>
+      <Dialog
+        visible={showXmlDialog}
+        style={{ width: "50vw" }}
+        onHide={() => onHide()}
+        footer={renderFooter}
+        header="Zadajte id nemocnice"
+      >
+        <InputNumber
+          inputId="withoutgrouping"
+          value={id}
+          autoFocus
+          onValueChange={(e) => setId(e.value)}
+          mode="decimal"
+          style={{ width: "100%" }}
+          useGrouping={false}
+        />
       </Dialog>
     </div>
   );
