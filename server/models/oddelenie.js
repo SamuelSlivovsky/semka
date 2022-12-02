@@ -28,7 +28,7 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
                                                    join oddelenie od on(od.id_oddelenia = zam.id_oddelenia)
                                                     join typ_oddelenia tod on(od.id_typu_oddelenia = tod.id_typu_oddelenia)
                                                      join nemocnica nem on(nem.id_nemocnice = od.id_nemocnice)
-                                                      join vyplata@db_link_vyplaty vyp on(vyp.id_zamestnanca = zam.id_zamestnanca)
+                                                      join vyplaty_mw vyp on(vyp.id_zamestnanca = zam.id_zamestnanca)
                                                        where zam.id_zamestnanca in(select id_zamestnanca from lekar)
                                                         group by nem.id_nemocnice, nem.nazov, tod.nazov, meno, priezvisko, osu.rod_cislo, od.id_oddelenia)
                                   where poradie <= :pocet)                               
