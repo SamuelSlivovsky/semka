@@ -16,7 +16,7 @@ async function getNajcastejsieChorobyRokaPocet(pocet, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select poradie,pocet_chorob, nazov from
+      `select poradie "Poradie",pocet_chorob "Počet chorôb" , nazov "Názov choroby" from
                 (select nazov, rank() over (order by count(id_choroby) desc) as poradie,
                 count(id_choroby) as pocet_chorob
                     from zoznam_chorob join choroba using(id_choroby)
@@ -24,8 +24,8 @@ async function getNajcastejsieChorobyRokaPocet(pocet, rok) {
                         or to_char(datum_od,'YYYY')= :rok
                         group by nazov, id_choroby
                 )
-<<<<<<< HEAD
-            where poradie <= :pocet`,
+            where poradie <= :pocet
+                order by poradie`,
       {
         rok: { val: rok, dir: oracledb.BIND_IN, type: oracledb.STRING },
         pocet: pocet,
@@ -36,21 +36,6 @@ async function getNajcastejsieChorobyRokaPocet(pocet, rok) {
   } catch (err) {
     console.log(err);
   }
-=======
-            where rank <= :pocet
-                order by rank`,
-            {
-                rok: { val: rok, dir: oracledb.BIND_IN, type: oracledb.STRING },
-                pocet: pocet
-            }
-        );
-        console.log(result);
-        return result.rows;
-
-    } catch (err) {
-        console.log(err);
-    }
->>>>>>> origin/Marek_general
 }
 
 module.exports = {

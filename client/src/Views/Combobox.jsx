@@ -46,12 +46,6 @@ export default function Combobox() {
       fotka: true,
     },
     {
-      name: "Výplaty",
-      path: "selects/sumaVyplatRoka",
-      attribute1: "id",
-      fotka: false,
-    },
-    {
       name: "Typy očkovaní pacientov",
       path: "selects/typyOckovaniaPacienti",
       attribute1: "",
@@ -80,12 +74,6 @@ export default function Combobox() {
       attribute1: "id",
       fotka: true,
     },
-    /*{
-      name: "Operácie",
-      path: "operacia/operacie",
-      attribute1: "dates",
-      fotka: false,
-    },*/
   ];
 
   const onSelectChange = (e) => {
@@ -221,7 +209,7 @@ export default function Combobox() {
   };
 
   const handleSubmit = () => {
-    console.log(inputVal2);
+    console.log(inputVal1);
     fetch(`/${select.path}/${inputVal1}/${inputVal2}`)
       .then((res) => res.json())
       .then((result) => {
@@ -273,10 +261,10 @@ export default function Combobox() {
         ></Column>,
       ];
     });
-    array = [
+    /*array = [
       ...array,
       <Column key="button" body={actionBodyTemplate}></Column>,
-    ];
+    ];*/
     setColumns(array);
   };
 
@@ -294,7 +282,7 @@ export default function Combobox() {
   const handleSelectedRow = (employee) => {
     setSelectedRow(employee);
     setShowDialog(true);
-    fetch(`selects/zamestnanciFotka/${employee.ID_ZAMESTNANCA}`)
+    fetch(`selects/zamestnanciFotka/${employee.Id}`)
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
@@ -380,11 +368,7 @@ export default function Combobox() {
         style={{ width: "50vw" }}
         onHide={() => onHide()}
       >
-        <h1>
-          {selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
-            : ""}
-        </h1>
+        <h1>{selectedRow != null ? selectedRow.Zamestnanec : ""}</h1>
         <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
       </Dialog>
     </div>

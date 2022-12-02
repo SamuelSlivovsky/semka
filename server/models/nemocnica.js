@@ -12,7 +12,7 @@ async function getNemocnice() {
   }
 }
 
-async function getSumaVyplatRoka(id_nemocnice, rok) {
+async function getSumaVyplatRoka(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
@@ -31,10 +31,10 @@ async function getSumaVyplatRoka(id_nemocnice, rok) {
                 from nemocnica join oddelenie using(id_nemocnice)
                              join zamestnanec using(id_oddelenia)
                               join vyplaty_mw using(id_zamestnanca)
-                                 where id_nemocnice = :id_nemocnice and to_char(datum, 'YYYY') = :rok`,
-      [id_nemocnice, rok]
+                                 where id_oddelenia = :id_oddelenia and to_char(datum, 'YYYY') = :rok`,
+      [id_oddelenia, rok]
     );
-
+    console.log(result.rows);
     return result.rows;
   } catch (err) {
     console.log(err);

@@ -37,6 +37,15 @@ module.exports = {
     })();
   },
 
+  getTopZamestnanciVyplatyOddelenie: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+    console.log(req.params);
+    (async () => {
+      ret_val = await oddelenie.getTopZamestnanciVyplatyOddelenie(req.params.id_oddelenia, req.params.rok);
+      res.status(200).json(ret_val);
+    })();
+  },
+
   getNajviacPredpisovaneLiekyRoka: (req, res) => {
     const liek = require("../models/liek");
     console.log(req.params);
@@ -51,7 +60,7 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await nemocnica.getSumaVyplatRoka(
-        req.params.id_nemocnice,
+        req.params.id_oddelenia,
         req.params.rok
       );
       res.status(200).json(ret_val);
@@ -169,7 +178,7 @@ module.exports = {
     const os_udaje = require("../models/os_udaje");
     console.log(req.params);
     (async () => {
-      ret_val = await os_udaje.getPomerMuziZeny();
+      ret_val = await os_udaje.getPomerMuziZeny(req.params.id_oddelenia);
       res.status(200).json(ret_val);
     })();
   },

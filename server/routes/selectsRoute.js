@@ -15,11 +15,16 @@ router.get(
   "/topZamestnanciVyplaty/:pocet",
   controller.getTopZamestnanciVyplatyPocet
 );
+
+router.get(
+  "/topZamestnanciVyplatyOddelenie/:id_oddelenia/:rok",
+  controller.getTopZamestnanciVyplatyOddelenie
+);
 router.get(
   "/najviacPredpisovaneLiekyRoka/:rok",
   controller.getNajviacPredpisovaneLiekyRoka
 );
-router.get("/sumaVyplatRoka/:id_nemocnice/:rok", controller.getSumaVyplatRoka);
+router.get("/sumaVyplatRoka/:id_oddelenia/:rok", controller.getSumaVyplatRoka);
 router.get("/typyOckovaniaPacienti", controller.getTypyOckovaniaPacienti);
 router.get("/zamestnanciOddeleni", controller.getZamestnanciOddeleni);
 router.get(
@@ -42,7 +47,7 @@ router.get(
 );
 router.get("/priemernyVek/", controller.getPriemernyVek);
 router.get("/pocetPacientiPodlaVeku/", controller.getPocetPacientiPodlaVeku);
-router.get("/pomerMuziZeny/", controller.getPomerMuziZeny);
+router.get("/pomerMuziZeny/:id_oddelenia", controller.getPomerMuziZeny);
 router.get(
   "/hospitalizacieNemocniceXML/:id_nemocnice",
   controller.getHospitalizacieNemocniceXML
