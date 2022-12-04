@@ -1,8 +1,13 @@
-select XMLRoot(XMLElement("nemocnica", 
+create or replace function getHospitalizacieNemocnice_f(p_id_nemocnice integer)
+return CLOB
+is    
+nemxml CLOB;
+begin
+    select XMLRoot(XMLElement("nemocnica", 
                           XMLElement("nazov_nemocnice", nazov_nemocnice),
                           XMLElement("hospitalizacie", hospitalizacie)
                           ), version '1.0'
-              ) as hospitalizacie_nemocnice_XML
+              ).getclobval() into nemxml
       from (select (select XMLAgg(XMLElement("hospitalizacia",
                                              XMLElement("datum_hospitalizacie", to_char(zz.datum, 'DD.MM.YYYY')),
                                              XMLElement("datum_ukoncenia", to_char(h.dat_do, 'DD.MM.YYYY')),
@@ -18,7 +23,8 @@ select XMLRoot(XMLElement("nemocnica",
                                                         ),     
                                              XMLElement("miestnost", XMLAttributes(m.nazov_miestnosti as "nazov"), 
                                                         XMLElement("lozko", XMLAttributes(h.id_lozka as "id"))
-                                                        )                        
+                                                        ),
+                                             XMLElement("popis", popis)           
                                              )
                                   ) from hospitalizacia h join lozko loz on(loz.id_lozka = h.id_lozka)
                                                            join miestnost m on(m.id_miestnosti = loz.id_miestnosti)
@@ -35,4 +41,8 @@ select XMLRoot(XMLElement("nemocnica",
                                                                       join oddelenie od on(od.id_oddelenia = m.id_oddelenia)
                                                                        join nemocnica nem on(nem.id_nemocnice = od.id_nemocnice)
                                                                         where nem.id_nemocnice = nem_out.id_nemocnice
-                    ) as hospitalizacie, nem_out.nazov as nazov_nemocnice from nemocnica nem_out where nem_out.id_nemocnice = 1);
+                    ) as hospitalizacie, nem_out.nazov as nazov_nemocnice from nemocnica nem_out where nem_out.id_nemocnice = p_id_nemocnice);
+                    return nemxml;
+end;
+/
+
