@@ -1,5 +1,4 @@
 module.exports = {
-
     getNajviacChoriPocet: (req, res) => {
         const pacient = require("../models/pacient");
         console.log(req.params);
@@ -9,11 +8,11 @@ module.exports = {
         })();
     },
 
-    getNajviacOckovaniPercenta: (req, res) => {
+    getNajviacOperovanyPercenta: (req, res) => {
         const pacient = require("../models/pacient");
         console.log(req.params);
         (async () => {
-            ret_val = await pacient.getNajviacOckovaniPercenta(req.params.percent);
+            ret_val = await pacient.getNajviacOperovanyPercenta(req.params.percent);
             res.status(200).json(ret_val);
         })();
     },
@@ -22,7 +21,9 @@ module.exports = {
         const pacient = require("../models/pacient");
         console.log(req.params);
         (async () => {
-            ret_val = await pacient.getNajviacHospitalizovaniPercenta(req.params.percent);
+            ret_val = await pacient.getNajviacHospitalizovaniPercenta(
+                req.params.percent
+            );
             res.status(200).json(ret_val);
         })();
     },
@@ -32,6 +33,15 @@ module.exports = {
         console.log(req.params);
         (async () => {
             ret_val = await oddelenie.getTopZamestnanciVyplatyPocet(req.params.pocet);
+            res.status(200).json(ret_val);
+        })();
+    },
+
+    getTopZamestnanciVyplatyOddelenie: (req, res) => {
+        const oddelenie = require("../models/oddelenie");
+        console.log(req.params);
+        (async () => {
+            ret_val = await oddelenie.getTopZamestnanciVyplatyOddelenie(req.params.id_oddelenia, req.params.rok);
             res.status(200).json(ret_val);
         })();
     },
@@ -46,10 +56,13 @@ module.exports = {
     },
 
     getSumaVyplatRoka: (req, res) => {
-        const nemocnica = require("../models/nemocnica");
+        const oddelenie = require("../models/oddelenie");
         console.log(req.params);
         (async () => {
-            ret_val = await nemocnica.getSumaVyplatRoka(req.params.id_nemocnice);
+            ret_val = await oddelenie.getSumaVyplatRoka(
+                req.params.id_oddelenia,
+                req.params.rok
+            );
             res.status(200).json(ret_val);
         })();
     },
@@ -76,7 +89,10 @@ module.exports = {
         const choroba = require("../models/choroba");
         console.log(req.params);
         (async () => {
-            ret_val = await choroba.getNajcastejsieChorobyRokaPocet(req.params.pocet, req.params.rok);
+            ret_val = await choroba.getNajcastejsieChorobyRokaPocet(
+                req.params.pocet,
+                req.params.rok
+            );
             res.status(200).json(ret_val);
         })();
     },
@@ -85,7 +101,9 @@ module.exports = {
         const lozko = require("../models/lozko");
         console.log(req.params);
         (async () => {
-            ret_val = await lozko.getNeobsadeneLozkaOddeleniaTyzden(req.params.id_oddelenia);
+            ret_val = await lozko.getNeobsadeneLozkaOddeleniaTyzden(
+                req.params.id_oddelenia
+            );
             res.status(200).json(ret_val);
         })();
     },
@@ -112,7 +130,10 @@ module.exports = {
         const operacia = require("../models/operacia");
         console.log(req.params);
         (async () => {
-            ret_val = await operacia.getOperaciePocetLekarovTrvanie(req.params.pocetLekarov, req.params.trvanie);
+            ret_val = await operacia.getOperaciePocetLekarovTrvanie(
+                req.params.pocetLekarov,
+                req.params.trvanie
+            );
             res.status(200).json(ret_val);
         })();
     },
@@ -157,7 +178,132 @@ module.exports = {
         const os_udaje = require("../models/os_udaje");
         console.log(req.params);
         (async () => {
-            ret_val = await os_udaje.getPomerMuziZeny();
+            ret_val = await os_udaje.getPomerMuziZeny(req.params.id_oddelenia);
+            res.status(200).json(ret_val);
+        })();
+    },
+
+    getHospitalizacieNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getHospitalizacieNemocniceXML(
+                req.params.id_nemocnice
+            );
+            res.status(200).send(ret_val);
+        })();
+    },
+
+    getOperacieNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getOperacieNemocniceXML(
+                req.params.id_nemocnice
+            );
+            res.status(200).send(ret_val);
+        })();
+    },
+
+    getOckovaniaNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getOckovaniaNemocniceXML(
+                req.params.id_nemocnice
+            );
+            res.status(200).send(ret_val);
+        })();
+    },
+
+    getVysetreniaNemocniceXML: (req, res) => {
+        res.header("Content-Type", "application/xml");
+        const nemocnica = require("../models/nemocnica");
+        console.log(req.params);
+        (async () => {
+            ret_val = await nemocnica.getVysetreniaNemocniceXML(
+                req.params.id_nemocnice
+            );
+            res.status(200).send(ret_val);
+        })();
+    },
+
+    getZamestnanciFotka: (req, res) => {
+        const zamestnanec = require("../models/zamestnanec");
+        (async () => {
+            ret_val = await zamestnanec.getZamestnanciFotka(
+                req.params.id_zamestnanca
+            );
+            res.status(200).write(ret_val.FOTKA, "binary");
+            res.end(null, "binary");
+        })();
+    },
+
+    getZamestnanciOddelenia: (req, res) => {
+        const oddelenie = require("../models/oddelenie");
+        console.log(req.params);
+        (async () => {
+            ret_val = await oddelenie.getZamestnanciOddelenia(
+                req.params.id_oddelenia
+            );
+            res.status(200).json(ret_val);
+        })();
+    },
+
+    getPocetPacientovOddelenia: (req, res) => {
+        const oddelenie = require("../models/oddelenie");
+        console.log(req.params);
+        (async () => {
+            ret_val = await oddelenie.getPocetPacientovOddelenia(
+                req.params.id_oddelenia
+            );
+            res.status(200).json(ret_val);
+        })();
+    },
+    getPocetOperaciiOddelenia: (req, res) => {
+        const oddelenie = require("../models/oddelenie");
+        console.log(req.params);
+        (async () => {
+            ret_val = await oddelenie.getPocetOperaciiOddelenia(
+                req.params.id_oddelenia,
+                req.params.rok
+            );
+            res.status(200).json(ret_val);
+        })();
+    },
+    getPocetHospitalizaciiOddelenia: (req, res) => {
+        const oddelenie = require("../models/oddelenie");
+        console.log(req.params);
+        (async () => {
+            ret_val = await oddelenie.getPocetHospitalizaciiOddelenia(
+                req.params.id_oddelenia,
+                req.params.rok
+            );
+            res.status(200).json(ret_val);
+        })();
+    },
+    getPocetVysetreniOddelenia: (req, res) => {
+        const oddelenie = require("../models/oddelenie");
+        console.log(req.params);
+        (async () => {
+            ret_val = await oddelenie.getPocetVysetreniOddelenia(
+                req.params.id_oddelenia,
+                req.params.rok
+            );
+            res.status(200).json(ret_val);
+        })();
+    },
+    getPocetZamOddelenia: (req, res) => {
+        const oddelenie = require("../models/oddelenie");
+        console.log(req.params);
+        (async () => {
+            ret_val = await oddelenie.getPocetZamOddelenia(
+                req.params.id_oddelenia,
+                req.params.rok
+            );
             res.status(200).json(ret_val);
         })();
     },
@@ -171,43 +317,12 @@ module.exports = {
         })();
     },
 
-    getHospitalizacieNemocniceXML: (req, res) => {
-        res.header("Content-Type", "application/xml");
-        const nemocnica = require("../models/nemocnica");
+    getZamestnanec: (req, res) => {
+        const zamestnanec = require("../models/zamestnanec");
         console.log(req.params);
         (async () => {
-            ret_val = await nemocnica.getHospitalizacieNemocniceXML(req.params.id_nemocnice);
-            res.status(200).send(ret_val);
+          ret_val = await zamestnanec.getZamestnanec(req.params.id_zamestnanca);
+          res.status(200).json(ret_val);
         })();
-    },
-
-    getOperacieNemocniceXML: (req, res) => {
-        res.header("Content-Type", "application/xml");
-        const nemocnica = require("../models/nemocnica");
-        console.log(req.params);
-        (async () => {
-            ret_val = await nemocnica.getOperacieNemocniceXML(req.params.id_nemocnice);
-            res.status(200).send(ret_val);
-        })();
-    },
-
-    getOckovaniaNemocniceXML: (req, res) => {
-        res.header("Content-Type", "application/xml");
-        const nemocnica = require("../models/nemocnica");
-        console.log(req.params);
-        (async () => {
-            ret_val = await nemocnica.getOckovaniaNemocniceXML(req.params.id_nemocnice);
-            res.status(200).send(ret_val);
-        })();
-    },
-
-    getVysetreniaNemocniceXML: (req, res) => {
-        res.header("Content-Type", "application/xml");
-        const nemocnica = require("../models/nemocnica");
-        console.log(req.params);
-        (async () => {
-            ret_val = await nemocnica.getVysetreniaNemocniceXML(req.params.id_nemocnice);
-            res.status(200).send(ret_val);
-        })();
-    },
-}
+      },
+};

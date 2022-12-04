@@ -1,6 +1,6 @@
 module.exports = {
   get: (req, res) => {
-    res.send("Prisli ste na stranku Lekar");
+    res.send('Prisli ste na stranku Lekar');
   },
 
     getPacienti: (req, res) => {
