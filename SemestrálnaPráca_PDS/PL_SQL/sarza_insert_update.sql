@@ -114,7 +114,7 @@ begin
     select id_sarze, id_oddelenia, pocet_liekov bulk collect into sarze
         from sarza join sklad using(id_skladu);
             
-    for i in 1..10
+    for i in 1..1000
     loop
         rnd_sarza := sarze(round(DBMS_RANDOM.VALUE (1, sarze.last)));
         
