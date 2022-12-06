@@ -157,6 +157,7 @@ export default function Combobox() {
 
   const onSelectChange = (e) => {
     setValuesInTable(null);
+    setColumns(null);
     setSelect(e.value);
     setIsDates(false);
     setInput1(null);
