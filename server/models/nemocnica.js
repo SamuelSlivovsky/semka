@@ -1,4 +1,4 @@
-const database = require("../database/Database");
+const database = require('../database/Database');
 const oracledb = database.oracledb;
 
 async function getNemocnice() {
@@ -108,7 +108,6 @@ async function getVysetreniaNemocniceXML(id_nemocnice) {
 
 module.exports = {
   getNemocnice,
-  getSumaVyplatRoka,
   getHospitalizacieNemocniceXML,
   getOperacieNemocniceXML,
   getOckovaniaNemocniceXML,
