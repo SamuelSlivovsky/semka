@@ -75,7 +75,7 @@ select  poradie, Zamestnanec, zarobok "Zárobok"
         from (select meno || ' ' || priezvisko as Zamestnanec ,nazov_nemocnice, nazov_oddelenia, zarobok, poradie 
           from (select meno, priezvisko, nem.nazov as nazov_nemocnice,
                    tod.nazov as nazov_oddelenia, sum(suma) as zarobok,
-                      dense_rank() over(order by sum(suma) desc) as poradie
+                      rank() over(order by sum(suma) desc) as poradie
                           from os_udaje osu join zamestnanec zam on(osu.rod_cislo = zam.rod_cislo)
                                          join oddelenie od on(od.id_oddelenia = zam.id_oddelenia)
                                           join typ_oddelenia tod on(od.id_typu_oddelenia = tod.id_typu_oddelenia)
