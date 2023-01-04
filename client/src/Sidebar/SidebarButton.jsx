@@ -8,7 +8,6 @@ export default function SidebarButton(props) {
   return (
     <>
       <Button
-
         icon={props.icon}
         onClick={() => navigate(props.path)}
         label={`${props.visibleLeft ? props.label : ""}`}

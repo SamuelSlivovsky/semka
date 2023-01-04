@@ -8,14 +8,12 @@ import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import "../styles/calendar.css";
 
 function EventCalendar() {
   const [currentEvents, setCurrentEvents] = useState(INITIAL_EVENTS);
-  const [allDay, setAllDay] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [showConfirmChanges, setShowConfirmChanges] = useState(false);
@@ -41,12 +39,12 @@ function EventCalendar() {
     setEventDateStart(new Date(selectInfo.start));
     setEventDateEnd(null);
     setCurrEventTitle(null);
-    setAllDay(null);
     setEventType(null);
   };
 
   const handleEventClick = (clickInfo) => {
     setShowDialog(true);
+    setShowAddEvent(false);
     switch (clickInfo.event._def.extendedProps.type) {
       case "OP":
         setEventType(eventTypes[0]);
@@ -65,12 +63,10 @@ function EventCalendar() {
     setEventDateStart(new Date(clickInfo.event._instance.range.start));
     setEventDateEnd(new Date(clickInfo.event._instance.range.end));
     setCurrEventTitle(clickInfo.event._def.title);
-    setAllDay(clickInfo.event._def.allDay);
   };
 
   const onHide = () => {
     setShowDialog(false);
-    setShowAddEvent(false);
   };
 
   const onConfirmDialogHide = (hideDialog) => {
@@ -94,12 +90,7 @@ function EventCalendar() {
     if (!addEvent) {
       let calendarApi = calendarRef.current.getApi();
       let currentEvent = calendarApi.getEventById(currEventId);
-      allDay
-        ? currentEvent.setDates(eventDateStart, eventDateEnd, { allDay: true })
-        : currentEvent.setDates(eventDateStart, eventDateEnd, {
-            allDay: false,
-          });
-
+      currentEvent.setDates(eventDateStart, eventDateEnd, { allDay: true });
       currentEvent.setProp("title", currEventTitle);
     } else {
       let backgroundColor = "";
@@ -123,7 +114,6 @@ function EventCalendar() {
         title: currEventTitle,
         start: eventDateStart,
         end: eventDateEnd,
-        allDay: allDay,
         type: eventType,
         backgroundColor: backgroundColor,
         borderColor: backgroundColor,
@@ -177,7 +167,8 @@ function EventCalendar() {
   };
 
   const renderAddEventContent = () => {
-    return selectButtonValue === "Zmeniť udalosť" ? (
+    console.log(showAddEvent);
+    return selectButtonValue === "Zmeniť udalosť" || showAddEvent ? (
       <>
         <div className="field col-12">
           <label htmlFor="basic">Názov udalosti</label>
@@ -217,18 +208,8 @@ function EventCalendar() {
             optionLabel="name"
           />
         </div>
-        <div className="field-checkbox col-12" style={{ marginTop: "10px" }}>
-          <Checkbox
-            inputId="binary"
-            checked={allDay}
-            onChange={(e) => setAllDay(e.checked)}
-          />
-          <label htmlFor="binary" style={{ marginLeft: "10px" }}>
-            Celodenná udalosť
-          </label>
-        </div>
       </>
-    ) : (
+    ) : !showAddEvent ? (
       <>
         <div className="field col-12">
           <h3 htmlFor="basic">Názov udalosti</h3>
@@ -261,6 +242,8 @@ function EventCalendar() {
           <p>{eventType !== null ? eventType.name : ""}</p>
         </div>
       </>
+    ) : (
+      ""
     );
   };
 
@@ -295,20 +278,24 @@ function EventCalendar() {
         }
         onHide={() => onHide()}
       >
-        <div className="p-fluid grid formgrid">
-          <SelectButton
-            value={selectButtonValue}
-            options={options}
-            onChange={(e) => setSelectButtonValue(e.value)}
-            style={{
-              height: "50px",
-              width: "200px",
-              marginBottom: "1rem",
-              marginLeft: "0.75rem",
-            }}
-          />
-          {renderAddEventContent()}
-        </div>
+        {!showAddEvent ? (
+          <div className="p-fluid grid formgrid">
+            <SelectButton
+              value={selectButtonValue}
+              options={options}
+              onChange={(e) => setSelectButtonValue(e.value)}
+              style={{
+                height: "50px",
+                width: "200px",
+                marginBottom: "1rem",
+                marginLeft: "0.75rem",
+              }}
+            />
+            {renderAddEventContent()}
+          </div>
+        ) : (
+          <div className="p-fluid grid formgrid">{renderAddEventContent()}</div>
+        )}
         <Dialog
           header="Prajete si uložiť zmeny?"
           visible={showConfirmChanges}

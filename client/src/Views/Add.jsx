@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
-import { Checkbox } from "primereact/checkbox";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 export default function Add() {
-  const [allDay, setAllDay] = useState(false);
   const [eventDateStart, setEventDateStart] = useState(null);
   const [eventDateEnd, setEventDateEnd] = useState(null);
   const [currEventTitle, setCurrEventTitle] = useState(null);
@@ -80,16 +78,6 @@ export default function Add() {
           onChange={onPlaceIdChange}
           optionLabel="id"
         />
-      </div>
-      <div className="field-checkbox col-12" style={{ marginTop: "10px" }}>
-        <Checkbox
-          inputId="binary"
-          checked={allDay}
-          onChange={(e) => setAllDay(e.checked)}
-        />
-        <label htmlFor="binary" style={{ marginLeft: "10px" }}>
-          Celodenná udalosť
-        </label>
       </div>
     </div>
   );
