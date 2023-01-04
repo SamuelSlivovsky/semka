@@ -1,6 +1,6 @@
 import React from "react";
 
 function Patient() {
-  return <p>ddd</p>;
+  return <div>Pacient</div>;
 }
 export default Patient;

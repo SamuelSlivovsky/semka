@@ -15,6 +15,14 @@ import "./App.css";
 import "./styles/sidebar.css";
 import "../node_modules/primeflex/primeflex.css";
 
+import TabPatients from './Views/Tables/TabPatients';
+import TabHospitalizations from './Views/Tables/TabHospitalizations'
+import TabOperations from './Views/Tables/TabOperations'
+import TabExaminations from './Views/Tables/TabExaminations'
+
+import TabDoctors from './Views/Tables/TabDoctors';
+import Doctor from './Views/Doctor'
+
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const handleShowSidebar = () => {
@@ -110,7 +118,21 @@ function App() {
             border: "none",
           }}
         />
-        {sidebarButtons}
+        <Button
+          icon='hospital-logo-icon'
+          className='p-button-rounded p-button-info'
+          iconPos='right'
+          style={{
+            marginTop: '1rem',
+            marginRight: '8px',
+            marginLeft: 'auto',
+            display: 'block',
+          }}
+        />
+        <div className='sidebar-content'>
+          <h1 style={{ verticalAlign: 'text-top', color: 'white' }}>USER</h1>
+          <Avatar label='P' className='mr-2' size='xlarge' shape='circle' />
+        </div>
       </div>
       <div
         className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
@@ -121,13 +143,15 @@ function App() {
             path="/calendar"
             element={<EventCalendar></EventCalendar>}
           ></Route>
-          <Route path="/patients" element={<Patients></Patients>}></Route>
-          <Route path="/patient" element={<Patient></Patient>}></Route>
-          <Route path="/register" element={<Register></Register>}></Route>
-          <Route path="/login" element={<Login></Login>}></Route>
-          <Route path="/doctors" element={<Doctors></Doctors>}></Route>
-          <Route path="/statistics" element={<Statistics></Statistics>}></Route>
-          <Route path="/add" element={<Add></Add>}></Route>
+          <Route path='/patients' element={<TabPatients/>}></Route>
+          <Route path='/patient' element={<Patient/>}></Route>
+          <Route path='/register' element={<Register></Register>}></Route>
+          <Route path='/login' element={<Login></Login>}></Route>
+          <Route path='/doctors' element={<TabDoctors></TabDoctors>}></Route>
+          <Route path='/doctor' element={<Doctor />}></Route>
+          <Route path='/hospitalizations' element={<TabHospitalizations />}></Route>
+          <Route path='/operations' element={<TabOperations />}></Route>
+          <Route path='/examinations' element={<TabExaminations />}></Route>
         </Routes>
       </div>
     </div>
