@@ -135,6 +135,26 @@ async function getPocetPacientiPodlaVeku() {
   }
 }
 
+async function getInfo(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select meno, priezvisko, 
+        trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
+        to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, tel, mail,
+        krvna_skupina, PSC, nazov 
+         from os_udaje join pacient using(rod_cislo)
+          join krvna_skupina using(id_typu_krvnej_skupiny)
+           join obec using(PSC) where id_pacienta = :id`,
+      [id]
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getPacienti,
   getNajviacChoriPocet,
@@ -143,4 +163,5 @@ module.exports = {
   getTypyOckovaniaPacienti,
   getPacientiChorobaP13,
   getPocetPacientiPodlaVeku,
+  getInfo
 };
