@@ -5,14 +5,19 @@ import { Button } from 'primereact/button';
 import { Routes, Route, useNavigate, useLocation } from 'react-router-dom';
 import { Avatar } from 'primereact/avatar';
 import hospitalImage from './images/hospital.png';
-import Patients from './Views/Patients';
-import Patient from './Views/Patient';
+import TabPatients from './Views/Tables/TabPatients';
+import TabHospitalizations from './Views/Tables/TabHospitalizations'
+import TabOperations from './Views/Tables/TabOperations'
+import TabExaminations from './Views/Tables/TabExaminations'
 import { Register } from './Auth/Register';
 import { Login } from './Auth/Login';
-import Doctors from './Views/Doctors';
+import TabDoctors from './Views/Tables/TabDoctors';
+import Doctor from './Views/Doctor'
 import './App.css';
 import './icons.css';
 import './styles/sidebar.css';
+import Patient from './Views/Patient';
+
 
 function App() {
   const navigate = useNavigate();
@@ -49,7 +54,7 @@ function App() {
           }}
         />
         <Button
-          icon='pi pi-user'
+          icon='hospital-logo-icon'
           className='p-button-rounded p-button-info'
           iconPos='right'
           style={{
@@ -73,11 +78,15 @@ function App() {
             path='/calendar'
             element={<EventCalendar></EventCalendar>}
           ></Route>
-          <Route path='/patients' element={<Patients></Patients>}></Route>
-          <Route path='/patient' element={<Patient></Patient>}></Route>
+          <Route path='/patients' element={<TabPatients/>}></Route>
+          <Route path='/patient' element={<Patient/>}></Route>
           <Route path='/register' element={<Register></Register>}></Route>
           <Route path='/login' element={<Login></Login>}></Route>
-          <Route path='/doctors' element={<Doctors></Doctors>}></Route>
+          <Route path='/doctors' element={<TabDoctors></TabDoctors>}></Route>
+          <Route path='/doctor' element={<Doctor />}></Route>
+          <Route path='/hospitalizations' element={<TabHospitalizations />}></Route>
+          <Route path='/operations' element={<TabOperations />}></Route>
+          <Route path='/examinations' element={<TabExaminations />}></Route>
         </Routes>
       </div>
     </div>
