@@ -1,5 +1,4 @@
 import TablePeople from "./TablePeople";
-import mockDataJson from "../../mock/mock-data.json";
 import { useState } from "react";
 import { useEffect } from "react";
 
