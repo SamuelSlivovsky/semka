@@ -1,0 +1,139 @@
+import React, { useState, useEffect } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { InputText } from 'primereact/inputtext';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { useNavigate } from 'react-router';
+
+
+export default function TablePeople(props) {
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [filters, setFilters] = useState(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const {route,tableName, cellData, titles}=props;
+
+  const navigate = useNavigate();
+
+  const onHide = () => {
+    setShowDialog(false);
+  };
+
+  const onSubmit = () => {
+    setShowDialog(false);
+    navigate(route);
+  };
+
+  const handleClick = (value) => {
+    setShowDialog(true);
+    setSelectedRow(value);
+  };
+
+  const renderDialogFooter = () => {
+    return (
+      <div>
+        <Button
+          label='Zatvoriť'
+          icon='pi pi-times'
+          className='p-button-danger'
+          onClick={() => onHide()}
+        />
+        <Button
+          label='Detail'
+          icon='pi pi-check'
+          onClick={() => onSubmit()}
+          autoFocus
+        />
+      </div>
+    );
+  };
+
+  const renderHeader = () => {
+    return (
+      <div className='flex justify-content-between'>
+        <div className="table-header">
+            {tableName}
+            <span className='p-input-icon-left'>
+          <i className='pi pi-search' />
+          <InputText
+            value={globalFilterValue}
+            onChange={onGlobalFilterChange}
+            placeholder='Keyword Search'
+          />
+        </span>
+        </div>
+      </div>
+    );
+  };
+
+  const onGlobalFilterChange = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
+    _filters['global'].value = value;
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  };
+
+  useEffect(() => {
+    initFilters();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const initFilters = () => {
+    setFilters({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      name: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      code: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      category: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      quantity: {
+        operator: FilterOperator.OR,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+    });
+    setGlobalFilterValue('');
+  };
+
+  const header = renderHeader();
+  return (
+    <div>
+      <div className='card'>
+        <DataTable
+          value={cellData}
+          responsiveLayout='scroll'
+          selectionMode='single'
+          selection={selectedRow}
+          onSelectionChange={(e) => handleClick(e.value)}
+          header={header}
+          filters={filters}
+          filterDisplay='menu'
+          globalFilterFields={titles.field}
+          emptyMessage='Žiadne výsledky nevyhovujú vyhľadávaniu'
+        >
+
+        {titles.map((title)=>(
+            <Column field={title.field} header={title.header} sortable filter></Column>
+        ))}
+
+          
+        </DataTable>
+      </div>
+      <Dialog
+        header={"Meno a priezvisko"}
+        visible={showDialog}
+        style={{ width: '50vw' }}
+        footer={renderDialogFooter()}
+        onHide={() => onHide()}
+      ></Dialog>
+    </div>
+  );
+}
