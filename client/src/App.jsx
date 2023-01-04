@@ -2,26 +2,22 @@ import React, { useState } from "react";
 import EventCalendar from "./Calendar/Calendar";
 import Home from "./Home/Home";
 import { Button } from "primereact/button";
-import { Routes, Route } from "react-router-dom";
-import Patients from "./Views/Patients";
-import Patient from "./Views/Patient";
-import { Register } from "./Auth/Register";
-import { Login } from "./Auth/Login";
-import Doctors from "./Views/Doctors";
-import Statistics from "./Views/Statistics";
-import Add from "./Views/Add";
-import SidebarButton from "./Sidebar/SidebarButton";
-import "./App.css";
-import "./styles/sidebar.css";
-import "../node_modules/primeflex/primeflex.css";
-
+import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
+import { Avatar } from 'primereact/avatar';
+import hospitalImage from './images/hospital.png';
 import TabPatients from './Views/Tables/TabPatients';
 import TabHospitalizations from './Views/Tables/TabHospitalizations'
 import TabOperations from './Views/Tables/TabOperations'
 import TabExaminations from './Views/Tables/TabExaminations'
-
+import Patient from "./Views/Patient";
+import { Register } from "./Auth/Register";
+import { Login } from "./Auth/Login";
 import TabDoctors from './Views/Tables/TabDoctors';
 import Doctor from './Views/Doctor'
+import SidebarButton from "./Sidebar/SidebarButton";
+import "./App.css";
+import "./styles/sidebar.css";
+import "../node_modules/primeflex/primeflex.css";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -129,6 +125,7 @@ function App() {
             display: 'block',
           }}
         />
+        {sidebarButtons}
         <div className='sidebar-content'>
           <h1 style={{ verticalAlign: 'text-top', color: 'white' }}>USER</h1>
           <Avatar label='P' className='mr-2' size='xlarge' shape='circle' />
@@ -143,8 +140,8 @@ function App() {
             path="/calendar"
             element={<EventCalendar></EventCalendar>}
           ></Route>
-          <Route path='/patients' element={<TabPatients/>}></Route>
-          <Route path='/patient' element={<Patient/>}></Route>
+          <Route path='/patients' element={<TabPatients />}></Route>
+          <Route path='/patient' element={<Patient />}></Route>
           <Route path='/register' element={<Register></Register>}></Route>
           <Route path='/login' element={<Login></Login>}></Route>
           <Route path='/doctors' element={<TabDoctors></TabDoctors>}></Route>

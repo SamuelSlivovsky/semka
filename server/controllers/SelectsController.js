@@ -1,4 +1,13 @@
 module.exports = {
+  insertPacientZTP: (req, res) => {
+    const pacient = require('../models/pacient');
+    console.log(req.params);
+    (async () => {
+      ret_val = await pacient.insertPacientZTP(req.body);
+      res.status(200);
+    })();
+  },
+
   getNajviacChoriPocet: (req, res) => {
     const pacient = require('../models/pacient');
     console.log(req.params);

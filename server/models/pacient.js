@@ -1,3 +1,4 @@
+const { element } = require("xml");
 const database = require("../database/Database");
 
 async function getPacienti() {
@@ -135,6 +136,116 @@ async function getPocetPacientiPodlaVeku() {
   }
 }
 
+async function insertPacientZTP(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+      pacient_ZTP_insert(:id_pacienta, :id_typu_ztp, :dat_od, dat_do);
+    END;`;
+
+    await conn.execute(sqlStatement,
+      {
+        id_pacienta: body.id_pacienta,
+        country_name: body.id_typu_ztp,
+        dat_od: body.dat_od,
+        dat_do: body.dat_do
+      }, function (err, result) {
+        if (err)
+          console.error(err.message);
+        else
+          console.log("Rows inserted " + result.rowsAffected);
+      }
+    );
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getUdalosti(id) {
+  try {
+    let udalosti = [];
+
+    //udalosti.push(await getOperacie(id));
+    let operacie = await getOperacie(id);
+    operacie.forEach(element => {
+      udalosti.push(element);
+    });
+
+    let ockovania = await getOckovania(id);
+    ockovania.forEach(element => {
+      udalosti.push(element);
+    });
+
+    let vysetrenia = await getVysetrenia(id);
+    vysetrenia.forEach(element => {
+      udalosti.push(element);
+    });
+
+    console.log(udalosti);
+    return udalosti;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getOperacie(id) {
+  try {
+    let conn = await database.getConnection();
+    const operacie = await conn.execute(
+      `select datum, id_zaznamu from zdravotny_zaznam
+        join operacia using(id_zaznamu) where id_pacienta = :id`,
+      [id]
+    );
+
+    operacie.rows.forEach(element => {
+      element.type = 'OPE'
+    });
+
+    return operacie.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getOckovania(id) {
+  try {
+    let conn = await database.getConnection();
+    const ockovania = await conn.execute(
+      `select datum, id_zaznamu from zdravotny_zaznam
+        join ockovanie using(id_zaznamu) where id_pacienta = :id`,
+      [id]
+    );
+
+    ockovania.rows.forEach(element => {
+      element.type = 'OCK'
+    });
+
+    return ockovania.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getVysetrenia(id) {
+  try {
+    let conn = await database.getConnection();
+    const vysetrenia = await conn.execute(
+      `select datum, id_zaznamu from zdravotny_zaznam
+        join ockovanie using(id_zaznamu) where id_pacienta = :id`,
+      [id]
+    );
+
+    vysetrenia.rows.forEach(element => {
+      element.type = 'VYS'
+    });
+
+    return vysetrenia.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getPacienti,
   getNajviacChoriPocet,
@@ -143,4 +254,6 @@ module.exports = {
   getTypyOckovaniaPacienti,
   getPacientiChorobaP13,
   getPocetPacientiPodlaVeku,
+  insertPacientZTP,
+  getUdalosti
 };
