@@ -14,6 +14,9 @@ import SidebarButton from "./Sidebar/SidebarButton";
 import "./App.css";
 import "./styles/sidebar.css";
 import "../node_modules/primeflex/primeflex.css";
+import TabExaminations from "./Views/Tables/TabExaminations";
+import TabHospitalizations from "./Views/Tables/TabHospitalizations";
+import TabOperations from "./Views/Tables/TabOperations";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -126,6 +129,18 @@ function App() {
           <Route path="/register" element={<Register></Register>}></Route>
           <Route path="/login" element={<Login></Login>}></Route>
           <Route path="/doctors" element={<Doctors></Doctors>}></Route>
+          <Route
+            path="/examinations"
+            element={<TabExaminations></TabExaminations>}
+          ></Route>
+          <Route
+            path="/hospitalizations"
+            element={<TabHospitalizations></TabHospitalizations>}
+          ></Route>
+          <Route
+            path="/operations"
+            element={<TabOperations></TabOperations>}
+          ></Route>
           <Route path="/statistics" element={<Statistics></Statistics>}></Route>
           <Route path="/add" element={<Add></Add>}></Route>
         </Routes>

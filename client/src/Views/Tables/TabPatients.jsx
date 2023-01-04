@@ -1,29 +1,34 @@
-import TablePeople from './TablePeople';
-import mockDataJson from '../../mock/mock-data.json';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import TablePeople from "./TablePeople";
+import mockDataJson from "../../mock/mock-data.json";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function TabPatients() {
   const [mockData, setMockData] = useState([]);
 
-  useEffect(()=>{
-    setMockData(mockDataJson.data);
-  },[])
+  useEffect(() => {
+    fetch(`/lekar/pacienti/${2}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setMockData(data);
+        console.log(data);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const tableData={
-    tableName:'Pacienti',
-    route:'/patient',
+  const tableData = {
+    tableName: "Pacienti",
+    route: "/patient",
     cellData: mockData,
-    titles: [{field: "id", header: 'Rodné číslo'},
-             {field: "code", header:'Meno'},
-             {field: "name", header: 'Priezvisko'}]
-  }
+    titles: [
+      { field: "ROD_CISLO", header: "Rodné číslo" },
+      { field: "MENO", header: "Meno" },
+      { field: "PRIEZVISKO", header: "Priezvisko" },
+    ],
+  };
 
- 
   return (
     <div>
-      <TablePeople {...tableData}/>
+      <TablePeople {...tableData} />
     </div>
-  )
+  );
 }
-

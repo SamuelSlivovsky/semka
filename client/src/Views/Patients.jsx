@@ -7,6 +7,7 @@ import { InputText } from "primereact/inputtext";
 //import mockDataJson from "../mock/mock-data.json";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
+import TabPatients from "./Tables/TabPatients";
 import "../styles/patients.css";
 
 function Patient() {
@@ -20,27 +21,10 @@ function Patient() {
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    fetch(`/lekar/pacienti/${2}`)
-      .then((response) => response.json())
-      .then((data) => console.log(data));
-  }, []);
-
   const onHide = () => {
     setShowDialog(false);
     setSelectedRow(null);
   };
-
-  useEffect(() => {
-    fetch("http://localhost:5000/lekar/pacienti")
-      .then((response) => response.json())
-      .then((data) => {
-        setPatients(data);
-        console.log(data);
-      });
-    setLoading(false);
-    initFilters();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const onSubmit = () => {
     setShowDialog(false);
@@ -146,7 +130,7 @@ function Patient() {
 
   return (
     <div>
-      <div className="card" style={{ height: "100vh" }}>
+      {/* <div className="card" style={{ height: "100vh" }}>
         <DataTable
           value={patients}
           responsiveLayout="scroll"
@@ -195,7 +179,8 @@ function Patient() {
         <p>{selectedRow != null ? "Adresa s PSC " + selectedRow.PSC : ""}</p>
         <p>ZŤP</p>
         <p>Nadchádzajúca udalosť</p>
-      </Dialog>
+      </Dialog> */}
+      <TabPatients></TabPatients>
     </div>
   );
 }

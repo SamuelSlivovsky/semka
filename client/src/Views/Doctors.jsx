@@ -7,6 +7,7 @@ import { InputText } from "primereact/inputtext";
 import mockDataJson from "../mock/mock-data.json";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
+import TabDoctros from "./Tables/TabDoctors";
 export default function Doctors() {
   const [mockData, setMockData] = useState([]);
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -104,7 +105,7 @@ export default function Doctors() {
   const header1 = renderHeader1();
   return (
     <div>
-      <div className="card">
+      {/* <div className="card">
         <DataTable
           value={mockData}
           responsiveLayout="scroll"
@@ -130,7 +131,8 @@ export default function Doctors() {
         style={{ width: "50vw" }}
         footer={renderDialogFooter()}
         onHide={() => onHide()}
-      ></Dialog>
+      ></Dialog> */}
+      <TabDoctros></TabDoctros>
     </div>
   );
 }
