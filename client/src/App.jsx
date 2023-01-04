@@ -11,7 +11,6 @@ import Doctors from "./Views/Doctors";
 import Statistics from "./Views/Statistics";
 import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
-import Combobox from "./Views/Combobox";
 import "./App.css";
 import "./styles/sidebar.css";
 import "../node_modules/primeflex/primeflex.css";
@@ -30,48 +29,48 @@ function App() {
       label="Domov"
       icon="home-icon"
     />,
-    /* <SidebarButton
-      key='2'
+    <SidebarButton
+      key="2"
       visibleLeft={visibleLeft}
-      path='/calendar'
-      label='Kalendár'
-      icon='calendar-icon'
+      path="/calendar"
+      label="Kalendár"
+      icon="calendar-icon"
     />,
     <SidebarButton
-      key='3'
+      key="3"
       visibleLeft={visibleLeft}
-      path='/patients'
-      label='Pacienti'
-      icon='patient-icon'
+      path="/patients"
+      label="Pacienti"
+      icon="patient-icon"
     />,
     <SidebarButton
-      key='4'
+      key="4"
       visibleLeft={visibleLeft}
-      path='/doctors'
-      label='Lekári'
-      icon='doctor-icon'
+      path="/doctors"
+      label="Lekári"
+      icon="doctor-icon"
     />,
     <SidebarButton
-      key='5'
+      key="5"
       visibleLeft={visibleLeft}
-      path='/examinations'
-      label='Vyšetrenia'
-      icon='examination-icon'
+      path="/examinations"
+      label="Vyšetrenia"
+      icon="examination-icon"
     />,
     <SidebarButton
-      key='6'
+      key="6"
       visibleLeft={visibleLeft}
-      path='/hospitalizations'
-      icon='hospit-icon'
-      label='Hospitalizácie'
+      path="/hospitalizations"
+      icon="hospit-icon"
+      label="Hospitalizácie"
     />,
     <SidebarButton
-      key='7'
+      key="7"
       visibleLeft={visibleLeft}
-      path='/operations'
-      label='Operácie'
-      icon='operation-icon'
-    />,*/
+      path="/operations"
+      label="Operácie"
+      icon="operation-icon"
+    />,
     <SidebarButton
       key="8"
       visibleLeft={visibleLeft}
@@ -82,24 +81,17 @@ function App() {
     <SidebarButton
       key="9"
       visibleLeft={visibleLeft}
-      path="/xml"
-      label="XML výstupy"
-      icon="xml-icon"
-    />,
-    /*<SidebarButton
-      key='9'
-      visibleLeft={visibleLeft}
-      path='/add'
-      label='Pridať udalosť'
-      icon='plus-icon'
+      path="/add"
+      label="Pridať udalosť"
+      icon="plus-icon"
     />,
     <SidebarButton
-      key='10'
+      key="10"
       visibleLeft={visibleLeft}
-      path='/user'
-      label='Meno usera'
-      icon='user-icon'
-    />,*/
+      path="/user"
+      label="Meno usera"
+      icon="user-icon"
+    />,
   ];
 
   return (
@@ -124,8 +116,7 @@ function App() {
         className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
       >
         <Routes>
-          {/* <Route path='/' element={<Home></Home>}></Route> */}
-          <Route path="/" element={<Combobox></Combobox>}></Route>
+          {<Route path="/" element={<Home></Home>}></Route>}
           <Route
             path="/calendar"
             element={<EventCalendar></EventCalendar>}
