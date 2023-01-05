@@ -3,11 +3,11 @@ import EventCalendar from "./Calendar/Calendar";
 import Home from "./Home/Home";
 import { Button } from "primereact/button";
 import { Routes, Route } from "react-router-dom";
-import Patients from "./Views/Patients";
+import TabPatients from "./Views/Tables/TabPatients";
 import Patient from "./Views/Patient";
 import { Register } from "./Auth/Register";
 import { Login } from "./Auth/Login";
-import Doctors from "./Views/Doctors";
+import TabDoctors from "./Views/Tables/TabDoctors";
 import Statistics from "./Views/Statistics";
 import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
@@ -124,11 +124,11 @@ function App() {
             path="/calendar"
             element={<EventCalendar></EventCalendar>}
           ></Route>
-          <Route path="/patients" element={<Patients></Patients>}></Route>
+          <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
           <Route path="/patient" element={<Patient></Patient>}></Route>
           <Route path="/register" element={<Register></Register>}></Route>
           <Route path="/login" element={<Login></Login>}></Route>
-          <Route path="/doctors" element={<Doctors></Doctors>}></Route>
+          <Route path="/doctors" element={<TabDoctors></TabDoctors>}></Route>
           <Route
             path="/examinations"
             element={<TabExaminations></TabExaminations>}

@@ -10,7 +10,6 @@ export default function TabPatients() {
       .then((response) => response.json())
       .then((data) => {
         setMockData(data);
-        console.log(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

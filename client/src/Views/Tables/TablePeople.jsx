@@ -102,6 +102,35 @@ export default function TablePeople(props) {
     setGlobalFilterValue("");
   };
 
+  const getPohlavie = () => {
+    if (selectedRow !== null)
+      return selectedRow.ROD_CISLO.substring(2, 3) === "5" ||
+        selectedRow.ROD_CISLO.substring(2, 3) === "6"
+        ? "Žena"
+        : "Muž";
+  };
+  const getVek = () => {
+    if (selectedRow != null) {
+      let birthDate =
+        "19" +
+        selectedRow.ROD_CISLO.substring(0, 2) +
+        "-" +
+        (selectedRow.ROD_CISLO.substring(2, 4) % 50) +
+        "-" +
+        selectedRow.ROD_CISLO.substring(4, 6);
+
+      birthDate = new Date(birthDate);
+
+      var today = new Date();
+      return getDifferenceInDays(today, birthDate);
+    }
+  };
+
+  const getDifferenceInDays = (date1, date2) => {
+    const diffInMs = Math.abs(date2 - date1);
+    return Math.round(diffInMs / (1000 * 60 * 60 * 24) / 365);
+  };
+
   const header = renderHeader();
   return (
     <div>
@@ -129,12 +158,20 @@ export default function TablePeople(props) {
         </DataTable>
       </div>
       <Dialog
-        header={"Meno a priezvisko"}
+        header={
+          selectedRow != null
+            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            : ""
+        }
         visible={showDialog}
         style={{ width: "50vw" }}
         footer={renderDialogFooter()}
         onHide={() => onHide()}
-      ></Dialog>
+      >
+        <p>{getPohlavie()}</p>
+        <p>{getVek() + " rokov"}</p>
+        <p>{selectedRow != null ? "PSČ " + selectedRow.PSC : ""}</p>
+      </Dialog>
     </div>
   );
 }
