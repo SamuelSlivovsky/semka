@@ -47,3 +47,9 @@ code {
 .p-button-icon-only .p-button-label {
   display: none;
 }
+
+.table-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
