@@ -113,22 +113,7 @@ function App() {
             border: "none",
           }}
         />
-        <Button
-          icon='hospital-logo-icon'
-          className='p-button-rounded p-button-info'
-          iconPos='right'
-          style={{
-            marginTop: '1rem',
-            marginRight: '8px',
-            marginLeft: 'auto',
-            display: 'block',
-          }}
-        />
         {sidebarButtons}
-        <div className='sidebar-content'>
-          <h1 style={{ verticalAlign: 'text-top', color: 'white' }}>USER</h1>
-          <Avatar label='P' className='mr-2' size='xlarge' shape='circle' />
-        </div>
       </div>
       <div
         className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
