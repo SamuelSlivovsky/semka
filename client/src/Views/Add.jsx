@@ -3,10 +3,11 @@ import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
+import { Button } from "primereact/button";
 export default function Add() {
   const [eventDateStart, setEventDateStart] = useState(null);
   const [eventDateEnd, setEventDateEnd] = useState(null);
-  const [currEventTitle, setCurrEventTitle] = useState(null);
+  const [currRodCislo, setCurrRodCislo] = useState(null);
   const [eventTypeButton, setEventTypeButton] = useState(1);
   const [placeId, setPlaceId] = useState(null);
   const eventTypes = [
@@ -28,6 +29,22 @@ export default function Add() {
   const onPlaceIdChange = (e) => {
     setPlaceId(e.value);
   };
+
+  const handleClick = () => {
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        rod_cislo: currRodCislo,
+        datum: eventDateStart,
+        id_lekara: 1,
+        id_lieku: placeId,
+      }),
+    };
+    fetch("https://reqres.in/api/posts", requestOptions).then((response) =>
+      response.json()
+    );
+  };
   return (
     <div
       style={{ width: "90%", marginTop: "2rem" }}
@@ -42,14 +59,14 @@ export default function Add() {
         />
       </div>
       <div className="field col-12">
-        <label htmlFor="basic">Názov udalosti</label>
+        <label htmlFor="basic">Rodné číslo</label>
         <InputText
-          value={currEventTitle !== null ? currEventTitle : ""}
-          onChange={(e) => setCurrEventTitle(e.target.value)}
+          value={currRodCislo !== null ? currRodCislo : ""}
+          onChange={(e) => setCurrRodCislo(e.target.value)}
         />
       </div>
       <div className="field col-12 ">
-        <label htmlFor="basic">Začiatok udalosti</label>
+        <label htmlFor="basic">Dátum zapísania receptu</label>
         <Calendar
           id="basic"
           value={eventDateStart}
@@ -60,18 +77,7 @@ export default function Add() {
         />
       </div>
       <div className="field col-12 ">
-        <label htmlFor="basic">Koniec udalosti</label>
-        <Calendar
-          id="basic"
-          value={eventDateEnd}
-          onChange={(e) => setEventDateEnd(e.value)}
-          showTime
-          showIcon
-          dateFormat="dd.mm.yy"
-        />
-      </div>
-      <div className="field col-12 ">
-        <label htmlFor="basic">Miestnosť</label>
+        <label htmlFor="basic">Id lieku</label>
         <Dropdown
           value={placeId}
           options={placesId}
@@ -79,6 +85,7 @@ export default function Add() {
           optionLabel="id"
         />
       </div>
+      <Button onClick={handleClick}></Button>
     </div>
   );
 }

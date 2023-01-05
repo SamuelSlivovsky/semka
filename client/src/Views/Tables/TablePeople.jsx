@@ -22,7 +22,7 @@ export default function TablePeople(props) {
 
   const onSubmit = () => {
     setShowDialog(false);
-    navigate(route);
+    navigate(route, { state: selectedRow.ID_PACIENTA });
   };
 
   const handleClick = (value) => {

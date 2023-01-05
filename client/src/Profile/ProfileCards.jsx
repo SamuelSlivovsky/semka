@@ -3,17 +3,131 @@ import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { useLocation } from "react-router";
+import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
+import { InputTextarea } from "primereact/inputtextarea";
 import "../icons.css";
 
 export default function ProfileCard() {
   const [profile, setProfile] = useState("");
+  const [show, setShow] = useState(false);
+  const location = useLocation();
+  const [eventType, setEventType] = useState("");
+  const [header, setHeader] = useState("");
+  const [text, setText] = useState("");
   useEffect(() => {
-    fetch(`/lekar/pacienti/${2}`)
+    fetch(`patient/info/${location.state}`)
       .then((response) => response.json())
       .then((data) => {
-        setProfile(data[1]);
+        setProfile(...data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const handleClick = (eventType) => {
+    setEventType(eventType);
+    switch (eventType) {
+      case "examination":
+        setHeader("Vytvoriť nové vyšetrenie");
+        break;
+      case "operation":
+        setHeader("Vytvoriť novú operáciu");
+        break;
+      case "hospit":
+        setHeader("Vytvoriť novú hospitalizáciu");
+        break;
+      default:
+        break;
+    }
+    setShow(true);
+  };
+
+  const onHide = () => {
+    setShow(false);
+  };
+
+  const examinationDialog = () => {
+    return (
+      <div className="p-fluid grid formgrid">
+        <div className="field col-12 ">
+          <label htmlFor="basic">Dátum vyšetrenia</label>
+          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
+        </div>
+        <div className="field col-12 ">
+          <label htmlFor="basic">Popis</label>
+          <InputTextarea
+            rows={5}
+            cols={30}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            autoResize
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const operationDialog = () => {
+    return (
+      <div className="p-fluid grid formgrid">
+        <div className="field col-12 ">
+          <label htmlFor="basic">Dátum operácie</label>
+          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
+        </div>
+        <div className="field col-12 ">
+          <label htmlFor="basic">Popis</label>
+          <InputTextarea
+            rows={5}
+            cols={30}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            autoResize
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const hospitDialog = () => {
+    return (
+      <div className="p-fluid grid formgrid">
+        <div className="field col-12 ">
+          <label htmlFor="basic">Dátum od</label>
+          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
+        </div>
+        <div className="field col-12 ">
+          <label htmlFor="basic">Dátum do</label>
+          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
+        </div>
+        <div className="field col-12 ">
+          <label htmlFor="basic">Popis</label>
+          <InputTextarea
+            rows={5}
+            cols={30}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            autoResize
+          />
+        </div>
+      </div>
+    );
+  };
+
+  const renderDialog = () => {
+    switch (eventType) {
+      case "examination":
+        return examinationDialog();
+      case "operation":
+        return operationDialog();
+      case "hospit":
+        return hospitDialog();
+      default:
+        break;
+    }
+  };
+
   return (
     <div>
       <div className="flex col-12 ">
@@ -25,7 +139,7 @@ export default function ProfileCard() {
           <div className="flex ">
             <div className="col-5 text-center m-0">
               <h4>Rok narodenia</h4>
-              <div>15.9.1985</div>
+              <div>{profile.DATUM_NARODENIA}</div>
             </div>
 
             <div className="col-5 text-center m-0">
@@ -37,7 +151,7 @@ export default function ProfileCard() {
           <div className="flex w-100">
             <div className="col-5 text-center m-0">
               <h4>Vek</h4>
-              <div>37</div>
+              <div>{profile.VEK}</div>
             </div>
             <div className="col-5 text-center m-0">
               <h4>Email</h4>
@@ -48,11 +162,11 @@ export default function ProfileCard() {
           <div className="flex">
             <div className="col-5 text-center m-0">
               <h4>Krvna skupina</h4>
-              <div>AB+</div>
+              <div>{profile.KRVNA_SKUPINA}</div>
             </div>
             <div className="col-5 text-center m-0">
               <h4>Adresa</h4>
-              <div>Krížna 54, 01234, Bratislava</div>
+              <div>{profile.NAZOV + " " + profile.PSC}</div>
             </div>
           </div>
           <div className="mt-5 text-center">
@@ -91,6 +205,7 @@ export default function ProfileCard() {
               style={{ width: "100%" }}
               label="Nové vyšetrenie"
               icon="examination-icon"
+              onClick={() => handleClick("examination")}
             />
           </div>
           <div className="p-3">
@@ -98,6 +213,7 @@ export default function ProfileCard() {
               style={{ width: "100%" }}
               label="Nová operácia"
               icon="operation-icon"
+              onClick={() => handleClick("operation")}
             />
           </div>
           <div className="p-3">
@@ -105,10 +221,14 @@ export default function ProfileCard() {
               style={{ width: "100%" }}
               label="Nová hospitalizácia"
               icon="hospit-icon"
+              onClick={() => handleClick("hospit")}
             />
           </div>
         </div>
       </div>
+      <Dialog visible={show} onHide={onHide} header={header}>
+        {renderDialog()}
+      </Dialog>
     </div>
   );
 }
