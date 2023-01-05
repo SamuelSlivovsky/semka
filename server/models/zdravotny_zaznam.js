@@ -14,6 +14,33 @@ async function getZdravotneZaznamy() {
     }
 }
 
+//TODO
+async function insertOperacia(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `BEGIN
+        operacia_insert(:id_miestnosti, :id_zaznamu, :trvanie, :datum, :datum_vyzdvihnutia);
+      END;`;
+
+        let result = await conn.execute(sqlStatement,
+            {
+                id_lieku: body.id_lieku,
+                id_pacienta: body.id_pacienta,
+                id_lekara: body.id_lekara,
+                datum: body.datum,
+                datum_vyzdvihnutia: body.datum_vyzdvihnutia
+            }
+        );
+
+        console.log("Rows inserted " + result.rowsAffected);
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 module.exports = {
-    getZdravotneZaznamy
+    getZdravotneZaznamy,
+    insertOperacia
 }
