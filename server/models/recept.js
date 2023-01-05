@@ -18,8 +18,8 @@ async function insertRecept(body) {
     try {
         let conn = await database.getConnection();
         const sqlStatement = `BEGIN
-        recept_insert(:id_lieku, :id_pacienta, :id_lekara, :datum, :datum_vyzdvihnutia);
-      END;`;
+            recept_insert(:id_lieku, :id_pacienta, :id_lekara, :datum, :datum_vyzdvihnutia);
+        END;`;
 
         let result = await conn.execute(sqlStatement,
             {

@@ -77,7 +77,7 @@ async function getOperacie(id) {
         const operacie = await conn.execute(
             `select to_char(datum,'DD.MM.YYYY') || 'T' || to_char(datum, 'HH24:MI:SS') as datum, id_zaznamu from zdravotny_zaznam
                 join operacia using(id_zaznamu)
-                 join operacia_lekar using(id_lekara) where id_lekara = :id`,
+                 join operacia_lekar using(id_operacie) where id_lekara = :id`,
             [id]
         );
 
@@ -125,7 +125,7 @@ async function getHospitalizacie(id) {
             element.type = 'OPE'
         });
 
-        return operacie.rows;
+        return hospitalizacie.rows;
     } catch (err) {
         console.log(err);
     }
