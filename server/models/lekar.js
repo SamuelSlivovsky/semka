@@ -102,7 +102,7 @@ async function getVysetrenia(id) {
         );
 
         vysetrenia.rows.forEach(element => {
-            element.type = 'OPE'
+            element.type = 'VYS'
         });
 
         return vysetrenia.rows;
@@ -122,7 +122,7 @@ async function getHospitalizacie(id) {
         );
 
         hospitalizacie.rows.forEach(element => {
-            element.type = 'OPE'
+            element.type = 'HOS'
         });
 
         return hospitalizacie.rows;

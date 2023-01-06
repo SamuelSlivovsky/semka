@@ -156,30 +156,9 @@ async function getInfo(id) {
   }
 }
 
-async function insertPacientZTP(body) {
-  try {
-    let conn = await database.getConnection();
-    const sqlStatement = `BEGIN
-      pacient_ZTP_insert(:id_pacienta, :id_typu_ztp, :dat_od, dat_do);
-    END;`;
-
-    let result = await conn.execute(sqlStatement,
-      {
-        id_pacienta: body.id_pacienta,
-        id_typu_ztp: body.id_typu_ztp,
-        dat_od: body.dat_od,
-        dat_do: body.dat_do
-      }
-    );
-
-    console.log("Rows inserted " + result.rowsAffected);
-  } catch (err) {
-    console.log(err);
-  }
-}
-
 async function getUdalosti(id) {
   try {
+
     let udalosti = [];
 
     let operacie = await getOperacie(id);
@@ -276,10 +255,31 @@ async function getHospitalizacie(id) {
     );
 
     hospitalizacia.rows.forEach(element => {
-      element.type = 'VYS'
+      element.type = 'HOS'
     });
 
     return hospitalizacia.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function insertPacient(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+    pacient_insert(:rod_cislo, :id_poistenca, :id_typu_krvnej_skupiny);
+    END;`;
+
+    let result = await conn.execute(sqlStatement,
+      {
+        rod_cislo: body.rod_cislo,
+        id_poistenca: body.id_poistenca,
+        id_typu_krvnej_skupiny: body.id_typu_krvnej_skupiny
+      }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
     console.log(err);
   }
@@ -294,6 +294,6 @@ module.exports = {
   getPacientiChorobaP13,
   getPocetPacientiPodlaVeku,
   getInfo,
-  insertPacientZTP,
-  getUdalosti
+  getUdalosti,
+  insertPacient
 };
