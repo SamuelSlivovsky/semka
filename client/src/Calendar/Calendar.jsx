@@ -3,6 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import listPlugin from "@fullcalendar/list";
 import { createEventId } from "./event-utils";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
@@ -36,9 +37,24 @@ function EventCalendar() {
   const options = ["Detaily udalosti", "Zmeniť udalosť"];
 
   useEffect(() => {
-    fetch(`/calendar/udalosti/${2}`)
+    fetch(`calendar/udalostiLekara/${2}`)
       .then((response) => response.json())
       .then((data) => {
+        data.forEach((element) => {
+          switch (element.type) {
+            case "OPE":
+              element.backgroundColor = "#00916E";
+              break;
+            case "VYS":
+              element.backgroundColor = "#593F62";
+              break;
+            case "HOS":
+              element.backgroundColor = "#8499B1";
+              break;
+            default:
+              break;
+          }
+        });
         setCurrentEvents(data);
         setCalendarVisible(true);
       });
@@ -57,14 +73,15 @@ function EventCalendar() {
   const handleEventClick = (clickInfo) => {
     setShowDialog(true);
     setShowAddEvent(false);
+    console.log(clickInfo);
     switch (clickInfo.event._def.extendedProps.type) {
-      case "OP":
+      case "OPE":
         setEventType(eventTypes[0]);
         break;
-      case "EX":
+      case "VYS":
         setEventType(eventTypes[1]);
         break;
-      case "HOSP":
+      case "HOS":
         setEventType(eventTypes[2]);
         break;
       default:
@@ -269,12 +286,17 @@ function EventCalendar() {
             ></ProgressBar>
           ) : (
             <FullCalendar
-              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              plugins={[
+                dayGridPlugin,
+                timeGridPlugin,
+                interactionPlugin,
+                listPlugin,
+              ]}
               ref={calendarRef}
               headerToolbar={{
-                left: "prev,next today",
+                left: "prev,next today prevYear,nextYear",
                 center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay",
+                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
               }}
               initialView="dayGridMonth"
               editable={true}
