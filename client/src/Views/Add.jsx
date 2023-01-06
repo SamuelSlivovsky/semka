@@ -7,6 +7,7 @@ import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
+
 export default function Add() {
   const [eventDateStart, setEventDateStart] = useState(null);
   const [eventDateEnd, setEventDateEnd] = useState(null);
@@ -55,7 +56,7 @@ export default function Add() {
         datum_vyzdvihnutia: eventDateEnd,
       }),
     };
-    const response = await fetch("/recept/recept", requestOptions);
+    const response = await fetch("/add/recept", requestOptions);
   }
 
   const customBase64Uploader = async (event) => {
@@ -63,16 +64,17 @@ export default function Add() {
     const file = event.files[0];
     const reader = new FileReader();
     let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
-    console.log(file.objectURL);
     reader.readAsDataURL(blob);
     reader.onloadend = function () {
       const base64data = reader.result;
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: base64data,
+        body: JSON.stringify({
+          image: base64data,
+        }),
       };
-      fetch();
+      fetch("/add/priloha", requestOptions).then((response) => response.blob());
     };
   };
 
