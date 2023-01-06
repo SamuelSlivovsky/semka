@@ -14,6 +14,30 @@ async function getPacientiZtp() {
     }
 }
 
+async function insertPacientZtp(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `BEGIN
+        pacient_ZTP_insert(:id_pacienta, :id_typu_ztp, :dat_od, :dat_do);
+      END;`;
+
+        let result = await conn.execute(sqlStatement,
+            {
+                id_pacienta: body.id_pacienta,
+                id_typu_ztp: body.id_typu_ztp,
+                dat_od: body.dat_od,
+                dat_do: body.dat_do
+            }
+        );
+
+        console.log("Rows inserted " + result.rowsAffected);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+
 module.exports = {
-    getPacientiZtp
+    getPacientiZtp,
+    insertPacientZtp
 }
