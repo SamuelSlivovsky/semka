@@ -18,10 +18,12 @@ export default function ProfileCard() {
   const [eventType, setEventType] = useState("");
   const [header, setHeader] = useState("");
   const [text, setText] = useState("");
+
   useEffect(() => {
     fetch(`patient/info/${location.state}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log(...data);
         setProfile(...data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

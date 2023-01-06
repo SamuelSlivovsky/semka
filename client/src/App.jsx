@@ -23,7 +23,6 @@ function App() {
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
-
   const sidebarButtons = [
     <SidebarButton
       key="1"

@@ -9,6 +9,7 @@ export default function TabPatients() {
     fetch(`/lekar/pacienti/${2}`)
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setMockData(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -21,6 +22,7 @@ export default function TabPatients() {
       { field: "ROD_CISLO", header: "Rodné číslo" },
       { field: "MENO", header: "Meno" },
       { field: "PRIEZVISKO", header: "Priezvisko" },
+      { field: "PSC", header: "Psc" },
     ],
   };
 

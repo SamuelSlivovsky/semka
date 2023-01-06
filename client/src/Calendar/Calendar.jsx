@@ -1,19 +1,21 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect, Suspense } from "react";
 import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { INITIAL_EVENTS, createEventId } from "./event-utils";
+import { createEventId } from "./event-utils";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
+import { ProgressBar } from "primereact/progressbar";
 import "../styles/calendar.css";
 
 function EventCalendar() {
-  const [currentEvents, setCurrentEvents] = useState(INITIAL_EVENTS);
+  const [currentEvents, setCurrentEvents] = useState(null);
+  const [calendarVisible, setCalendarVisible] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [showConfirmChanges, setShowConfirmChanges] = useState(false);
@@ -24,6 +26,7 @@ function EventCalendar() {
   const [eventType, setEventType] = useState(null);
   const [selectButtonValue, setSelectButtonValue] =
     useState("Detaily udalosti");
+
   const calendarRef = useRef(null);
   const eventTypes = [
     { name: "Operácia", code: "OP" },
@@ -31,6 +34,15 @@ function EventCalendar() {
     { name: "Hospitalizácia", code: "HOSP" },
   ];
   const options = ["Detaily udalosti", "Zmeniť udalosť"];
+
+  useEffect(() => {
+    fetch(`/calendar/udalosti/${2}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setCurrentEvents(data);
+        setCalendarVisible(true);
+      });
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleDateSelect = (selectInfo) => {
     setShowAddEvent(true);
@@ -167,7 +179,6 @@ function EventCalendar() {
   };
 
   const renderAddEventContent = () => {
-    console.log(showAddEvent);
     return selectButtonValue === "Zmeniť udalosť" || showAddEvent ? (
       <>
         <div className="field col-12">
@@ -250,24 +261,33 @@ function EventCalendar() {
   return (
     <div className="kalendar">
       <div className="kalendar-obal">
-        <FullCalendar
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
-          ref={calendarRef}
-          headerToolbar={{
-            left: "prev,next today",
-            center: "title",
-            right: "dayGridMonth,timeGridWeek,timeGridDay",
-          }}
-          initialView="dayGridMonth"
-          editable={true}
-          selectable={true}
-          weekends={true}
-          initialEvents={currentEvents}
-          select={handleDateSelect}
-          eventClick={handleEventClick}
-          eventsSet={handleEvents}
-          locale="sk"
-        />
+        <Suspense>
+          {!calendarVisible ? (
+            <ProgressBar
+              mode="indeterminate"
+              style={{ height: "6px" }}
+            ></ProgressBar>
+          ) : (
+            <FullCalendar
+              plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              ref={calendarRef}
+              headerToolbar={{
+                left: "prev,next today",
+                center: "title",
+                right: "dayGridMonth,timeGridWeek,timeGridDay",
+              }}
+              initialView="dayGridMonth"
+              editable={true}
+              selectable={true}
+              weekends={true}
+              initialEvents={currentEvents}
+              select={handleDateSelect}
+              eventClick={handleEventClick}
+              eventsSet={handleEvents}
+              locale="sk"
+            />
+          )}
+        </Suspense>
       </div>
       <Dialog
         header={!showAddEvent ? selectButtonValue : "Pridať udalosť"}
