@@ -6,6 +6,7 @@ import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import { Button } from "primereact/button";
+import { FileUpload } from "primereact/fileupload";
 export default function Add() {
   const [eventDateStart, setEventDateStart] = useState(null);
   const [eventDateEnd, setEventDateEnd] = useState(null);
@@ -55,8 +56,25 @@ export default function Add() {
       }),
     };
     const response = await fetch("/recept/recept", requestOptions);
-    const data = await response.json();
   }
+
+  const customBase64Uploader = async (event) => {
+    // convert file to base64 encoded
+    const file = event.files[0];
+    const reader = new FileReader();
+    let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+    console.log(file.objectURL);
+    reader.readAsDataURL(blob);
+    reader.onloadend = function () {
+      const base64data = reader.result;
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: base64data,
+      };
+      fetch();
+    };
+  };
 
   const renderAddPatientContent = () => {
     return (
@@ -163,6 +181,13 @@ export default function Add() {
         </>
       )}
       <Button onClick={handleClick}></Button>
+      <FileUpload
+        mode="basic"
+        url="https://primefaces.org/primereact/showcase/upload.php"
+        accept="image/*"
+        customUpload
+        uploadHandler={customBase64Uploader}
+      />
     </div>
   );
 }
