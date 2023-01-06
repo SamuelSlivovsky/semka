@@ -18,7 +18,7 @@ async function insertHospitalizacia(body) {
     try {
         let conn = await database.getConnection();
         const sqlStatement = `BEGIN
-        hospitalizacia_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_lekara, :id_lozka, :id_sestricky, :dat_do);
+        hospitalizacia_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_lekara, :dat_do);
         END;`;
 
         await conn.execute(sqlStatement,
@@ -28,14 +28,12 @@ async function insertHospitalizacia(body) {
                 popis: body.popis,
                 datum: body.datum,
                 id_lekara: body.id_lekara,
-                id_lozka: body.id_lozka,
-                id_sestricky: body.id_sestricky,
                 dat_do: body.dat_do,
             }
         );
 
-    } catch (err) {
-        console.log(err);
+    } catch {
+        throw new Error('Error');
     }
 }
 
@@ -57,8 +55,8 @@ async function insertOperacia(body) {
             }
         );
 
-    } catch (err) {
-        console.log(err);
+    } catch {
+        throw new Error('Error');
     }
 }
 
@@ -79,8 +77,8 @@ async function insertVysetrenie(body) {
             }
         );
 
-    } catch (err) {
-        console.log(err);
+    } catch {
+        throw new Error('Error');
     }
 }
 
