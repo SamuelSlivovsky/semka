@@ -3,6 +3,11 @@
   height: 44px;
   width: 44px;
 }
+.storage-icon {
+  content: url("./images/drugs.png");
+  height: 44px;
+  width: 44px;
+}
 .calendar-icon {
   content: url("./images/calendar-black.png");
   height: 44px;

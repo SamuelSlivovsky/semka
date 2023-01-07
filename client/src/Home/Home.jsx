@@ -1,4 +1,5 @@
 import React from "react";
+import storageIcon from "../images/drugs.png"
 import calendarIcon from "../images/calendar.png";
 import patientIcon from "../images/patient.png";
 import doctorsIcon from "../images/doctors.png";
@@ -68,6 +69,13 @@ function Home() {
       icon={plusIcon}
       key="8"
     ></HomeCard>,
+    <HomeCard
+      title="Sklad"
+      isCalendar={false}
+      path="/sklad"
+      icon={storageIcon}
+      key="9"
+    ></HomeCard>
   ];
 
   return <div>{cards}</div>;

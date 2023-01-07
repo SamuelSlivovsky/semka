@@ -4,7 +4,6 @@ import Home from "./Home/Home";
 import { Button } from "primereact/button";
 import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import { Avatar } from 'primereact/avatar';
-import hospitalImage from './images/hospital.png';
 import TabPatients from './Views/Tables/TabPatients';
 import TabHospitalizations from './Views/Tables/TabHospitalizations'
 import TabOperations from './Views/Tables/TabOperations'
@@ -13,7 +12,8 @@ import Patient from "./Views/Patient";
 import { Register } from "./Auth/Register";
 import { Login } from "./Auth/Login";
 import TabDoctors from './Views/Tables/TabDoctors';
-import Doctor from './Views/Doctor'
+import Doctor from './Views/Doctor';
+import Storage from "./Views/Storage";
 import SidebarButton from "./Sidebar/SidebarButton";
 import "./App.css";
 import "./styles/sidebar.css";
@@ -92,6 +92,13 @@ function App() {
     <SidebarButton
       key="10"
       visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
+    />,
+    <SidebarButton
+      key="11"
+      visibleLeft={visibleLeft}
       path="/user"
       label="Meno usera"
       icon="user-icon"
@@ -149,6 +156,7 @@ function App() {
           <Route path='/hospitalizations' element={<TabHospitalizations />}></Route>
           <Route path='/operations' element={<TabOperations />}></Route>
           <Route path='/examinations' element={<TabExaminations />}></Route>
+          <Route path='/sklad' element={<Storage />}></Route>
         </Routes>
       </div>
     </div>

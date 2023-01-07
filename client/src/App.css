@@ -53,3 +53,35 @@ code {
   align-items: center;
   justify-content: space-between;
 }
+
+@media screen and (max-width: 960px) {
+  .storage-table .table-header {
+      align-items: flex-start;
+  }
+}
+
+.storage-table .confirmation-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media screen and (max-width: 960px) {
+  .storage-table .p-toolbar {
+      flex-wrap: wrap;
+  }
+  .storage-table .p-toolbar .p-button {
+      margin-bottom: 0.25rem;
+  }
+  .storage-table .table-header {
+      flex-direction: column;
+  }
+  .storage-table .table-header .p-input-icon-left, .datatable-crud-demo .table-header input {
+      width: 100%;
+  }
+}
+
+.p-dropdown-panel{
+  width: 100%;
+  max-width: 200px;
+}
