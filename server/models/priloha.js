@@ -4,7 +4,6 @@ async function insertPriloha(blob) {
   try {
     let conn = await database.getConnection();
     let buffer = Buffer.from(blob, "base64");
-    console.log(buffer);
     const result = await conn.execute(
       `INSERT INTO priloha(priloha) VALUES (:blob)`,
       { blob: buffer },
