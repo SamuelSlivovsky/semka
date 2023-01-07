@@ -8,8 +8,6 @@ import { createEventId } from "./event-utils";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import { ProgressBar } from "primereact/progressbar";
 import "../styles/calendar.css";
@@ -34,7 +32,7 @@ function EventCalendar() {
     { name: "Vyšetrenie", code: "EX" },
     { name: "Hospitalizácia", code: "HOSP" },
   ];
-  const options = ["Detaily udalosti", "Zmeniť udalosť"];
+  const options = ["Detaily udalosti", "Zmeniť dátum udalosti"];
 
   useEffect(() => {
     fetch(`calendar/udalostiLekara/${2}`)
@@ -60,20 +58,9 @@ function EventCalendar() {
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleDateSelect = (selectInfo) => {
-    setShowAddEvent(true);
-    setShowDialog(true);
-    setCurrEventId(null);
-    setEventDateStart(new Date(selectInfo.start));
-    setEventDateEnd(null);
-    setCurrEventTitle(null);
-    setEventType(null);
-  };
-
   const handleEventClick = (clickInfo) => {
     setShowDialog(true);
     setShowAddEvent(false);
-    console.log(clickInfo);
     switch (clickInfo.event._def.extendedProps.type) {
       case "OPE":
         setEventType(eventTypes[0]);
@@ -109,10 +96,6 @@ function EventCalendar() {
 
   const handleEvents = (events) => {
     setCurrentEvents(events);
-  };
-
-  const onEventTypeChange = (e) => {
-    setEventType(e.value);
   };
 
   const onSubmitChanges = (addEvent) => {
@@ -196,14 +179,11 @@ function EventCalendar() {
   };
 
   const renderAddEventContent = () => {
-    return selectButtonValue === "Zmeniť udalosť" || showAddEvent ? (
+    return selectButtonValue === "Zmeniť dátum udalosti" || showAddEvent ? (
       <>
         <div className="field col-12">
-          <label htmlFor="basic">Názov udalosti</label>
-          <InputText
-            value={currEventTitle !== null ? currEventTitle : ""}
-            onChange={(e) => setCurrEventTitle(e.target.value)}
-          />
+          <h3 htmlFor="basic">Názov udalosti</h3>
+          <p>Typ udalosti - Meno Pacienta</p>
         </div>
         <div className="field col-12 ">
           <label htmlFor="basic">Začiatok udalosti</label>
@@ -228,13 +208,8 @@ function EventCalendar() {
           />
         </div>
         <div className="field col-12 ">
-          <label htmlFor="basic">Typ udalosti</label>
-          <Dropdown
-            value={eventType}
-            options={eventTypes}
-            onChange={onEventTypeChange}
-            optionLabel="name"
-          />
+          <h3 htmlFor="basic">Typ udalosti</h3>
+          <p>{eventType !== null ? eventType.name : ""}</p>
         </div>
       </>
     ) : !showAddEvent ? (
@@ -303,7 +278,7 @@ function EventCalendar() {
               selectable={true}
               weekends={true}
               initialEvents={currentEvents}
-              select={handleDateSelect}
+              //select={handleDateSelect}
               eventClick={handleEventClick}
               eventsSet={handleEvents}
               locale="sk"
@@ -316,7 +291,9 @@ function EventCalendar() {
         visible={showDialog}
         style={{ width: "50vw" }}
         footer={
-          selectButtonValue === "Zmeniť udalosť" ? renderDialogFooter() : ""
+          selectButtonValue === "Zmeniť dátum udalosti"
+            ? renderDialogFooter()
+            : ""
         }
         onHide={() => onHide()}
       >
@@ -327,8 +304,8 @@ function EventCalendar() {
               options={options}
               onChange={(e) => setSelectButtonValue(e.value)}
               style={{
-                height: "50px",
-                width: "200px",
+                height: "80px",
+                width: "300px",
                 marginBottom: "1rem",
                 marginLeft: "0.75rem",
               }}
