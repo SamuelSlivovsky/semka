@@ -66,7 +66,9 @@ export default function Add() {
     let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
     reader.readAsDataURL(blob);
     reader.onloadend = function () {
-      const base64data = reader.result;
+      const base64data = reader.result.substring(
+        reader.result.indexOf(",") + 1
+      );
       const requestOptions = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

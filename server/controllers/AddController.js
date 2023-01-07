@@ -15,7 +15,7 @@ module.exports = {
     const priloha = require("../models/priloha");
     (async () => {
       ret_val = await priloha.insertPriloha(req.body.image);
-      res.status(200);
+      res.status(200).json("test");
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
