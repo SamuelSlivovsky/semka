@@ -43,7 +43,7 @@ async function insertOperacia(body) {
     try {
         let conn = await database.getConnection();
         const sqlStatement = `BEGIN
-        operacia_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_miestnosti, :trvanie);
+        operacia_insert(:rod_cislo, :priloha, :popis, :datum, :id_miestnosti, :trvanie);
         END;`;
 
         let buffer = Buffer.from(body.priloha, "base64");
