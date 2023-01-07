@@ -1,0 +1,11 @@
+.count-card {
+  background: rgb(18, 161, 145);
+  background: linear-gradient(
+    90deg,
+    rgba(18, 161, 145, 1) 0%,
+    rgba(21, 171, 154, 1) 27%,
+    rgba(17, 186, 168, 1) 43%,
+    rgba(27, 198, 178, 1) 61%,
+    rgba(53, 249, 226, 0.692) 88%
+  );
+}

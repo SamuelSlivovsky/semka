@@ -1,4 +1,5 @@
 const database = require("../database/Database");
+const oracledb = database.oracledb;
 
 async function getOckovania() {
     try {

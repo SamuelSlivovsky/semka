@@ -11,6 +11,28 @@ async function getKraje() {
   }
 }
 
+async function getKrajePodlaPoctuOperovanych() {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select kraj.nazov "Kraj", count(distinct rod_cislo)"Počet pacientov", dense_rank() over(order by count(distinct rod_cislo) desc) "Poradie" 
+                from obec join okres using(id_okresu)
+                join kraj using(id_kraja)
+                join os_udaje using(PSC)
+                join pacient using(rod_cislo)
+                join zdravotny_zaznam using(id_pacienta)
+                join operacia using(id_zaznamu)
+                group by kraj.nazov, id_kraja
+                order by dense_rank() over(order by count(distinct rod_cislo) desc)`
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getKraje,
+  getKrajePodlaPoctuOperovanych,
 };

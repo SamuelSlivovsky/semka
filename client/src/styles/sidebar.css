@@ -3,8 +3,8 @@
   position: fixed;
   left: 0;
   top: 0;
-  width: 20rem;
-  transform: translateX(-16rem);
+  width: 16rem;
+  transform: translateX(-12rem);
   height: 100vh;
   transition: 0.5s;
 }
