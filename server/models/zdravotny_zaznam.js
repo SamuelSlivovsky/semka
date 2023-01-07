@@ -18,13 +18,15 @@ async function insertHospitalizacia(body) {
     try {
         let conn = await database.getConnection();
         const sqlStatement = `BEGIN
-        hospitalizacia_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_lekara, :dat_do);
+        hospitalizacia_insert(:rod_cislo, :priloha, :popis, :datum, :id_lekara, :dat_do);
         END;`;
+
+        let buffer = Buffer.from(body.priloha, "base64");
 
         await conn.execute(sqlStatement,
             {
                 rod_cislo: body.rod_cislo,
-                id_prilohy: body.id_prilohy,
+                priloha: buffer,
                 popis: body.popis,
                 datum: body.datum,
                 id_lekara: body.id_lekara,
@@ -44,10 +46,12 @@ async function insertOperacia(body) {
         operacia_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_miestnosti, :trvanie);
         END;`;
 
+        let buffer = Buffer.from(body.priloha, "base64");
+
         await conn.execute(sqlStatement,
             {
                 rod_cislo: body.rod_cislo,
-                id_prilohy: body.id_prilohy,
+                priloha: buffer,
                 popis: body.popis,
                 datum: body.datum,
                 id_miestnosti: body.id_miestnosti,
@@ -67,10 +71,12 @@ async function insertVysetrenie(body) {
         vysetrenie_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_lekara);
         END;`;
 
+        let buffer = Buffer.from(body.priloha, "base64");
+
         await conn.execute(sqlStatement,
             {
                 rod_cislo: body.rod_cislo,
-                id_prilohy: body.id_prilohy,
+                priloha: buffer,
                 popis: body.popis,
                 datum: body.datum,
                 id_lekara: body.id_lekara
