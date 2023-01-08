@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { Calendar } from "primereact/calendar";
 import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
 import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
-
+import { Toast } from "primereact/toast";
 export default function Add() {
+  const toast = useRef(null);
+  const fileUploader = useRef(null);
   const [eventDateStart, setEventDateStart] = useState(null);
-  const [eventDateEnd, setEventDateEnd] = useState(null);
+  const [base64Data, setBase64Data] = useState(null);
   const [currRodCislo, setCurrRodCislo] = useState(null);
   const [patientName, setPatientName] = useState("");
   const [patientSurname, setPatientSurname] = useState("");
@@ -19,6 +20,7 @@ export default function Add() {
   const [currPsc, setCurrPsc] = useState(null);
   const [eventTypeButton, setEventTypeButton] = useState(1);
   const [placeId, setPlaceId] = useState(null);
+  const [buttonLoading, setButtonLoading] = useState(false);
   const eventTypes = [
     { name: "Operácia", code: "OP", value: 1 },
     { name: "Vyšetrenie", code: "EX", value: 2 },
@@ -41,6 +43,7 @@ export default function Add() {
   };
 
   const handleClick = () => {
+    setButtonLoading(true);
     insertData();
   };
 
@@ -53,10 +56,30 @@ export default function Add() {
         datum: eventDateStart.toLocaleString("en-GB").replace(",", ""),
         id_lekara: 1,
         id_lieku: placeId.id,
-        datum_vyzdvihnutia: eventDateEnd,
+        datum_vyzdvihnutia: null,
       }),
     };
     const response = await fetch("/add/recept", requestOptions);
+    console.log(response);
+    const requestOptionsForFile = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        image: base64Data,
+      }),
+    };
+    fetch("/add/priloha", requestOptionsForFile)
+      .then((response) => response.blob())
+      .then((res) => {
+        setButtonLoading(false);
+        console.log(fileUploader.current.clear());
+        toast.current.show({
+          severity: "success",
+          summary: "Úspešné odoslanie",
+          detail: "Dáta sa podarilo úspešne odoslať",
+          life: 3000,
+        });
+      });
   }
 
   const customBase64Uploader = async (event) => {
@@ -66,17 +89,7 @@ export default function Add() {
     let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
     reader.readAsDataURL(blob);
     reader.onloadend = function () {
-      const base64data = reader.result.substring(
-        reader.result.indexOf(",") + 1
-      );
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          image: base64data,
-        }),
-      };
-      fetch("/add/priloha", requestOptions).then((response) => response.blob());
+      setBase64Data(reader.result.substring(reader.result.indexOf(",") + 1));
     };
   };
 
@@ -136,12 +149,30 @@ export default function Add() {
     );
   };
 
+  const headerTemplate = (options) => {
+    const { className, chooseButton, cancelButton } = options;
+    return (
+      <div
+        className={className}
+        style={{
+          backgroundColor: "transparent",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {chooseButton}
+        {cancelButton}
+      </div>
+    );
+  };
+
   return (
     <div
       style={{ width: "90%", marginTop: "2rem" }}
       className="p-fluid grid formgrid"
     >
-      <div className="field col-6">
+      <Toast ref={toast} />
+      <div className="field col-12">
         <SelectButton
           value={eventTypeButton}
           options={eventTypes}
@@ -182,16 +213,39 @@ export default function Add() {
               optionLabel="id"
             />
           </div>
+          <div className="field col-12 ">
+            <label htmlFor="basic">Príloha</label>
+            <FileUpload
+              ref={fileUploader}
+              mode="advanced"
+              accept="image/*"
+              customUpload
+              chooseLabel="Vložiť"
+              cancelLabel="Zrušiť"
+              headerTemplate={headerTemplate}
+              maxFileSize={50000000}
+              uploadHandler={customBase64Uploader}
+              emptyTemplate={
+                <p className="m-0">Drag and drop files to here to upload.</p>
+              }
+            />
+          </div>
         </>
       )}
-      <Button onClick={handleClick}></Button>
-      <FileUpload
-        mode="basic"
-        url="https://primefaces.org/primereact/showcase/upload.php"
-        accept="image/*"
-        customUpload
-        uploadHandler={customBase64Uploader}
-      />
+      <div
+        className="field col-12 "
+        style={{ justifyContent: "center", display: "grid" }}
+      >
+        <Button
+          style={{ width: "50vh" }}
+          className="p-button-lg"
+          label="Submit"
+          icon="pi pi-check"
+          loading={buttonLoading}
+          onClick={handleClick}
+          iconPos="right"
+        />
+      </div>
     </div>
   );
 }
