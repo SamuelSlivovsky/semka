@@ -1,4 +1,3 @@
-const { element } = require("xml");
 const database = require("../database/Database");
 
 async function getPacienti() {
