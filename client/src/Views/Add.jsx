@@ -220,6 +220,8 @@ export default function Add() {
               mode="advanced"
               accept="image/*"
               customUpload
+              chooseLabel="Vložiť"
+              cancelLabel="Zrušiť"
               headerTemplate={headerTemplate}
               maxFileSize={50000000}
               uploadHandler={customBase64Uploader}
