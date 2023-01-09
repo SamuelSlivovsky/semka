@@ -74,9 +74,11 @@ async function getOperacie(id) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+      `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
                 join operacia using(id_zaznamu)
-                 join operacia_lekar using(id_operacie) where id_lekara = :id`,
+                 join operacia_lekar using(id_operacie) 
+                  join pacient using(id_pacienta)
+                   join os_udaje using(rod_cislo) where id_lekara = :id`,
       [id]
     );
 
@@ -94,9 +96,11 @@ async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+      `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
                 join vysetrenie using(id_zaznamu)
-                  where id_lekara = :id`,
+                 join pacient using(id_pacienta)
+                  join os_udaje using(rod_cislo) where id_lekara = :id
+                   where id_lekara = :id`,
       [id]
     );
 
@@ -114,8 +118,10 @@ async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+      `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
                 join hospitalizacia using(id_zaznamu)
+                 join pacient using(id_pacienta)
+                  join os_udaje using(rod_cislo) where id_lekara = :id
                   where id_lekara = :id`,
       [id]
     );
