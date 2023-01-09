@@ -4,7 +4,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import listPlugin from '@fullcalendar/list';
-import { createEventId } from './event-utils';
 import { Calendar } from 'primereact/calendar';
 import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
@@ -19,7 +18,6 @@ function EventCalendar() {
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [showConfirmChanges, setShowConfirmChanges] = useState(false);
   const [eventDateStart, setEventDateStart] = useState(null);
-  const [eventDateEnd, setEventDateEnd] = useState(null);
   const [currEventId, setCurrEventId] = useState(null);
   const [currEventTitle, setCurrEventTitle] = useState(null);
   const [eventType, setEventType] = useState(null);
@@ -77,8 +75,13 @@ function EventCalendar() {
     }
     setCurrEventId(clickInfo.event._def.publicId);
     setEventDateStart(new Date(clickInfo.event._instance.range.start));
-    setEventDateEnd(new Date(clickInfo.event._instance.range.end));
-    setCurrEventTitle(clickInfo.event._def.title);
+    setCurrEventTitle(
+      clickInfo.event._def.extendedProps.type +
+        ' - ' +
+        clickInfo.event._def.extendedProps.MENO +
+        ' ' +
+        clickInfo.event._def.extendedProps.PRIEZVISKO
+    );
   };
 
   const onHide = () => {
@@ -102,37 +105,26 @@ function EventCalendar() {
     if (!addEvent) {
       let calendarApi = calendarRef.current.getApi();
       let currentEvent = calendarApi.getEventById(currEventId);
-      currentEvent.setDates(eventDateStart, eventDateEnd, { allDay: true });
-      currentEvent.setProp('title', currEventTitle);
-    } else {
-      let backgroundColor = '';
-      switch (eventType.code) {
-        case 'OP':
-          backgroundColor = '#00916E';
-          break;
-        case 'EX':
-          backgroundColor = '#593F62';
-          break;
-        case 'HOSP':
-          backgroundColor = '#8499B1';
-          break;
-        default:
-          break;
-      }
-      let calendarApi = calendarRef.current.getApi();
-      calendarApi.unselect(); // clear date selection
-      calendarApi.addEvent({
-        id: createEventId(),
-        title: currEventTitle,
-        start: eventDateStart,
-        end: eventDateEnd,
-        type: eventType,
-        backgroundColor: backgroundColor,
-        borderColor: backgroundColor,
-      });
+      let endDate = new Date(eventDateStart.getTime() + 3600000);
+      let startDate = new Date(eventDateStart.getTime() - 3600000);
+      const requestOptions = {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          datum: startDate.toLocaleString('en-GB').replace(',', ''),
+          id: currEventId,
+        }),
+      };
+      fetch('/calendar/zmenaZaznamu', requestOptions)
+        .then((response) => response.json())
+        .then((res) => {
+          currentEvent.setDates(startDate, endDate, {
+            allDay: false,
+          });
+          setShowConfirmChanges(false);
+          setShowDialog(false);
+        });
     }
-    setShowConfirmChanges(false);
-    setShowDialog(false);
   };
 
   const renderDialogFooter = () => {
@@ -182,8 +174,8 @@ function EventCalendar() {
     return selectButtonValue === 'Zmeniť dátum udalosti' || showAddEvent ? (
       <>
         <div className='field col-12'>
-          <h3 htmlFor='basic'>Názov udalosti</h3>
-          <p>Typ udalosti - Meno Pacienta</p>
+          <h3 htmlFor='basic'>Udalosť</h3>
+          <p>{currEventTitle}</p>
         </div>
         <div className='field col-12 '>
           <label htmlFor='basic'>Začiatok udalosti</label>
@@ -191,17 +183,6 @@ function EventCalendar() {
             id='basic'
             value={eventDateStart}
             onChange={(e) => setEventDateStart(e.value)}
-            showTime
-            showIcon
-            dateFormat='dd.mm.yy'
-          />
-        </div>
-        <div className='field col-12 '>
-          <label htmlFor='basic'>Koniec udalosti</label>
-          <Calendar
-            id='basic'
-            value={eventDateEnd}
-            onChange={(e) => setEventDateEnd(e.value)}
             showTime
             showIcon
             dateFormat='dd.mm.yy'
@@ -216,27 +197,13 @@ function EventCalendar() {
       <>
         <div className='field col-12'>
           <h3 htmlFor='basic'>Názov udalosti</h3>
-          <p>Typ udalosti - Meno Pacienta</p>
+          <p>{currEventTitle}</p>
         </div>
         <div className='field col-12 '>
           <h3 htmlFor='basic'>Začiatok udalosti</h3>
           <p>
             {eventDateStart !== null
-              ? eventDateStart
-                  .toLocaleDateString()
-                  .replace('. ', '.')
-                  .replace(' ', '')
-              : ''}
-          </p>
-        </div>
-        <div className='field col-12 '>
-          <h3 htmlFor='basic'>Koniec udalosti</h3>
-          <p>
-            {eventDateEnd !== null
-              ? eventDateEnd
-                  .toLocaleDateString()
-                  .replace('. ', '.')
-                  .replace(' ', '')
+              ? eventDateStart.toLocaleString('sk-SK').replace('. ', '.')
               : ''}
           </p>
         </div>
