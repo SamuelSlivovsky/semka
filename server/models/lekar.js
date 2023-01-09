@@ -1,4 +1,4 @@
-const database = require("../database/Database");
+const database = require('../database/Database');
 
 async function getLekari() {
   try {
@@ -83,7 +83,7 @@ async function getOperacie(id) {
     );
 
     operacie.rows.forEach((element) => {
-      element.type = "OPE";
+      element.type = 'OPE';
     });
 
     return operacie.rows;
@@ -99,13 +99,13 @@ async function getVysetrenia(id) {
       `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
                 join vysetrenie using(id_zaznamu)
                  join pacient using(id_pacienta)
-                  join os_udaje using(rod_cislo) where id_lekara = :id
+                  join os_udaje using(rod_cislo) 
                    where id_lekara = :id`,
       [id]
     );
 
     vysetrenia.rows.forEach((element) => {
-      element.type = "VYS";
+      element.type = 'VYS';
     });
 
     return vysetrenia.rows;
@@ -121,13 +121,13 @@ async function getHospitalizacie(id) {
       `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
                 join hospitalizacia using(id_zaznamu)
                  join pacient using(id_pacienta)
-                  join os_udaje using(rod_cislo) where id_lekara = :id
+                  join os_udaje using(rod_cislo) 
                   where id_lekara = :id`,
       [id]
     );
 
     hospitalizacie.rows.forEach((element) => {
-      element.type = "HOS";
+      element.type = 'HOS';
     });
 
     return hospitalizacie.rows;
