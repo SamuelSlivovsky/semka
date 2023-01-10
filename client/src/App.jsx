@@ -17,6 +17,7 @@ import "../node_modules/primeflex/primeflex.css";
 import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
+import Storage from "./Views/Storage";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -107,12 +108,9 @@ function App() {
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
-      <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
         <Button
           icon={`${visibleLeft ? "pi pi-times" : "pi pi-bars"}`}
-          icon={`${visibleLeft ? "pi pi-times" : "pi pi-bars"}`}
           onClick={() => handleShowSidebar()}
-          iconPos="right"
           iconPos="right"
           style={{
             marginTop: "1rem",
@@ -133,13 +131,10 @@ function App() {
       </div>
       <div
         className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
-        className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
       >
         <Routes>
           {<Route path="/" element={<Home></Home>}></Route>}
-          {<Route path="/" element={<Home></Home>}></Route>}
           <Route
-            path="/calendar"
             path="/calendar"
             element={<EventCalendar></EventCalendar>}
           ></Route>
@@ -162,6 +157,7 @@ function App() {
           ></Route>
           <Route path="/statistics" element={<Statistics></Statistics>}></Route>
           <Route path="/add" element={<Add></Add>}></Route>
+          <Route path='/sklad' element={<Storage />}></Route>
         </Routes>
       </div>
     </div>

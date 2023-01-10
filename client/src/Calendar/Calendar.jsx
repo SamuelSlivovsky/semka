@@ -3,7 +3,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import listPlugin from "@fullcalendar/list";
+//import listPlugin from "@fullcalendar/list";
 import { createEventId } from "./event-utils";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
@@ -286,12 +286,12 @@ function EventCalendar() {
             ></ProgressBar>
           ) : (
             <FullCalendar
-              plugins={[
-                dayGridPlugin,
-                timeGridPlugin,
-                interactionPlugin,
-                listPlugin,
-              ]}
+              // plugins={[
+              //   dayGridPlugin,
+              //   timeGridPlugin,
+              //   interactionPlugin,
+              //   listPlugin,
+              // ]}
               ref={calendarRef}
               headerToolbar={{
                 left: "prev,next today prevYear,nextYear",

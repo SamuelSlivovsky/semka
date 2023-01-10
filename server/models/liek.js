@@ -4,7 +4,7 @@ const oracledb = database.oracledb;
 async function getLieky() {
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`SELECT * FROM liek`);
+    const result = await conn.execute(`SELECT nazov FROM liek`);
 
     return result.rows;
   } catch (err) {

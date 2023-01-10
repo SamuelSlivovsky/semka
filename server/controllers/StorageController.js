@@ -14,6 +14,29 @@ module.exports = {
       ret_val = await sklad.insertDrug(req.body);
       res.status(200);
     })().catch((err) => {
+      console.log("Error Kontroler");
+      console.error(err);
+      res.status(500).send(err);
+    });
+  },
+
+  updateQuantity: (req, res) => {
+    const sklad = require("../models/sklad");
+    (async () => {
+      ret_val = await sklad.updateQuantity(req.body);
+      res.status(200);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  },
+
+  deleteSarza: (req, res) => {
+    const sklad = require("../models/sklad");
+    (async () => {
+      ret_val = await sklad.deleteSarza(req.body);
+      res.status(200);
+    })().catch((err) => {
       console.error(err);
       res.status(500).send(err);
     });
