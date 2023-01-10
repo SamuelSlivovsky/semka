@@ -1,30 +1,25 @@
-import React, { useState, useEffect } from "react";
-import { DataTable } from "primereact/datatable";
+import React from "react";
+/*import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 //import mockDataJson from "../mock/mock-data.json";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router";*/
+import TabPatients from "./Tables/TabPatients";
 import "../styles/patients.css";
 
 function Patient() {
   //const [mockData, setMockData] = useState([]);
-  const [patients, setPatients] = useState([]);
+  /*const [patients, setPatients] = useState([]);
   const [loading, setLoading] = useState(true);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [selectedRow, setSelectedRow] = useState(null);*/
 
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    fetch(`/lekar/pacienti/${2}`)
-      .then((response) => response.json())
-      .then((data) => console.log(data));
-  }, []);
+  /*const navigate = useNavigate();
 
   const onHide = () => {
     setShowDialog(false);
@@ -142,11 +137,11 @@ function Patient() {
       },
     });
     setGlobalFilterValue("");
-  };
+  };*/
 
   return (
     <div>
-      <div className="card" style={{ height: "100vh" }}>
+      {/* <div className="card" style={{ height: "100vh" }}>
         <DataTable
           value={patients}
           responsiveLayout="scroll"
@@ -195,7 +190,8 @@ function Patient() {
         <p>{selectedRow != null ? "Adresa s PSC " + selectedRow.PSC : ""}</p>
         <p>ZŤP</p>
         <p>Nadchádzajúca udalosť</p>
-      </Dialog>
+      </Dialog> */}
+      <TabPatients></TabPatients>
     </div>
   );
 }

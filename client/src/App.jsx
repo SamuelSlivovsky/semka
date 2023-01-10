@@ -2,22 +2,21 @@ import React, { useState } from "react";
 import EventCalendar from "./Calendar/Calendar";
 import Home from "./Home/Home";
 import { Button } from "primereact/button";
-import { Routes, Route, useNavigate, useLocation } from "react-router-dom";
-import { Avatar } from 'primereact/avatar';
-import TabPatients from './Views/Tables/TabPatients';
-import TabHospitalizations from './Views/Tables/TabHospitalizations'
-import TabOperations from './Views/Tables/TabOperations'
-import TabExaminations from './Views/Tables/TabExaminations'
+import { Routes, Route } from "react-router-dom";
+import TabPatients from "./Views/Tables/TabPatients";
 import Patient from "./Views/Patient";
 import { Register } from "./Auth/Register";
 import { Login } from "./Auth/Login";
-import TabDoctors from './Views/Tables/TabDoctors';
-import Doctor from './Views/Doctor';
-import Storage from "./Views/Storage";
+import TabDoctors from "./Views/Tables/TabDoctors";
+import Statistics from "./Views/Statistics";
+import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
 import "./App.css";
 import "./styles/sidebar.css";
 import "../node_modules/primeflex/primeflex.css";
+import TabExaminations from "./Views/Tables/TabExaminations";
+import TabHospitalizations from "./Views/Tables/TabHospitalizations";
+import TabOperations from "./Views/Tables/TabOperations";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -108,9 +107,12 @@ function App() {
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
+      <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
         <Button
           icon={`${visibleLeft ? "pi pi-times" : "pi pi-bars"}`}
+          icon={`${visibleLeft ? "pi pi-times" : "pi pi-bars"}`}
           onClick={() => handleShowSidebar()}
+          iconPos="right"
           iconPos="right"
           style={{
             marginTop: "1rem",
@@ -119,44 +121,47 @@ function App() {
             display: "flex",
             background: "none",
             border: "none",
-          }}
-        />
-        <Button
-          icon='hospital-logo-icon'
-          className='p-button-rounded p-button-info'
-          iconPos='right'
-          style={{
-            marginTop: '1rem',
-            marginRight: '8px',
-            marginLeft: 'auto',
-            display: 'block',
+            marginTop: "1rem",
+            marginRight: "8px",
+            marginLeft: "auto",
+            display: "flex",
+            background: "none",
+            border: "none",
           }}
         />
         {sidebarButtons}
-        <div className='sidebar-content'>
-          <h1 style={{ verticalAlign: 'text-top', color: 'white' }}>USER</h1>
-          <Avatar label='P' className='mr-2' size='xlarge' shape='circle' />
-        </div>
       </div>
       <div
+        className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
         className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
       >
         <Routes>
           {<Route path="/" element={<Home></Home>}></Route>}
+          {<Route path="/" element={<Home></Home>}></Route>}
           <Route
+            path="/calendar"
             path="/calendar"
             element={<EventCalendar></EventCalendar>}
           ></Route>
-          <Route path='/patients' element={<TabPatients />}></Route>
-          <Route path='/patient' element={<Patient />}></Route>
-          <Route path='/register' element={<Register></Register>}></Route>
-          <Route path='/login' element={<Login></Login>}></Route>
-          <Route path='/doctors' element={<TabDoctors></TabDoctors>}></Route>
-          <Route path='/doctor' element={<Doctor />}></Route>
-          <Route path='/hospitalizations' element={<TabHospitalizations />}></Route>
-          <Route path='/operations' element={<TabOperations />}></Route>
-          <Route path='/examinations' element={<TabExaminations />}></Route>
-          <Route path='/sklad' element={<Storage />}></Route>
+          <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
+          <Route path="/patient" element={<Patient></Patient>}></Route>
+          <Route path="/register" element={<Register></Register>}></Route>
+          <Route path="/login" element={<Login></Login>}></Route>
+          <Route path="/doctors" element={<TabDoctors></TabDoctors>}></Route>
+          <Route
+            path="/examinations"
+            element={<TabExaminations></TabExaminations>}
+          ></Route>
+          <Route
+            path="/hospitalizations"
+            element={<TabHospitalizations></TabHospitalizations>}
+          ></Route>
+          <Route
+            path="/operations"
+            element={<TabOperations></TabOperations>}
+          ></Route>
+          <Route path="/statistics" element={<Statistics></Statistics>}></Route>
+          <Route path="/add" element={<Add></Add>}></Route>
         </Routes>
       </div>
     </div>

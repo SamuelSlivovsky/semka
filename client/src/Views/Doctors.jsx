@@ -1,20 +1,21 @@
-import React, { useState, useEffect } from "react";
-import { DataTable } from "primereact/datatable";
+import React from "react";
+/*import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";*/
+/*import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import mockDataJson from "../mock/mock-data.json";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router";*/
+import TabDoctros from "./Tables/TabDoctors";
 export default function Doctors() {
-  const [mockData, setMockData] = useState([]);
-  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [filters1, setFilters1] = useState(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  //const [mockData, setMockData] = useState([]);
+  //const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  //const [filters1, setFilters1] = useState(null);
+  //const [showDialog, setShowDialog] = useState(false);
+  //const [selectedRow, setSelectedRow] = useState(null);
 
-  const navigate = useNavigate();
+  /*const navigate = useNavigate();
 
   const onHide = () => {
     setShowDialog(false);
@@ -28,9 +29,9 @@ export default function Doctors() {
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
-  };
+  };*/
 
-  const renderDialogFooter = () => {
+  /*const renderDialogFooter = () => {
     return (
       <div>
         <Button
@@ -47,9 +48,9 @@ export default function Doctors() {
         />
       </div>
     );
-  };
+  };*/
 
-  const renderHeader1 = () => {
+  /*const renderHeader1 = () => {
     return (
       <div className="flex justify-content-between">
         <span className="p-input-icon-left">
@@ -62,9 +63,9 @@ export default function Doctors() {
         </span>
       </div>
     );
-  };
+  };*/
 
-  const onGlobalFilterChange1 = (e) => {
+  /*const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
     let _filters1 = { ...filters1 };
     _filters1["global"].value = value;
@@ -76,9 +77,9 @@ export default function Doctors() {
   useEffect(() => {
     setMockData(mockDataJson.data);
     initFilters1();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps*/
 
-  const initFilters1 = () => {
+  /*const initFilters1 = () => {
     setFilters1({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       name: {
@@ -99,12 +100,12 @@ export default function Doctors() {
       },
     });
     setGlobalFilterValue1("");
-  };
+  };*/
 
-  const header1 = renderHeader1();
+  //const header1 = renderHeader1();
   return (
     <div>
-      <div className="card">
+      {/* <div className="card">
         <DataTable
           value={mockData}
           responsiveLayout="scroll"
@@ -130,7 +131,8 @@ export default function Doctors() {
         style={{ width: "50vw" }}
         footer={renderDialogFooter()}
         onHide={() => onHide()}
-      ></Dialog>
+      ></Dialog> */}
+      <TabDoctros></TabDoctros>
     </div>
   );
 }

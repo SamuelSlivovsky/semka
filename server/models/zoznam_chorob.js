@@ -14,7 +14,28 @@ async function getZoznamChorob() {
     }
 }
 
+async function insertZoznamChorob(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `BEGIN
+        zoznam_chorob_insert(:rod_cislo, :id_choroby, :datum_od, :datum_do);
+        END;`;
+
+        await conn.execute(sqlStatement,
+            {
+                rod_cislo: body.rod_cislo,
+                id_choroby: body.id_choroby,
+                datum_od: body.datum_od,
+                datum_do: body.datum_do
+            }
+        );
+
+    } catch (err) {
+        console.log(err);
+    }
+}
+
 module.exports = {
     getZoznamChorob,
-    getNajviacChori
+    insertZoznamChorob
 }

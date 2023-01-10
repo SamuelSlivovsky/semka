@@ -50,8 +50,33 @@ async function getPomerMuziZeny(id_oddelenia) {
   }
 }
 
+async function insertOsUdaje(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+      os_udaje_insert(:rod_cislo, :PSC, :meno, :priezvisko, :tel, :mail);
+    END;`;
+
+    let result = await conn.execute(sqlStatement,
+      {
+        rod_cislo: body.rod_cislo,
+        PSC: body.PSC,
+        meno: body.meno,
+        priezvisko: body.priezvisko,
+        tel: body.tel,
+        mail: body.mail
+      }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getOsobneUdaje,
   getMenovciPacientLekar,
   getPomerMuziZeny,
+  insertOsUdaje
 };

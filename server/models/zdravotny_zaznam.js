@@ -14,33 +14,77 @@ async function getZdravotneZaznamy() {
     }
 }
 
-//TODO
+async function insertHospitalizacia(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `BEGIN
+        hospitalizacia_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_lekara, :dat_do);
+        END;`;
+
+        await conn.execute(sqlStatement,
+            {
+                rod_cislo: body.rod_cislo,
+                id_prilohy: body.id_prilohy,
+                popis: body.popis,
+                datum: body.datum,
+                id_lekara: body.id_lekara,
+                dat_do: body.dat_do,
+            }
+        );
+
+    } catch {
+        throw new Error('Error');
+    }
+}
+
 async function insertOperacia(body) {
     try {
         let conn = await database.getConnection();
         const sqlStatement = `BEGIN
-        operacia_insert(:id_miestnosti, :id_zaznamu, :trvanie, :datum, :datum_vyzdvihnutia);
-      END;`;
+        operacia_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_miestnosti, :trvanie);
+        END;`;
 
-        let result = await conn.execute(sqlStatement,
+        await conn.execute(sqlStatement,
             {
-                id_lieku: body.id_lieku,
-                id_pacienta: body.id_pacienta,
-                id_lekara: body.id_lekara,
+                rod_cislo: body.rod_cislo,
+                id_prilohy: body.id_prilohy,
+                popis: body.popis,
                 datum: body.datum,
-                datum_vyzdvihnutia: body.datum_vyzdvihnutia
+                id_miestnosti: body.id_miestnosti,
+                trvanie: body.trvanie
             }
         );
 
-        console.log("Rows inserted " + result.rowsAffected);
-
-    } catch (err) {
-        console.log(err);
+    } catch {
+        throw new Error('Error');
     }
 }
 
+async function insertVysetrenie(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `BEGIN
+        vysetrenie_insert(:rod_cislo, :id_prilohy, :popis, :datum, :id_lekara);
+        END;`;
+
+        await conn.execute(sqlStatement,
+            {
+                rod_cislo: body.rod_cislo,
+                id_prilohy: body.id_prilohy,
+                popis: body.popis,
+                datum: body.datum,
+                id_lekara: body.id_lekara
+            }
+        );
+
+    } catch {
+        throw new Error('Error');
+    }
+}
 
 module.exports = {
     getZdravotneZaznamy,
-    insertOperacia
+    insertOperacia,
+    insertHospitalizacia,
+    insertVysetrenie
 }

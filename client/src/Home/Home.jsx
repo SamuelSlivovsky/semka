@@ -1,5 +1,4 @@
 import React from "react";
-import storageIcon from "../images/drugs.png"
 import calendarIcon from "../images/calendar.png";
 import patientIcon from "../images/patient.png";
 import doctorsIcon from "../images/doctors.png";
