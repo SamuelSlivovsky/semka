@@ -16,4 +16,21 @@ const verifyRoles = (...allowedRoles) => {
     }
 }
 
-module.exports = verifyRoles
+const checkForCorrectId = () => {
+    return (req, res, next) => {
+
+        if (!req?.userid) return res.sendStatus(401);
+
+        const id = parseInt(req.params.id)
+
+        if (id !== req.userid) {
+            return res.sendStatus(401);
+        }
+        next();
+    }
+}
+
+module.exports = {
+    verifyRoles,
+    checkForCorrectId
+} 

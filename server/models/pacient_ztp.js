@@ -10,7 +10,7 @@ async function getPacientiZtp() {
         return result.rows;
 
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -32,7 +32,7 @@ async function insertPacientZtp(body) {
 
         console.log("Rows inserted " + result.rowsAffected);
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 

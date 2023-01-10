@@ -26,7 +26,7 @@ async function getNajviacChoriPocet(pocet) {
     console.log(result.rows);
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -48,7 +48,7 @@ async function getNajviacOperovanyPercenta(percent) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -70,7 +70,7 @@ async function getNajviacHospitalizovaniPercenta(percent) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -97,7 +97,7 @@ async function getTypyOckovaniaPacienti() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -115,7 +115,7 @@ async function getPacientiChorobaP13() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -131,7 +131,7 @@ async function getPocetPacientiPodlaVeku() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -151,7 +151,7 @@ async function getInfo(id) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -202,7 +202,7 @@ async function getOperacie(id) {
 
     return operacie.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -221,7 +221,7 @@ async function getOckovania(id) {
 
     return ockovania.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -240,7 +240,7 @@ async function getVysetrenia(id) {
 
     return vysetrenia.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -259,7 +259,7 @@ async function getHospitalizacie(id) {
 
     return hospitalizacia.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -280,7 +280,7 @@ async function insertPacient(body) {
 
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

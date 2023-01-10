@@ -10,7 +10,7 @@ async function getLozka() {
         return result.rows;
 
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -32,7 +32,7 @@ async function getNeobsadeneLozkaOddeleniaTyzden(id_oddelenia) {
         return result.rows;
 
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 

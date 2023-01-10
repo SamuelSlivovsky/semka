@@ -11,7 +11,7 @@ async function userExists(userid) {
 
         return false;
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -32,7 +32,7 @@ async function insertUser(body) {
 
         console.log("Rows inserted " + result.rowsAffected);
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -49,7 +49,7 @@ async function getUserByUserId(userid) {
         console.log(result.rows);
         return result.rows[0];
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -66,7 +66,7 @@ async function getUserByRefreshToken(refresh_token) {
         console.log(result.rows);
         return result.rows[0];
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -84,7 +84,7 @@ async function updateUserRefreshToken(body) {
 
         console.log("Rows updated " + result.rowsAffected);
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 

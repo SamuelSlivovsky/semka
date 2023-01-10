@@ -10,7 +10,7 @@ async function getZoznamChorob() {
         return result.rows;
 
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -31,7 +31,7 @@ async function insertZoznamChorob(body) {
         );
 
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 

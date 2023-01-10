@@ -6,8 +6,7 @@ module.exports = {
       ret_val = await recept.insertRecept(req.body);
       res.status(200);
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+      console.error(err); 
       res.status(500).send(err);
     });
   },
@@ -17,8 +16,7 @@ module.exports = {
       ret_val = await priloha.insertPriloha(req.body.image);
       res.status(200).json("test");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+      console.error(err); 
       res.status(500).send(err);
     });
   },

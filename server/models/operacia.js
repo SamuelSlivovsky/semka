@@ -12,7 +12,7 @@ async function getOperacie() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -38,7 +38,7 @@ async function getOperaciePocetLekarovTrvanie(pocetLekarov, trvanie) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -61,7 +61,7 @@ async function insertOperacia(body) {
     );
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -79,7 +79,7 @@ async function updateOperacia(body) {
     );
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

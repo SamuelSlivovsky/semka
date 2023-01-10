@@ -8,7 +8,7 @@ async function getNemocnice() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -33,7 +33,7 @@ async function getHospitalizacieNemocniceXML(id_nemocnice) {
     console.log(result.outBinds.ret);
     return result.outBinds.ret;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -56,7 +56,7 @@ async function getOperacieNemocniceXML(id_nemocnice) {
     console.log(result.outBinds.ret);
     return result.outBinds.ret;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -79,7 +79,7 @@ async function getOckovaniaNemocniceXML(id_nemocnice) {
     console.log(result.outBinds.ret);
     return result.outBinds.ret;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -102,7 +102,7 @@ async function getVysetreniaNemocniceXML(id_nemocnice) {
     console.log(result.outBinds.ret);
     return result.outBinds.ret;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

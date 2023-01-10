@@ -10,7 +10,7 @@ async function getZdravotneZaznamy() {
         return result.rows;
 
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -35,7 +35,7 @@ async function insertHospitalizacia(body) {
         );
 
     } catch {
-        throw new Error('Error');
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -60,7 +60,7 @@ async function insertOperacia(body) {
         );
 
     } catch {
-        throw new Error('Error');
+        throw new Error('Database error: ' + err);
     }
 }
 
@@ -84,7 +84,7 @@ async function insertVysetrenie(body) {
         );
 
     } catch {
-        throw new Error('Error');
+        throw new Error('Database error: ' + err);
     }
 }
 
