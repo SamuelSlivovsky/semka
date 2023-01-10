@@ -1,9 +1,0 @@
-{
-  "username": "labat_sp",
-  "password": "heslo1234",
-  "database": "orcl.fri.uniza.sk",
-  "host": "oracle.fri.uniza.sk",
-  "dialect": "oracle",
-  "port": 1521,
-  "connectString": "obelix.fri.uniza.sk:1521/orcl.fri.uniza.sk"
-}

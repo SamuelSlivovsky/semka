@@ -21,7 +21,7 @@ async function insertUser(body) {
 
         console.log(body);
 
-        const result = await conn.execute(`insert into user_tab values(:userid, :pwd, :role)`,
+        const result = await conn.execute(`insert into user_tab values(:userid, :pwd, null, :role)`,
             {
                 userid: body.userid,
                 pwd: body.pwd,
@@ -36,7 +36,7 @@ async function insertUser(body) {
     }
 }
 
-async function getUser(userid) {
+async function getUserByUserId(userid) {
     try {
         let conn = await database.getConnection();
 
@@ -47,7 +47,44 @@ async function getUser(userid) {
         );
 
         console.log(result.rows);
-        return result.rows;
+        return result.rows[0];
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function getUserByRefreshToken(refresh_token) {
+    try {
+        let conn = await database.getConnection();
+
+        const result = await conn.execute(`select * from user_tab where refresh_token = :refresh_token`,
+            {
+                refresh_token: refresh_token
+            }
+        );
+
+        console.log(result.rows);
+        return result.rows[0];
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+async function updateUserRefreshToken(body) {
+    try {
+        let conn = await database.getConnection();
+
+        console.log(body);
+
+        const result = await conn.execute(`update user_tab set refresh_token = :refresh_token where userid = :userid`,
+            {
+                refresh_token: body.refresh_token,
+                userid: body.userid
+            },
+            { autoCommit: true }
+        );
+
+        console.log("Rows updated " + result.rowsAffected);
     } catch (err) {
         console.log(err);
     }
@@ -56,5 +93,7 @@ async function getUser(userid) {
 module.exports = {
     userExists,
     insertUser,
-    getUser
+    getUserByUserId,
+    getUserByRefreshToken,
+    updateUserRefreshToken
 };
