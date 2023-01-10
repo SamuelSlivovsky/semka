@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const controller = require('../controllers/SelectsController');
+const verifyRoles = require('../middleware/verifyRoles');
 
 router.get('/liekyMenejAkoPocet/:pocet', controller.getLiekyMenejAkoPocet);
 router.get(
@@ -40,6 +41,9 @@ router.get(
   controller.getKrajePodlaPoctuOperovanych
 );
 router.get('/priemernyVek/', controller.getPriemernyVek);
+
+router.get('/priemernyVekRole', verifyRoles(1, 2), controller.getPriemernyVek);
+
 router.get('/zamestnanciFotka/:id_zamestnanca', controller.getZamestnanciFotka);
 router.get('/zamestnanec/:id_zamestnanca', controller.getZamestnanec);
 

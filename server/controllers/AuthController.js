@@ -45,29 +45,33 @@ const handleLogin = async (req, res) => {
     if (!await userModel.userExists(userid)) return res.sendStatus(401); //Unauthorized 
 
     const foundUser = await userModel.getUserByUserId(userid);
-
+    console.log(foundUser.USERID);
     const match = await bcrypt.compare(pwd, foundUser.PWD);
     if (match == true) {
-
         const accessToken = jwt.sign(
-            { "userid": foundUser.userid },
+            {
+                "UserInfo": {
+                    "userid": foundUser.USERID,
+                    "role": foundUser.ROLE
+                }
+            },
             process.env.ACCESS_TOKEN_SECRET,
             { expiresIn: '30s' }
         );
 
         const refreshToken = jwt.sign(
-            { "userid": foundUser.userid },
+            { "userid": foundUser.USERID },
             process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '1d' }
         );
 
         userModel.updateUserRefreshToken(
             {
-                userid: userid,
+                userid: foundUser.USERID,
                 refresh_token: refreshToken
             });
 
-        res.cookie('jwt', refreshToken, { httpOnly: true, sameSite: 'None', secure: true, maxAge: 24 * 60 * 60 * 1000 }); //1 day httponly cookie is not available to javascript
+        res.cookie('jwt', refreshToken, { httpOnly: true }); //1 day httponly cookie is not available to javascript
         res.status(200).json({ accessToken }); //store in memory not in local storage
     } else {
         res.status(409).json({ 'message': "Passwords not matching" });
@@ -80,11 +84,10 @@ const handleLogout = async (req, res) => {
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(204); //No content
     const refreshToken = cookies.jwt;
-
     // Is refreshToken in db?
     const foundUser = await userModel.getUserByRefreshToken(refreshToken);
     if (!foundUser) {
-        res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true }); // vymazat sameSite, secure ak budu bugy
+        res.clearCookie('jwt', { httpOnly: true }); // vymazat sameSite, secure ak budu bugy
         return res.sendStatus(204);
     }
 
@@ -95,11 +98,14 @@ const handleLogout = async (req, res) => {
             refresh_token: null
         });
 
-    res.clearCookie('jwt', { httpOnly: true, sameSite: 'None', secure: true });
+    res.clearCookie('jwt', { httpOnly: true });
     res.sendStatus(204);
 }
 
 const handleRefreshToken = async (req, res) => {
+
+    console.log(req.cookies);
+
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(401);
 
@@ -112,9 +118,16 @@ const handleRefreshToken = async (req, res) => {
         refreshToken,
         process.env.REFRESH_TOKEN_SECRET,
         (err, decoded) => {
-            if (err || foundUser.userid !== decoded.userid) return res.sendStatus(403);
+            console.log(decoded);
+            if (err || foundUser.USERID !== decoded.userid) return res.sendStatus(403);
+
             const accessToken = jwt.sign(
-                { "userid": decoded.userid },
+                {
+                    "UserInfo": {
+                        "userid": foundUser.USERID,
+                        "role": foundUser.ROLE
+                    }
+                },
                 process.env.ACCESS_TOKEN_SECRET,
                 { expiresIn: '30s' }
             );

@@ -74,8 +74,6 @@ async function updateUserRefreshToken(body) {
     try {
         let conn = await database.getConnection();
 
-        console.log(body);
-
         const result = await conn.execute(`update user_tab set refresh_token = :refresh_token where userid = :userid`,
             {
                 refresh_token: body.refresh_token,
