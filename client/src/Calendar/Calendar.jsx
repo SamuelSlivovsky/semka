@@ -33,7 +33,7 @@ function EventCalendar() {
   const options = ['Detaily udalosti', 'Zmeniť dátum udalosti'];
 
   useEffect(() => {
-    fetch(`calendar/udalostiLekara/${2}`)
+    fetch(`calendar/udalostiLekara/${1}`)
       .then((response) => response.json())
       .then((data) => {
         data.forEach((element) => {
