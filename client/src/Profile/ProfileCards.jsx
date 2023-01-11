@@ -408,7 +408,7 @@ export default function ProfileCard() {
         <Card
           className="col-5 shadow-4"
           title="Choroby"
-          style={{ height: "100%" }}
+          style={{ width: "50rem", height: "40rem" }}
         >
           <TableWithoutDetail {...diseasesTable} />
         </Card>
