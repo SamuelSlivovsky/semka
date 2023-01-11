@@ -49,11 +49,13 @@ async function getUdalosti(id) {
     let udalosti = [];
 
     let operacie = await getOperacie(id);
+    console.log(operacie);
     operacie.forEach((element) => {
       udalosti.push(element);
     });
 
     let vysetrenia = await getVysetrenia(id);
+    console.log(vysetrenia);
     vysetrenia.forEach((element) => {
       udalosti.push(element);
     });

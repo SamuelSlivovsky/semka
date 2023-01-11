@@ -1,5 +1,5 @@
-const { element } = require("xml");
-const database = require("../database/Database");
+const { element } = require('xml');
+const database = require('../database/Database');
 
 async function getPacienti() {
   try {
@@ -140,7 +140,7 @@ async function getInfo(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select meno, priezvisko, 
+      `select meno, priezvisko, rod_cislo,
         trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
         to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, tel, mail,
         krvna_skupina, PSC, nazov 
@@ -158,7 +158,6 @@ async function getInfo(id) {
 
 async function getUdalosti(id) {
   try {
-
     let udalosti = [];
 
     let operacie = await getOperacie(id);
@@ -198,7 +197,7 @@ async function getOperacie(id) {
     );
 
     operacie.rows.forEach((element) => {
-      element.type = "OPE";
+      element.type = 'OPE';
     });
 
     return operacie.rows;
@@ -217,7 +216,7 @@ async function getOckovania(id) {
     );
 
     ockovania.rows.forEach((element) => {
-      element.type = "OCK";
+      element.type = 'OCK';
     });
 
     return ockovania.rows;
@@ -236,7 +235,7 @@ async function getVysetrenia(id) {
     );
 
     vysetrenia.rows.forEach((element) => {
-      element.type = "VYS";
+      element.type = 'VYS';
     });
 
     return vysetrenia.rows;
@@ -254,8 +253,8 @@ async function getHospitalizacie(id) {
       [id]
     );
 
-    hospitalizacia.rows.forEach(element => {
-      element.type = 'HOS'
+    hospitalizacia.rows.forEach((element) => {
+      element.type = 'HOS';
     });
 
     return hospitalizacia.rows;
@@ -268,20 +267,27 @@ async function insertPacient(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-    pacient_insert(:rod_cislo, :id_poistenca, :id_typu_krvnej_skupiny);
+    pacient_insert(:meno, :priezvisko, :psc, :telefon, :email, :rod_cislo, :id_poistenca, :id_typu_krvnej_skupiny, :id_lekara);
     END;`;
 
-    let result = await conn.execute(sqlStatement,
-      {
-        rod_cislo: body.rod_cislo,
-        id_poistenca: body.id_poistenca,
-        id_typu_krvnej_skupiny: body.id_typu_krvnej_skupiny
-      }
-    );
+    console.log(body);
+    let result = await conn.execute(sqlStatement, {
+      rod_cislo: body.rod_cislo,
+      id_poistenca: body.id_poistenca,
+      id_typu_krvnej_skupiny: body.id_typu_krvnej_skupiny,
+      meno: body.meno,
+      priezvisko: body.priezvisko,
+      rod_cislo: body.rod_cislo,
+      email: body.email,
+      telefon: body.telefon,
+      psc: body.psc,
+      id_lekara: body.id_lekara,
+    });
 
-    console.log("Rows inserted " + result.rowsAffected);
+    console.log('Rows inserted ' + result.rowsAffected);
   } catch (err) {
     console.log(err);
+    throw new Error('Error');
   }
 }
 
@@ -295,5 +301,5 @@ module.exports = {
   getPocetPacientiPodlaVeku,
   getInfo,
   getUdalosti,
-  insertPacient
+  insertPacient,
 };
