@@ -63,7 +63,7 @@ export default function Storage() {
 
   const openNew = () => {
     if (drugs == null) {
-      fetch(`drugs/all`)
+      fetch(`lieky/all`)
         .then((response) => response.json())
         .then((data) => {
           setDrugs(data);

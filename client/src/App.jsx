@@ -7,7 +7,6 @@ import TabPatients from "./Views/Tables/TabPatients";
 import Patient from "./Views/Patient";
 import { Register } from "./Auth/Register";
 import { Login } from "./Auth/Login";
-import TabDoctors from "./Views/Tables/TabDoctors";
 import Statistics from "./Views/Statistics";
 import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
@@ -18,6 +17,7 @@ import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
+import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -142,7 +142,10 @@ function App() {
           <Route path="/patient" element={<Patient></Patient>}></Route>
           <Route path="/register" element={<Register></Register>}></Route>
           <Route path="/login" element={<Login></Login>}></Route>
-          <Route path="/doctors" element={<TabDoctors></TabDoctors>}></Route>
+          <Route
+            path="/doctors"
+            element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
+          ></Route>
           <Route
             path="/examinations"
             element={<TabExaminations></TabExaminations>}
@@ -157,7 +160,7 @@ function App() {
           ></Route>
           <Route path="/statistics" element={<Statistics></Statistics>}></Route>
           <Route path="/add" element={<Add></Add>}></Route>
-          <Route path='/sklad' element={<Storage />}></Route>
+          <Route path="/sklad" element={<Storage />}></Route>
         </Routes>
       </div>
     </div>

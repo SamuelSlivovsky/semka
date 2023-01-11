@@ -10,6 +10,8 @@ const patientRoute = require("./routes/patientRoute");
 const receptRoute = require("./routes/receptRoute");
 const storageRoute = require("./routes/storageRoute");
 const drugsRoute = require("./routes/drugsRoute");
+const medRecordsRoute = require("./routes/medRecordsRoute");
+const { autoCommit } = require("oracledb");
 
 const app = express();
 app.use(express.json());
@@ -20,7 +22,8 @@ app.use("/calendar", calendarRoute);
 app.use("/patient", patientRoute);
 app.use("/recept", receptRoute);
 app.use("/sklad", storageRoute);
-app.use("/drugs", drugsRoute);
+app.use("/lieky", drugsRoute);
+app.use("/zaznamy", medRecordsRoute);
 
 app.listen(port, () => {
   console.log(`Aplikacia bezi na porte ${port}`);

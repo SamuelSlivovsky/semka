@@ -159,6 +159,26 @@ async function getInfo(id) {
   }
 }
 
+async function getDoctorsOfPatient(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select meno, priezvisko, mail, t.nazov, n.nazov from os_udaje ou
+      join zamestnanec z on(ou.rod_cislo=z.rod_cislo)
+      join lekar l on(z.id_zamestnanca=l.id_zamestnanca)
+      join lekar_pacient lp on(lp.id_lekara = l.id_lekara and lp.id_pacienta = :id)
+      join oddelenie o on (o.id_oddelenia = z.id_oddelenia)
+      join nemocnica n on(n.id_nemocnice = o.id_nemocnice)
+      join typ_oddelenia t on(t.id_typu_oddelenia = o.id_typu_oddelenia);`,
+      [id]
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getUdalosti(id) {
   try {
     let udalosti = [];
@@ -374,4 +394,5 @@ module.exports = {
   getChoroby,
   getTypyZTP,
   insertPacient,
+  getDoctorsOfPatient,
 };
