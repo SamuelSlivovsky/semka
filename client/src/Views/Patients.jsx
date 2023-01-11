@@ -26,6 +26,17 @@ function Patient() {
     setSelectedRow(null);
   };
 
+  useEffect(() => {
+    fetch("http://localhost:5000/lekar/pacienti")
+      .then((response) => response.json())
+      .then((data) => {
+        setPatients(data);
+        console.log(data);
+      });
+    setLoading(false);
+    initFilters();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const onSubmit = () => {
     setShowDialog(false);
     navigate("/patient");

@@ -8,6 +8,7 @@ import operationIcon from "../images/operation.png";
 import plusIcon from "../images/plus.png";
 import statIcon from "../images/statistics.png";
 import HomeCard from "./HomeCard";
+import storageIcon from "../images/drugs.png"
 import "../styles/homepage.css";
 
 function Home() {
@@ -68,6 +69,13 @@ function Home() {
       icon={plusIcon}
       key="8"
     ></HomeCard>,
+    <HomeCard
+      title="Sklad"
+      isCalendar={false}
+      path="/sklad"
+      icon={storageIcon}
+      key="9"
+    ></HomeCard>
   ];
 
   return <div>{cards}</div>;

@@ -17,12 +17,14 @@ import "../node_modules/primeflex/primeflex.css";
 import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
+import Storage from "./Views/Storage";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
+
   const sidebarButtons = [
     <SidebarButton
       key="1"
@@ -90,6 +92,13 @@ function App() {
     <SidebarButton
       key="10"
       visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
+    />,
+    <SidebarButton
+      key="11"
+      visibleLeft={visibleLeft}
       path="/user"
       label="Meno usera"
       icon="user-icon"
@@ -104,6 +113,12 @@ function App() {
           onClick={() => handleShowSidebar()}
           iconPos="right"
           style={{
+            marginTop: "1rem",
+            marginRight: "8px",
+            marginLeft: "auto",
+            display: "flex",
+            background: "none",
+            border: "none",
             marginTop: "1rem",
             marginRight: "8px",
             marginLeft: "auto",
@@ -142,6 +157,7 @@ function App() {
           ></Route>
           <Route path="/statistics" element={<Statistics></Statistics>}></Route>
           <Route path="/add" element={<Add></Add>}></Route>
+          <Route path='/sklad' element={<Storage />}></Route>
         </Routes>
       </div>
     </div>

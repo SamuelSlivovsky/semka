@@ -115,3 +115,9 @@
   height: 44px;
   width: 44px;
 }
+
+.storage-icon {
+  content: url("./images/drugs.png");
+  height: 44px;
+  width: 44px;
+}
