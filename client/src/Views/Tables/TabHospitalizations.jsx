@@ -23,6 +23,7 @@ export default function TabHospitalizations() {
       { field: "DAT_OD", header: "Dátum prijatia" },
       { field: "DAT_DO", header: "Dátum prepustenia" },
     ],
+    filters: true,
   };
 
   return (

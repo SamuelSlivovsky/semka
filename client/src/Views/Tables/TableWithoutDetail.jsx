@@ -16,7 +16,7 @@ export default function TableWithoutDetail(props) {
     "electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages," +
     "and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 
-  const { tableName, cellData, titles } = props;
+  const { tableName, cellData, titles, filters } = props;
 
   const onHide = () => {
     setShowDialog(false);
@@ -81,7 +81,7 @@ export default function TableWithoutDetail(props) {
     setGlobalFilterValue1("");
   };
 
-  const header = renderHeader();
+  const header = filters ? renderHeader() : "";
   return (
     <div>
       <div className="card">
@@ -93,7 +93,7 @@ export default function TableWithoutDetail(props) {
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters1}
-          filterDisplay="menu"
+          filterDisplay={filters ? "menu" : ""}
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
@@ -120,9 +120,7 @@ export default function TableWithoutDetail(props) {
       >
         <div>
           <h4>Doktor:</h4>
-          <h5>
-            {selectedRow.DATUM != null ? "Dátum: " || selectedRow.DATUM : ""}{" "}
-          </h5>
+          <h5>{selectedRow != null ? "Dátum: " || selectedRow.DATUM : ""} </h5>
           <div>{text}</div>
         </div>
       </Dialog>
