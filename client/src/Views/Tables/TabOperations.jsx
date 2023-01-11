@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
-import TableWithoutDetail from "./TableWithoutDetail";
+import TableMedicalRecords from "./TableMedicalRecords";
 
 export default function TabOperations() {
-  const [operacie, setOperacie] = useState([]);
+  const [operacie, setOperacie] = useState(null);
 
   useEffect(() => {
     fetch(`/lekar/operacie/${2}`)
@@ -24,9 +24,5 @@ export default function TabOperations() {
     ],
   };
 
-  return (
-    <div>
-      <TableWithoutDetail {...data} />
-    </div>
-  );
+  return <div>{data && <TableMedicalRecords {...data} />}</div>;
 }

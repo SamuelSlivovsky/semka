@@ -5,18 +5,13 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 
-export default function TableWithoutDetail(props) {
+export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
-  const [filters1, setFilters1] = useState(null);
+  const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const text =
-    "What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s," +
-    "when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into " +
-    "electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages," +
-    "and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
-
   const { tableName, cellData, titles } = props;
+  const [popis, setPopis] = useState(null);
 
   const onHide = () => {
     setShowDialog(false);
@@ -25,6 +20,12 @@ export default function TableWithoutDetail(props) {
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
+
+    fetch(`/zaznamy/popis/${value.ID_ZAZNAMU}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setPopis(data[0].POPIS);
+      });
   };
 
   const renderHeader = () => {
@@ -47,34 +48,34 @@ export default function TableWithoutDetail(props) {
 
   const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
-    let _filters1 = { ...filters1 };
-    _filters1["global"].value = value;
+    let _filters = { ...filters };
+    _filters["global"].value = value;
 
-    setFilters1(_filters1);
+    setFilters(_filters);
     setGlobalFilterValue1(value);
   };
 
   useEffect(() => {
-    initFilters1();
+    initFilters();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const initFilters1 = () => {
-    setFilters1({
+  const initFilters = () => {
+    setFilters({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      name: {
+      MENO: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      code: {
+      PRIEZVISKO: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      category: {
+      ROD_CISLO: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
-      quantity: {
-        operator: FilterOperator.OR,
+      DATUM: {
+        operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
     });
@@ -92,18 +93,14 @@ export default function TableWithoutDetail(props) {
           selection={selectedRow}
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
-          filters={filters1}
+          filters={filters}
           filterDisplay="menu"
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
+          <Column field="ID_ZAZNAMU"></Column>
           {titles.map((title) => (
-            <Column
-              field={title.field}
-              header={title.header}
-              sortable
-              filter
-            ></Column>
+            <Column field={title.field} header={title.header} filter></Column>
           ))}
         </DataTable>
       </div>
@@ -119,11 +116,8 @@ export default function TableWithoutDetail(props) {
         onHide={() => onHide()}
       >
         <div>
-          <h4>Doktor:</h4>
-          <h5>
-            {selectedRow.DATUM != null ? "Dátum: " || selectedRow.DATUM : ""}{" "}
-          </h5>
-          <div>{text}</div>
+          <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
+          <div>{selectedRow != null ? popis : ""}</div>
         </div>
       </Dialog>
     </div>

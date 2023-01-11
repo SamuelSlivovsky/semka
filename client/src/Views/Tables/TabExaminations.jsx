@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import TableWithoutDetail from "./TableWithoutDetail";
+import TableMedicalRecords from "./TableMedicalRecords";
 
 export default function TabExaminations() {
   const [vysetrenia, setVysetrenia] = useState([]);
@@ -24,9 +24,5 @@ export default function TabExaminations() {
     ],
   };
 
-  return (
-    <div>
-      <TableWithoutDetail {...data} />
-    </div>
-  );
+  return <div>{data && <TableMedicalRecords {...data} />}</div>;
 }

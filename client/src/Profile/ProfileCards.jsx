@@ -5,7 +5,6 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useLocation } from "react-router";
 import { Dialog } from "primereact/dialog";
-import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";

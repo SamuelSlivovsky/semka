@@ -7,4 +7,13 @@ module.exports = {
       res.status(200).json(ret_val);
     })();
   },
+
+  getDoctorsOfPatient: (req, res) => {
+    const pacient = require("../models/pacient");
+    console.log(req.params);
+    (async () => {
+      ret_val = await pacient.getDoctorsOfPatient(req.params.id);
+      res.status(200).json(ret_val);
+    })();
+  },
 };

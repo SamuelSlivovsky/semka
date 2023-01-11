@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import TableWithoutDetail from "./TableWithoutDetail";
+import TableMedicalRecords from "./TableMedicalRecords";
 
 export default function TabHospitalizations() {
   const [hospitalizacie, setHospitalizacie] = useState([]);
@@ -20,14 +20,9 @@ export default function TabHospitalizations() {
       { field: "ROD_CISLO", header: "Rodné číslo" },
       { field: "MENO", header: "Meno" },
       { field: "PRIEZVISKO", header: "Priezvisko" },
-      { field: "DAT_OD", header: "Dátum prijatia" },
-      { field: "DAT_DO", header: "Dátum prepustenia" },
+      { field: "DATUM", header: "Dátum od - Dátum do" },
     ],
   };
 
-  return (
-    <div>
-      <TableWithoutDetail {...data} />
-    </div>
-  );
+  return <div>{data && <TableMedicalRecords {...data} />}</div>;
 }

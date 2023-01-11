@@ -4,7 +4,7 @@ async function getLekari(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT meno, priezvisko, typ_oddelenia.nazov as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov
+      `SELECT meno, priezvisko, typ_oddelenia.nazov as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, mail 
           from lekar join zamestnanec using(id_zamestnanca) 
                     join os_udaje using(rod_cislo)
                     join oddelenie using(id_oddelenia)
@@ -85,7 +85,7 @@ async function getOperacie(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'DD-MM-YYYY') datum 
+      `select id_zaznamu,rod_cislo, meno, priezvisko, to_char(datum,'DD.MM.YYYY') datum 
           from os_udaje join pacient using(rod_cislo)
                         join zdravotny_zaznam using(id_pacienta) 
                         join operacia using(id_zaznamu)
@@ -103,7 +103,7 @@ async function getVysetrenia(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'DD-MM-YYYY') datum 
+      `select id_zaznamu,rod_cislo, meno, priezvisko, to_char(datum,'DD.MM.YYYY') datum 
           from os_udaje join pacient using(rod_cislo)
                         join zdravotny_zaznam using(id_pacienta)
                         join lekar_pacient using(id_pacienta) where id_lekara = :pid_lekara`,
@@ -119,7 +119,7 @@ async function getHospitalizacie(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'DD-MM-YYYY') dat_od, to_char(dat_do, 'DD-MM-YYYY') dat_do
+      `select id_zaznamu,rod_cislo, meno, priezvisko, to_char(datum,'DD.MM.YYYY') || '-' || nvl(to_char(dat_do,'DD.MM.YYYY'),'Neukončená') datum
           from os_udaje join pacient using(rod_cislo)
                         join zdravotny_zaznam using(id_pacienta) 
                         join hospitalizacia using(id_zaznamu) where id_lekara = :pid_lekara`,
