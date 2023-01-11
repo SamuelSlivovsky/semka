@@ -1,23 +1,23 @@
-import TablePeople from "./TablePeople";
+import TableWithDetail from "./TableWithDetail";
 import { useState } from "react";
 import { useEffect } from "react";
 
 export default function TabPatients() {
-  const [mockData, setMockData] = useState([]);
+  const [pacienti, setPacienti] = useState([]);
 
   useEffect(() => {
     fetch(`/lekar/pacienti/${2}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setMockData(data);
+        setPacienti(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const tableData = {
     tableName: "Pacienti",
     route: "/patient",
-    cellData: mockData,
+    cellData: pacienti,
     titles: [
       { field: "ROD_CISLO", header: "Rodné číslo" },
       { field: "MENO", header: "Meno" },
@@ -28,7 +28,7 @@ export default function TabPatients() {
 
   return (
     <div>
-      <TablePeople {...tableData} />
+      <TableWithDetail {...tableData} />
     </div>
   );
 }

@@ -143,10 +143,13 @@ async function getInfo(id) {
       `select meno, priezvisko, 
         trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
         to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, tel, mail,
-        krvna_skupina, PSC, nazov 
+        krvna_skupina, PSC, obec.nazov as nazov_obce, poistovna.nazov as nazov_poistovne 
          from os_udaje join pacient using(rod_cislo)
           join krvna_skupina using(id_typu_krvnej_skupiny)
-           join obec using(PSC) where id_pacienta = :id`,
+          join obec using(PSC) 
+          join poistenec using(id_poistenca)
+          join poistovna using(id_poistovne)
+            where id_pacienta = :id`,
       [id]
     );
 
@@ -158,7 +161,6 @@ async function getInfo(id) {
 
 async function getUdalosti(id) {
   try {
-
     let udalosti = [];
 
     let operacie = await getOperacie(id);
@@ -254,8 +256,8 @@ async function getHospitalizacie(id) {
       [id]
     );
 
-    hospitalizacia.rows.forEach(element => {
-      element.type = 'HOS'
+    hospitalizacia.rows.forEach((element) => {
+      element.type = "HOS";
     });
 
     return hospitalizacia.rows;
@@ -271,13 +273,11 @@ async function insertPacient(body) {
     pacient_insert(:rod_cislo, :id_poistenca, :id_typu_krvnej_skupiny);
     END;`;
 
-    let result = await conn.execute(sqlStatement,
-      {
-        rod_cislo: body.rod_cislo,
-        id_poistenca: body.id_poistenca,
-        id_typu_krvnej_skupiny: body.id_typu_krvnej_skupiny
-      }
-    );
+    let result = await conn.execute(sqlStatement, {
+      rod_cislo: body.rod_cislo,
+      id_poistenca: body.id_poistenca,
+      id_typu_krvnej_skupiny: body.id_typu_krvnej_skupiny,
+    });
 
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
@@ -295,5 +295,5 @@ module.exports = {
   getPocetPacientiPodlaVeku,
   getInfo,
   getUdalosti,
-  insertPacient
+  insertPacient,
 };

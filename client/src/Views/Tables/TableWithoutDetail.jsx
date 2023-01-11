@@ -2,51 +2,29 @@ import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate } from "react-router";
 
-export default function TablePeople(props) {
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
-  const [filters, setFilters] = useState(null);
+export default function TableWithoutDetail(props) {
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
+  const [filters1, setFilters1] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const { route, tableName, cellData, titles } = props;
+  const text =
+    "What is Lorem Ipsum? Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s," +
+    "when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into " +
+    "electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages," +
+    "and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.";
 
-  const navigate = useNavigate();
+  const { tableName, cellData, titles } = props;
 
   const onHide = () => {
     setShowDialog(false);
   };
 
-  const onSubmit = () => {
-    setShowDialog(false);
-    navigate(route, { state: selectedRow.ID_PACIENTA });
-  };
-
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
-  };
-
-  const renderDialogFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Zatvoriť"
-          icon="pi pi-times"
-          className="p-button-danger"
-          onClick={() => onHide()}
-        />
-        <Button
-          label="Detail"
-          icon="pi pi-check"
-          onClick={() => onSubmit()}
-          autoFocus
-        />
-      </div>
-    );
   };
 
   const renderHeader = () => {
@@ -57,8 +35,8 @@ export default function TablePeople(props) {
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText
-              value={globalFilterValue}
-              onChange={onGlobalFilterChange}
+              value={globalFilterValue1}
+              onChange={onGlobalFilterChange1}
               placeholder="Keyword Search"
             />
           </span>
@@ -67,68 +45,40 @@ export default function TablePeople(props) {
     );
   };
 
-  const onGlobalFilterChange = (e) => {
+  const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
-    let _filters = { ...filters };
-    _filters["global"].value = value;
-    setFilters(_filters);
-    setGlobalFilterValue(value);
+    let _filters1 = { ...filters1 };
+    _filters1["global"].value = value;
+
+    setFilters1(_filters1);
+    setGlobalFilterValue1(value);
   };
 
   useEffect(() => {
-    initFilters();
+    initFilters1();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const initFilters = () => {
-    setFilters({
+  const initFilters1 = () => {
+    setFilters1({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      MENO: {
+      name: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      PRIEZVISKO: {
+      code: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      ROD_CISLO: {
+      category: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
-      ODDELENIE: {
+      quantity: {
         operator: FilterOperator.OR,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
     });
-    setGlobalFilterValue("");
-  };
-
-  const getPohlavie = () => {
-    if (selectedRow !== null)
-      return selectedRow.ROD_CISLO.substring(2, 3) === "5" ||
-        selectedRow.ROD_CISLO.substring(2, 3) === "6"
-        ? "Žena"
-        : "Muž";
-  };
-  const getVek = () => {
-    if (selectedRow != null) {
-      let birthDate =
-        "19" +
-        selectedRow.ROD_CISLO.substring(0, 2) +
-        "-" +
-        (selectedRow.ROD_CISLO.substring(2, 4) % 50) +
-        "-" +
-        selectedRow.ROD_CISLO.substring(4, 6);
-
-      birthDate = new Date(birthDate);
-
-      var today = new Date();
-      return getDifferenceInDays(today, birthDate);
-    }
-  };
-
-  const getDifferenceInDays = (date1, date2) => {
-    const diffInMs = Math.abs(date2 - date1);
-    return Math.round(diffInMs / (1000 * 60 * 60 * 24) / 365);
+    setGlobalFilterValue1("");
   };
 
   const header = renderHeader();
@@ -142,7 +92,7 @@ export default function TablePeople(props) {
           selection={selectedRow}
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
-          filters={filters}
+          filters={filters1}
           filterDisplay="menu"
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
@@ -157,6 +107,7 @@ export default function TablePeople(props) {
           ))}
         </DataTable>
       </div>
+
       <Dialog
         header={
           selectedRow != null
@@ -165,12 +116,15 @@ export default function TablePeople(props) {
         }
         visible={showDialog}
         style={{ width: "50vw" }}
-        footer={renderDialogFooter()}
         onHide={() => onHide()}
       >
-        <p>{getPohlavie()}</p>
-        <p>{getVek() + " rokov"}</p>
-        <p>{selectedRow != null ? "PSČ " + selectedRow.PSC : ""}</p>
+        <div>
+          <h4>Doktor:</h4>
+          <h5>
+            {selectedRow.DATUM != null ? "Dátum: " || selectedRow.DATUM : ""}{" "}
+          </h5>
+          <div>{text}</div>
+        </div>
       </Dialog>
     </div>
   );

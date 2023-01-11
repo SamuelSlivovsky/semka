@@ -1,26 +1,32 @@
-import { useEffect, useState } from 'react';
-import mockDataJson from '../../mock/mock-data.json';
-import TableMedicalRecord from './TableMedicalRecord';
+import { useEffect, useState } from "react";
+import TableWithoutDetail from "./TableWithoutDetail";
 
 export default function TabExaminations() {
-  const [mockData, setMockData] = useState([]);
+  const [vysetrenia, setVysetrenia] = useState([]);
 
-  useEffect(()=>{
-    setMockData(mockDataJson.data);
-  },[])
+  useEffect(() => {
+    fetch(`/lekar/vysetrenia/${2}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setVysetrenia(data);
+      });
+  }, []);
 
-  const data={
-    tableName:'Vyšetrenia',
-    cellData: mockData,
-    titles: [{field: "id", header: 'Rodné číslo'},
-             {field: "name", header:'Meno'},
-             {field: "code", header: 'Priezvisko'},
-             {field: "price", header: 'Dátum'}]
-  }
+  const data = {
+    tableName: "Vyšetrenia",
+    cellData: vysetrenia,
+    titles: [
+      { field: "ROD_CISLO", header: "Rodné číslo" },
+      { field: "MENO", header: "Meno" },
+      { field: "PRIEZVISKO", header: "Priezvisko" },
+      { field: "DATUM", header: "Dátum" },
+    ],
+  };
 
   return (
     <div>
-      <TableMedicalRecord {...data}/>
+      <TableWithoutDetail {...data} />
     </div>
-  )
+  );
 }

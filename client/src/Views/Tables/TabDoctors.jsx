@@ -1,29 +1,34 @@
-import TablePeople from './TablePeople';
-import mockDataJson from '../../mock/mock-data.json';
-import { useState } from 'react';
-import { useEffect } from 'react';
+import TableWithoutDetail from "./TableWithoutDetail";
+import { useState } from "react";
+import { useEffect } from "react";
 
 export default function TabDoctros() {
-  const [mockData, setMockData] = useState([]);
+  const [lekari, setLekari] = useState([]);
 
-  useEffect(()=>{
-    setMockData(mockDataJson.data);
-  },[])
+  useEffect(() => {
+    fetch(`/lekar/lekari/${2}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setLekari(data);
+      });
+  }, []);
 
-  const tableData={
-    tableName:'Doktori',
-    route:'/doktor',
-    cellData: mockData,
-    titles: [{field: "category", header: 'Oddelenie'},
-             {field: "description", header:'Meno'},
-             {field: "name", header: 'Priezvisko'}]
-  }
+  const tableData = {
+    tableName: "Doktori",
+    route: "/lekar",
+    cellData: lekari,
+    titles: [
+      { field: "ODDELENIE_NAZOV", header: "Oddelenie" },
+      { field: "NEMOCNICA_NAZOV", header: "Nemocnica" },
+      { field: "MENO", header: "Meno" },
+      { field: "PRIEZVISKO", header: "Priezvisko" },
+    ],
+  };
 
- 
   return (
     <div>
-      <TablePeople {...tableData}/>
+      <TableWithoutDetail {...tableData} />
     </div>
-  )
+  );
 }
-
