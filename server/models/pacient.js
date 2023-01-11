@@ -140,7 +140,7 @@ async function getInfo(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select meno, priezvisko, 
+      `select meno, priezvisko, rod_cislo,
         trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
         to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, tel, mail,
         krvna_skupina, PSC, nazov 

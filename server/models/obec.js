@@ -4,7 +4,7 @@ async function getObce() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT PSC as "name", nazov as "code" FROM obec`
+      `SELECT PSC || ' - ' || nazov as "name", PSC as "psc" FROM obec`
     );
 
     return result.rows;

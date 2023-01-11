@@ -1,4 +1,4 @@
-const database = require("../database/Database");
+const database = require('../database/Database');
 
 async function getRecepty() {
   try {
@@ -26,7 +26,7 @@ async function insertRecept(body) {
       datum_vyzdvihnutia: body.datum_vyzdvihnutia,
     });
 
-    console.log("Rows inserted " + result.rowsAffected);
+    console.log('Rows inserted ' + result.rowsAffected);
   } catch (err) {
     console.log(err);
   }
