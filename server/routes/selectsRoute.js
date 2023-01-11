@@ -27,7 +27,7 @@ router.get("/zamestnanciOddeleni", controller.getZamestnanciOddeleni);
 
 router.get("/typyChoroby", controller.getTypyChoroby);
 
-router.get("/choroby", controller.getChoroby);
+router.get("/choroby/:id_typu_choroby", controller.getChoroby);
 
 router.get(
   "/najcastejsieChorobyRokaPocet/:pocet/:rok",

@@ -9,6 +9,7 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import "../icons.css";
+import TableWithoutDetail from "../Views/Tables/TableWithoutDetail";
 
 export default function ProfileCard() {
   const [profile, setProfile] = useState("");
@@ -17,14 +18,63 @@ export default function ProfileCard() {
   const [eventType, setEventType] = useState("");
   const [header, setHeader] = useState("");
   const [text, setText] = useState("");
+
   const [vaccinationTypes, setVaccinationTypes] = useState("");
   const [selectedVaccinationType, setSelectedVaccinationType] = useState("");
+
   const [diseaseTypes, setDiseaseTypes] = useState("");
   const [selectedDiseaseType, setSelectedDiseaseType] = useState("");
+
   const [diseases, setDiseases] = useState("");
   const [selectedDisease, setSelectedDisease] = useState("");
+
   const [ZTPTypes, setZTPTypes] = useState("");
   const [selectedZTP, setSelectedZTPType] = useState("");
+
+  const [patientMedicalRecords, setPatientMedicalRecords] = useState("");
+
+  const [patientRecipes, setPatientRecipes] = useState("");
+
+  const [patientDiseases, setPatientDiseases] = useState("");
+
+  const [patientZTPTypes, setPatientZTPTypes] = useState("");
+
+  const medicalRecordsTable = {
+    tableName: "Zdravotné záznamy",
+    route: "/pacient",
+    cellData: patientMedicalRecords,
+    titles: [
+      { field: "DATUM", header: "Dátum" },
+      { field: "TYP", header: "Typ záznamu" },
+      { field: "NAZOV", header: "Oddelenie" },
+      { field: "LEKAR", header: "Lekár" },
+    ],
+  };
+
+  const recipesTable = {
+    tableName: "Recepty",
+    route: "/pacient",
+    cellData: patientRecipes,
+    titles: [
+      { field: "NAZOV", header: "Názov" },
+      { field: "DATUM", header: "Dátum" },
+      { field: "LEKAR", header: "Lekár" },
+    ],
+    filters: false,
+  };
+
+  const diseasesTable = {
+    tableName: "Choroby",
+    route: "/pacient",
+    cellData: patientDiseases,
+    titles: [
+      { field: "NAZOV", header: "Názov choroby" },
+      { field: "TYP", header: "Typ choroby" },
+      { field: "DAT_OD", header: "Od" },
+      { field: "DAT_DO", header: "Do" },
+    ],
+    filters: false,
+  };
 
   useEffect(() => {
     fetch(`patient/info/${location.state}`)
@@ -33,6 +83,7 @@ export default function ProfileCard() {
         console.log(...data);
         setProfile(...data);
       });
+
     fetch(`selects/typyOckovania`)
       .then((response) => response.json())
       .then((data) => {
@@ -46,17 +97,40 @@ export default function ProfileCard() {
         console.log(data);
         setDiseaseTypes(data);
       });
-    fetch(`selects/choroby`)
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setDiseases(data);
-      });
+
     fetch(`selects/typyZTP`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setZTPTypes(data);
+      });
+
+    fetch(`patient/recepty/${location.state}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setPatientRecipes(data);
+      });
+
+    fetch(`patient/choroby/${location.state}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setPatientDiseases(data);
+      });
+
+    fetch(`patient/typZTP/${location.state}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setPatientZTPTypes(data);
+      });
+
+    fetch(`patient/zdravZaznamy/${location.state}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setPatientMedicalRecords(data);
       });
   }, []);
 
@@ -184,6 +258,13 @@ export default function ProfileCard() {
 
   const onDiseaseTypeChange = (e) => {
     setSelectedDiseaseType(e.value);
+    console.log(e.value.ID_TYPU_CHOROBY);
+    fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setDiseases(data);
+      });
   };
 
   const onDiseaseChange = (e) => {
@@ -259,7 +340,7 @@ export default function ProfileCard() {
       <div className="flex col-12 ">
         <Card
           className="col-5 shadow-4"
-          style={{ height: "100%" }}
+          style={{ width: "50rem", height: "40rem" }}
           title={profile.MENO + " " + profile.PRIEZVISKO}
         >
           <div className="flex ">
@@ -309,11 +390,9 @@ export default function ProfileCard() {
         <Card
           className="col-4 shadow-4"
           title="Recepty"
-          style={{ height: "100%" }}
+          style={{ width: "50rem", height: "40rem" }}
         >
-          <DataTable responsiveLayout="scroll" selectionMode="single">
-            <Column field="Názov lieku" header="Názov lieku"></Column>
-          </DataTable>
+          <TableWithoutDetail {...recipesTable} />
         </Card>
       </div>
 
@@ -321,16 +400,20 @@ export default function ProfileCard() {
         <Card
           className="col-5 shadow-4"
           title="Zdravotné záznamy"
-          style={{ height: "100%" }}
+          style={{ width: "50rem", height: "40rem" }}
         >
-          <DataTable responsiveLayout="scroll" selectionMode="single">
-            <Column field="Dátum" header="Dátum"></Column>
-            <Column field="Typ záznamu" header="Typ záznamu"></Column>
-            <Column field="Oddelenie" header="Oddelenie"></Column>
-            <Column field="Lekár" header="Lekár"></Column>
-          </DataTable>
+          <TableWithoutDetail {...medicalRecordsTable} />
         </Card>
 
+        <Card
+          className="col-5 shadow-4"
+          title="Choroby"
+          style={{ height: "100%" }}
+        >
+          <TableWithoutDetail {...diseasesTable} />
+        </Card>
+      </div>
+      <div>
         <div className="col-4 m-4">
           <div className="p-3">
             <Button

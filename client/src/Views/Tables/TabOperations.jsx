@@ -22,6 +22,7 @@ export default function TabOperations() {
       { field: "PRIEZVISKO", header: "Priezvisko" },
       { field: "DATUM", header: "Dátum" },
     ],
+    filters: true,
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;

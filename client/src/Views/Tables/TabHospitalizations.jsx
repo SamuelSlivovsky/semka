@@ -22,6 +22,7 @@ export default function TabHospitalizations() {
       { field: "PRIEZVISKO", header: "Priezvisko" },
       { field: "DATUM", header: "Dátum od - Dátum do" },
     ],
+    filters: true,
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;

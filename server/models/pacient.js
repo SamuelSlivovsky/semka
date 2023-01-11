@@ -286,6 +286,80 @@ async function getHospitalizacie(id) {
   }
 }
 
+async function getRecepty(pid_pacienta) {
+  try {
+    let conn = await database.getConnection();
+    const recepty = await conn.execute(
+      `select nazov, datum, meno || ' ' || priezvisko as lekar
+            from recept join liek using(id_lieku)
+                        join lekar using(id_lekara)
+                        join zamestnanec zc using(id_zamestnanca)
+                        join os_udaje ou on(ou.rod_cislo = zc.rod_cislo) 
+                  where id_pacienta = :pid_pacienta`,
+      { pid_pacienta }
+    );
+
+    return recepty.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getZdravZaznamy(pid_pacienta) {
+  try {
+    let conn = await database.getConnection();
+    const zdravZaznamy = await conn.execute(
+      `select datum, get_typ_zdrav_zaznamu(:pid_pacienta) as typ, nazov, meno || ' ' || priezvisko as lekar  
+          from zdravotny_zaznam join pacient using(id_pacienta)
+                                join lekar_pacient using(id_pacienta)
+                                join lekar using(id_lekara)
+                                join zamestnanec zc using(id_zamestnanca)
+                                join os_udaje ou on(ou.rod_cislo = zc.rod_cislo)
+                                join oddelenie using(id_oddelenia)
+                                join typ_oddelenia using(id_typu_oddelenia) 
+                      where id_pacienta = :pid_pacienta`,
+      { pid_pacienta }
+    );
+
+    return zdravZaznamy.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getChoroby(pid_pacienta) {
+  try {
+    let conn = await database.getConnection();
+    const choroby = await conn.execute(
+      `select nazov, typ, to_char(datum_od,'MM.DD.YYYY') dat_od, nvl(to_char(datum_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+            from zoznam_chorob join choroba using(id_choroby)
+                               join typ_choroby using(id_typu_choroby)
+                          where id_pacienta = :pid_pacienta`,
+      { pid_pacienta }
+    );
+
+    return choroby.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getTypyZTP(pid_pacienta) {
+  try {
+    let conn = await database.getConnection();
+    const typyZTP = await conn.execute(
+      `select nazov, to_char(dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+          from pacient_ZTP join typ_ZTP using (id_typu_ztp)
+                              where id_pacienta = :pid_pacienta`,
+      { pid_pacienta }
+    );
+
+    return typyZTP.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function insertPacient(body) {
   try {
     let conn = await database.getConnection();
@@ -315,6 +389,10 @@ module.exports = {
   getPocetPacientiPodlaVeku,
   getInfo,
   getUdalosti,
+  getRecepty,
+  getZdravZaznamy,
+  getChoroby,
+  getTypyZTP,
   insertPacient,
   getDoctorsOfPatient,
 };

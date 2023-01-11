@@ -22,6 +22,7 @@ export default function TabExaminations() {
       { field: "PRIEZVISKO", header: "Priezvisko" },
       { field: "DATUM", header: "Dátum" },
     ],
+    filters: true,
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;
