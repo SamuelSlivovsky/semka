@@ -5,7 +5,12 @@ const verify = require('../middleware/verifyUser');
 
 router.get('/udalostiPacienta/:id', controller.getUdalostiPacienta);
 
-router.get('/udalostiLekara/:id', controller.getUdalostiLekara);
+router.get(
+  '/udalostiLekara/:id',
+  verify.verifyRoles(1, 3),
+  verify.checkForCorrectId(),
+  controller.getUdalostiLekara
+);
 router.post('/zmenaZaznamu', controller.updateZaznam);
 
 module.exports = router;
