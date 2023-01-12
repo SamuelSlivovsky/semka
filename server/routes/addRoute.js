@@ -19,7 +19,7 @@ router.post(
 router.post('/pacient', verify.verifyRoles(1, 2), controller.insertPacient);
 router.get('/psc', controller.getObce);
 router.get(
-  '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum',
+  '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum', verify.verifyRoles(1, 2),
   controller.getDostupneMiestnosti
 );
 module.exports = router;
