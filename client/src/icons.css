@@ -145,3 +145,8 @@
   height: 44px;
   width: 44px;
 }
+.logout-icon {
+  content: url('./images/logout.png');
+  height: 44px;
+  width: 44px;
+}
