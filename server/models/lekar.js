@@ -60,11 +60,13 @@ async function getUdalosti(id) {
     let udalosti = [];
 
     let operacie = await getOperacie(id);
+    console.log(operacie);
     operacie.forEach((element) => {
       udalosti.push(element);
     });
 
     let vysetrenia = await getVysetrenia(id);
+    console.log(vysetrenia);
     vysetrenia.forEach((element) => {
       udalosti.push(element);
     });
@@ -81,17 +83,21 @@ async function getUdalosti(id) {
   }
 }
 
-async function getOperacie(pid_lekara) {
+async function getOperacie(id) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select id_zaznamu,rod_cislo, meno, priezvisko, to_char(datum,'DD.MM.YYYY') datum 
-          from os_udaje join pacient using(rod_cislo)
-                        join zdravotny_zaznam using(id_pacienta) 
-                        join operacia using(id_zaznamu)
-                        join operacia_lekar using(id_operacie) where id_lekara = :pid_lekara`,
-      { pid_lekara }
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+                join operacia using(id_zaznamu)
+                 join operacia_lekar using(id_operacie) 
+                  join pacient using(id_pacienta)
+                   join os_udaje using(rod_cislo) where id_lekara = :id`,
+      [id]
     );
+
+    operacie.rows.forEach((element) => {
+      element.type = "OPE";
+    });
 
     return operacie.rows;
   } catch (err) {
@@ -99,32 +105,45 @@ async function getOperacie(pid_lekara) {
   }
 }
 
-async function getVysetrenia(pid_lekara) {
+async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select id_zaznamu,rod_cislo, meno, priezvisko, to_char(datum,'DD.MM.YYYY') datum 
-          from os_udaje join pacient using(rod_cislo)
-                        join zdravotny_zaznam using(id_pacienta)
-                        join lekar_pacient using(id_pacienta) where id_lekara = :pid_lekara`,
-      { pid_lekara }
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+                join vysetrenie using(id_zaznamu)
+                 join pacient using(id_pacienta)
+                  join os_udaje using(rod_cislo) 
+                   where id_lekara = :id`,
+      [id]
     );
+
+    vysetrenia.rows.forEach((element) => {
+      element.type = "VYS";
+    });
+
     return vysetrenia.rows;
   } catch (err) {
     console.log(err);
   }
 }
 
-async function getHospitalizacie(pid_lekara) {
+async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select id_zaznamu,rod_cislo, meno, priezvisko, to_char(datum,'DD.MM.YYYY') || '-' || nvl(to_char(dat_do,'DD.MM.YYYY'),'Neukončená') datum
-          from os_udaje join pacient using(rod_cislo)
-                        join zdravotny_zaznam using(id_pacienta) 
-                        join hospitalizacia using(id_zaznamu) where id_lekara = :pid_lekara`,
-      { pid_lekara }
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id", to_char(datum,'DD.MM.YYYY') || '-' || nvl(to_char(dat_do,'DD.MM.YYYY'),'Neukončená') datum
+       from zdravotny_zaznam
+                join hospitalizacia using(id_zaznamu)
+                 join pacient using(id_pacienta)
+                  join os_udaje using(rod_cislo) 
+                  where id_lekara = :id`,
+      [id]
     );
+
+    hospitalizacie.rows.forEach((element) => {
+      element.type = "HOS";
+    });
+
     return hospitalizacie.rows;
   } catch (err) {
     console.log(err);

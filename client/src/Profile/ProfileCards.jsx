@@ -1,10 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 import { useLocation } from "react-router";
 import { Dialog } from "primereact/dialog";
+import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
+import HospitForm from "../Forms/HospitForm";
+//import RecipeForm from '../Forms/RecipeForm';
+import OperationForm from "../Forms/OperationForm";
+import ExaminationForm from "../Forms/ExaminationForm";
 import { InputTextarea } from "primereact/inputtextarea";
 import "../icons.css";
 import TableMedicalRecords from "../Views/Tables/TableMedicalRecords";
@@ -15,7 +22,6 @@ export default function ProfileCard() {
   const location = useLocation();
   const [eventType, setEventType] = useState("");
   const [header, setHeader] = useState("");
-  const [text, setText] = useState("");
 
   const [vaccinationTypes, setVaccinationTypes] = useState("");
   const [selectedVaccinationType, setSelectedVaccinationType] = useState("");
@@ -157,6 +163,15 @@ export default function ProfileCard() {
       case "ZTP":
         setHeader("Pridať nové ZŤP");
         break;
+      case "vacci":
+        setHeader("Vytvoriť nové očkovanie");
+        break;
+      case "disease":
+        setHeader("Pridať novú chorobu");
+        break;
+      case "ZTP":
+        setHeader("Pridať nové ZŤP");
+        break;
       default:
         break;
     }
@@ -165,73 +180,6 @@ export default function ProfileCard() {
 
   const onHide = () => {
     setShow(false);
-  };
-
-  const examinationDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum vyšetrenia</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Popis</label>
-          <InputTextarea
-            rows={5}
-            cols={30}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoResize
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const operationDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum operácie</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Popis</label>
-          <InputTextarea
-            rows={5}
-            cols={30}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoResize
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const hospitDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum od</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum do</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Popis</label>
-          <InputTextarea
-            rows={5}
-            cols={30}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoResize
-          />
-        </div>
-      </div>
-    );
   };
 
   const onVaccinationTypeChange = (e) => {
@@ -321,11 +269,11 @@ export default function ProfileCard() {
   const renderDialog = () => {
     switch (eventType) {
       case "examination":
-        return examinationDialog();
+        return <ExaminationForm rod_cislo={profile.ROD_CISLO} />;
       case "operation":
-        return operationDialog();
+        return <OperationForm rod_cislo={profile.ROD_CISLO} />;
       case "hospit":
-        return hospitDialog();
+        return <HospitForm rod_cislo={profile.ROD_CISLO} />;
       case "vacci":
         return vacciDialog();
       case "disease":
