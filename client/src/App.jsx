@@ -19,7 +19,7 @@ import TabOperations from './Views/Tables/TabOperations';
 import Storage from './Views/Storage';
 import TabDoctorsOfHospital from './Views/Tables/TabDoctorsOfHospital';
 import GetUserData from './Auth/GetUserData';
-
+import Logout from './Auth/Logout';
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -32,7 +32,11 @@ function App() {
     const token = localStorage.getItem('user');
     const userDataHelper = GetUserData(token);
     setUserData(userDataHelper);
-    if (userDataHelper.UserInfo.role === 3) {
+    if (
+      typeof userDataHelper !== 'undefined' &&
+      userDataHelper !== null &&
+      userDataHelper.UserInfo.role === 3
+    ) {
       const token = localStorage.getItem('user');
       const headers = { authorization: 'Bearer ' + token };
       fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, { headers })
@@ -318,13 +322,26 @@ function App() {
             border: 'none',
           }}
         />
-        {userData !== null && userData.UserInfo.role === 1
+        {typeof userData !== 'undefined' &&
+        userData !== null &&
+        userData.UserInfo.role === 1
           ? sidebarButtonsAdmin
           : userData !== null && userData.UserInfo.role === 2
           ? sidebarButtons
           : userData !== null && userData.UserInfo.role === 3
           ? sidebarButtonsPatient
           : ''}
+        {typeof userData !== 'undefined' && userData !== null ? (
+          <SidebarButton
+            key='12'
+            visibleLeft={visibleLeft}
+            path='/logout'
+            label='Odhlas'
+            icon='logout-icon'
+          />
+        ) : (
+          ''
+        )}
       </div>
       <div
         className={`page-content ${visibleLeft ? 'page-content-opened' : ''}`}
@@ -333,11 +350,18 @@ function App() {
           <Route path='/' element={<Home userData={userData}></Home>}></Route>
           <Route path='/register' element={<Register></Register>}></Route>
           <Route path='/login' element={<Login></Login>}></Route>
-          {userData !== null && userData.UserInfo.role === 1
+          <Route path='/logout' element={<Logout></Logout>}></Route>
+          {typeof userData !== 'undefined' &&
+          userData !== null &&
+          userData.UserInfo.role === 1
             ? renderAdminRoutes()
-            : userData !== null && userData.UserInfo.role === 2
+            : typeof userData !== 'undefined' &&
+              userData !== null &&
+              userData.UserInfo.role === 2
             ? renderDoctorRoutes()
-            : userData !== null && userData.UserInfo.role === 3
+            : typeof userData !== 'undefined' &&
+              userData !== null &&
+              userData.UserInfo.role === 3
             ? renderPatientRoutes()
             : ''}
         </Routes>
