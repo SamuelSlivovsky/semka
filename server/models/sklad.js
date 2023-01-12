@@ -7,7 +7,7 @@ async function getSklady() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -29,7 +29,7 @@ async function getLiekyMenejAkoPocet(pocet) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

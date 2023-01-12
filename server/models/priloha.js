@@ -12,7 +12,7 @@ async function insertPriloha(blob) {
 
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

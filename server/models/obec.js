@@ -7,10 +7,11 @@ async function getObce() {
       `SELECT PSC || ' - ' || nazov as "name", PSC as "psc" FROM obec`
     );
 
-    return result.rows;
-  } catch (err) {
-    console.log(err);
-  }
+        return result.rows;
+
+    } catch (err) {
+        throw new Error('Database error: ' + err);
+    }
 }
 
 module.exports = {

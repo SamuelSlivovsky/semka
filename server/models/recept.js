@@ -7,7 +7,7 @@ async function getRecepty() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -28,7 +28,7 @@ async function insertRecept(body) {
 
     console.log('Rows inserted ' + result.rowsAffected);
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

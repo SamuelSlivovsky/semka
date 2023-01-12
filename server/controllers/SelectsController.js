@@ -5,7 +5,10 @@ module.exports = {
     (async () => {
       ret_val = await pacient.insertPacientZTP(req.body);
       res.status(200);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getNajviacChoriPocet: (req, res) => {
@@ -14,7 +17,10 @@ module.exports = {
     (async () => {
       ret_val = await pacient.getNajviacChoriPocet(req.params.pocet);
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getNajviacOperovanyPercenta: (req, res) => {
@@ -23,7 +29,10 @@ module.exports = {
     (async () => {
       ret_val = await pacient.getNajviacOperovanyPercenta(req.params.percent);
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getNajviacHospitalizovaniPercenta: (req, res) => {
@@ -34,7 +43,10 @@ module.exports = {
         req.params.percent
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getTopZamestnanciVyplatyPocet: (req, res) => {
@@ -43,7 +55,10 @@ module.exports = {
     (async () => {
       ret_val = await oddelenie.getTopZamestnanciVyplatyPocet(req.params.pocet);
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getTopZamestnanciVyplatyOddelenie: (req, res) => {
@@ -55,7 +70,10 @@ module.exports = {
         req.params.rok
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getNajviacPredpisovaneLiekyRoka: (req, res) => {
@@ -64,7 +82,10 @@ module.exports = {
     (async () => {
       ret_val = await liek.getNajviacPredpisovaneLiekyRoka(req.params.rok);
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getSumaVyplatRoka: (req, res) => {
@@ -76,7 +97,10 @@ module.exports = {
         req.params.rok
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getTypyOckovaniaPacienti: (req, res) => {
@@ -85,7 +109,10 @@ module.exports = {
     (async () => {
       ret_val = await pacient.getTypyOckovaniaPacienti();
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getZamestnanciOddeleni: (req, res) => {
@@ -94,7 +121,10 @@ module.exports = {
     (async () => {
       ret_val = await oddelenie.getZamestnanciOddeleni();
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getNajcastejsieChorobyRokaPocet: (req, res) => {
@@ -106,7 +136,10 @@ module.exports = {
         req.params.rok
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getNeobsadeneLozkaOddeleniaTyzden: (req, res) => {
@@ -117,7 +150,10 @@ module.exports = {
         req.params.id_oddelenia
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getLiekyMenejAkoPocet: (req, res) => {
@@ -126,7 +162,10 @@ module.exports = {
     (async () => {
       ret_val = await sklad.getLiekyMenejAkoPocet(req.params.pocet);
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getMenovciPacientLekar: (req, res) => {
@@ -135,7 +174,10 @@ module.exports = {
     (async () => {
       ret_val = await os_udaje.getMenovciPacientLekar();
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getOperaciePocetLekarovTrvanie: (req, res) => {
@@ -147,7 +189,10 @@ module.exports = {
         req.params.trvanie
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getKrajePodlaPoctuOperovanych: (req, res) => {
@@ -156,7 +201,10 @@ module.exports = {
     (async () => {
       ret_val = await kraj.getKrajePodlaPoctuOperovanych();
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getPacientiChorobaP13: (req, res) => {
@@ -165,7 +213,10 @@ module.exports = {
     (async () => {
       ret_val = await pacient.getPacientiChorobaP13();
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getPriemernyVek: (req, res) => {
@@ -174,7 +225,10 @@ module.exports = {
     (async () => {
       ret_val = await lekar.getPriemernyVek();
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getPocetPacientiPodlaVeku: (req, res) => {
@@ -183,7 +237,10 @@ module.exports = {
     (async () => {
       ret_val = await pacient.getPocetPacientiPodlaVeku();
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getPomerMuziZeny: (req, res) => {
@@ -192,7 +249,10 @@ module.exports = {
     (async () => {
       ret_val = await os_udaje.getPomerMuziZeny(req.params.id_oddelenia);
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getHospitalizacieNemocniceXML: (req, res) => {
@@ -204,7 +264,10 @@ module.exports = {
         req.params.id_nemocnice
       );
       res.status(200).send(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getOperacieNemocniceXML: (req, res) => {
@@ -216,7 +279,10 @@ module.exports = {
         req.params.id_nemocnice
       );
       res.status(200).send(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getOckovaniaNemocniceXML: (req, res) => {
@@ -228,7 +294,10 @@ module.exports = {
         req.params.id_nemocnice
       );
       res.status(200).send(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getVysetreniaNemocniceXML: (req, res) => {
@@ -240,7 +309,10 @@ module.exports = {
         req.params.id_nemocnice
       );
       res.status(200).send(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getZamestnanciFotka: (req, res) => {
@@ -251,7 +323,10 @@ module.exports = {
       );
       res.status(200).write(ret_val.FOTKA, 'binary');
       res.end(null, 'binary');
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getZamestnanciOddelenia: (req, res) => {
@@ -262,7 +337,10 @@ module.exports = {
         req.params.id_oddelenia
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getPocetPacientovOddelenia: (req, res) => {
@@ -273,7 +351,10 @@ module.exports = {
         req.params.id_oddelenia
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
   getPocetOperaciiOddelenia: (req, res) => {
     const oddelenie = require('../models/oddelenie');
@@ -284,7 +365,10 @@ module.exports = {
         req.params.rok
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
   getPocetHospitalizaciiOddelenia: (req, res) => {
     const oddelenie = require('../models/oddelenie');
@@ -295,7 +379,10 @@ module.exports = {
         req.params.rok
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
   getPocetVysetreniOddelenia: (req, res) => {
     const oddelenie = require('../models/oddelenie');
@@ -306,7 +393,10 @@ module.exports = {
         req.params.rok
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
   getPocetZamOddelenia: (req, res) => {
     const oddelenie = require('../models/oddelenie');
@@ -317,7 +407,10 @@ module.exports = {
         req.params.rok
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getKrvneSkupinyOddelenia: (req, res) => {
@@ -328,7 +421,10 @@ module.exports = {
         req.params.id_oddelenia
       );
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getZamestnanec: (req, res) => {
@@ -337,6 +433,9 @@ module.exports = {
     (async () => {
       ret_val = await zamestnanec.getZamestnanec(req.params.id_zamestnanca);
       res.status(200).json(ret_val);
-    })();
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 };

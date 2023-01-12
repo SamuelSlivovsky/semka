@@ -11,7 +11,7 @@ async function getZamestnanci() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -25,7 +25,7 @@ async function getZamestnanciFotka(id_zamestnanca) {
     console.log(result.rows[0]);
     return result.rows[0];
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -59,7 +59,7 @@ async function getZamestnanec(id_zamestnanca) {
     console.log(result.rows[0]);
     return result.rows[0];
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
