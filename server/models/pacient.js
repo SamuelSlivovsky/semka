@@ -12,6 +12,18 @@ async function getPacienti() {
   }
 }
 
+async function getIdPacienta(rod_cislo) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(`SELECT * FROM pacient where rod_cislo : rod_cislo fetch first 1 rows only`
+    [rod_cislo]);
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getNajviacChoriPocet(pocet) {
   try {
     let conn = await database.getConnection();
@@ -410,4 +422,5 @@ module.exports = {
   insertPacient,
   getDoctorsOfPatient,
   insertPacient,
+  getIdPacienta
 };

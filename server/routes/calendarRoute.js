@@ -5,7 +5,7 @@ const verify = require('../middleware/verifyUser');
 
 router.get(
   '/udalostiPacienta/:id',
-  verify.verifyRoles(1, 3),
+  verify.verifyRoles(2, 3),
   verify.checkForCorrectId(),
   controller.getUdalostiPacienta
 );
