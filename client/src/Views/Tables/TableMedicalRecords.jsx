@@ -10,8 +10,14 @@ export default function TableMedic(props) {
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const { tableName, cellData, titles, allowFilters, tableScrollHeight } =
-    props;
+  const {
+    tableName,
+    cellData,
+    titles,
+    allowFilters,
+    dialog,
+    tableScrollHeight,
+  } = props;
   const [popis, setPopis] = useState(null);
 
   const onHide = () => {
@@ -27,6 +33,16 @@ export default function TableMedic(props) {
       .then((data) => {
         setPopis(data[0].POPIS);
       });
+  };
+
+  const getRecordDetails = () => {
+    let popis = "notfound";
+    cellData.map((data) => {
+      if (data.ID_ZAZNAMU === selectedRow.ID_ZAZNAMU) {
+        popis = data.LEKAR + " " + data.ODDELENIE;
+      }
+    });
+    return popis;
   };
 
   const renderHeader = () => {
@@ -110,14 +126,23 @@ export default function TableMedic(props) {
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            ? selectedRow.MENO != null
+              ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+              : selectedRow.TYP
             : ""
         }
-        visible={showDialog}
+        visible={showDialog && dialog}
         style={{ width: "50vw" }}
         onHide={() => onHide()}
       >
         <div>
+          <h5>
+            {selectedRow != null
+              ? selectedRow.TYP != null
+                ? getRecordDetails()
+                : ""
+              : ""}
+          </h5>
           <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
           <div>{selectedRow != null ? popis : ""}</div>
         </div>
