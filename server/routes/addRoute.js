@@ -17,9 +17,10 @@ router.post(
   controller.insertHospitalizacia
 );
 router.post('/pacient', verify.verifyRoles(1, 2), controller.insertPacient);
-router.get('/psc', controller.getObce);
+router.get('/psc', verify.verifyRoles(1, 2), controller.getObce);
 router.get(
-  '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum', verify.verifyRoles(1, 2),
+  '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum',
+  verify.verifyRoles(1, 2),
   controller.getDostupneMiestnosti
 );
 module.exports = router;

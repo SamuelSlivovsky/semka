@@ -32,7 +32,6 @@ export const Login = () => {
     fetch('/auth/login', requestOptions)
       .then((response) => response.json())
       .then((res) => {
-        console.log(res);
         localStorage.setItem('user', res.accessToken);
       });
 

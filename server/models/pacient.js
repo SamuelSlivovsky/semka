@@ -13,10 +13,15 @@ async function getPacienti() {
 }
 
 async function getIdPacienta(rod_cislo) {
+  rod_cislo = String(rod_cislo);
+  rod_cislo = rod_cislo.substring(0, 6) + 'R' + rod_cislo.substring(6);
+  rod_cislo = rod_cislo.replace('R', '/');
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`SELECT * FROM pacient where rod_cislo : rod_cislo fetch first 1 rows only`
-    [rod_cislo]);
+    const result = await conn.execute(
+      `SELECT * FROM pacient where rod_cislo = :rod_cislo fetch first 1 rows only`,
+      [rod_cislo]
+    );
 
     return result.rows;
   } catch (err) {
@@ -422,5 +427,5 @@ module.exports = {
   insertPacient,
   getDoctorsOfPatient,
   insertPacient,
-  getIdPacienta
+  getIdPacienta,
 };

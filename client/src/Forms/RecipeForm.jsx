@@ -6,6 +6,7 @@ import { InputMask } from 'primereact/inputmask';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
+import GetUserData from '../Auth/GetUserData';
 export default function RecipeForm() {
   const [showMessage, setShowMessage] = useState(false);
   const drugs = [
@@ -34,14 +35,19 @@ export default function RecipeForm() {
   };
 
   const onSubmit = async (data, form) => {
+    const token = localStorage.getItem('user');
+    const userData = GetUserData(token);
     const requestOptions = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
+      },
       body: JSON.stringify({
         rod_cislo: data.rod_cislo,
         datum: data.datum.toLocaleString('en-GB').replace(',', ''),
         id_lieku: data.id_lieku.id,
-        id_lekara: 1,
+        id_lekara: userData.UserInfo.userid,
         datum_vyzdvihnutia: null,
       }),
     };

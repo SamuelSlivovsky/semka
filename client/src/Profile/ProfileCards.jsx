@@ -81,56 +81,83 @@ export default function ProfileCard(props) {
   };
 
   useEffect(() => {
-    fetch(`patient/info/${location.state}`)
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
+    fetch(
+      `patient/info/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(...data);
         setProfile(...data);
       });
 
-    fetch(`selects/typyOckovania`)
+    fetch(`selects/typyOckovania`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setVaccinationTypes(data);
       });
 
-    fetch(`selects/typyChoroby`)
+    fetch(`selects/typyChoroby`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setDiseaseTypes(data);
       });
 
-    fetch(`selects/typyZTP`)
+    fetch(`selects/typyZTP`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setZTPTypes(data);
       });
 
-    fetch(`patient/recepty/${location.state}`)
+    fetch(
+      `patient/recepty/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setPatientRecipes(data);
       });
 
-    fetch(`patient/choroby/${location.state}`)
+    fetch(
+      `patient/choroby/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setPatientDiseases(data);
       });
 
-    fetch(`patient/typyZTP/${location.state}`)
+    fetch(
+      `patient/typyZTP/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setPatientZTPTypes(data);
       });
 
-    fetch(`patient/zdravZaznamy/${location.state}`)
+    fetch(
+      `patient/zdravZaznamy/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);

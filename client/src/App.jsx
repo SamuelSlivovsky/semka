@@ -22,6 +22,7 @@ import GetUserData from './Auth/GetUserData';
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
+  const [patientId, setPatientId] = useState(null);
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
@@ -29,10 +30,20 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('user');
-    setUserData(GetUserData(token));
+    const userDataHelper = GetUserData(token);
+    setUserData(userDataHelper);
+    if (userDataHelper.UserInfo.role === 3) {
+      const token = localStorage.getItem('user');
+      const headers = { authorization: 'Bearer ' + token };
+      fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, { headers })
+        .then((response) => response.json())
+        .then((data) => {
+          setPatientId(data[0].ID_PACIENTA);
+        });
+    }
   }, []);
 
-  const sidebarButtons = [
+  const sidebarButtonsAdmin = [
     <SidebarButton
       key='1'
       visibleLeft={visibleLeft}
@@ -111,6 +122,72 @@ function App() {
       icon='user-icon'
     />,
   ];
+
+  const sidebarButtons = [
+    <SidebarButton
+      key='1'
+      visibleLeft={visibleLeft}
+      path='/'
+      label='Domov'
+      icon='home-icon'
+    />,
+    <SidebarButton
+      key='2'
+      visibleLeft={visibleLeft}
+      path='/calendar'
+      label='Kalendár'
+      icon='calendar-icon'
+    />,
+    <SidebarButton
+      key='3'
+      visibleLeft={visibleLeft}
+      path='/patients'
+      label='Pacienti'
+      icon='patient-icon'
+    />,
+    <SidebarButton
+      key='5'
+      visibleLeft={visibleLeft}
+      path='/examinations'
+      label='Vyšetrenia'
+      icon='examination-icon'
+    />,
+    <SidebarButton
+      key='6'
+      visibleLeft={visibleLeft}
+      path='/hospitalizations'
+      icon='hospit-icon'
+      label='Hospitalizácie'
+    />,
+    <SidebarButton
+      key='7'
+      visibleLeft={visibleLeft}
+      path='/operations'
+      label='Operácie'
+      icon='operation-icon'
+    />,
+    <SidebarButton
+      key='9'
+      visibleLeft={visibleLeft}
+      path='/add'
+      label='Pridať udalosť'
+      icon='plus-icon'
+    />,
+    <SidebarButton
+      key='10'
+      visibleLeft={visibleLeft}
+      path='/sklad'
+      label='Sklad'
+      icon='storage-icon'
+    />,
+    <SidebarButton
+      key='11'
+      visibleLeft={visibleLeft}
+      path='/user'
+      label='Meno usera'
+      icon='user-icon'
+    />,
+  ];
   const sidebarButtonsPatient = [
     <SidebarButton
       key='1'
@@ -143,7 +220,12 @@ function App() {
           element={<EventCalendar userData={userData}></EventCalendar>}
         ></Route>
         <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
-        <Route path='/patient' element={<Patient></Patient>}></Route>
+        <Route
+          path='/patient'
+          element={
+            <Patient patientId={patientId} userData={userData}></Patient>
+          }
+        ></Route>
 
         <Route
           path='/doctors'
@@ -168,7 +250,6 @@ function App() {
     );
   };
   const renderAdminRoutes = () => {
-    console.log('first');
     return (
       <>
         <Route
@@ -176,7 +257,10 @@ function App() {
           element={<EventCalendar></EventCalendar>}
         ></Route>
         <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
-        <Route path='/patient' element={<Patient></Patient>}></Route>
+        <Route
+          path='/patient'
+          element={<Patient userData={userData}></Patient>}
+        ></Route>
 
         <Route
           path='/doctors'
@@ -202,7 +286,6 @@ function App() {
   };
 
   const renderPatientRoutes = () => {
-    console.log('first');
     return (
       <>
         <Route
@@ -211,7 +294,9 @@ function App() {
         ></Route>
         <Route
           path='/patient'
-          element={<Patient userData={userData}></Patient>}
+          element={
+            <Patient userData={userData} patientId={patientId}></Patient>
+          }
         ></Route>
       </>
     );
@@ -233,8 +318,9 @@ function App() {
             border: 'none',
           }}
         />
-        {userData !== null &&
-        (userData.UserInfo.role === 2 || userData.UserInfo.role) === 1
+        {userData !== null && userData.UserInfo.role === 1
+          ? sidebarButtonsAdmin
+          : userData !== null && userData.UserInfo.role === 2
           ? sidebarButtons
           : userData !== null && userData.UserInfo.role === 3
           ? sidebarButtonsPatient

@@ -6,13 +6,16 @@ import { Dialog } from 'primereact/dialog';
 import { InputMask } from 'primereact/inputmask';
 import { classNames } from 'primereact/utils';
 import { AutoComplete } from 'primereact/autocomplete';
+import GetUserData from '../Auth/GetUserData';
 export default function PatientForm() {
   const [showMessage, setShowMessage] = useState(false);
   const [cities, setCities] = useState([]);
   const [filteredPsc, setFilteredPsc] = useState(null);
 
   useEffect(() => {
-    fetch('/add/psc')
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
+    fetch('/add/psc', { headers })
       .then((response) => response.json())
       .then((res) => {
         console.log(res);
@@ -51,9 +54,15 @@ export default function PatientForm() {
   };
 
   const onSubmit = async (data, form) => {
+    const token = localStorage.getItem('user');
+    const userData = GetUserData(token);
     const requestOptionsPatient = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
+      },
+
       body: JSON.stringify({
         rod_cislo: data.rod_cislo,
         meno: data.meno,
@@ -63,7 +72,7 @@ export default function PatientForm() {
         email: data.email === '' ? null : data.email,
         id_poistenca: null,
         id_typu_krvnej_skupiny: 1,
-        id_lekara: 1,
+        id_lekara: userData.UserInfo.userid,
       }),
     };
     const responsePatient = await fetch(

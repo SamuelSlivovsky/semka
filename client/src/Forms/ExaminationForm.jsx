@@ -7,6 +7,7 @@ import { InputMask } from 'primereact/inputmask';
 import { classNames } from 'primereact/utils';
 import { Calendar } from 'primereact/calendar';
 import { FileUpload } from 'primereact/fileupload';
+import GetUserData from '../Auth/GetUserData';
 export default function ExaminationForm(props) {
   const [showMessage, setShowMessage] = useState(false);
   const [base64Data, setBase64Data] = useState(null);
@@ -26,14 +27,19 @@ export default function ExaminationForm(props) {
   };
 
   const onSubmit = async (data, form) => {
+    const token = localStorage.getItem('user');
+    const userData = GetUserData(token);
     const requestOptionsPatient = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
+      },
       body: JSON.stringify({
         rod_cislo: data.rod_cislo === '' ? null : data.rod_cislo,
         datum: data.datum.toLocaleString('en-GB').replace(',', ''),
         popis: data.popis,
-        id_lekara: 1,
+        id_lekara: userData.UserInfo.userid,
         priloha: base64Data,
       }),
     };

@@ -4,9 +4,9 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await recept.insertRecept(req.body);
-      res.status(200);
+      res.status(200).json('success');
     })().catch((err) => {
-      console.error(err); 
+      console.error(err);
       res.status(500).send(err);
     });
   },
@@ -73,7 +73,7 @@ module.exports = {
       ret_val = await obec.getObce();
       res.status(200).json(ret_val);
     })().catch((err) => {
-      console.error(err); 
+      console.error(err);
       res.status(500).send(err);
     });
   },
