@@ -3,20 +3,18 @@ import { useForm, Controller } from 'react-hook-form';
 import { InputText } from 'primereact/inputtext';
 import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
-import { Checkbox } from 'primereact/checkbox';
 import { Dialog } from 'primereact/dialog';
-import { Divider } from 'primereact/divider';
 import { classNames } from 'primereact/utils';
+import { InputMask } from 'primereact/inputmask';
 import '../styles/auth.css';
 
 export const Register = () => {
   const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData] = useState({});
   const defaultValues = {
-    name: '',
+    rc: '',
     email: '',
     password: '',
-    accept: false,
   };
 
   const {
@@ -29,7 +27,6 @@ export const Register = () => {
   const onSubmit = (data) => {
     setFormData(data);
     setShowMessage(true);
-
     reset();
   };
 
@@ -50,19 +47,6 @@ export const Register = () => {
     </div>
   );
   const passwordHeader = <h6>Pick a password</h6>;
-  const passwordFooter = (
-    <React.Fragment>
-      <Divider />
-      <p className='mt-2'>Suggestions</p>
-      <ul className='pl-2 ml-2 mt-0' style={{ lineHeight: '1.5' }}>
-        <li>At least one lowercase</li>
-        <li>At least one uppercase</li>
-        <li>At least one numeric</li>
-        <li>Minimum 8 characters</li>
-      </ul>
-    </React.Fragment>
-  );
-
   return (
     <div className='auth-form-container'>
       <Dialog
@@ -79,30 +63,26 @@ export const Register = () => {
             className='pi pi-check-circle'
             style={{ fontSize: '5rem', color: 'var(--green-500)' }}
           ></i>
-          <h5>Registration Successful!</h5>
-          <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-            Your account is registered under name <b>{formData.name}</b> ; it'll
-            be valid next 30 days without activation. Please check{' '}
-            <b>{formData.email}</b> for activation instructions.
-          </p>
+          <h5>Registrácia prebehla úspešne pod mailom {formData.rc}</h5>
         </div>
       </Dialog>
 
       <div className='flex justify-content-center'>
         <div className='card'>
-          <h5 className='text-center'>Register</h5>
+          <h5 className='text-center'>Registrácia</h5>
           <form onSubmit={handleSubmit(onSubmit)} className='p-fluid'>
             <div className='field'>
               <span className='p-float-label'>
                 <Controller
-                  name='name'
+                  name='rc'
                   control={control}
-                  rules={{ required: 'Name is required.' }}
+                  rules={{ required: 'Rodné číslo je povinné' }}
                   render={({ field, fieldState }) => (
-                    <InputText
+                    <InputMask
                       id={field.name}
                       {...field}
                       autoFocus
+                      mask='999999/9999'
                       className={classNames({
                         'p-invalid': fieldState.invalid,
                       })}
@@ -110,13 +90,13 @@ export const Register = () => {
                   )}
                 />
                 <label
-                  htmlFor='name'
-                  className={classNames({ 'p-error': errors.name })}
+                  htmlFor='rc'
+                  className={classNames({ 'p-error': errors.rc })}
                 >
-                  Name*
+                  Rodné číslo*
                 </label>
               </span>
-              {getFormErrorMessage('name')}
+              {getFormErrorMessage('rc')}
             </div>
             <div className='field'>
               <span className='p-float-label p-input-icon-right'>
@@ -125,10 +105,11 @@ export const Register = () => {
                   name='email'
                   control={control}
                   rules={{
-                    required: 'Email is required.',
+                    required: 'Email je povinnný.',
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                      message: 'Invalid email address. E.g. example@email.com',
+                      message:
+                        'Nesprávny tvar e-mail adresa, napríklad: meno@email.com',
                     },
                   }}
                   render={({ field, fieldState }) => (
@@ -155,7 +136,7 @@ export const Register = () => {
                 <Controller
                   name='password'
                   control={control}
-                  rules={{ required: 'Password is required.' }}
+                  rules={{ required: 'Heslo je povinné.' }}
                   render={({ field, fieldState }) => (
                     <Password
                       id={field.name}
@@ -165,7 +146,6 @@ export const Register = () => {
                         'p-invalid': fieldState.invalid,
                       })}
                       header={passwordHeader}
-                      footer={passwordFooter}
                     />
                   )}
                 />
@@ -173,36 +153,14 @@ export const Register = () => {
                   htmlFor='password'
                   className={classNames({ 'p-error': errors.password })}
                 >
-                  Password*
+                  Heslo*
                 </label>
               </span>
               {getFormErrorMessage('password')}
             </div>
-            <div className='field-checkbox'>
-              <Controller
-                name='accept'
-                control={control}
-                rules={{ required: true }}
-                render={({ field, fieldState }) => (
-                  <Checkbox
-                    inputId={field.name}
-                    onChange={(e) => field.onChange(e.checked)}
-                    checked={field.value}
-                    className={classNames({ 'p-invalid': fieldState.invalid })}
-                  />
-                )}
-              />
-              <label
-                htmlFor='accept'
-                className={classNames({ 'p-error': errors.accept })}
-              >
-                I agree to the terms and conditions*
-              </label>
-            </div>
-
             <Button
               type='submit'
-              label='Submit'
+              label='Zadaj'
               className='mt-2'
               style={{ marginTop: '10px' }}
             />
