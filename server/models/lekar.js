@@ -60,11 +60,13 @@ async function getUdalosti(id) {
     let udalosti = [];
 
     let operacie = await getOperacie(id);
+    console.log(operacie);
     operacie.forEach((element) => {
       udalosti.push(element);
     });
 
     let vysetrenia = await getVysetrenia(id);
+    console.log(vysetrenia);
     vysetrenia.forEach((element) => {
       udalosti.push(element);
     });
@@ -93,6 +95,10 @@ async function getOperacie(pid_lekara) {
       { pid_lekara }
     );
 
+    operacie.rows.forEach((element) => {
+      element.type = "OPE";
+    });
+
     return operacie.rows;
   } catch (err) {
     console.log(err);
@@ -109,6 +115,11 @@ async function getVysetrenia(pid_lekara) {
                         join lekar_pacient using(id_pacienta) where id_lekara = :pid_lekara`,
       { pid_lekara }
     );
+
+    vysetrenia.rows.forEach((element) => {
+      element.type = "VYS";
+    });
+
     return vysetrenia.rows;
   } catch (err) {
     console.log(err);
@@ -125,6 +136,11 @@ async function getHospitalizacie(pid_lekara) {
                         join hospitalizacia using(id_zaznamu) where id_lekara = :pid_lekara`,
       { pid_lekara }
     );
+
+    hospitalizacie.rows.forEach((element) => {
+      element.type = "HOS";
+    });
+
     return hospitalizacie.rows;
   } catch (err) {
     console.log(err);

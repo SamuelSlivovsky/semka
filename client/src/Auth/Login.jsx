@@ -11,7 +11,7 @@ export const Login = () => {
   const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData] = useState({});
   const defaultValues = {
-    email: '',
+    userid: '',
     password: '',
   };
 
@@ -73,19 +73,18 @@ export const Login = () => {
 
       <div className='flex justify-content-center'>
         <div className='card'>
-          <h5 className='text-center'>Login</h5>
+          <h5 className='text-center'>Prihlásenie</h5>
           <form onSubmit={handleSubmit(onSubmit)} className='p-fluid'>
             <div className='field'>
               <span className='p-float-label p-input-icon-right'>
-                <i className='pi pi-envelope' />
+                <i className='pi pi-user' />
                 <Controller
-                  name='email'
+                  name='userid'
                   control={control}
                   rules={{
-                    required: 'Email is required.',
+                    required: 'Identifikácia je povinná',
                     pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                      message: 'Invalid email address. E.g. example@email.com',
+                      message: 'Nesprávna identifikácia',
                     },
                   }}
                   render={({ field, fieldState }) => (
@@ -99,13 +98,13 @@ export const Login = () => {
                   )}
                 />
                 <label
-                  htmlFor='email'
-                  className={classNames({ 'p-error': !!errors.email })}
+                  htmlFor='userid'
+                  className={classNames({ 'p-error': !!errors.userid })}
                 >
-                  Email*
+                  Prihlasovacie číslo*
                 </label>
               </span>
-              {getFormErrorMessage('email')}
+              {getFormErrorMessage('userid')}
             </div>
             <div className='field'>
               <span className='p-float-label'>
@@ -136,7 +135,7 @@ export const Login = () => {
             </div>
             <Button
               type='submit'
-              label='Submit'
+              label='Zadaj'
               className='mt-2'
               style={{ marginTop: '10px' }}
             />

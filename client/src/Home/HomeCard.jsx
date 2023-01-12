@@ -20,7 +20,6 @@ function HomeCard(props) {
             <p className='m-0 calendar-card-day'>
               {new Date().toLocaleString('en-US', { day: '2-digit' })}
             </p>
-            <p style={{ marginTop: '40px' }}>Event</p>{' '}
           </>
         ) : (
           ''
