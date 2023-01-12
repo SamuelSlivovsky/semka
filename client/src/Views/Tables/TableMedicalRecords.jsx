@@ -42,12 +42,17 @@ export default function TableMedic(props) {
   };
 
   const getRecordDetails = () => {
-    let popis = "notfound";
+    let popis;
     cellData.map((data) => {
       if (data.id === selectedRow.id) {
         data.LEKAR === data.ODDELENIE
-          ? (popis = data.LEKAR)
-          : (popis = data.LEKAR + " " + data.ODDELENIE);
+          ? (popis = <h5>{data.LEKAR} </h5>)
+          : (popis = (
+              <div>
+                <h5>{data.LEKAR}</h5>
+                <h5>{data.ODDELENIE}</h5>
+              </div>
+            ));
       }
     });
     return popis;
@@ -145,13 +150,13 @@ export default function TableMedic(props) {
       >
         <div>
           <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
-          <h5>
-            {selectedRow != null
-              ? selectedRow.TYP != null
-                ? getRecordDetails()
-                : ""
-              : ""}
-          </h5>
+
+          {selectedRow != null
+            ? selectedRow.TYP != null
+              ? getRecordDetails()
+              : ""
+            : ""}
+
           <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
           <div>{selectedRow != null ? popis : ""}</div>
         </div>
