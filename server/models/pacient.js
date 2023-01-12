@@ -296,6 +296,7 @@ async function getRecepty(pid_pacienta) {
                         join zamestnanec zc using(id_zamestnanca)
                         join os_udaje ou on(ou.rod_cislo = zc.rod_cislo) 
                   where id_pacienta = :pid_pacienta
+                  and datum_vyzdvihnutia is null
                   order by recept.datum`,
       { pid_pacienta }
     );
@@ -310,7 +311,7 @@ async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
-      `select to_char(datum, 'DD.MM.YYYY') as datum, get_typ_zdrav_zaznamu(:pid_pacienta) as typ, 
+      `select id_zaznamu, to_char(datum, 'DD.MM.YYYY') as datum, get_typ_zdrav_zaznamu(:pid_pacienta) as typ, 
                                                      get_nazov_oddelenia(:pid_pacienta) as oddelenie, 
                                                      get_nazov_lekara(:pid_pacienta) as lekar  
           from zdravotny_zaznam  

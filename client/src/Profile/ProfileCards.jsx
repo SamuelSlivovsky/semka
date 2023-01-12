@@ -44,23 +44,22 @@ export default function ProfileCard() {
     titles: [
       { field: "DATUM", header: "Dátum" },
       { field: "TYP", header: "Typ záznamu" },
-      { field: "ODDELENIE", header: "Oddelenie" },
-      { field: "LEKAR", header: "Lekár" },
     ],
     allowFilters: false,
+    dialog: true,
     tableScrollHeight: "500px",
   };
 
   const recipesTable = {
-    tableName: "Recepty",
+    tableName: "Predpísané recepty",
     route: "/pacient",
     cellData: patientRecipes,
     titles: [
       { field: "NAZOV", header: "Názov" },
-      { field: "DATUM", header: "Dátum" },
       { field: "LEKAR", header: "Lekár" },
     ],
     allowFilters: false,
+    dialog: false,
     tableScrollHeight: "500px",
   };
 
@@ -75,6 +74,7 @@ export default function ProfileCard() {
       { field: "DAT_DO", header: "Do" },
     ],
     allowFilters: false,
+    dialog: false,
     tableScrollHeight: "500px",
   };
 
@@ -329,7 +329,7 @@ export default function ProfileCard() {
             <div className="col-5 text-center m-0">
               <h4>Typ ZŤP</h4>
               <div>
-                {patientZTPTypes.length != 0
+                {patientZTPTypes.length !== 0
                   ? patientZTPTypes.map((item) => <div>{item.NAZOV}</div>)
                   : ""}
               </div>
@@ -342,7 +342,7 @@ export default function ProfileCard() {
 
         <Card
           className="col-4 shadow-4"
-          title="Recepty"
+          title="Predpísané recepty"
           style={{ width: "50rem", height: "40rem" }}
         >
           <TableMedicalRecords {...recipesTable} />

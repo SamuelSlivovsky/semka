@@ -23,6 +23,7 @@ export default function TabExaminations() {
       { field: "DATUM", header: "Dátum" },
     ],
     allowFilters: true,
+    dialog: true,
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;

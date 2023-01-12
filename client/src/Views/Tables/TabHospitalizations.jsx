@@ -23,6 +23,7 @@ export default function TabHospitalizations() {
       { field: "DATUM", header: "Dátum od - Dátum do" },
     ],
     allowFilters: true,
+    dialog: true,
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;
