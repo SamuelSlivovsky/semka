@@ -29,7 +29,7 @@ app.use(cookieParser()); //middleware for cookies
 
 app.use('/auth', require('./routes/authRoute'));
 
-app.use(verifyJWT);
+//app.use(verifyJWT);
 app.use('/lekar', lekarRoute);
 app.use('/selects', selectsRoute);
 app.use('/calendar', calendarRoute);
