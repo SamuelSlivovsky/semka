@@ -8,5 +8,6 @@ router.get('/recepty/:id', verify.verifyRoles(1, 3), verify.checkForCorrectId(),
 router.get('/zdravZaznamy/:id', verify.verifyRoles(1, 3), verify.checkForCorrectId(), controller.getZdravZaznamy);
 router.get('/choroby/:id', verify.verifyRoles(1, 3), verify.checkForCorrectId(), controller.getChoroby);
 router.get('/typyZTP/:id', verify.verifyRoles(1, 3), verify.checkForCorrectId(), controller.getTypyZTP);
+router.get('/pacientId/:id', verify.verifyRoles(1, 3), verify.checkForCorrectId(), controller.getIdPacienta);
 
 module.exports = router;
