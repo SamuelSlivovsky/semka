@@ -311,9 +311,9 @@ async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
-      `select id_zaznamu, to_char(datum, 'DD.MM.YYYY') as datum, get_typ_zdrav_zaznamu(:pid_pacienta) as typ, 
-                                                     get_nazov_oddelenia(:pid_pacienta) as oddelenie, 
-                                                     get_nazov_lekara(:pid_pacienta) as lekar  
+      `select id_zaznamu, to_char(datum, 'DD.MM.YYYY') as datum, get_typ_zdrav_zaznamu(id_zaznamu) as typ, 
+                                                     get_nazov_oddelenia(id_zaznamu) as oddelenie, 
+                                                     get_nazov_lekara(id_zaznamu) as lekar  
           from zdravotny_zaznam  
             where id_pacienta = :pid_pacienta
                   order by zdravotny_zaznam.datum`,
