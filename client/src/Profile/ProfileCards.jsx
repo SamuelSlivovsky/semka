@@ -400,7 +400,7 @@ export default function ProfileCard() {
 
         <Card
           className="col-4 shadow-4"
-          title="Recepty"
+          title="Predpísané recepty"
           style={{ width: "50rem", height: "40rem" }}
         >
           <TableMedicalRecords {...recipesTable} />
