@@ -10,7 +10,8 @@ export default function TableMedic(props) {
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const { tableName, cellData, titles } = props;
+  const { tableName, cellData, titles, allowFilters, tableScrollHeight } =
+    props;
   const [popis, setPopis] = useState(null);
 
   const onHide = () => {
@@ -82,7 +83,7 @@ export default function TableMedic(props) {
     setGlobalFilterValue1("");
   };
 
-  const header = renderHeader();
+  const header = allowFilters ? renderHeader() : "";
   return (
     <div>
       <div className="card">
@@ -94,7 +95,8 @@ export default function TableMedic(props) {
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}
-          filterDisplay="menu"
+          scrollHeight={tableScrollHeight}
+          filterDisplay={allowFilters ? "menu" : ""}
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >

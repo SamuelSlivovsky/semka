@@ -1,15 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
 import { useLocation } from "react-router";
 import { Dialog } from "primereact/dialog";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { InputTextarea } from "primereact/inputtextarea";
 import "../icons.css";
-import TableWithoutDetail from "../Views/Tables/TableWithoutDetail";
+import TableMedicalRecords from "../Views/Tables/TableMedicalRecords";
 
 export default function ProfileCard() {
   const [profile, setProfile] = useState("");
@@ -37,7 +35,7 @@ export default function ProfileCard() {
 
   const [patientDiseases, setPatientDiseases] = useState("");
 
-  const [patientZTPTypes, setPatientZTPTypes] = useState("");
+  const [patientZTPTypes, setPatientZTPTypes] = useState([]);
 
   const medicalRecordsTable = {
     tableName: "Zdravotné záznamy",
@@ -46,9 +44,11 @@ export default function ProfileCard() {
     titles: [
       { field: "DATUM", header: "Dátum" },
       { field: "TYP", header: "Typ záznamu" },
-      { field: "NAZOV", header: "Oddelenie" },
+      { field: "ODDELENIE", header: "Oddelenie" },
       { field: "LEKAR", header: "Lekár" },
     ],
+    allowFilters: false,
+    tableScrollHeight: "500px",
   };
 
   const recipesTable = {
@@ -60,7 +60,8 @@ export default function ProfileCard() {
       { field: "DATUM", header: "Dátum" },
       { field: "LEKAR", header: "Lekár" },
     ],
-    filters: false,
+    allowFilters: false,
+    tableScrollHeight: "500px",
   };
 
   const diseasesTable = {
@@ -73,7 +74,8 @@ export default function ProfileCard() {
       { field: "DAT_OD", header: "Od" },
       { field: "DAT_DO", header: "Do" },
     ],
-    filters: false,
+    allowFilters: false,
+    tableScrollHeight: "500px",
   };
 
   useEffect(() => {
@@ -119,7 +121,7 @@ export default function ProfileCard() {
         setPatientDiseases(data);
       });
 
-    fetch(`patient/typZTP/${location.state}`)
+    fetch(`patient/typyZTP/${location.state}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -376,10 +378,19 @@ export default function ProfileCard() {
               <div>{profile.NAZOV_POISTOVNE}</div>
             </div>
           </div>
+
           <div className="flex w-100">
             <div className="col-5 text-center m-0">
               <h4>Adresa</h4>
               <div>{profile.NAZOV_OBCE + " " + profile.PSC}</div>
+            </div>
+            <div className="col-5 text-center m-0">
+              <h4>Typ ZŤP</h4>
+              <div>
+                {patientZTPTypes.length != 0
+                  ? patientZTPTypes.map((item) => <div>{item.NAZOV}</div>)
+                  : ""}
+              </div>
             </div>
           </div>
           <div className="mt-5 text-center">
@@ -392,7 +403,7 @@ export default function ProfileCard() {
           title="Recepty"
           style={{ width: "50rem", height: "40rem" }}
         >
-          <TableWithoutDetail {...recipesTable} />
+          <TableMedicalRecords {...recipesTable} />
         </Card>
       </div>
 
@@ -402,7 +413,7 @@ export default function ProfileCard() {
           title="Zdravotné záznamy"
           style={{ width: "50rem", height: "40rem" }}
         >
-          <TableWithoutDetail {...medicalRecordsTable} />
+          <TableMedicalRecords {...medicalRecordsTable} />
         </Card>
 
         <Card
@@ -410,7 +421,7 @@ export default function ProfileCard() {
           title="Choroby"
           style={{ width: "50rem", height: "40rem" }}
         >
-          <TableWithoutDetail {...diseasesTable} />
+          <TableMedicalRecords {...diseasesTable} />
         </Card>
       </div>
       <div>

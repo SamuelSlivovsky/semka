@@ -290,12 +290,13 @@ async function getRecepty(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const recepty = await conn.execute(
-      `select nazov, datum, meno || ' ' || priezvisko as lekar
+      `select nazov, to_char(datum, 'DD.MM.YYYY') as datum, meno || ' ' || priezvisko as lekar
             from recept join liek using(id_lieku)
                         join lekar using(id_lekara)
                         join zamestnanec zc using(id_zamestnanca)
                         join os_udaje ou on(ou.rod_cislo = zc.rod_cislo) 
-                  where id_pacienta = :pid_pacienta`,
+                  where id_pacienta = :pid_pacienta
+                  order by recept.datum`,
       { pid_pacienta }
     );
 
@@ -309,15 +310,12 @@ async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
-      `select datum, get_typ_zdrav_zaznamu(:pid_pacienta) as typ, nazov, meno || ' ' || priezvisko as lekar  
-          from zdravotny_zaznam join pacient using(id_pacienta)
-                                join lekar_pacient using(id_pacienta)
-                                join lekar using(id_lekara)
-                                join zamestnanec zc using(id_zamestnanca)
-                                join os_udaje ou on(ou.rod_cislo = zc.rod_cislo)
-                                join oddelenie using(id_oddelenia)
-                                join typ_oddelenia using(id_typu_oddelenia) 
-                      where id_pacienta = :pid_pacienta`,
+      `select to_char(datum, 'DD.MM.YYYY') as datum, get_typ_zdrav_zaznamu(:pid_pacienta) as typ, 
+                                                     get_nazov_oddelenia(:pid_pacienta) as oddelenie, 
+                                                     get_nazov_lekara(:pid_pacienta) as lekar  
+          from zdravotny_zaznam  
+            where id_pacienta = :pid_pacienta
+                  order by zdravotny_zaznam.datum`,
       { pid_pacienta }
     );
 
@@ -334,7 +332,8 @@ async function getChoroby(pid_pacienta) {
       `select nazov, typ, to_char(datum_od,'MM.DD.YYYY') dat_od, nvl(to_char(datum_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
             from zoznam_chorob join choroba using(id_choroby)
                                join typ_choroby using(id_typu_choroby)
-                          where id_pacienta = :pid_pacienta`,
+                          where id_pacienta = :pid_pacienta
+                          order by datum_od, datum_do`,
       { pid_pacienta }
     );
 
