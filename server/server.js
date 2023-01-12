@@ -21,7 +21,7 @@ const addRoute = require('./routes/addRoute');
 app.use(express.json());
 
 app.use(credentials);
-app.use(cors(corsOptions));
+//app.use(cors(corsOptions));
 
 app.use(express.json({ extended: true, limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -29,7 +29,7 @@ app.use(cookieParser()); //middleware for cookies
 
 app.use('/auth', require('./routes/authRoute'));
 
-//app.use(verifyJWT);
+app.use(verifyJWT);
 app.use('/lekar', lekarRoute);
 app.use('/selects', selectsRoute);
 app.use('/calendar', calendarRoute);

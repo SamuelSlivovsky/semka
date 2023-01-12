@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import EventCalendar from './Calendar/Calendar';
 import Home from './Home/Home';
 import { Button } from 'primereact/button';
@@ -18,12 +18,21 @@ import TabHospitalizations from './Views/Tables/TabHospitalizations';
 import TabOperations from './Views/Tables/TabOperations';
 import Storage from './Views/Storage';
 import TabDoctorsOfHospital from './Views/Tables/TabDoctorsOfHospital';
+import GetUserData from './Auth/GetUserData';
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
+  const [userData, setUserData] = useState(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem('user');
+    console.log(token);
+    setUserData(GetUserData(token));
+    console.log(userData);
+  }, []);
 
   const sidebarButtons = [
     <SidebarButton
@@ -105,6 +114,86 @@ function App() {
     />,
   ];
 
+  const renderDoctorRoutes = () => {
+    console.log('first');
+    return (
+      <>
+        <Route
+          path='/calendar'
+          element={<EventCalendar></EventCalendar>}
+        ></Route>
+        <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
+        <Route path='/patient' element={<Patient></Patient>}></Route>
+
+        <Route
+          path='/doctors'
+          element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
+        ></Route>
+        <Route
+          path='/examinations'
+          element={<TabExaminations></TabExaminations>}
+        ></Route>
+        <Route
+          path='/hospitalizations'
+          element={<TabHospitalizations></TabHospitalizations>}
+        ></Route>
+        <Route
+          path='/operations'
+          element={<TabOperations></TabOperations>}
+        ></Route>
+        <Route path='/statistics' element={<Statistics></Statistics>}></Route>
+        <Route path='/add' element={<Add></Add>}></Route>
+        <Route path='/sklad' element={<Storage />}></Route>
+      </>
+    );
+  };
+  const renderAdminRoutes = () => {
+    console.log('first');
+    return (
+      <>
+        <Route
+          path='/calendar'
+          element={<EventCalendar></EventCalendar>}
+        ></Route>
+        <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
+        <Route path='/patient' element={<Patient></Patient>}></Route>
+
+        <Route
+          path='/doctors'
+          element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
+        ></Route>
+        <Route
+          path='/examinations'
+          element={<TabExaminations></TabExaminations>}
+        ></Route>
+        <Route
+          path='/hospitalizations'
+          element={<TabHospitalizations></TabHospitalizations>}
+        ></Route>
+        <Route
+          path='/operations'
+          element={<TabOperations></TabOperations>}
+        ></Route>
+        <Route path='/statistics' element={<Statistics></Statistics>}></Route>
+        <Route path='/add' element={<Add></Add>}></Route>
+        <Route path='/sklad' element={<Storage />}></Route>
+      </>
+    );
+  };
+
+  const renderPatientRoutes = () => {
+    console.log('first');
+    return (
+      <>
+        <Route
+          path='/calendar'
+          element={<EventCalendar></EventCalendar>}
+        ></Route>
+        <Route path='/patient' element={<Patient></Patient>}></Route>
+      </>
+    );
+  };
+
   return (
     <div>
       <div className={`side-box ${visibleLeft ? 'side-box-opened' : ''}`}>
@@ -127,34 +216,16 @@ function App() {
         className={`page-content ${visibleLeft ? 'page-content-opened' : ''}`}
       >
         <Routes>
-          {<Route path='/' element={<Home></Home>}></Route>}
-          <Route
-            path='/calendar'
-            element={<EventCalendar></EventCalendar>}
-          ></Route>
-          <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
-          <Route path='/patient' element={<Patient></Patient>}></Route>
+          <Route path='/' element={<Home></Home>}></Route>
           <Route path='/register' element={<Register></Register>}></Route>
           <Route path='/login' element={<Login></Login>}></Route>
-          <Route
-            path='/doctors'
-            element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
-          ></Route>
-          <Route
-            path='/examinations'
-            element={<TabExaminations></TabExaminations>}
-          ></Route>
-          <Route
-            path='/hospitalizations'
-            element={<TabHospitalizations></TabHospitalizations>}
-          ></Route>
-          <Route
-            path='/operations'
-            element={<TabOperations></TabOperations>}
-          ></Route>
-          <Route path='/statistics' element={<Statistics></Statistics>}></Route>
-          <Route path='/add' element={<Add></Add>}></Route>
-          <Route path='/sklad' element={<Storage />}></Route>
+          {userData !== null && userData.UserInfo.role === 1
+            ? renderAdminRoutes()
+            : userData !== null && userData.UserInfo.role === 2
+            ? renderDoctorRoutes()
+            : userData !== null && userData.UserInfo.role === 3
+            ? renderPatientRoutes()
+            : ''}
         </Routes>
       </div>
     </div>

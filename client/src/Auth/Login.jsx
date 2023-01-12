@@ -9,12 +9,10 @@ import '../styles/auth.css';
 
 export const Login = () => {
   const [showMessage, setShowMessage] = useState(false);
-  const [formData, setFormData] = useState({});
   const defaultValues = {
     userid: '',
     password: '',
   };
-
   const {
     control,
     formState: { errors },
@@ -23,8 +21,20 @@ export const Login = () => {
   } = useForm({ defaultValues });
 
   const onSubmit = (data) => {
-    setFormData(data);
-    setShowMessage(true);
+    const requestOptions = {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userid: data.userid,
+        pwd: data.password,
+      }),
+    };
+    fetch('/auth/login', requestOptions)
+      .then((response) => response.json())
+      .then((res) => {
+        console.log(res);
+        localStorage.setItem('user', res.accessToken);
+      });
 
     reset();
   };
@@ -62,12 +72,6 @@ export const Login = () => {
             className='pi pi-check-circle'
             style={{ fontSize: '5rem', color: 'var(--green-500)' }}
           ></i>
-          <h5>Registration Successful!</h5>
-          <p style={{ lineHeight: 1.5, textIndent: '1rem' }}>
-            Your account is registered under name <b>{formData.name}</b> ; it'll
-            be valid next 30 days without activation. Please check{' '}
-            <b>{formData.email}</b> for activation instructions.
-          </p>
         </div>
       </Dialog>
 

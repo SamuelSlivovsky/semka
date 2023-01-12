@@ -1,15 +1,16 @@
-import React, { useState, useRef, useEffect, Suspense } from "react";
-import FullCalendar from "@fullcalendar/react";
-import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
-import listPlugin from "@fullcalendar/list";
-import { Calendar } from "primereact/calendar";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { SelectButton } from "primereact/selectbutton";
-import { ProgressBar } from "primereact/progressbar";
-import "../styles/calendar.css";
+import React, { useState, useRef, useEffect, Suspense } from 'react';
+import FullCalendar from '@fullcalendar/react';
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+import listPlugin from '@fullcalendar/list';
+import { Calendar } from 'primereact/calendar';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { SelectButton } from 'primereact/selectbutton';
+import { ProgressBar } from 'primereact/progressbar';
+import GetUserData from '../Auth/GetUserData';
+import '../styles/calendar.css';
 
 function EventCalendar() {
   const [currentEvents, setCurrentEvents] = useState(null);
@@ -22,30 +23,34 @@ function EventCalendar() {
   const [currEventTitle, setCurrEventTitle] = useState(null);
   const [eventType, setEventType] = useState(null);
   const [selectButtonValue, setSelectButtonValue] =
-    useState("Detaily udalosti");
+    useState('Detaily udalosti');
 
   const calendarRef = useRef(null);
   const eventTypes = [
-    { name: "Operácia", code: "OP" },
-    { name: "Vyšetrenie", code: "EX" },
-    { name: "Hospitalizácia", code: "HOSP" },
+    { name: 'Operácia', code: 'OP' },
+    { name: 'Vyšetrenie', code: 'EX' },
+    { name: 'Hospitalizácia', code: 'HOSP' },
   ];
-  const options = ["Detaily udalosti", "Zmeniť dátum udalosti"];
+  const options = ['Detaily udalosti', 'Zmeniť dátum udalosti'];
 
   useEffect(() => {
-    fetch(`calendar/udalostiLekara/${1}`)
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
+    let userData = GetUserData(token);
+
+    fetch(`calendar/udalostiLekara/${userData.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         data.forEach((element) => {
           switch (element.type) {
-            case "OPE":
-              element.backgroundColor = "#00916E";
+            case 'OPE':
+              element.backgroundColor = '#00916E';
               break;
-            case "VYS":
-              element.backgroundColor = "#593F62";
+            case 'VYS':
+              element.backgroundColor = '#593F62';
               break;
-            case "HOS":
-              element.backgroundColor = "#8499B1";
+            case 'HOS':
+              element.backgroundColor = '#8499B1';
               break;
             default:
               break;
@@ -60,13 +65,13 @@ function EventCalendar() {
     setShowDialog(true);
     setShowAddEvent(false);
     switch (clickInfo.event._def.extendedProps.type) {
-      case "OPE":
+      case 'OPE':
         setEventType(eventTypes[0]);
         break;
-      case "VYS":
+      case 'VYS':
         setEventType(eventTypes[1]);
         break;
-      case "HOS":
+      case 'HOS':
         setEventType(eventTypes[2]);
         break;
       default:
@@ -77,9 +82,9 @@ function EventCalendar() {
     setEventDateStart(new Date(clickInfo.event._instance.range.start));
     setCurrEventTitle(
       clickInfo.event._def.extendedProps.type +
-        " - " +
+        ' - ' +
         clickInfo.event._def.extendedProps.MENO +
-        " " +
+        ' ' +
         clickInfo.event._def.extendedProps.PRIEZVISKO
     );
   };
@@ -108,14 +113,14 @@ function EventCalendar() {
       let endDate = new Date(eventDateStart.getTime() + 3600000);
       let startDate = new Date(eventDateStart.getTime() - 3600000);
       const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          datum: startDate.toLocaleString("en-GB").replace(",", ""),
+          datum: startDate.toLocaleString('en-GB').replace(',', ''),
           id: currEventId,
         }),
       };
-      fetch("/calendar/zmenaZaznamu", requestOptions)
+      fetch('/calendar/zmenaZaznamu', requestOptions)
         .then((response) => response.json())
         .then((res) => {
           currentEvent.setDates(startDate, endDate, {
@@ -131,14 +136,14 @@ function EventCalendar() {
     return (
       <div>
         <Button
-          label="Nie"
-          icon="pi pi-times"
-          className="p-button-danger"
+          label='Nie'
+          icon='pi pi-times'
+          className='p-button-danger'
           onClick={() => onHide()}
         />
         <Button
-          label="Áno"
-          icon="pi pi-check"
+          label='Áno'
+          icon='pi pi-check'
           onClick={() => onSubmit()}
           autoFocus
         />
@@ -150,19 +155,19 @@ function EventCalendar() {
     return (
       <div>
         <Button
-          label="Zrušiť"
+          label='Zrušiť'
           onClick={() => onConfirmDialogHide(false)}
-          className="p-button-text"
+          className='p-button-text'
         />
         <Button
-          label="Nie"
-          icon="pi pi-times"
-          className="p-button-danger"
+          label='Nie'
+          icon='pi pi-times'
+          className='p-button-danger'
           onClick={() => onConfirmDialogHide(true)}
         />
         <Button
-          label="Áno"
-          icon="pi pi-check"
+          label='Áno'
+          icon='pi pi-check'
           onClick={() => onSubmitChanges(showAddEvent)}
           autoFocus
         />
@@ -171,60 +176,60 @@ function EventCalendar() {
   };
 
   const renderAddEventContent = () => {
-    return selectButtonValue === "Zmeniť dátum udalosti" || showAddEvent ? (
+    return selectButtonValue === 'Zmeniť dátum udalosti' || showAddEvent ? (
       <>
-        <div className="field col-12">
-          <h3 htmlFor="basic">Udalosť</h3>
+        <div className='field col-12'>
+          <h3 htmlFor='basic'>Udalosť</h3>
           <p>{currEventTitle}</p>
         </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Začiatok udalosti</label>
+        <div className='field col-12 '>
+          <label htmlFor='basic'>Začiatok udalosti</label>
           <Calendar
-            id="basic"
+            id='basic'
             value={eventDateStart}
             onChange={(e) => setEventDateStart(e.value)}
             showTime
             showIcon
-            dateFormat="dd.mm.yy"
+            dateFormat='dd.mm.yy'
           />
         </div>
-        <div className="field col-12 ">
-          <h3 htmlFor="basic">Typ udalosti</h3>
-          <p>{eventType !== null ? eventType.name : ""}</p>
+        <div className='field col-12 '>
+          <h3 htmlFor='basic'>Typ udalosti</h3>
+          <p>{eventType !== null ? eventType.name : ''}</p>
         </div>
       </>
     ) : !showAddEvent ? (
       <>
-        <div className="field col-12">
-          <h3 htmlFor="basic">Názov udalosti</h3>
+        <div className='field col-12'>
+          <h3 htmlFor='basic'>Názov udalosti</h3>
           <p>{currEventTitle}</p>
         </div>
-        <div className="field col-12 ">
-          <h3 htmlFor="basic">Začiatok udalosti</h3>
+        <div className='field col-12 '>
+          <h3 htmlFor='basic'>Začiatok udalosti</h3>
           <p>
             {eventDateStart !== null
-              ? eventDateStart.toLocaleString("sk-SK").replace(". ", ".")
-              : ""}
+              ? eventDateStart.toLocaleString('sk-SK').replace('. ', '.')
+              : ''}
           </p>
         </div>
-        <div className="field col-12 ">
-          <h3 htmlFor="basic">Typ udalosti</h3>
-          <p>{eventType !== null ? eventType.name : ""}</p>
+        <div className='field col-12 '>
+          <h3 htmlFor='basic'>Typ udalosti</h3>
+          <p>{eventType !== null ? eventType.name : ''}</p>
         </div>
       </>
     ) : (
-      ""
+      ''
     );
   };
 
   return (
-    <div className="kalendar">
-      <div className="kalendar-obal">
+    <div className='kalendar'>
+      <div className='kalendar-obal'>
         <Suspense>
           {!calendarVisible ? (
             <ProgressBar
-              mode="indeterminate"
-              style={{ height: "6px" }}
+              mode='indeterminate'
+              style={{ height: '6px' }}
             ></ProgressBar>
           ) : (
             <FullCalendar
@@ -236,55 +241,55 @@ function EventCalendar() {
               ]}
               ref={calendarRef}
               headerToolbar={{
-                left: "prev,next today prevYear,nextYear",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+                left: 'prev,next today prevYear,nextYear',
+                center: 'title',
+                right: 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
               }}
-              initialView="dayGridMonth"
+              initialView='dayGridMonth'
               editable={true}
               selectable={true}
               weekends={true}
               initialEvents={currentEvents}
               eventClick={handleEventClick}
               eventsSet={handleEvents}
-              locale="sk"
+              locale='sk'
             />
           )}
         </Suspense>
       </div>
       <Dialog
-        header={!showAddEvent ? selectButtonValue : "Pridať udalosť"}
+        header={!showAddEvent ? selectButtonValue : 'Pridať udalosť'}
         visible={showDialog}
-        style={{ width: "50vw" }}
+        style={{ width: '50vw' }}
         footer={
-          selectButtonValue === "Zmeniť dátum udalosti"
+          selectButtonValue === 'Zmeniť dátum udalosti'
             ? renderDialogFooter()
-            : ""
+            : ''
         }
         onHide={() => onHide()}
       >
         {!showAddEvent ? (
-          <div className="p-fluid grid formgrid">
+          <div className='p-fluid grid formgrid'>
             <SelectButton
               value={selectButtonValue}
               options={options}
               onChange={(e) => setSelectButtonValue(e.value)}
               style={{
-                height: "80px",
-                width: "300px",
-                marginBottom: "1rem",
-                marginLeft: "0.75rem",
+                height: '80px',
+                width: '300px',
+                marginBottom: '1rem',
+                marginLeft: '0.75rem',
               }}
             />
             {renderAddEventContent()}
           </div>
         ) : (
-          <div className="p-fluid grid formgrid">{renderAddEventContent()}</div>
+          <div className='p-fluid grid formgrid'>{renderAddEventContent()}</div>
         )}
         <Dialog
-          header="Prajete si uložiť zmeny?"
+          header='Prajete si uložiť zmeny?'
           visible={showConfirmChanges}
-          style={{ width: "50vw" }}
+          style={{ width: '50vw' }}
           footer={renderConfirmChangesFooter()}
           onHide={() => onConfirmDialogHide()}
         />
