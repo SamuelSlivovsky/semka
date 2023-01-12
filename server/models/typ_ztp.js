@@ -1,4 +1,4 @@
-const database = require("../database/Database");
+const database = require('../database/Database');
 
 async function getTypyZtp() {
   try {
@@ -7,7 +7,7 @@ async function getTypyZtp() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

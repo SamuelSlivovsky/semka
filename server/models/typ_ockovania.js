@@ -10,7 +10,7 @@ async function getTypyOckovania() {
         return result.rows;
 
     } catch (err) {
-        console.log(err);
+        throw new Error('Database error: ' + err);
     }
 }
 

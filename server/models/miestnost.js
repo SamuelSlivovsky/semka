@@ -28,10 +28,9 @@ async function getDostupneMiestnosti(id_oddelenia, trv, dat_od) {
                 order by id_miestnosti`,
       [dat_od, durat, dat_od, dat_od, durat, dat_od, id_oddelenia]
     );
-
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

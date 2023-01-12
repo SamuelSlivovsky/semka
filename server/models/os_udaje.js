@@ -7,7 +7,7 @@ async function getOsobneUdaje() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -26,7 +26,7 @@ async function getMenovciPacientLekar() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -46,7 +46,7 @@ async function getPomerMuziZeny(id_oddelenia) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -70,7 +70,7 @@ async function insertOsUdaje(body) {
 
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 

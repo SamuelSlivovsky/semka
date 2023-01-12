@@ -6,8 +6,7 @@ module.exports = {
       ret_val = await recept.insertRecept(req.body);
       res.status(200);
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+      console.error(err); 
       res.status(500).send(err);
     });
   },
@@ -74,8 +73,7 @@ module.exports = {
       ret_val = await obec.getObce();
       res.status(200).json(ret_val);
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+      console.error(err); 
       res.status(500).send(err);
     });
   },

@@ -10,7 +10,7 @@ oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 const fs = require("fs");
 const path = require("path");
 
-const configFilePath = path.join(__dirname, "./config.json");
+const configFilePath = path.join(__dirname, "../config/dbConfig.json");
 
 const dbConfig = JSON.parse(fs.readFileSync(configFilePath, "UTF-8"));
 

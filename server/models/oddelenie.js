@@ -7,7 +7,7 @@ async function getOddelenia() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -34,7 +34,7 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -60,7 +60,7 @@ async function getTopZamestnanciVyplatyOddelenie(id_oddelenia, rok) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -79,7 +79,7 @@ async function getZamestnanciOddeleni() {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -98,7 +98,7 @@ async function getZamestnanciOddelenia(id_oddelenia) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -117,7 +117,7 @@ async function getPocetZamOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -135,7 +135,7 @@ async function getPocetPacientovOddelenia(id_oddelenia) {
     console.log(result);
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -154,7 +154,7 @@ async function getPocetOperaciiOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -174,7 +174,7 @@ async function getPocetHospitalizaciiOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -194,7 +194,7 @@ async function getPocetVysetreniOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -213,7 +213,7 @@ async function getKrvneSkupinyOddelenia(id_oddelenia) {
 
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 
@@ -242,7 +242,7 @@ async function getSumaVyplatRoka(id_oddelenia, rok) {
     console.log(result.rows);
     return result.rows;
   } catch (err) {
-    console.log(err);
+     throw new Error('Database error: ' + err);
   }
 }
 

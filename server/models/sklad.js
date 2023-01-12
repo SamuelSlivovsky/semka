@@ -12,7 +12,7 @@ async function getDrugsOfDepartment(id) {
     console.log(result);
     return result.rows;
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
@@ -69,7 +69,7 @@ async function deleteSarza(body) {
 
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    console.log(err);
+    throw new Error('Database error: ' + err);
   }
 }
 
