@@ -121,3 +121,27 @@
   height: 44px;
   width: 44px;
 }
+
+.vaccine-icon {
+  content: url("./images/vaccine.png");
+  height: 44px;
+  width: 44px;
+}
+
+.disease-icon {
+  content: url("./images/disease.png");
+  height: 44px;
+  width: 44px;
+}
+
+.disabled-icon {
+  content: url("./images/disabled.png");
+  height: 44px;
+  width: 44px;
+}
+
+.recipe-icon {
+  content: url("./images/recipe.png");
+  height: 44px;
+  width: 44px;
+}
