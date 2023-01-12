@@ -179,26 +179,29 @@ async function getDoctorsOfPatient(id) {
   }
 }
 
-async function getUdalosti(id) {
+async function getUdalosti(rod_cislo) {
+  rod_cislo = String(rod_cislo);
+  rod_cislo = rod_cislo.substring(0, 6) + 'R' + rod_cislo.substring(6);
+  rod_cislo = rod_cislo.replace('R', '/');
   try {
     let udalosti = [];
 
-    let operacie = await getOperacie(id);
+    let operacie = await getOperacie(rod_cislo);
     operacie.forEach((element) => {
       udalosti.push(element);
     });
 
-    let ockovania = await getOckovania(id);
+    let ockovania = await getOckovania(rod_cislo);
     ockovania.forEach((element) => {
       udalosti.push(element);
     });
 
-    let vysetrenia = await getVysetrenia(id);
+    let vysetrenia = await getVysetrenia(rod_cislo);
     vysetrenia.forEach((element) => {
       udalosti.push(element);
     });
 
-    let hospitalizacie = await getHospitalizacie(id);
+    let hospitalizacie = await getHospitalizacie(rod_cislo);
     hospitalizacie.forEach((element) => {
       udalosti.push(element);
     });
@@ -210,13 +213,15 @@ async function getUdalosti(id) {
   }
 }
 
-async function getOperacie(id) {
+async function getOperacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join operacia using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join operacia using(id_zaznamu) 
+        join pacient using(id_pacienta)
+        where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     operacie.rows.forEach((element) => {
@@ -229,13 +234,15 @@ async function getOperacie(id) {
   }
 }
 
-async function getOckovania(id) {
+async function getOckovania(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const ockovania = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join ockovanie using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join ockovanie using(id_zaznamu)
+        join pacient using(id_pacienta)
+         where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     ockovania.rows.forEach((element) => {
@@ -248,13 +255,13 @@ async function getOckovania(id) {
   }
 }
 
-async function getVysetrenia(id) {
+async function getVysetrenia(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join vysetrenie using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join vysetrenie using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     vysetrenia.rows.forEach((element) => {
@@ -267,13 +274,13 @@ async function getVysetrenia(id) {
   }
 }
 
-async function getHospitalizacie(id) {
+async function getHospitalizacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const hospitalizacia = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join hospitalizacia using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join hospitalizacia using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     hospitalizacia.rows.forEach((element) => {

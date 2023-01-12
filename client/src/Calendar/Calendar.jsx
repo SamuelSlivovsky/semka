@@ -12,7 +12,7 @@ import { ProgressBar } from 'primereact/progressbar';
 import GetUserData from '../Auth/GetUserData';
 import '../styles/calendar.css';
 
-function EventCalendar() {
+function EventCalendar(props) {
   const [currentEvents, setCurrentEvents] = useState(null);
   const [calendarVisible, setCalendarVisible] = useState(false);
   const [showDialog, setShowDialog] = useState(false);
@@ -32,13 +32,18 @@ function EventCalendar() {
     { name: 'Hospitalizácia', code: 'HOSP' },
   ];
   const options = ['Detaily udalosti', 'Zmeniť dátum udalosti'];
+  const patientOptions = ['Detaily udalosti'];
 
   useEffect(() => {
     const token = localStorage.getItem('user');
     const headers = { authorization: 'Bearer ' + token };
-    let userData = GetUserData(token);
-
-    fetch(`calendar/udalostiLekara/${userData.UserInfo.userid}`, { headers })
+    let route =
+      props.userData.UserInfo.role === 2
+        ? 'calendar/udalostiLekara/'
+        : props.userData.UserInfo.role === 3
+        ? 'calendar/udalostiPacienta/'
+        : 'calendar/udalostiLekara/';
+    fetch(`${route}${props.userData.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         data.forEach((element) => {
@@ -268,11 +273,13 @@ function EventCalendar() {
         }
         onHide={() => onHide()}
       >
-        {!showAddEvent ? (
+        {!showAddEvent || props.userData.UserInfo.role !== 3 ? (
           <div className='p-fluid grid formgrid'>
             <SelectButton
               value={selectButtonValue}
-              options={options}
+              options={
+                props.userData.UserInfo.role === 3 ? patientOptions : options
+              }
               onChange={(e) => setSelectButtonValue(e.value)}
               style={{
                 height: '80px',

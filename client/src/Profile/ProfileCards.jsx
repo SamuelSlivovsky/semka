@@ -12,7 +12,7 @@ import ExaminationForm from '../Forms/ExaminationForm';
 import '../icons.css';
 import TableMedicalRecords from '../Views/Tables/TableMedicalRecords';
 
-export default function ProfileCard() {
+export default function ProfileCard(props) {
   const [profile, setProfile] = useState('');
   const [show, setShow] = useState(false);
   const location = useLocation();
@@ -359,78 +359,84 @@ export default function ProfileCard() {
           <TableMedicalRecords {...diseasesTable} />
         </Card>
       </div>
-      <div className='flex '>
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nové vyšetrenie'
-              icon='examination-icon'
-              onClick={() => handleClick('examination')}
-            />
-          </div>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nová operácia'
-              icon='operation-icon'
-              onClick={() => handleClick('operation')}
-            />
-          </div>
-        </div>
+      {props.userData.UserInfo.role !== 3 ? (
+        <>
+          <div className='flex '>
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nové vyšetrenie'
+                  icon='examination-icon'
+                  onClick={() => handleClick('examination')}
+                />
+              </div>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nová operácia'
+                  icon='operation-icon'
+                  onClick={() => handleClick('operation')}
+                />
+              </div>
+            </div>
 
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nová hospitalizácia'
-              icon='hospit-icon'
-              onClick={() => handleClick('hospit')}
-            />
-          </div>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nové očkovanie'
-              icon='vaccine-icon'
-              onClick={() => handleClick('vacci')}
-            />
-          </div>
-        </div>
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nová hospitalizácia'
+                  icon='hospit-icon'
+                  onClick={() => handleClick('hospit')}
+                />
+              </div>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nové očkovanie'
+                  icon='vaccine-icon'
+                  onClick={() => handleClick('vacci')}
+                />
+              </div>
+            </div>
 
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nová choroba'
-              icon='disease-icon'
-              onClick={() => handleClick('disease')}
-            />
-          </div>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nové ZŤP'
-              icon='disabled-icon'
-              onClick={() => handleClick('ZTP')}
-            />
-          </div>
-        </div>
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nová choroba'
+                  icon='disease-icon'
+                  onClick={() => handleClick('disease')}
+                />
+              </div>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nové ZŤP'
+                  icon='disabled-icon'
+                  onClick={() => handleClick('ZTP')}
+                />
+              </div>
+            </div>
 
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nový recept'
-              icon='recipe-icon'
-              onClick={() => handleClick('recipe')}
-            />
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nový recept'
+                  icon='recipe-icon'
+                  onClick={() => handleClick('recipe')}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <Dialog visible={show} onHide={onHide} header={header}>
-        {renderDialog()}
-      </Dialog>
+          <Dialog visible={show} onHide={onHide} header={header}>
+            {renderDialog()}
+          </Dialog>
+        </>
+      ) : (
+        ''
+      )}
     </div>
   );
 }

@@ -29,9 +29,7 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('user');
-    console.log(token);
     setUserData(GetUserData(token));
-    console.log(userData);
   }, []);
 
   const sidebarButtons = [
@@ -113,14 +111,36 @@ function App() {
       icon='user-icon'
     />,
   ];
+  const sidebarButtonsPatient = [
+    <SidebarButton
+      key='1'
+      visibleLeft={visibleLeft}
+      path='/'
+      label='Domov'
+      icon='home-icon'
+    />,
+    <SidebarButton
+      key='2'
+      visibleLeft={visibleLeft}
+      path='/calendar'
+      label='Kalendár'
+      icon='calendar-icon'
+    />,
+    <SidebarButton
+      key='3'
+      visibleLeft={visibleLeft}
+      path='/patient'
+      label='Pacient'
+      icon='patient-icon'
+    />,
+  ];
 
   const renderDoctorRoutes = () => {
-    console.log('first');
     return (
       <>
         <Route
           path='/calendar'
-          element={<EventCalendar></EventCalendar>}
+          element={<EventCalendar userData={userData}></EventCalendar>}
         ></Route>
         <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
         <Route path='/patient' element={<Patient></Patient>}></Route>
@@ -187,9 +207,12 @@ function App() {
       <>
         <Route
           path='/calendar'
-          element={<EventCalendar></EventCalendar>}
+          element={<EventCalendar userData={userData}></EventCalendar>}
         ></Route>
-        <Route path='/patient' element={<Patient></Patient>}></Route>
+        <Route
+          path='/patient'
+          element={<Patient userData={userData}></Patient>}
+        ></Route>
       </>
     );
   };
@@ -210,13 +233,18 @@ function App() {
             border: 'none',
           }}
         />
-        {sidebarButtons}
+        {userData !== null &&
+        (userData.UserInfo.role === 2 || userData.UserInfo.role) === 1
+          ? sidebarButtons
+          : userData !== null && userData.UserInfo.role === 3
+          ? sidebarButtonsPatient
+          : ''}
       </div>
       <div
         className={`page-content ${visibleLeft ? 'page-content-opened' : ''}`}
       >
         <Routes>
-          <Route path='/' element={<Home></Home>}></Route>
+          <Route path='/' element={<Home userData={userData}></Home>}></Route>
           <Route path='/register' element={<Register></Register>}></Route>
           <Route path='/login' element={<Login></Login>}></Route>
           {userData !== null && userData.UserInfo.role === 1
