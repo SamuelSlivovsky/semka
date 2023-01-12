@@ -1,4 +1,7 @@
 const database = require("../database/Database");
+const oracledb = database.oracledb;
+// force all queried BLOBs to be returned as Buffers
+oracledb.fetchAsBuffer = [oracledb.BLOB];
 
 async function getZdravotneZaznamy() {
   try {
@@ -20,6 +23,20 @@ async function getPopisZaznamu(id) {
       { id }
     );
     return zaznam.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getPriloha(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `SELECT priloha FROM priloha join zdravotny_zaznam using(id_prilohy) WHERE id_zaznamu = :id`,
+      { id }
+    );
+    console.log(result.rows[0]);
+    return result.rows[0];
   } catch (err) {
     console.log(err);
   }
@@ -90,4 +107,5 @@ module.exports = {
   insertHospitalizacia,
   insertVysetrenie,
   getPopisZaznamu,
+  getPriloha,
 };

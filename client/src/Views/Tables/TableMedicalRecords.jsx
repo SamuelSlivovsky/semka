@@ -10,6 +10,7 @@ export default function TableMedic(props) {
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
+  const [imgUrl, setImgUrl] = useState("");
   const {
     tableName,
     cellData,
@@ -27,7 +28,12 @@ export default function TableMedic(props) {
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
-
+    fetch(`/zaznamy/priloha/${value.ID_ZAZNAMU}`)
+      .then((res) => res.blob())
+      .then((result) => {
+        setImgUrl(URL.createObjectURL(result));
+        console.log(result);
+      });
     fetch(`/zaznamy/popis/${value.ID_ZAZNAMU}`)
       .then((response) => response.json())
       .then((data) => {
@@ -136,6 +142,7 @@ export default function TableMedic(props) {
         onHide={() => onHide()}
       >
         <div>
+          <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
           <h5>
             {selectedRow != null
               ? selectedRow.TYP != null
