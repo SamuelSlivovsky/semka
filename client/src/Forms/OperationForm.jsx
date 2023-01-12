@@ -24,10 +24,17 @@ export default function OperationForm(props) {
   ];
   const validate = (data) => {
     let errors = {};
-    console.log(props);
 
     if (!data.datum) {
       errors.datum = 'Dátum je povinný';
+    } else {
+      fetch(
+        `/add/dostupneMiestnosti/${2}/${data.trvanie}/${encodeURIComponent(
+          data.datum.toLocaleString('en-GB').replace(',', '')
+        )}`
+      )
+        .then((response) => response.json())
+        .then((data) => console.log(data));
     }
     if (!data.popis) {
       errors.popis = 'Popis je povinný';
@@ -109,6 +116,7 @@ export default function OperationForm(props) {
       console.log(reader.result);
     };
   };
+
   return (
     <div
       style={{ width: '100%', marginTop: '2rem' }}
@@ -164,7 +172,7 @@ export default function OperationForm(props) {
                       id='rod_cislo'
                       mask='999999/9999'
                       disabled={
-                        props.rod_cislo !== null ||
+                        props.rod_cislo !== null &&
                         typeof props.rod_cislo !== 'undefined'
                           ? true
                           : false

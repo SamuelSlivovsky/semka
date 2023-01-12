@@ -1,10 +1,14 @@
 const database = require("../database/Database");
 const oracledb = database.oracledb;
 
-async function getChoroby() {
+async function getChoroby(pid_typu_choroby) {
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`SELECT * FROM choroba`);
+    const result = await conn.execute(
+      `SELECT * FROM choroba
+          where id_typu_choroby = :pid_typu_choroby`,
+      { pid_typu_choroby }
+    );
 
     return result.rows;
   } catch (err) {

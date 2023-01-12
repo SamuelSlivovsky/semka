@@ -103,6 +103,42 @@ module.exports = {
     });
   },
 
+  getTypyChoroby: (req, res) => {
+    const typ_choroby = require('../models/typ_choroby');
+    console.log(req.params);
+    (async () => {
+      ret_val = await typ_choroby.getTypyChoroby();
+      res.status(200).json(ret_val);
+    })();
+  },
+
+  getChoroby: (req, res) => {
+    const choroba = require('../models/choroba');
+    console.log(req.params);
+    (async () => {
+      ret_val = await choroba.getChoroby(req.params.id_typu_choroby);
+      res.status(200).json(ret_val);
+    })();
+  },
+
+  getTypyZtp: (req, res) => {
+    const typ_ztp = require('../models/typ_ztp');
+    console.log(req.params);
+    (async () => {
+      ret_val = await typ_ztp.getTypyZtp();
+      res.status(200).json(ret_val);
+    })();
+  },
+
+  getTypyOckovania: (req, res) => {
+    const typ_ockovania = require('../models/typ_ockovania');
+    console.log(req.params);
+    (async () => {
+      ret_val = await typ_ockovania.getTypyOckovania();
+      res.status(200).json(ret_val);
+    })();
+  },
+
   getTypyOckovaniaPacienti: (req, res) => {
     const pacient = require('../models/pacient');
     console.log(req.params);

@@ -14,6 +14,7 @@ module.exports = {
   getUdalostiLekara: (req, res) => {
     const lekar = require('../models/lekar');
     console.log(req.params);
+
     (async () => {
       ret_val = await lekar.getUdalosti(req.params.id);
       res.status(200).json(ret_val);

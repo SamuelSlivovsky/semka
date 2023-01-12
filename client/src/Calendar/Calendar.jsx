@@ -9,6 +9,7 @@ import { Dialog } from 'primereact/dialog';
 import { Button } from 'primereact/button';
 import { SelectButton } from 'primereact/selectbutton';
 import { ProgressBar } from 'primereact/progressbar';
+import GetUserData from '../Auth/GetUserData';
 import '../styles/calendar.css';
 
 function EventCalendar() {
@@ -33,7 +34,11 @@ function EventCalendar() {
   const options = ['Detaily udalosti', 'Zmeniť dátum udalosti'];
 
   useEffect(() => {
-    fetch(`calendar/udalostiLekara/${1}`)
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
+    let userData = GetUserData(token);
+
+    fetch(`calendar/udalostiLekara/${userData.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         data.forEach((element) => {

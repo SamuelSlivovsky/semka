@@ -1,26 +1,30 @@
-import { useEffect, useState } from 'react';
-import mockDataJson from '../../mock/mock-data.json';
-import TableMedicalRecord from './TableMedicalRecord';
+import { useEffect, useState } from "react";
+import TableMedicalRecords from "./TableMedicalRecords";
 
 export default function TabOperations() {
-  const [mockData, setMockData] = useState([]);
+  const [operacie, setOperacie] = useState(null);
 
-  useEffect(()=>{
-    setMockData(mockDataJson.data);
-  },[])
+  useEffect(() => {
+    fetch(`/lekar/operacie/${2}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setOperacie(data);
+      });
+  }, []);
 
-  const data={
-    tableName:'Operácie',
-    cellData: mockData,
-    titles: [{field: "id", header: 'Rodné číslo'},
-             {field: "name", header:'Meno'},
-             {field: "code", header: 'Priezvisko'},
-             {field: 'description', header: 'Dátum'}]
-  }
+  const data = {
+    tableName: "Operácie",
+    cellData: operacie,
+    titles: [
+      { field: "ROD_CISLO", header: "Rodné číslo" },
+      { field: "MENO", header: "Meno" },
+      { field: "PRIEZVISKO", header: "Priezvisko" },
+      { field: "DATUM", header: "Dátum" },
+    ],
+    allowFilters: true,
+    dialog: true,
+  };
 
-  return (
-    <div>
-      <TableMedicalRecord {...data}/>
-    </div>
-  )
+  return <div>{data && <TableMedicalRecords {...data} />}</div>;
 }

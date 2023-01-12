@@ -77,4 +77,19 @@ module.exports = {
       res.status(500).send(err);
     });
   },
+  getDostupneMiestnosti: (req, res) => {
+    const miestnost = require('../models/miestnost');
+    (async () => {
+      ret_val = await miestnost.getDostupneMiestnosti(
+        req.params.id_oddelenia,
+        req.params.trvanie,
+        req.params.datum
+      );
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
 };

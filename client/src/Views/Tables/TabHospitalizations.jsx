@@ -1,27 +1,30 @@
-import { useEffect, useState } from 'react';
-import mockDataJson from '../../mock/mock-data.json';
-import TableMedicalRecord from './TableMedicalRecord';
+import { useEffect, useState } from "react";
+import TableMedicalRecords from "./TableMedicalRecords";
 
 export default function TabHospitalizations() {
-  const [mockData, setMockData] = useState([]);
+  const [hospitalizacie, setHospitalizacie] = useState([]);
 
-  useEffect(()=>{
-    setMockData(mockDataJson.data);
-  },[])
+  useEffect(() => {
+    fetch(`/lekar/hospitalizacie/${2}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setHospitalizacie(data);
+      });
+  }, []);
 
-  const data={
-    tableName:'Hospitalizácie',
-    cellData: mockData,
-    titles: [{field: "price", header: 'Rodné číslo'},
-             {field: "code", header:'Meno'},
-             {field: "description", header: 'Priezvisko'},
-             {field: "category", header: 'Dátum prijatia'},
-             {field: "id", header: 'Dátum prepustenia'}]
-  }
+  const data = {
+    tableName: "Hospitalizácie",
+    cellData: hospitalizacie,
+    titles: [
+      { field: "ROD_CISLO", header: "Rodné číslo" },
+      { field: "MENO", header: "Meno" },
+      { field: "PRIEZVISKO", header: "Priezvisko" },
+      { field: "DATUM", header: "Dátum od - Dátum do" },
+    ],
+    allowFilters: true,
+    dialog: true,
+  };
 
-  return (
-    <div>
-      <TableMedicalRecord {...data}/>
-    </div>
-  )
+  return <div>{data && <TableMedicalRecords {...data} />}</div>;
 }

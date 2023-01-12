@@ -152,7 +152,7 @@ export default function HospitForm(props) {
                       id='rod_cislo'
                       mask='999999/9999'
                       disabled={
-                        props.rod_cislo !== null ||
+                        props.rod_cislo !== null &&
                         typeof props.rod_cislo !== 'undefined'
                           ? true
                           : false

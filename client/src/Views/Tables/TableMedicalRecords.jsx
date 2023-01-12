@@ -2,51 +2,53 @@ import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate } from "react-router";
 
-export default function TablePeople(props) {
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
+export default function TableMedic(props) {
+  const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
-  const { route, tableName, cellData, titles } = props;
-
-  const navigate = useNavigate();
+  const [imgUrl, setImgUrl] = useState("");
+  const {
+    tableName,
+    cellData,
+    titles,
+    allowFilters,
+    dialog,
+    tableScrollHeight,
+  } = props;
+  const [popis, setPopis] = useState(null);
 
   const onHide = () => {
     setShowDialog(false);
   };
 
-  const onSubmit = () => {
-    setShowDialog(false);
-    navigate(route, { state: selectedRow.ID_PACIENTA });
-  };
-
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
+    fetch(`/zaznamy/priloha/${value.ID_ZAZNAMU}`)
+      .then((res) => res.blob())
+      .then((result) => {
+        setImgUrl(URL.createObjectURL(result));
+        console.log(result);
+      });
+    fetch(`/zaznamy/popis/${value.ID_ZAZNAMU}`)
+      .then((response) => response.json())
+      .then((data) => {
+        setPopis(data[0].POPIS);
+      });
   };
 
-  const renderDialogFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Zatvoriť"
-          icon="pi pi-times"
-          className="p-button-danger"
-          onClick={() => onHide()}
-        />
-        <Button
-          label="Detail"
-          icon="pi pi-check"
-          onClick={() => onSubmit()}
-          autoFocus
-        />
-      </div>
-    );
+  const getRecordDetails = () => {
+    let popis = "notfound";
+    cellData.map((data) => {
+      if (data.ID_ZAZNAMU === selectedRow.ID_ZAZNAMU) {
+        popis = data.LEKAR + " " + data.ODDELENIE;
+      }
+    });
+    return popis;
   };
 
   const renderHeader = () => {
@@ -57,8 +59,8 @@ export default function TablePeople(props) {
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText
-              value={globalFilterValue}
-              onChange={onGlobalFilterChange}
+              value={globalFilterValue1}
+              onChange={onGlobalFilterChange1}
               placeholder="Keyword Search"
             />
           </span>
@@ -67,12 +69,13 @@ export default function TablePeople(props) {
     );
   };
 
-  const onGlobalFilterChange = (e) => {
+  const onGlobalFilterChange1 = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
     _filters["global"].value = value;
+
     setFilters(_filters);
-    setGlobalFilterValue(value);
+    setGlobalFilterValue1(value);
   };
 
   useEffect(() => {
@@ -94,44 +97,15 @@ export default function TablePeople(props) {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
-      ODDELENIE: {
-        operator: FilterOperator.OR,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      DATUM: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
     });
-    setGlobalFilterValue("");
+    setGlobalFilterValue1("");
   };
 
-  const getPohlavie = () => {
-    if (selectedRow !== null)
-      return selectedRow.ROD_CISLO.substring(2, 3) === "5" ||
-        selectedRow.ROD_CISLO.substring(2, 3) === "6"
-        ? "Žena"
-        : "Muž";
-  };
-  const getVek = () => {
-    if (selectedRow != null) {
-      let birthDate =
-        "19" +
-        selectedRow.ROD_CISLO.substring(0, 2) +
-        "-" +
-        (selectedRow.ROD_CISLO.substring(2, 4) % 50) +
-        "-" +
-        selectedRow.ROD_CISLO.substring(4, 6);
-
-      birthDate = new Date(birthDate);
-
-      var today = new Date();
-      return getDifferenceInDays(today, birthDate);
-    }
-  };
-
-  const getDifferenceInDays = (date1, date2) => {
-    const diffInMs = Math.abs(date2 - date1);
-    return Math.round(diffInMs / (1000 * 60 * 60 * 24) / 365);
-  };
-
-  const header = renderHeader();
+  const header = allowFilters ? renderHeader() : "";
   return (
     <div>
       <div className="card">
@@ -143,34 +117,42 @@ export default function TablePeople(props) {
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}
-          filterDisplay="menu"
+          scrollHeight={tableScrollHeight}
+          filterDisplay={allowFilters ? "menu" : ""}
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
+          <Column field="ID_ZAZNAMU"></Column>
           {titles.map((title) => (
-            <Column
-              field={title.field}
-              header={title.header}
-              sortable
-              filter
-            ></Column>
+            <Column field={title.field} header={title.header} filter></Column>
           ))}
         </DataTable>
       </div>
+
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            ? selectedRow.MENO != null
+              ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+              : selectedRow.TYP
             : ""
         }
-        visible={showDialog}
+        visible={showDialog && dialog}
         style={{ width: "50vw" }}
-        footer={renderDialogFooter()}
         onHide={() => onHide()}
       >
-        <p>{getPohlavie()}</p>
-        <p>{getVek() + " rokov"}</p>
-        <p>{selectedRow != null ? "PSČ " + selectedRow.PSC : ""}</p>
+        <div>
+          <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
+          <h5>
+            {selectedRow != null
+              ? selectedRow.TYP != null
+                ? getRecordDetails()
+                : ""
+              : ""}
+          </h5>
+          <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
+          <div>{selectedRow != null ? popis : ""}</div>
+        </div>
       </Dialog>
     </div>
   );

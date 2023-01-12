@@ -1,9 +1,20 @@
-const database = require('../database/Database');
+const database = require("../database/Database");
 
-async function getLekari() {
+async function getLekari(pid_lekara) {
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`SELECT * FROM lekar`);
+    const result = await conn.execute(
+      `SELECT meno, priezvisko, typ_oddelenia.nazov as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, mail 
+          from lekar join zamestnanec using(id_zamestnanca) 
+                    join os_udaje using(rod_cislo)
+                    join oddelenie using(id_oddelenia)
+                    join typ_oddelenia using(id_typu_oddelenia)
+                    join nemocnica using(id_nemocnice)
+              where id_nemocnice = get_id_nemocnice(:pid_lekara)
+              and id_lekara <> :pid_lekara
+              order by id_oddelenia`,
+      { pid_lekara }
+    );
 
     return result.rows;
   } catch (err) {
@@ -15,8 +26,8 @@ async function getPacienti(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT * FROM os_udaje join pacient using(rod_cislo) join lekar_pacient using(id_pacienta) where id_lekara = :idaa_lekara`,
-      { idaa_lekara: pid_lekara }
+      `SELECT * FROM os_udaje join pacient using(rod_cislo) join lekar_pacient using(id_pacienta) where id_lekara = :pid_lekara`,
+      { pid_lekara }
     );
     return result.rows;
   } catch (err) {
@@ -76,7 +87,7 @@ async function getOperacie(id) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
                 join operacia using(id_zaznamu)
                  join operacia_lekar using(id_operacie) 
                   join pacient using(id_pacienta)
@@ -85,7 +96,7 @@ async function getOperacie(id) {
     );
 
     operacie.rows.forEach((element) => {
-      element.type = 'OPE';
+      element.type = "OPE";
     });
 
     return operacie.rows;
@@ -98,7 +109,7 @@ async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
                 join vysetrenie using(id_zaznamu)
                  join pacient using(id_pacienta)
                   join os_udaje using(rod_cislo) 
@@ -107,7 +118,7 @@ async function getVysetrenia(id) {
     );
 
     vysetrenia.rows.forEach((element) => {
-      element.type = 'VYS';
+      element.type = "VYS";
     });
 
     return vysetrenia.rows;
@@ -120,7 +131,8 @@ async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id" from zdravotny_zaznam
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id", to_char(datum,'DD.MM.YYYY') || '-' || nvl(to_char(dat_do,'DD.MM.YYYY'),'Neukončená') datum
+       from zdravotny_zaznam
                 join hospitalizacia using(id_zaznamu)
                  join pacient using(id_pacienta)
                   join os_udaje using(rod_cislo) 
@@ -129,7 +141,7 @@ async function getHospitalizacie(id) {
     );
 
     hospitalizacie.rows.forEach((element) => {
-      element.type = 'HOS';
+      element.type = "HOS";
     });
 
     return hospitalizacie.rows;
@@ -143,4 +155,7 @@ module.exports = {
   getPacienti,
   getPriemernyVek,
   getUdalosti,
+  getOperacie,
+  getVysetrenia,
+  getHospitalizacie,
 };
