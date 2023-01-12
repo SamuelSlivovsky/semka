@@ -1,6 +1,6 @@
-const database = require('../database/Database');
+const database = require("../database/Database");
 const oracledb = database.oracledb;
-const { autoCommit } = require('oracledb');
+const { autoCommit } = require("oracledb");
 // force all queried BLOBs to be returned as Buffers
 oracledb.fetchAsBuffer = [oracledb.BLOB];
 
@@ -11,7 +11,7 @@ async function getZdravotneZaznamy() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -52,7 +52,7 @@ async function insertHospitalizacia(body) {
 
     let buffer = Buffer.from([0x00]);
     if (body.priloha !== null) {
-      buffer = Buffer.from(body.priloha, 'base64');
+      buffer = Buffer.from(body.priloha, "base64");
     }
 
     await conn.execute(sqlStatement, {
@@ -64,7 +64,7 @@ async function insertHospitalizacia(body) {
       datum_do: body.datum_do,
     });
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -77,7 +77,7 @@ async function insertOperacia(body) {
 
     let buffer = Buffer.from([0x00]);
     if (body.priloha !== null) {
-      buffer = Buffer.from(body.priloha, 'base64');
+      buffer = Buffer.from(body.priloha, "base64");
     }
     await conn.execute(sqlStatement, {
       rod_cislo: body.rod_cislo,
@@ -89,7 +89,7 @@ async function insertOperacia(body) {
       id_lekara: body.id_lekara,
     });
   } catch {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -102,7 +102,7 @@ async function insertVysetrenie(body) {
 
     let buffer = Buffer.from([0x00]);
     if (body.priloha !== null) {
-      buffer = Buffer.from(body.priloha, 'base64');
+      buffer = Buffer.from(body.priloha, "base64");
     }
 
     await conn.execute(sqlStatement, {
@@ -113,7 +113,7 @@ async function insertVysetrenie(body) {
       id_lekara: body.id_lekara,
     });
   } catch {
-    throw new Error('Error');
+    throw new Error("Error");
   }
 }
 
@@ -129,7 +129,7 @@ async function updateZaznam(body) {
       { autoCommit: true } // type and direction are optional for IN binds
     );
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 

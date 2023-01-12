@@ -1,4 +1,4 @@
-const database = require('../database/Database');
+const database = require("../database/Database");
 
 async function getTypyZtp() {
   try {
@@ -7,10 +7,30 @@ async function getTypyZtp() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function insertTypZtp(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+        typZtp_insert(:rod_cislo , :id_typu_ztp, :dat_od, :dat_do);
+        END;`;
+
+    let result = await conn.execute(sqlStatement, {
+      rod_cislo: body.rod_cislo,
+      id_typu_ztp: body.id_typu_ztp,
+      dat_od: body.dat_od,
+      dat_do: body.dat_do,
+    });
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    throw new Error("Database error: " + err);
   }
 }
 
 module.exports = {
   getTypyZtp,
+  insertTypZtp,
 };
