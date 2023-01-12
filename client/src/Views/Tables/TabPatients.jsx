@@ -16,7 +16,7 @@ export default function TabPatients() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`/lekar/pacienti/${2}`)
+    fetch(`/lekar/pacienti/${1}`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);

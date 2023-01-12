@@ -3,13 +3,10 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-//import listPlugin from "@fullcalendar/list";
-import { createEventId } from "./event-utils";
+import listPlugin from "@fullcalendar/list";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
 import { SelectButton } from "primereact/selectbutton";
 import { ProgressBar } from "primereact/progressbar";
 import "../styles/calendar.css";
@@ -21,7 +18,6 @@ function EventCalendar() {
   const [showAddEvent, setShowAddEvent] = useState(false);
   const [showConfirmChanges, setShowConfirmChanges] = useState(false);
   const [eventDateStart, setEventDateStart] = useState(null);
-  const [eventDateEnd, setEventDateEnd] = useState(null);
   const [currEventId, setCurrEventId] = useState(null);
   const [currEventTitle, setCurrEventTitle] = useState(null);
   const [eventType, setEventType] = useState(null);
@@ -34,10 +30,10 @@ function EventCalendar() {
     { name: "Vyšetrenie", code: "EX" },
     { name: "Hospitalizácia", code: "HOSP" },
   ];
-  const options = ["Detaily udalosti", "Zmeniť udalosť"];
+  const options = ["Detaily udalosti", "Zmeniť dátum udalosti"];
 
   useEffect(() => {
-    fetch(`calendar/udalostiLekara/${2}`)
+    fetch(`calendar/udalostiLekara/${1}`)
       .then((response) => response.json())
       .then((data) => {
         data.forEach((element) => {
@@ -60,20 +56,9 @@ function EventCalendar() {
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const handleDateSelect = (selectInfo) => {
-    setShowAddEvent(true);
-    setShowDialog(true);
-    setCurrEventId(null);
-    setEventDateStart(new Date(selectInfo.start));
-    setEventDateEnd(null);
-    setCurrEventTitle(null);
-    setEventType(null);
-  };
-
   const handleEventClick = (clickInfo) => {
     setShowDialog(true);
     setShowAddEvent(false);
-    console.log(clickInfo);
     switch (clickInfo.event._def.extendedProps.type) {
       case "OPE":
         setEventType(eventTypes[0]);
@@ -90,8 +75,13 @@ function EventCalendar() {
     }
     setCurrEventId(clickInfo.event._def.publicId);
     setEventDateStart(new Date(clickInfo.event._instance.range.start));
-    setEventDateEnd(new Date(clickInfo.event._instance.range.end));
-    setCurrEventTitle(clickInfo.event._def.title);
+    setCurrEventTitle(
+      clickInfo.event._def.extendedProps.type +
+        " - " +
+        clickInfo.event._def.extendedProps.MENO +
+        " " +
+        clickInfo.event._def.extendedProps.PRIEZVISKO
+    );
   };
 
   const onHide = () => {
@@ -111,45 +101,30 @@ function EventCalendar() {
     setCurrentEvents(events);
   };
 
-  const onEventTypeChange = (e) => {
-    setEventType(e.value);
-  };
-
   const onSubmitChanges = (addEvent) => {
     if (!addEvent) {
       let calendarApi = calendarRef.current.getApi();
       let currentEvent = calendarApi.getEventById(currEventId);
-      currentEvent.setDates(eventDateStart, eventDateEnd, { allDay: true });
-      currentEvent.setProp("title", currEventTitle);
-    } else {
-      let backgroundColor = "";
-      switch (eventType.code) {
-        case "OP":
-          backgroundColor = "#00916E";
-          break;
-        case "EX":
-          backgroundColor = "#593F62";
-          break;
-        case "HOSP":
-          backgroundColor = "#8499B1";
-          break;
-        default:
-          break;
-      }
-      let calendarApi = calendarRef.current.getApi();
-      calendarApi.unselect(); // clear date selection
-      calendarApi.addEvent({
-        id: createEventId(),
-        title: currEventTitle,
-        start: eventDateStart,
-        end: eventDateEnd,
-        type: eventType,
-        backgroundColor: backgroundColor,
-        borderColor: backgroundColor,
-      });
+      let endDate = new Date(eventDateStart.getTime() + 3600000);
+      let startDate = new Date(eventDateStart.getTime() - 3600000);
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          datum: startDate.toLocaleString("en-GB").replace(",", ""),
+          id: currEventId,
+        }),
+      };
+      fetch("/calendar/zmenaZaznamu", requestOptions)
+        .then((response) => response.json())
+        .then((res) => {
+          currentEvent.setDates(startDate, endDate, {
+            allDay: false,
+          });
+          setShowConfirmChanges(false);
+          setShowDialog(false);
+        });
     }
-    setShowConfirmChanges(false);
-    setShowDialog(false);
   };
 
   const renderDialogFooter = () => {
@@ -196,14 +171,11 @@ function EventCalendar() {
   };
 
   const renderAddEventContent = () => {
-    return selectButtonValue === "Zmeniť udalosť" || showAddEvent ? (
+    return selectButtonValue === "Zmeniť dátum udalosti" || showAddEvent ? (
       <>
         <div className="field col-12">
-          <label htmlFor="basic">Názov udalosti</label>
-          <InputText
-            value={currEventTitle !== null ? currEventTitle : ""}
-            onChange={(e) => setCurrEventTitle(e.target.value)}
-          />
+          <h3 htmlFor="basic">Udalosť</h3>
+          <p>{currEventTitle}</p>
         </div>
         <div className="field col-12 ">
           <label htmlFor="basic">Začiatok udalosti</label>
@@ -217,51 +189,21 @@ function EventCalendar() {
           />
         </div>
         <div className="field col-12 ">
-          <label htmlFor="basic">Koniec udalosti</label>
-          <Calendar
-            id="basic"
-            value={eventDateEnd}
-            onChange={(e) => setEventDateEnd(e.value)}
-            showTime
-            showIcon
-            dateFormat="dd.mm.yy"
-          />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Typ udalosti</label>
-          <Dropdown
-            value={eventType}
-            options={eventTypes}
-            onChange={onEventTypeChange}
-            optionLabel="name"
-          />
+          <h3 htmlFor="basic">Typ udalosti</h3>
+          <p>{eventType !== null ? eventType.name : ""}</p>
         </div>
       </>
     ) : !showAddEvent ? (
       <>
         <div className="field col-12">
           <h3 htmlFor="basic">Názov udalosti</h3>
-          <p>Typ udalosti - Meno Pacienta</p>
+          <p>{currEventTitle}</p>
         </div>
         <div className="field col-12 ">
           <h3 htmlFor="basic">Začiatok udalosti</h3>
           <p>
             {eventDateStart !== null
-              ? eventDateStart
-                  .toLocaleDateString()
-                  .replace(". ", ".")
-                  .replace(" ", "")
-              : ""}
-          </p>
-        </div>
-        <div className="field col-12 ">
-          <h3 htmlFor="basic">Koniec udalosti</h3>
-          <p>
-            {eventDateEnd !== null
-              ? eventDateEnd
-                  .toLocaleDateString()
-                  .replace(". ", ".")
-                  .replace(" ", "")
+              ? eventDateStart.toLocaleString("sk-SK").replace(". ", ".")
               : ""}
           </p>
         </div>
@@ -303,7 +245,6 @@ function EventCalendar() {
               selectable={true}
               weekends={true}
               initialEvents={currentEvents}
-              select={handleDateSelect}
               eventClick={handleEventClick}
               eventsSet={handleEvents}
               locale="sk"
@@ -316,7 +257,9 @@ function EventCalendar() {
         visible={showDialog}
         style={{ width: "50vw" }}
         footer={
-          selectButtonValue === "Zmeniť udalosť" ? renderDialogFooter() : ""
+          selectButtonValue === "Zmeniť dátum udalosti"
+            ? renderDialogFooter()
+            : ""
         }
         onHide={() => onHide()}
       >
@@ -327,8 +270,8 @@ function EventCalendar() {
               options={options}
               onChange={(e) => setSelectButtonValue(e.value)}
               style={{
-                height: "50px",
-                width: "200px",
+                height: "80px",
+                width: "300px",
                 marginBottom: "1rem",
                 marginLeft: "0.75rem",
               }}

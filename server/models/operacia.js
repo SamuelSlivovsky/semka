@@ -1,4 +1,4 @@
-const database = require("../database/Database");
+const database = require('../database/Database');
 
 async function getOperacie() {
   try {
@@ -42,7 +42,46 @@ async function getOperaciePocetLekarovTrvanie(pocetLekarov, trvanie) {
   }
 }
 
+async function insertOperacia(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+      operacia_insert(:rod_cislo , :priloha, :popis , :datum,  :id_miestnosti, :trvanie);
+      END;`;
+
+    let result = await conn.execute(sqlStatement, {
+      rod_cislo: body.rod_cislo,
+      priloha: body.priloha,
+      popis: body.popis,
+      datum: body.datum,
+      id_miestnosti: body.id_miestnosti,
+      trvanie: body.trvanie,
+    });
+    console.log('Rows inserted ' + result.rowsAffected);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function updateOperacia(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `update zdravotny_zaznam set datum = to_date(to_char(to_timestamp(:datum,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS')))
+      where id_zaznamu = :id_zaznamu`;
+
+    let result = await conn.execute(sqlStatement, {
+      datum: body.datum,
+      id_zaznamu: body.id_zaznamu,
+    });
+    console.log('Rows inserted ' + result.rowsAffected);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getOperacie,
   getOperaciePocetLekarovTrvanie,
+  insertOperacia,
+  updateOperacia,
 };

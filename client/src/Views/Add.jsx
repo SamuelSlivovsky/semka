@@ -1,197 +1,47 @@
-import React, { useState } from "react";
-import { Calendar } from "primereact/calendar";
-import { InputText } from "primereact/inputtext";
-import { InputNumber } from "primereact/inputnumber";
-import { InputMask } from "primereact/inputmask";
-import { Dropdown } from "primereact/dropdown";
-import { SelectButton } from "primereact/selectbutton";
-import { Button } from "primereact/button";
-import { FileUpload } from "primereact/fileupload";
-
+import React, { useState, useRef } from 'react';
+import { SelectButton } from 'primereact/selectbutton';
+import { Toast } from 'primereact/toast';
+import PatientForm from '../Forms/PatientForm';
+import RecipeForm from '../Forms/RecipeForm';
+import HospitForm from '../Forms/HospitForm';
+import OperationForm from '../Forms/OperationForm';
+import ExaminationForm from '../Forms/ExaminationForm';
 export default function Add() {
-  const [eventDateStart, setEventDateStart] = useState(null);
-  const [eventDateEnd, setEventDateEnd] = useState(null);
-  const [currRodCislo, setCurrRodCislo] = useState(null);
-  const [patientName, setPatientName] = useState("");
-  const [patientSurname, setPatientSurname] = useState("");
-  const [patientPhone, setPatientPhone] = useState("");
-  const [patientMail, setPatientMail] = useState("");
-  const [currPsc, setCurrPsc] = useState(null);
+  const toast = useRef(null);
   const [eventTypeButton, setEventTypeButton] = useState(1);
-  const [placeId, setPlaceId] = useState(null);
   const eventTypes = [
-    { name: "Operácia", code: "OP", value: 1 },
-    { name: "Vyšetrenie", code: "EX", value: 2 },
-    { name: "Hospitalizácia", code: "HOSP", value: 3 },
-    { name: "Recept", code: "RECEPT", value: 4 },
-    { name: "Pacient", code: "PAT", value: 5 },
+    { name: 'Operácia', code: 'OP', value: 1 },
+    { name: 'Vyšetrenie', code: 'EX', value: 2 },
+    { name: 'Hospitalizácia', code: 'HOSP', value: 3 },
+    { name: 'Recept', code: 'RECEPT', value: 4 },
+    { name: 'Pacient', code: 'PAT', value: 5 },
   ];
-  const placesId = [
-    { id: 1 },
-    { id: 2 },
-    { id: 3 },
-    { id: 4 },
-    { id: 5 },
-    { id: 6 },
-    { id: 7 },
-  ];
-
-  const onPlaceIdChange = (e) => {
-    setPlaceId(e.value);
-  };
-
-  const handleClick = () => {
-    insertData();
-  };
-
-  async function insertData() {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        rod_cislo: currRodCislo,
-        datum: eventDateStart.toLocaleString("en-GB").replace(",", ""),
-        id_lekara: 1,
-        id_lieku: placeId.id,
-        datum_vyzdvihnutia: eventDateEnd,
-      }),
-    };
-    const response = await fetch("/add/recept", requestOptions);
-  }
-
-  const customBase64Uploader = async (event) => {
-    // convert file to base64 encoded
-    const file = event.files[0];
-    const reader = new FileReader();
-    let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
-    reader.readAsDataURL(blob);
-    reader.onloadend = function () {
-      const base64data = reader.result.substring(
-        reader.result.indexOf(",") + 1
-      );
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          image: base64data,
-        }),
-      };
-      fetch("/add/priloha", requestOptions).then((response) => response.blob());
-    };
-  };
-
-  const renderAddPatientContent = () => {
-    return (
-      <>
-        <div className="field col-12">
-          <label htmlFor="basic">Meno</label>
-          <InputText
-            value={patientName !== null ? patientName : ""}
-            onChange={(e) => setPatientName(e.target.value)}
-          />
-        </div>
-        <div className="field col-12">
-          <label htmlFor="basic">Priezvisko</label>
-          <InputText
-            value={patientSurname !== null ? patientSurname : ""}
-            onChange={(e) => setPatientSurname(e.target.value)}
-          />
-        </div>
-        <div className="field col-12">
-          <label htmlFor="basic">Rodné číslo</label>
-          <InputMask
-            value={currRodCislo !== null ? currRodCislo : ""}
-            onChange={(e) => setCurrRodCislo(e.target.value)}
-            mask="999999/9999"
-            placeholder="900101/0101"
-          />
-        </div>
-        <div className="field col-12">
-          <label htmlFor="basic">PSČ</label>
-          <InputMask
-            value={currPsc !== null ? currPsc : ""}
-            onChange={(e) => setCurrPsc(e.target.value)}
-            mask="99999"
-            placeholder="99999"
-          />
-        </div>
-        <div className="field col-12">
-          <label htmlFor="basic">Telefón</label>
-          <InputMask
-            value={patientPhone !== null ? patientPhone : ""}
-            onChange={(e) => setPatientPhone(e.target.value)}
-            mask="+421999999999"
-            placeholder="+421919121121"
-          />
-        </div>
-        <div className="field col-12">
-          <label htmlFor="basic">E-mail</label>
-          <InputText
-            value={patientMail !== null ? patientMail : ""}
-            onChange={(e) => setPatientMail(e.target.value)}
-            pattern=" /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i"
-          />
-        </div>
-      </>
-    );
-  };
 
   return (
     <div
-      style={{ width: "90%", marginTop: "2rem" }}
-      className="p-fluid grid formgrid"
+      style={{ width: '90%', marginTop: '2rem' }}
+      className='p-fluid grid formgrid'
     >
-      <div className="field col-6">
+      <Toast ref={toast} />
+      <div className='field col-12'>
         <SelectButton
           value={eventTypeButton}
           options={eventTypes}
           onChange={(e) => setEventTypeButton(e.value)}
-          optionLabel="name"
+          optionLabel='name'
         />
       </div>
-      {eventTypeButton === 5 ? (
-        renderAddPatientContent()
+      {eventTypeButton === 1 ? (
+        <OperationForm />
+      ) : eventTypeButton === 2 ? (
+        <ExaminationForm />
+      ) : eventTypeButton === 3 ? (
+        <HospitForm />
+      ) : eventTypeButton === 4 ? (
+        <RecipeForm />
       ) : (
-        <>
-          <div className="field col-12">
-            <label htmlFor="basic">Rodné číslo</label>
-            <InputMask
-              value={currRodCislo !== null ? currRodCislo : ""}
-              onChange={(e) => setCurrRodCislo(e.target.value)}
-              mask="999999/9999"
-              placeholder="900101/0101"
-            />
-          </div>
-          <div className="field col-12 ">
-            <label htmlFor="basic">Dátum</label>
-            <Calendar
-              id="basic"
-              value={eventDateStart}
-              onChange={(e) => setEventDateStart(e.value)}
-              showTime
-              showIcon
-              dateFormat="dd.mm.yy"
-            />
-          </div>
-          <div className="field col-12 ">
-            <label htmlFor="basic">Id lieku</label>
-            <Dropdown
-              value={placeId}
-              options={placesId}
-              onChange={onPlaceIdChange}
-              optionLabel="id"
-            />
-          </div>
-        </>
+        <PatientForm />
       )}
-      <Button onClick={handleClick}></Button>
-      <FileUpload
-        mode="basic"
-        url="https://primefaces.org/primereact/showcase/upload.php"
-        accept="image/*"
-        customUpload
-        uploadHandler={customBase64Uploader}
-      />
     </div>
   );
 }
