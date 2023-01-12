@@ -424,8 +424,8 @@ export default function ProfileCard() {
           <TableMedicalRecords {...diseasesTable} />
         </Card>
       </div>
-      <div>
-        <div className="col-4 m-4">
+      <div className="flex ">
+        <div className="col-2 m-4">
           <div className="p-3">
             <Button
               style={{ width: "100%" }}
@@ -442,6 +442,9 @@ export default function ProfileCard() {
               onClick={() => handleClick("operation")}
             />
           </div>
+        </div>
+
+        <div className="col-2 m-4">
           <div className="p-3">
             <Button
               style={{ width: "100%" }}
@@ -454,15 +457,18 @@ export default function ProfileCard() {
             <Button
               style={{ width: "100%" }}
               label="Nové očkovanie"
-              icon="hospit-icon"
+              icon="vaccine-icon"
               onClick={() => handleClick("vacci")}
             />
           </div>
+        </div>
+
+        <div className="col-2 m-4">
           <div className="p-3">
             <Button
               style={{ width: "100%" }}
               label="Nová choroba"
-              icon="hospit-icon"
+              icon="disease-icon"
               onClick={() => handleClick("disease")}
             />
           </div>
@@ -470,8 +476,19 @@ export default function ProfileCard() {
             <Button
               style={{ width: "100%" }}
               label="Nové ZŤP"
-              icon="hospit-icon"
+              icon="disabled-icon"
               onClick={() => handleClick("ZTP")}
+            />
+          </div>
+        </div>
+
+        <div className="col-2 m-4">
+          <div className="p-3">
+            <Button
+              style={{ width: "100%" }}
+              label="Nový recept"
+              icon="recipe-icon"
+              onClick={() => handleClick("recipe")}
             />
           </div>
         </div>
