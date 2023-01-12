@@ -157,6 +157,15 @@ export default function ProfileCard() {
       case "ZTP":
         setHeader("Pridať nové ZŤP");
         break;
+      case "vacci":
+        setHeader("Vytvoriť nové očkovanie");
+        break;
+      case "disease":
+        setHeader("Pridať novú chorobu");
+        break;
+      case "ZTP":
+        setHeader("Pridať nové ZŤP");
+        break;
       default:
         break;
     }
@@ -165,73 +174,6 @@ export default function ProfileCard() {
 
   const onHide = () => {
     setShow(false);
-  };
-
-  const examinationDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum vyšetrenia</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Popis</label>
-          <InputTextarea
-            rows={5}
-            cols={30}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoResize
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const operationDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum operácie</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Popis</label>
-          <InputTextarea
-            rows={5}
-            cols={30}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoResize
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const hospitDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum od</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum do</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <label htmlFor="basic">Popis</label>
-          <InputTextarea
-            rows={5}
-            cols={30}
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            autoResize
-          />
-        </div>
-      </div>
-    );
   };
 
   const onVaccinationTypeChange = (e) => {
@@ -321,11 +263,11 @@ export default function ProfileCard() {
   const renderDialog = () => {
     switch (eventType) {
       case "examination":
-        return examinationDialog();
+        return <ExaminationForm rod_cislo={profile.ROD_CISLO} />;
       case "operation":
-        return operationDialog();
+        return <OperationForm rod_cislo={profile.ROD_CISLO} />;
       case "hospit":
-        return hospitDialog();
+        return <HospitForm rod_cislo={profile.ROD_CISLO} />;
       case "vacci":
         return vacciDialog();
       case "disease":
@@ -416,16 +358,7 @@ export default function ProfileCard() {
           <TableMedicalRecords {...medicalRecordsTable} />
         </Card>
 
-        <Card
-          className="col-5 shadow-4"
-          title="Choroby"
-          style={{ width: "50rem", height: "40rem" }}
-        >
-          <TableMedicalRecords {...diseasesTable} />
-        </Card>
-      </div>
-      <div className="flex ">
-        <div className="col-2 m-4">
+        <div className="col-4 m-4">
           <div className="p-3">
             <Button
               style={{ width: "100%" }}
@@ -442,9 +375,6 @@ export default function ProfileCard() {
               onClick={() => handleClick("operation")}
             />
           </div>
-        </div>
-
-        <div className="col-2 m-4">
           <div className="p-3">
             <Button
               style={{ width: "100%" }}
@@ -491,9 +421,52 @@ export default function ProfileCard() {
               onClick={() => handleClick("recipe")}
             />
           </div>
+          <div className="p-3">
+            <Button
+              style={{ width: "100%" }}
+              label="Nové očkovanie"
+              icon="vaccine-icon"
+              onClick={() => handleClick("vacci")}
+            />
+          </div>
+        </div>
+
+        <div className="col-2 m-4">
+          <div className="p-3">
+            <Button
+              style={{ width: "100%" }}
+              label="Nová choroba"
+              icon="disease-icon"
+              onClick={() => handleClick("disease")}
+            />
+          </div>
+          <div className="p-3">
+            <Button
+              style={{ width: "100%" }}
+              label="Nové ZŤP"
+              icon="disabled-icon"
+              onClick={() => handleClick("ZTP")}
+            />
+          </div>
+        </div>
+
+        <div className="col-2 m-4">
+          <div className="p-3">
+            <Button
+              style={{ width: "100%" }}
+              label="Nový recept"
+              icon="recipe-icon"
+              onClick={() => handleClick("recipe")}
+            />
+          </div>
         </div>
       </div>
-      <Dialog visible={show} onHide={onHide} header={header}>
+      <Dialog
+        style={{ width: "50vw" }}
+        visible={show}
+        onHide={onHide}
+        header={header}
+      >
         {renderDialog()}
       </Dialog>
     </div>
