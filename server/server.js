@@ -1,7 +1,12 @@
 const port = 5000;
-const app = express();
 const express = require('express');
+const app = express();
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
+const corsOptions = require('./config/corsOptions');
+const verifyJWT = require('./middleware/verifyJWT');
+const credentials = require('./middleware/credentials');
 //ROUTES
 const lekarRoute = require('./routes/lekarRoute');
 const selectsRoute = require('./routes/selectsRoute');
@@ -14,13 +19,6 @@ const medRecordsRoute = require('./routes/medRecordsRoute');
 const addRoute = require('./routes/addRoute');
 
 app.use(express.json());
-const cors = require('cors');
-const express = require('express');
-const cookieParser = require('cookie-parser');
-
-const corsOptions = require('./config/corsOptions');
-const verifyJWT = require('./middleware/verifyJWT');
-const credentials = require('./middleware/credentials');
 
 app.use(credentials);
 app.use(cors(corsOptions));
