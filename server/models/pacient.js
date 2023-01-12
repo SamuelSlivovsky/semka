@@ -1,5 +1,5 @@
-const { element } = require('xml');
-const database = require('../database/Database');
+const { element } = require("xml");
+const database = require("../database/Database");
 
 async function getPacienti() {
   try {
@@ -44,7 +44,7 @@ async function getNajviacChoriPocet(pocet) {
     console.log(result.rows);
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -66,7 +66,7 @@ async function getNajviacOperovanyPercenta(percent) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -88,7 +88,7 @@ async function getNajviacHospitalizovaniPercenta(percent) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -115,7 +115,7 @@ async function getTypyOckovaniaPacienti() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -133,7 +133,7 @@ async function getPacientiChorobaP13() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -149,7 +149,7 @@ async function getPocetPacientiPodlaVeku() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -192,7 +192,7 @@ async function getDoctorsOfPatient(id) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -242,12 +242,12 @@ async function getOperacie(rod_cislo) {
     );
 
     operacie.rows.forEach((element) => {
-      element.type = 'OPE';
+      element.type = "OPE";
     });
 
     return operacie.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -263,12 +263,12 @@ async function getOckovania(rod_cislo) {
     );
 
     ockovania.rows.forEach((element) => {
-      element.type = 'OCK';
+      element.type = "OCK";
     });
 
     return ockovania.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -282,12 +282,12 @@ async function getVysetrenia(rod_cislo) {
     );
 
     vysetrenia.rows.forEach((element) => {
-      element.type = 'VYS';
+      element.type = "VYS";
     });
 
     return vysetrenia.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -301,12 +301,12 @@ async function getHospitalizacie(rod_cislo) {
     );
 
     hospitalizacia.rows.forEach((element) => {
-      element.type = 'HOS';
+      element.type = "HOS";
     });
 
     return hospitalizacia.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -335,7 +335,7 @@ async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
-      `select id_zaznamu, to_char(datum, 'DD.MM.YYYY') as datum, get_typ_zdrav_zaznamu(id_zaznamu) as typ, 
+      `select id_zaznamu as "id", to_char(datum, 'DD.MM.YYYY') DATUM, get_typ_zdrav_zaznamu(id_zaznamu) as typ, 
                                                      get_nazov_oddelenia(id_zaznamu) as oddelenie, 
                                                      get_nazov_lekara(id_zaznamu) as lekar  
           from zdravotny_zaznam  
@@ -404,9 +404,9 @@ async function insertPacient(body) {
       id_lekara: body.id_lekara,
     });
 
-    console.log('Rows inserted ' + result.rowsAffected);
+    console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 

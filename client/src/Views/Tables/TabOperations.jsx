@@ -13,6 +13,7 @@ export default function TabOperations() {
       });
   }, []);
 
+  console.log(operacie);
   const data = {
     tableName: "Operácie",
     cellData: operacie,

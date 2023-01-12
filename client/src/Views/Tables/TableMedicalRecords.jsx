@@ -28,13 +28,13 @@ export default function TableMedic(props) {
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
-    fetch(`/zaznamy/priloha/${value.ID_ZAZNAMU}`)
+    fetch(`/zaznamy/priloha/${value.id}`)
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
         console.log(result);
       });
-    fetch(`/zaznamy/popis/${value.ID_ZAZNAMU}`)
+    fetch(`/zaznamy/popis/${value.id}`)
       .then((response) => response.json())
       .then((data) => {
         setPopis(data[0].POPIS);
@@ -42,10 +42,17 @@ export default function TableMedic(props) {
   };
 
   const getRecordDetails = () => {
-    let popis = "notfound";
+    let popis;
     cellData.map((data) => {
-      if (data.ID_ZAZNAMU === selectedRow.ID_ZAZNAMU) {
-        popis = data.LEKAR + " " + data.ODDELENIE;
+      if (data.id === selectedRow.id) {
+        data.LEKAR === data.ODDELENIE
+          ? (popis = <h5>{data.LEKAR} </h5>)
+          : (popis = (
+              <div>
+                <h5>{data.LEKAR}</h5>
+                <h5>{data.ODDELENIE}</h5>
+              </div>
+            ));
       }
     });
     return popis;
@@ -122,7 +129,7 @@ export default function TableMedic(props) {
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
-          <Column field="ID_ZAZNAMU"></Column>
+          <Column field="id"></Column>
           {titles.map((title) => (
             <Column field={title.field} header={title.header} filter></Column>
           ))}
@@ -143,13 +150,13 @@ export default function TableMedic(props) {
       >
         <div>
           <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
-          <h5>
-            {selectedRow != null
-              ? selectedRow.TYP != null
-                ? getRecordDetails()
-                : ""
-              : ""}
-          </h5>
+
+          {selectedRow != null
+            ? selectedRow.TYP != null
+              ? getRecordDetails()
+              : ""
+            : ""}
+
           <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
           <div>{selectedRow != null ? popis : ""}</div>
         </div>
