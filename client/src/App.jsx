@@ -20,9 +20,11 @@ import Storage from './Views/Storage';
 import TabDoctorsOfHospital from './Views/Tables/TabDoctorsOfHospital';
 import GetUserData from './Auth/GetUserData';
 import Logout from './Auth/Logout';
+import { useNavigate } from 'react-router-dom';
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
+  const navigate = useNavigate();
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
@@ -44,6 +46,9 @@ function App() {
         .then((data) => {
           setPatientId(data[0].ID_PACIENTA);
         });
+    }
+    if (userDataHelper === null) {
+      navigate('/login');
     }
   }, []);
 
