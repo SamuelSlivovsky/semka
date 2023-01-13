@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import TabDoctors from "./TabDoctors";
+import GetUserData from "../../Auth/GetUserData";
 
 function TabDoctorsOfPatient() {
   const [lekari, setLekari] = useState([]);
 
   useEffect(() => {
-    fetch(`/patient/doctors/${2}`)
+    const token = localStorage.getItem("user");
+    const userDataHelper = GetUserData(token);
+    const headers = { authorization: "Bearer " + token };
+    fetch(`/patient/doctors/${userDataHelper.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
