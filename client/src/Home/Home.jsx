@@ -10,6 +10,7 @@ import statIcon from '../images/statistics.png';
 import HomeCard from './HomeCard';
 import storageIcon from '../images/drugs.png';
 import GetUserData from '../Auth/GetUserData';
+import comboboxIcon from '../images/database.png';
 import '../styles/homepage.css';
 
 function Home() {
@@ -84,6 +85,30 @@ function Home() {
     ></HomeCard>,
   ];
 
+  const adminCards = [
+    <HomeCard
+      title='Štatistiky'
+      isCalendar={false}
+      path='/statistics'
+      icon={statIcon}
+      key='7'
+    ></HomeCard>,
+    <HomeCard
+      title='Databáza'
+      isCalendar={false}
+      path='/combobox'
+      icon={comboboxIcon}
+      key='2'
+    ></HomeCard>,
+    <HomeCard
+      title='Sklad'
+      isCalendar={false}
+      path='/sklad'
+      icon={storageIcon}
+      key='9'
+    ></HomeCard>,
+  ];
+
   const patientCards = [
     <HomeCard
       title='Kalendár'
@@ -106,7 +131,7 @@ function Home() {
       {userData !== null &&
       typeof userData !== 'undefined' &&
       userData.UserInfo.role === 1
-        ? cards
+        ? adminCards
         : userData !== null &&
           typeof userData !== 'undefined' &&
           userData.UserInfo.role === 2

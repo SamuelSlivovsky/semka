@@ -150,3 +150,8 @@
   height: 44px;
   width: 44px;
 }
+.database-icon {
+  content: url('./images/database.png');
+  height: 44px;
+  width: 44px;
+}

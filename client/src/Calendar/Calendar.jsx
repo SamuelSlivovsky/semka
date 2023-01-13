@@ -113,13 +113,17 @@ function EventCalendar(props) {
 
   const onSubmitChanges = (addEvent) => {
     if (!addEvent) {
+      const token = localStorage.getItem('user');
       let calendarApi = calendarRef.current.getApi();
       let currentEvent = calendarApi.getEventById(currEventId);
       let endDate = new Date(eventDateStart.getTime() + 3600000);
       let startDate = new Date(eventDateStart.getTime() - 3600000);
       const requestOptions = {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          authorization: 'Bearer ' + token,
+        },
         body: JSON.stringify({
           datum: startDate.toLocaleString('en-GB').replace(',', ''),
           id: currEventId,

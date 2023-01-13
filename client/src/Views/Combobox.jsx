@@ -1,4 +1,4 @@
-import React, { useState, useRef, useReducer } from 'react';
+import React, { useState, useRef } from 'react';
 import { Dropdown } from 'primereact/dropdown';
 import { Button } from 'primereact/button';
 import { DataTable } from 'primereact/datatable';
@@ -313,10 +313,13 @@ export default function Combobox() {
 
   const handleSubmit = () => {
     setLoading(true);
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
     fetch(
       `/${select.path}/${inputVal1 !== null ? inputVal1 : ''}/${
         inputVal2 !== null ? inputVal2 : ''
-      }`
+      }`,
+      { headers }
     )
       .then((res) => res.json())
       .then((result) => {
@@ -365,13 +368,15 @@ export default function Combobox() {
 
   const handleSelectedRow = (employee) => {
     setSelectedRow(employee);
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
     setShowDialog(true);
-    fetch(`selects/zamestnanciFotka/${employee.Id}`)
+    fetch(`selects/zamestnanciFotka/${employee.Id}`, { headers })
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
       });
-    fetch(`selects/zamestnanec/${employee.Id}`)
+    fetch(`selects/zamestnanec/${employee.Id}`, { headers })
       .then((res) => res.json())
       .then((result) => {
         console.log(result);

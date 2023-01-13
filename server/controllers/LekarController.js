@@ -12,7 +12,7 @@ module.exports = {
     const lekar = require('../models/lekar');
     console.log(req.params);
     (async () => {
-      lekari = await lekar.getLekari(req.params.id_lekara);
+      lekari = await lekar.getLekari(req.params.id);
       res.status(200).json(lekari);
     })();
   },
@@ -21,7 +21,7 @@ module.exports = {
     const lekar = require('../models/lekar');
     console.log(req.params);
     (async () => {
-      operacie = await lekar.getOperacie(req.params.id_lekara);
+      operacie = await lekar.getOperacie(req.params.id);
       res.status(200).json(operacie);
     })();
   },
@@ -30,7 +30,7 @@ module.exports = {
     const lekar = require('../models/lekar');
     console.log(req.params);
     (async () => {
-      vysetrenia = await lekar.getVysetrenia(req.params.id_lekara);
+      vysetrenia = await lekar.getVysetrenia(req.params.id);
       res.status(200).json(vysetrenia);
     })();
   },
@@ -39,7 +39,7 @@ module.exports = {
     const lekar = require('../models/lekar');
     console.log(req.params);
     (async () => {
-      hospitalizacie = await lekar.getHospitalizacie(req.params.id_lekara);
+      hospitalizacie = await lekar.getHospitalizacie(req.params.id);
       res.status(200).json(hospitalizacie);
     })();
   },

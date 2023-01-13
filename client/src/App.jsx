@@ -21,6 +21,7 @@ import TabDoctorsOfHospital from './Views/Tables/TabDoctorsOfHospital';
 import GetUserData from './Auth/GetUserData';
 import Logout from './Auth/Logout';
 import { useNavigate } from 'react-router-dom';
+import Combobox from './Views/Combobox';
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -49,6 +50,7 @@ function App() {
     }
     if (userDataHelper === null) {
       navigate('/login');
+    } else {
     }
   }, []);
 
@@ -60,48 +62,7 @@ function App() {
       label='Domov'
       icon='home-icon'
     />,
-    <SidebarButton
-      key='2'
-      visibleLeft={visibleLeft}
-      path='/calendar'
-      label='Kalendár'
-      icon='calendar-icon'
-    />,
-    <SidebarButton
-      key='3'
-      visibleLeft={visibleLeft}
-      path='/patients'
-      label='Pacienti'
-      icon='patient-icon'
-    />,
-    <SidebarButton
-      key='4'
-      visibleLeft={visibleLeft}
-      path='/doctors'
-      label='Lekári'
-      icon='doctor-icon'
-    />,
-    <SidebarButton
-      key='5'
-      visibleLeft={visibleLeft}
-      path='/examinations'
-      label='Vyšetrenia'
-      icon='examination-icon'
-    />,
-    <SidebarButton
-      key='6'
-      visibleLeft={visibleLeft}
-      path='/hospitalizations'
-      icon='hospit-icon'
-      label='Hospitalizácie'
-    />,
-    <SidebarButton
-      key='7'
-      visibleLeft={visibleLeft}
-      path='/operations'
-      label='Operácie'
-      icon='operation-icon'
-    />,
+
     <SidebarButton
       key='8'
       visibleLeft={visibleLeft}
@@ -109,13 +70,7 @@ function App() {
       label='Štatistiky'
       icon='stat-icon'
     />,
-    <SidebarButton
-      key='9'
-      visibleLeft={visibleLeft}
-      path='/add'
-      label='Pridať udalosť'
-      icon='plus-icon'
-    />,
+
     <SidebarButton
       key='10'
       visibleLeft={visibleLeft}
@@ -129,6 +84,13 @@ function App() {
       path='/user'
       label='Meno usera'
       icon='user-icon'
+    />,
+    <SidebarButton
+      key='13'
+      visibleLeft={visibleLeft}
+      path='/combobox'
+      label='Admin selecty'
+      icon='database-icon'
     />,
   ];
 
@@ -261,35 +223,9 @@ function App() {
   const renderAdminRoutes = () => {
     return (
       <>
-        <Route
-          path='/calendar'
-          element={<EventCalendar></EventCalendar>}
-        ></Route>
-        <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
-        <Route
-          path='/patient'
-          element={<Patient userData={userData}></Patient>}
-        ></Route>
-
-        <Route
-          path='/doctors'
-          element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
-        ></Route>
-        <Route
-          path='/examinations'
-          element={<TabExaminations></TabExaminations>}
-        ></Route>
-        <Route
-          path='/hospitalizations'
-          element={<TabHospitalizations></TabHospitalizations>}
-        ></Route>
-        <Route
-          path='/operations'
-          element={<TabOperations></TabOperations>}
-        ></Route>
         <Route path='/statistics' element={<Statistics></Statistics>}></Route>
-        <Route path='/add' element={<Add></Add>}></Route>
         <Route path='/sklad' element={<Storage />}></Route>
+        <Route path='/combobox' element={<Combobox />}></Route>
       </>
     );
   };
