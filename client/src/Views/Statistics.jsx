@@ -30,10 +30,12 @@ export default function Statistics() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
     if (id !== null && year !== null) {
       setRender(true);
       setLoading(true);
-      fetch(`/selects/pomerMuziZeny/${id}`)
+      fetch(`/selects/pomerMuziZeny/${id}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setMuziZeny({
@@ -49,7 +51,7 @@ export default function Statistics() {
           });
         });
 
-      fetch(`/selects/krvneSkupinyOddelenia/${id}`)
+      fetch(`/selects/krvneSkupinyOddelenia/${id}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setLoading(false);
@@ -83,31 +85,31 @@ export default function Statistics() {
           });
         });
 
-      fetch(`/selects/priemernyVek`)
+      fetch(`/selects/priemernyVek`, { headers })
         .then((res) => res.json())
         .then((result) => {
           console.log(result);
         });
 
-      fetch(`/selects/pocetZamOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetZamOddelenia/${id}/${year.getFullYear()}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPocetZam(result[0].POCET_ZAMESTNANCOV);
         });
 
-      fetch(`/selects/pocetOperOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetOperOddelenia/${id}/${year.getFullYear()}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPocetOpe(result[0].POC_OPERACII);
         });
 
-      fetch(`/selects/pocetHospitOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetHospitOddelenia/${id}/${year.getFullYear()}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPocetHosp(result[0].POC_HOSPIT);
         });
 
-      fetch(`/selects/pocetVyseOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetVyseOddelenia/${id}/${year.getFullYear()}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPocetVys(result[0].POC_VYS);
@@ -119,7 +121,7 @@ export default function Statistics() {
           setPocetPac(result[0].POCET_PACIENTOV);
         });
       fetch(
-        `/selects/topZamestnanciVyplatyOddelenie/${id}/${year.getFullYear()}`
+        `/selects/topZamestnanciVyplatyOddelenie/${id}/${year.getFullYear()}`, { headers }
       )
         .then((res) => res.json())
         .then((result) => {
@@ -127,7 +129,7 @@ export default function Statistics() {
           loadColumnsHeaders(result);
         });
 
-      fetch(`/selects/sumaVyplatRoka/${id}/${year.getFullYear()}`)
+      fetch(`/selects/sumaVyplatRoka/${id}/${year.getFullYear()}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setSumaVyplat({
@@ -191,7 +193,7 @@ export default function Statistics() {
           });
         });
 
-      fetch(`/selects/pocetPacientiPodlaVeku`)
+      fetch(`/selects/pocetPacientiPodlaVeku`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPacientiVek({
