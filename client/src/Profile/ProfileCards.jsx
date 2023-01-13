@@ -85,7 +85,9 @@ export default function ProfileCard(props) {
     const headers = { authorization: 'Bearer ' + token };
     fetch(
       `patient/info/${
-        props.patientId !== null ? props.patientId : location.state
+        typeof props.patientId !== 'undefined' && props.patientId !== null
+          ? props.patientId
+          : location.state
       }`,
       { headers }
     )
@@ -221,9 +223,11 @@ export default function ProfileCard(props) {
   };
 
   const onDiseaseTypeChange = (e) => {
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
     setSelectedDiseaseType(e.value);
     console.log(e.value.ID_TYPU_CHOROBY);
-    fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`)
+    fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
