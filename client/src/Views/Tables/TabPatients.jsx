@@ -6,6 +6,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
+import GetUserData from "../../Auth/GetUserData";
 
 export default function TabPatients() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -16,7 +17,12 @@ export default function TabPatients() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`/lekar/pacienti/${1}`)
+    const token = localStorage.getItem("user");
+    const userDataHelper = GetUserData(token);
+    const headers = { authorization: "Bearer " + token };
+    fetch(`/lekar/pacienti/${userDataHelper.UserInfo.userid}`, {
+      headers,
+    })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
