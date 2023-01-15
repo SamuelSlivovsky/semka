@@ -22,6 +22,8 @@ import GetUserData from './Auth/GetUserData';
 import Logout from './Auth/Logout';
 import { useNavigate } from 'react-router-dom';
 import Combobox from './Views/Combobox';
+import Objednavka from './Views/Objednavka';
+
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -181,6 +183,13 @@ function App() {
       label='Pacient'
       icon='patient-icon'
     />,
+    <SidebarButton
+      key='4'
+      visibleLeft={visibleLeft}
+      path='/objednavka'
+      label='Objednavka'
+      icon='patient-icon'
+    />,
   ];
 
   const renderDoctorRoutes = () => {
@@ -243,6 +252,12 @@ function App() {
             <Patient userData={userData} patientId={patientId}></Patient>
           }
         ></Route>
+        <Route
+          path='/objednavka'
+          element={
+            <Objednavka userData={userData} patientId={patientId}></Objednavka>
+          }
+        ></Route>
       </>
     );
   };
@@ -264,14 +279,14 @@ function App() {
           }}
         />
         {typeof userData !== 'undefined' &&
-        userData !== null &&
-        userData.UserInfo.role === 1
+          userData !== null &&
+          userData.UserInfo.role === 1
           ? sidebarButtonsAdmin
           : userData !== null && userData.UserInfo.role === 2
-          ? sidebarButtons
-          : userData !== null && userData.UserInfo.role === 3
-          ? sidebarButtonsPatient
-          : ''}
+            ? sidebarButtons
+            : userData !== null && userData.UserInfo.role === 3
+              ? sidebarButtonsPatient
+              : ''}
         {typeof userData !== 'undefined' && userData !== null ? (
           <SidebarButton
             key='12'
@@ -293,18 +308,18 @@ function App() {
           <Route path='/login' element={<Login></Login>}></Route>
           <Route path='/logout' element={<Logout></Logout>}></Route>
           {typeof userData !== 'undefined' &&
-          userData !== null &&
-          userData.UserInfo.role === 1
+            userData !== null &&
+            userData.UserInfo.role === 1
             ? renderAdminRoutes()
             : typeof userData !== 'undefined' &&
               userData !== null &&
               userData.UserInfo.role === 2
-            ? renderDoctorRoutes()
-            : typeof userData !== 'undefined' &&
-              userData !== null &&
-              userData.UserInfo.role === 3
-            ? renderPatientRoutes()
-            : ''}
+              ? renderDoctorRoutes()
+              : typeof userData !== 'undefined' &&
+                userData !== null &&
+                userData.UserInfo.role === 3
+                ? renderPatientRoutes()
+                : ''}
         </Routes>
       </div>
     </div>

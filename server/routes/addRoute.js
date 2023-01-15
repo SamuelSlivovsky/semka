@@ -25,4 +25,10 @@ router.get(
   '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum',
   controller.getDostupneMiestnosti
 );
+
+router.get(
+  '/lekariPacienta/:id',
+  controller.getLekariPacienta
+);
+
 module.exports = router;

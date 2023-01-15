@@ -410,6 +410,27 @@ async function insertPacient(body) {
   }
 }
 
+async function getLekariPacienta(id) {
+  rod_cislo = String(id);
+  rod_cislo = rod_cislo.substring(0, 6) + 'R' + rod_cislo.substring(6);
+  rod_cislo = rod_cislo.replace('R', '/');
+  console.log(rod_cislo);
+  try {
+    let conn = await database.getConnection();
+    const lekari = await conn.execute(
+      `select * from lekari_pacient lp join lekar l on(l.id_lekara = lp.id_lekara)
+        join zamestnanec zam on(zam.id_zamestnanca = l.id_zamestnanca)
+         join pacient pac on(pac.id_pacienta = lp.id_pacienta)
+          where pac.rod_cislo = :rod_cislo`,
+      { rod_cislo }
+    );
+
+    return lekari.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getPacienti,
   getNajviacChoriPocet,
@@ -428,4 +449,5 @@ module.exports = {
   getDoctorsOfPatient,
   insertPacient,
   getIdPacienta,
+  getLekariPacienta
 };
