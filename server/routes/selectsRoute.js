@@ -72,11 +72,7 @@ router.get(
   verify.verifyRoles(1),
   controller.getKrajePodlaPoctuOperovanych
 );
-router.get(
-  '/priemernyVek/',
-  verify.verifyRoles(1),
-  controller.getPriemernyVek
-);
+router.get('/priemernyVek/', verify.verifyRoles(1), controller.getPriemernyVek);
 
 router.get(
   '/priemernyVekRole',

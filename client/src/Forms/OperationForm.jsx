@@ -9,6 +9,7 @@ import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { FileUpload } from 'primereact/fileupload';
 import { InputText } from 'primereact/inputtext';
+import GetUserData from '../Auth/GetUserData';
 export default function OperationForm(props) {
   const [showMessage, setShowMessage] = useState(false);
   const [base64Data, setBase64Data] = useState(null);
@@ -27,15 +28,16 @@ export default function OperationForm(props) {
 
     if (!data.datum) {
       errors.datum = 'Dátum je povinný';
-    } else {
-      fetch(
-        `/add/dostupneMiestnosti/${2}/${data.trvanie}/${encodeURIComponent(
-          data.datum.toLocaleString('en-GB').replace(',', '')
-        )}`
-      )
-        .then((response) => response.json())
-        .then((data) => console.log(data));
     }
+    // else {
+    //   fetch(
+    //     `/add/dostupneMiestnosti/${2}/${data.trvanie}/${encodeURIComponent(
+    //       data.datum.toLocaleString('en-GB').replace(',', '')
+    //     )}`
+    //   )
+    //     .then((response) => response.json())
+    //     .then((data) => console.log(data));
+    // }
     if (!data.popis) {
       errors.popis = 'Popis je povinný';
     }
@@ -49,15 +51,20 @@ export default function OperationForm(props) {
   };
 
   const onSubmit = async (data, form) => {
+    const token = localStorage.getItem('user');
+    const userData = GetUserData(token);
     const requestOptionsPatient = {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
+      },
       body: JSON.stringify({
         rod_cislo: data.rod_cislo === '' ? null : data.rod_cislo,
         datum: data.datum.toLocaleString('en-GB').replace(',', ''),
         trvanie: data.trvanie,
         popis: data.popis,
-        id_lekara: 1,
+        id_lekara: userData.UserInfo.userid,
         priloha: base64Data,
         id_miestnosti: data.miestnost.id,
       }),

@@ -5,10 +5,12 @@ import { Button } from 'primereact/button';
 import { Password } from 'primereact/password';
 import { Dialog } from 'primereact/dialog';
 import { classNames } from 'primereact/utils';
+import { useNavigate } from 'react-router';
 import '../styles/auth.css';
 
 export const Login = () => {
   const [showMessage, setShowMessage] = useState(false);
+  const navigate = useNavigate();
   const defaultValues = {
     userid: '',
     password: '',
@@ -32,8 +34,8 @@ export const Login = () => {
     fetch('/auth/login', requestOptions)
       .then((response) => response.json())
       .then((res) => {
-        console.log(res);
         localStorage.setItem('user', res.accessToken);
+        navigate('/');
       });
 
     reset();

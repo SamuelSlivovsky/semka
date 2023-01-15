@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import TableMedicalRecords from "./TableMedicalRecords";
+import GetUserData from "../../Auth/GetUserData";
 
 export default function TabHospitalizations() {
   const [hospitalizacie, setHospitalizacie] = useState([]);
 
   useEffect(() => {
-    fetch(`/lekar/hospitalizacie/${2}`)
+    const token = localStorage.getItem("user");
+    const userDataHelper = GetUserData(token);
+    const headers = { authorization: "Bearer " + token };
+    fetch(`/lekar/hospitalizacie/${userDataHelper.UserInfo.userid}`, {
+      headers,
+    })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);

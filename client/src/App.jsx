@@ -19,9 +19,13 @@ import TabOperations from './Views/Tables/TabOperations';
 import Storage from './Views/Storage';
 import TabDoctorsOfHospital from './Views/Tables/TabDoctorsOfHospital';
 import GetUserData from './Auth/GetUserData';
-
+import Logout from './Auth/Logout';
+import { useNavigate } from 'react-router-dom';
+import Combobox from './Views/Combobox';
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
+  const [patientId, setPatientId] = useState(null);
+  const navigate = useNavigate();
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
@@ -29,10 +33,66 @@ function App() {
 
   useEffect(() => {
     const token = localStorage.getItem('user');
-    console.log(token);
-    setUserData(GetUserData(token));
-    console.log(userData);
+    const userDataHelper = GetUserData(token);
+    setUserData(userDataHelper);
+    if (
+      typeof userDataHelper !== 'undefined' &&
+      userDataHelper !== null &&
+      userDataHelper.UserInfo.role === 3
+    ) {
+      const token = localStorage.getItem('user');
+      const headers = { authorization: 'Bearer ' + token };
+      fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, { headers })
+        .then((response) => response.json())
+        .then((data) => {
+          setPatientId(data[0].ID_PACIENTA);
+        });
+    }
+    if (userDataHelper === null) {
+      navigate('/login');
+    } else {
+    }
   }, []);
+
+  const sidebarButtonsAdmin = [
+    <SidebarButton
+      key='1'
+      visibleLeft={visibleLeft}
+      path='/'
+      label='Domov'
+      icon='home-icon'
+    />,
+
+    <SidebarButton
+      key='8'
+      visibleLeft={visibleLeft}
+      path='/statistics'
+      label='Štatistiky'
+      icon='stat-icon'
+    />,
+
+    <SidebarButton
+      key='10'
+      visibleLeft={visibleLeft}
+      path='/sklad'
+      label='Sklad'
+      icon='storage-icon'
+    />,
+    <SidebarButton
+      key='11'
+      visibleLeft={visibleLeft}
+      path='/user'
+      label='Meno usera'
+      icon='user-icon'
+    />,
+    <SidebarButton
+      key='13'
+      visibleLeft={visibleLeft}
+      path='/combobox'
+      label='Admin selecty'
+      icon='database-icon'
+    />,
+  ];
 
   const sidebarButtons = [
     <SidebarButton
@@ -57,13 +117,6 @@ function App() {
       icon='patient-icon'
     />,
     <SidebarButton
-      key='4'
-      visibleLeft={visibleLeft}
-      path='/doctors'
-      label='Lekári'
-      icon='doctor-icon'
-    />,
-    <SidebarButton
       key='5'
       visibleLeft={visibleLeft}
       path='/examinations'
@@ -83,13 +136,6 @@ function App() {
       path='/operations'
       label='Operácie'
       icon='operation-icon'
-    />,
-    <SidebarButton
-      key='8'
-      visibleLeft={visibleLeft}
-      path='/statistics'
-      label='Štatistiky'
-      icon='stat-icon'
     />,
     <SidebarButton
       key='9'
@@ -113,17 +159,44 @@ function App() {
       icon='user-icon'
     />,
   ];
+  const sidebarButtonsPatient = [
+    <SidebarButton
+      key='1'
+      visibleLeft={visibleLeft}
+      path='/'
+      label='Domov'
+      icon='home-icon'
+    />,
+    <SidebarButton
+      key='2'
+      visibleLeft={visibleLeft}
+      path='/calendar'
+      label='Kalendár'
+      icon='calendar-icon'
+    />,
+    <SidebarButton
+      key='3'
+      visibleLeft={visibleLeft}
+      path='/patient'
+      label='Pacient'
+      icon='patient-icon'
+    />,
+  ];
 
   const renderDoctorRoutes = () => {
-    console.log('first');
     return (
       <>
         <Route
           path='/calendar'
-          element={<EventCalendar></EventCalendar>}
+          element={<EventCalendar userData={userData}></EventCalendar>}
         ></Route>
         <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
-        <Route path='/patient' element={<Patient></Patient>}></Route>
+        <Route
+          path='/patient'
+          element={
+            <Patient patientId={patientId} userData={userData}></Patient>
+          }
+        ></Route>
 
         <Route
           path='/doctors'
@@ -148,48 +221,28 @@ function App() {
     );
   };
   const renderAdminRoutes = () => {
-    console.log('first');
     return (
       <>
-        <Route
-          path='/calendar'
-          element={<EventCalendar></EventCalendar>}
-        ></Route>
-        <Route path='/patients' element={<TabPatients></TabPatients>}></Route>
-        <Route path='/patient' element={<Patient></Patient>}></Route>
-
-        <Route
-          path='/doctors'
-          element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
-        ></Route>
-        <Route
-          path='/examinations'
-          element={<TabExaminations></TabExaminations>}
-        ></Route>
-        <Route
-          path='/hospitalizations'
-          element={<TabHospitalizations></TabHospitalizations>}
-        ></Route>
-        <Route
-          path='/operations'
-          element={<TabOperations></TabOperations>}
-        ></Route>
         <Route path='/statistics' element={<Statistics></Statistics>}></Route>
-        <Route path='/add' element={<Add></Add>}></Route>
         <Route path='/sklad' element={<Storage />}></Route>
+        <Route path='/combobox' element={<Combobox />}></Route>
       </>
     );
   };
 
   const renderPatientRoutes = () => {
-    console.log('first');
     return (
       <>
         <Route
           path='/calendar'
-          element={<EventCalendar></EventCalendar>}
+          element={<EventCalendar userData={userData}></EventCalendar>}
         ></Route>
-        <Route path='/patient' element={<Patient></Patient>}></Route>
+        <Route
+          path='/patient'
+          element={
+            <Patient userData={userData} patientId={patientId}></Patient>
+          }
+        ></Route>
       </>
     );
   };
@@ -210,20 +263,46 @@ function App() {
             border: 'none',
           }}
         />
-        {sidebarButtons}
+        {typeof userData !== 'undefined' &&
+        userData !== null &&
+        userData.UserInfo.role === 1
+          ? sidebarButtonsAdmin
+          : userData !== null && userData.UserInfo.role === 2
+          ? sidebarButtons
+          : userData !== null && userData.UserInfo.role === 3
+          ? sidebarButtonsPatient
+          : ''}
+        {typeof userData !== 'undefined' && userData !== null ? (
+          <SidebarButton
+            key='12'
+            visibleLeft={visibleLeft}
+            path='/logout'
+            label='Odhlas'
+            icon='logout-icon'
+          />
+        ) : (
+          ''
+        )}
       </div>
       <div
         className={`page-content ${visibleLeft ? 'page-content-opened' : ''}`}
       >
         <Routes>
-          <Route path='/' element={<Home></Home>}></Route>
+          <Route path='/' element={<Home userData={userData}></Home>}></Route>
           <Route path='/register' element={<Register></Register>}></Route>
           <Route path='/login' element={<Login></Login>}></Route>
-          {userData !== null && userData.UserInfo.role === 1
+          <Route path='/logout' element={<Logout></Logout>}></Route>
+          {typeof userData !== 'undefined' &&
+          userData !== null &&
+          userData.UserInfo.role === 1
             ? renderAdminRoutes()
-            : userData !== null && userData.UserInfo.role === 2
+            : typeof userData !== 'undefined' &&
+              userData !== null &&
+              userData.UserInfo.role === 2
             ? renderDoctorRoutes()
-            : userData !== null && userData.UserInfo.role === 3
+            : typeof userData !== 'undefined' &&
+              userData !== null &&
+              userData.UserInfo.role === 3
             ? renderPatientRoutes()
             : ''}
         </Routes>

@@ -1,5 +1,5 @@
-const { element } = require('xml');
-const database = require('../database/Database');
+const { element } = require("xml");
+const database = require("../database/Database");
 
 async function getPacienti() {
   try {
@@ -13,10 +13,15 @@ async function getPacienti() {
 }
 
 async function getIdPacienta(rod_cislo) {
+  rod_cislo = String(rod_cislo);
+  rod_cislo = rod_cislo.substring(0, 6) + 'R' + rod_cislo.substring(6);
+  rod_cislo = rod_cislo.replace('R', '/');
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`SELECT * FROM pacient where rod_cislo : rod_cislo fetch first 1 rows only`
-    [rod_cislo]);
+    const result = await conn.execute(
+      `SELECT * FROM pacient where rod_cislo = :rod_cislo fetch first 1 rows only`,
+      [rod_cislo]
+    );
 
     return result.rows;
   } catch (err) {
@@ -39,7 +44,7 @@ async function getNajviacChoriPocet(pocet) {
     console.log(result.rows);
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -61,7 +66,7 @@ async function getNajviacOperovanyPercenta(percent) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -83,7 +88,7 @@ async function getNajviacHospitalizovaniPercenta(percent) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -110,7 +115,7 @@ async function getTypyOckovaniaPacienti() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -128,7 +133,7 @@ async function getPacientiChorobaP13() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -144,7 +149,7 @@ async function getPocetPacientiPodlaVeku() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -152,7 +157,7 @@ async function getInfo(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select meno, priezvisko, rod_cislo,
+      `select id_pacienta, meno, priezvisko, rod_cislo,
         trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
         to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, tel, mail,
         krvna_skupina, PSC, obec.nazov as nazov_obce, poistovna.nazov as nazov_poistovne 
@@ -187,30 +192,33 @@ async function getDoctorsOfPatient(id) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
-async function getUdalosti(id) {
+async function getUdalosti(rod_cislo) {
+  rod_cislo = String(rod_cislo);
+  rod_cislo = rod_cislo.substring(0, 6) + 'R' + rod_cislo.substring(6);
+  rod_cislo = rod_cislo.replace('R', '/');
   try {
     let udalosti = [];
 
-    let operacie = await getOperacie(id);
+    let operacie = await getOperacie(rod_cislo);
     operacie.forEach((element) => {
       udalosti.push(element);
     });
 
-    let ockovania = await getOckovania(id);
+    let ockovania = await getOckovania(rod_cislo);
     ockovania.forEach((element) => {
       udalosti.push(element);
     });
 
-    let vysetrenia = await getVysetrenia(id);
+    let vysetrenia = await getVysetrenia(rod_cislo);
     vysetrenia.forEach((element) => {
       udalosti.push(element);
     });
 
-    let hospitalizacie = await getHospitalizacie(id);
+    let hospitalizacie = await getHospitalizacie(rod_cislo);
     hospitalizacie.forEach((element) => {
       udalosti.push(element);
     });
@@ -222,79 +230,83 @@ async function getUdalosti(id) {
   }
 }
 
-async function getOperacie(id) {
+async function getOperacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join operacia using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join operacia using(id_zaznamu) 
+        join pacient using(id_pacienta)
+        where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     operacie.rows.forEach((element) => {
-      element.type = 'OPE';
+      element.type = "OPE";
     });
 
     return operacie.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
-async function getOckovania(id) {
+async function getOckovania(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const ockovania = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join ockovanie using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join ockovanie using(id_zaznamu)
+        join pacient using(id_pacienta)
+         where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     ockovania.rows.forEach((element) => {
-      element.type = 'OCK';
+      element.type = "OCK";
     });
 
     return ockovania.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
-async function getVysetrenia(id) {
+async function getVysetrenia(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join vysetrenie using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join vysetrenie using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     vysetrenia.rows.forEach((element) => {
-      element.type = 'VYS';
+      element.type = "VYS";
     });
 
     return vysetrenia.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
-async function getHospitalizacie(id) {
+async function getHospitalizacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const hospitalizacia = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
-        join hospitalizacia using(id_zaznamu) where id_pacienta = :id`,
-      [id]
+        join hospitalizacia using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
+      [rod_cislo]
     );
 
     hospitalizacia.rows.forEach((element) => {
-      element.type = 'HOS';
+      element.type = "HOS";
     });
 
     return hospitalizacia.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -323,7 +335,7 @@ async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
-      `select id_zaznamu, to_char(datum, 'DD.MM.YYYY') as datum, get_typ_zdrav_zaznamu(id_zaznamu) as typ, 
+      `select id_zaznamu as "id", to_char(datum, 'DD.MM.YYYY') DATUM, get_typ_zdrav_zaznamu(id_zaznamu) as typ, 
                                                      get_nazov_oddelenia(id_zaznamu) as oddelenie, 
                                                      get_nazov_lekara(id_zaznamu) as lekar  
           from zdravotny_zaznam  
@@ -392,9 +404,9 @@ async function insertPacient(body) {
       id_lekara: body.id_lekara,
     });
 
-    console.log('Rows inserted ' + result.rowsAffected);
+    console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -415,5 +427,5 @@ module.exports = {
   insertPacient,
   getDoctorsOfPatient,
   insertPacient,
-  getIdPacienta
+  getIdPacienta,
 };

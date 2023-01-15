@@ -16,10 +16,13 @@ router.post(
   verify.verifyRoles(1, 2),
   controller.insertHospitalizacia
 );
+router.post('/ockovanie', verify.verifyRoles(1, 2), controller.insertOckovanie);
+router.post('/choroba', verify.verifyRoles(1, 2), controller.insertChoroba);
+router.post('/typ_ztp', verify.verifyRoles(1, 2), controller.insertTypZtp);
 router.post('/pacient', verify.verifyRoles(1, 2), controller.insertPacient);
 router.get('/psc', controller.getObce);
 router.get(
-  '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum', verify.verifyRoles(1, 2),
+  '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum',
   controller.getDostupneMiestnosti
 );
 module.exports = router;

@@ -1,11 +1,17 @@
 import { useEffect, useState } from "react";
 import TableMedicalRecords from "./TableMedicalRecords";
+import GetUserData from "../../Auth/GetUserData";
 
 export default function TabOperations() {
   const [operacie, setOperacie] = useState(null);
 
   useEffect(() => {
-    fetch(`/lekar/operacie/${2}`)
+    const token = localStorage.getItem("user");
+    const userDataHelper = GetUserData(token);
+    const headers = { authorization: "Bearer " + token };
+    fetch(`/lekar/operacie/${userDataHelper.UserInfo.userid}`, {
+      headers,
+    })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -13,6 +19,7 @@ export default function TabOperations() {
       });
   }, []);
 
+  console.log(operacie);
   const data = {
     tableName: "Operácie",
     cellData: operacie,

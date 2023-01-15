@@ -12,7 +12,26 @@ async function getChoroby(pid_typu_choroby) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function insertChoroba(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+        typZtp_insert(:rod_cislo , :id_choroby, :datum_od, :datum_do);
+        END;`;
+
+    let result = await conn.execute(sqlStatement, {
+      rod_cislo: body.rod_cislo,
+      id_typu_ztp: body.id_typu_ztp,
+      datum_od: body.datum_od,
+      datum_do: body.datum_do,
+    });
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -38,11 +57,12 @@ async function getNajcastejsieChorobyRokaPocet(pocet, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
 module.exports = {
   getChoroby,
+  insertChoroba,
   getNajcastejsieChorobyRokaPocet,
 };

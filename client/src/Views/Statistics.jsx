@@ -1,14 +1,14 @@
-import React, { useState, useRef } from "react";
-import { Chart } from "primereact/chart";
-import { InputNumber } from "primereact/inputnumber";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { ProgressBar } from "primereact/progressbar";
-import { Calendar } from "primereact/calendar";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+import React, { useState, useRef } from 'react';
+import { Chart } from 'primereact/chart';
+import { InputNumber } from 'primereact/inputnumber';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+import { ProgressBar } from 'primereact/progressbar';
+import { Calendar } from 'primereact/calendar';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
 
-import "../styles/stat.css";
+import '../styles/stat.css';
 export default function Statistics() {
   const toast = useRef(null);
   const [render, setRender] = useState(false);
@@ -22,7 +22,7 @@ export default function Statistics() {
   const [pocetVys, setPocetVys] = useState(null);
   const [krv, setKrv] = useState(null);
   const [id, setId] = useState(null);
-  const [year, setYear] = useState("");
+  const [year, setYear] = useState('');
   const [pacientiVek, setPacientiVek] = useState(null);
   const [pacientiVekOptions, setPacientiVekOptions] = useState(null);
   const [sumaVyplat, setSumaVyplat] = useState(null);
@@ -30,26 +30,28 @@ export default function Statistics() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
     if (id !== null && year !== null) {
       setRender(true);
       setLoading(true);
-      fetch(`/selects/pomerMuziZeny/${id}`)
+      fetch(`/selects/pomerMuziZeny/${id}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setMuziZeny({
-            labels: ["Muzi", "Zeny"],
+            labels: ['Muzi', 'Zeny'],
             datasets: [
               {
-                label: "%",
+                label: '%',
                 data: [result[0].MUZI, result[0].ZENY],
-                backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726"],
-                hoverBackgroundColor: ["#64B5F6", "#81C784", "#FFB74D"],
+                backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726'],
+                hoverBackgroundColor: ['#64B5F6', '#81C784', '#FFB74D'],
               },
             ],
           });
         });
 
-      fetch(`/selects/krvneSkupinyOddelenia/${id}`)
+      fetch(`/selects/krvneSkupinyOddelenia/${id}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setLoading(false);
@@ -59,67 +61,76 @@ export default function Statistics() {
               {
                 data: result.map((item) => item.POCET),
                 backgroundColor: [
-                  "#ff595e",
-                  "#ffca3a",
-                  "#8ac926",
-                  "#82A5F5",
-                  "#1982c4",
-                  "#6a4c93",
-                  "#BBDEF0",
-                  "#00A6A6",
+                  '#ff595e',
+                  '#ffca3a',
+                  '#8ac926',
+                  '#82A5F5',
+                  '#1982c4',
+                  '#6a4c93',
+                  '#BBDEF0',
+                  '#00A6A6',
                 ],
                 hoverBackgroundColor: [
-                  "#ff595e",
-                  "#ffca3a",
-                  "#8ac926",
-                  "#82A5F5",
-                  "#1982c4",
-                  "#6a4c93",
-                  "#BBDEF0",
-                  "#00A6A6",
+                  '#ff595e',
+                  '#ffca3a',
+                  '#8ac926',
+                  '#82A5F5',
+                  '#1982c4',
+                  '#6a4c93',
+                  '#BBDEF0',
+                  '#00A6A6',
                 ],
               },
             ],
           });
         });
 
-      fetch(`/selects/priemernyVek`)
+      fetch(`/selects/priemernyVek`, { headers })
         .then((res) => res.json())
         .then((result) => {
           console.log(result);
         });
 
-      fetch(`/selects/pocetZamOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetZamOddelenia/${id}/${year.getFullYear()}`, {
+        headers,
+      })
         .then((res) => res.json())
         .then((result) => {
           setPocetZam(result[0].POCET_ZAMESTNANCOV);
         });
 
-      fetch(`/selects/pocetOperOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetOperOddelenia/${id}/${year.getFullYear()}`, {
+        headers,
+      })
         .then((res) => res.json())
         .then((result) => {
           setPocetOpe(result[0].POC_OPERACII);
         });
 
-      fetch(`/selects/pocetHospitOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetHospitOddelenia/${id}/${year.getFullYear()}`, {
+        headers,
+      })
         .then((res) => res.json())
         .then((result) => {
           setPocetHosp(result[0].POC_HOSPIT);
         });
 
-      fetch(`/selects/pocetVyseOddelenia/${id}/${year.getFullYear()}`)
+      fetch(`/selects/pocetVyseOddelenia/${id}/${year.getFullYear()}`, {
+        headers,
+      })
         .then((res) => res.json())
         .then((result) => {
           setPocetVys(result[0].POC_VYS);
         });
 
-      fetch(`/selects/pocetPacOddelenia/${id}`)
+      fetch(`/selects/pocetPacOddelenia/${id}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPocetPac(result[0].POCET_PACIENTOV);
         });
       fetch(
-        `/selects/topZamestnanciVyplatyOddelenie/${id}/${year.getFullYear()}`
+        `/selects/topZamestnanciVyplatyOddelenie/${id}/${year.getFullYear()}`,
+        { headers }
       )
         .then((res) => res.json())
         .then((result) => {
@@ -127,28 +138,28 @@ export default function Statistics() {
           loadColumnsHeaders(result);
         });
 
-      fetch(`/selects/sumaVyplatRoka/${id}/${year.getFullYear()}`)
+      fetch(`/selects/sumaVyplatRoka/${id}/${year.getFullYear()}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setSumaVyplat({
             labels: [
-              "Január",
-              "Február",
-              "Marec",
-              "Apríl",
-              "Máj",
-              "Jún",
-              "Júl",
-              "August",
-              "September",
-              "Október",
-              "November",
-              "December",
+              'Január',
+              'Február',
+              'Marec',
+              'Apríl',
+              'Máj',
+              'Jún',
+              'Júl',
+              'August',
+              'September',
+              'Október',
+              'November',
+              'December',
             ],
             datasets: [
               {
-                label: "Súčet výplat",
-                backgroundColor: "#42A5F5",
+                label: 'Súčet výplat',
+                backgroundColor: '#42A5F5',
                 data: [
                   result[0].JANUAR,
                   result[0].FEBRUAR,
@@ -170,7 +181,7 @@ export default function Statistics() {
             plugins: {
               legend: {
                 labels: {
-                  color: "#495057",
+                  color: '#495057',
                 },
               },
             },
@@ -178,28 +189,28 @@ export default function Statistics() {
               y: {
                 title: {
                   display: true,
-                  text: "Suma v €",
+                  text: 'Suma v €',
                 },
               },
               x: {
                 title: {
                   display: true,
-                  text: "Mesiac",
+                  text: 'Mesiac',
                 },
               },
             },
           });
         });
 
-      fetch(`/selects/pocetPacientiPodlaVeku`)
+      fetch(`/selects/pocetPacientiPodlaVeku`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPacientiVek({
             labels: result.map((item) => item.VEK),
             datasets: [
               {
-                label: "Pacienti",
-                backgroundColor: "#42A5F5",
+                label: 'Pacienti',
+                backgroundColor: '#42A5F5',
                 data: result.map((item) => item.POCET),
               },
             ],
@@ -208,7 +219,7 @@ export default function Statistics() {
             plugins: {
               legend: {
                 labels: {
-                  color: "#495057",
+                  color: '#495057',
                 },
               },
             },
@@ -216,13 +227,13 @@ export default function Statistics() {
               y: {
                 title: {
                   display: true,
-                  text: "Počet",
+                  text: 'Počet',
                 },
               },
               x: {
                 title: {
                   display: true,
-                  text: "Vek",
+                  text: 'Vek',
                 },
               },
             },
@@ -230,8 +241,8 @@ export default function Statistics() {
         });
     } else {
       toast.current.show({
-        severity: "error",
-        summary: "Zadajte ID oddelenia",
+        severity: 'error',
+        summary: 'Zadajte ID oddelenia',
         life: 3000,
       });
     }
@@ -244,7 +255,7 @@ export default function Statistics() {
   };
 
   const loadColumns = (keys) => {
-    let array = "";
+    let array = '';
     keys.forEach((element) => {
       array = [
         ...array,
@@ -261,133 +272,133 @@ export default function Statistics() {
 
   return (
     <div>
-      <div className="grid" style={{ marginTop: "1rem" }}>
+      <div className='grid' style={{ marginTop: '1rem' }}>
         <Toast ref={toast} />
-        <div className="field col-4 md:col-3">
-          <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
+        <div className='field col-4 md:col-3'>
+          <label htmlFor='withoutgrouping' style={{ marginRight: '1rem' }}>
             Zadajte id
           </label>
           <InputNumber
             autoFocus
-            inputId="withoutgrouping"
+            inputId='withoutgrouping'
             value={id}
             onValueChange={(e) => setId(e.value)}
-            mode="decimal"
+            mode='decimal'
             useGrouping={false}
           />
         </div>
-        <div className="field col-4 md:col-3">
-          <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
+        <div className='field col-4 md:col-3'>
+          <label htmlFor='withoutgrouping' style={{ marginRight: '1rem' }}>
             Zadajte rok
           </label>
           <Calendar
-            id="range"
+            id='range'
             value={year}
             onChange={(e) => {
               setYear(e.value);
             }}
-            view="year"
-            dateFormat="yy"
+            view='year'
+            dateFormat='yy'
             readOnlyInput
           />
         </div>
-        <div className="field col-4 md:col-3">
+        <div className='field col-4 md:col-3'>
           <Button
-            icon="pi pi-check"
-            label="Zadaj"
+            icon='pi pi-check'
+            label='Zadaj'
             onClick={handleSubmit}
           ></Button>
         </div>
         {render && !loading ? (
           <>
-            <div className="xl:col-12">
-              <div className="grid">
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+            <div className='xl:col-12'>
+              <div className='grid'>
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet pacientov
                   <p>{pocetPac}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet zamestnancov
                   <p>{pocetZam}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet vykonaných operácií
                   <p>{pocetOpe}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet vykonaných hospitalizácií
                   <p>{pocetHosp}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet vykonaných vyšetrení
                   <p>{pocetVys}</p>
                 </div>
               </div>
             </div>
-            <div className="xl:col-12 justify-content-center align-content-center flex">
+            <div className='xl:col-12 justify-content-center align-content-center flex'>
               <Chart
-                type="bar"
+                type='bar'
                 data={pacientiVek}
                 options={pacientiVekOptions}
-                style={{ width: "35%" }}
+                style={{ width: '35%' }}
               />
               <Chart
-                type="bar"
+                type='bar'
                 data={sumaVyplat}
                 options={sumaVyplatOptions}
-                style={{ width: "35%" }}
+                style={{ width: '35%' }}
               />
               <DataTable
-                size="small"
+                size='small'
                 value={valuesInTable}
-                style={{ width: "25%", marginLeft: "1rem" }}
+                style={{ width: '25%', marginLeft: '1rem' }}
                 scrollable
                 showGridlines
-                responsiveLayout="scroll"
+                responsiveLayout='scroll'
               >
                 {columns}
               </DataTable>
             </div>
-            <div className="xl:col-12 justify-content-center align-content-center flex h-auto">
+            <div className='xl:col-12 justify-content-center align-content-center flex h-auto'>
               <Chart
-                type="pie"
+                type='pie'
                 data={muziZeny}
                 options={{
                   plugins: {
                     title: {
                       display: true,
-                      text: "Podiel pohlaví pacientov (%)",
+                      text: 'Podiel pohlaví pacientov (%)',
                     },
                   },
                 }}
-                style={{ position: "relative", width: "30%" }}
+                style={{ position: 'relative', width: '30%' }}
               />
               <Chart
-                type="pie"
+                type='pie'
                 options={{
                   plugins: {
                     title: {
                       display: true,
-                      text: "Podiel typu krvi u pacientov",
+                      text: 'Podiel typu krvi u pacientov',
                     },
                   },
                 }}
                 data={krv}
-                style={{ position: "relative", width: "30%" }}
+                style={{ position: 'relative', width: '30%' }}
               />
-            </div>{" "}
+            </div>{' '}
           </>
         ) : (
-          ""
+          ''
         )}
       </div>
       {loading ? (
         <ProgressBar
-          mode="indeterminate"
-          style={{ height: "6px", width: "99%" }}
+          mode='indeterminate'
+          style={{ height: '6px', width: '99%' }}
         ></ProgressBar>
       ) : (
-        ""
+        ''
       )}
     </div>
   );

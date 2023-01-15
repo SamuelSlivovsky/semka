@@ -12,7 +12,7 @@ import ExaminationForm from '../Forms/ExaminationForm';
 import '../icons.css';
 import TableMedicalRecords from '../Views/Tables/TableMedicalRecords';
 
-export default function ProfileCard() {
+export default function ProfileCard(props) {
   const [profile, setProfile] = useState('');
   const [show, setShow] = useState(false);
   const location = useLocation();
@@ -81,56 +81,85 @@ export default function ProfileCard() {
   };
 
   useEffect(() => {
-    fetch(`patient/info/${location.state}`)
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
+    fetch(
+      `patient/info/${
+        typeof props.patientId !== 'undefined' && props.patientId !== null
+          ? props.patientId
+          : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(...data);
         setProfile(...data);
       });
 
-    fetch(`selects/typyOckovania`)
+    fetch(`selects/typyOckovania`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setVaccinationTypes(data);
       });
 
-    fetch(`selects/typyChoroby`)
+    fetch(`selects/typyChoroby`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setDiseaseTypes(data);
       });
 
-    fetch(`selects/typyZTP`)
+    fetch(`selects/typyZTP`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setZTPTypes(data);
       });
 
-    fetch(`patient/recepty/${location.state}`)
+    fetch(
+      `patient/recepty/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setPatientRecipes(data);
       });
 
-    fetch(`patient/choroby/${location.state}`)
+    fetch(
+      `patient/choroby/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setPatientDiseases(data);
       });
 
-    fetch(`patient/typyZTP/${location.state}`)
+    fetch(
+      `patient/typyZTP/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
         setPatientZTPTypes(data);
       });
 
-    fetch(`patient/zdravZaznamy/${location.state}`)
+    fetch(
+      `patient/zdravZaznamy/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -194,9 +223,11 @@ export default function ProfileCard() {
   };
 
   const onDiseaseTypeChange = (e) => {
+    const token = localStorage.getItem('user');
+    const headers = { authorization: 'Bearer ' + token };
     setSelectedDiseaseType(e.value);
     console.log(e.value.ID_TYPU_CHOROBY);
-    fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`)
+    fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
@@ -359,78 +390,84 @@ export default function ProfileCard() {
           <TableMedicalRecords {...diseasesTable} />
         </Card>
       </div>
-      <div className='flex '>
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nové vyšetrenie'
-              icon='examination-icon'
-              onClick={() => handleClick('examination')}
-            />
-          </div>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nová operácia'
-              icon='operation-icon'
-              onClick={() => handleClick('operation')}
-            />
-          </div>
-        </div>
+      {props.userData.UserInfo.role !== 3 ? (
+        <>
+          <div className='flex '>
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nové vyšetrenie'
+                  icon='examination-icon'
+                  onClick={() => handleClick('examination')}
+                />
+              </div>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nová operácia'
+                  icon='operation-icon'
+                  onClick={() => handleClick('operation')}
+                />
+              </div>
+            </div>
 
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nová hospitalizácia'
-              icon='hospit-icon'
-              onClick={() => handleClick('hospit')}
-            />
-          </div>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nové očkovanie'
-              icon='vaccine-icon'
-              onClick={() => handleClick('vacci')}
-            />
-          </div>
-        </div>
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nová hospitalizácia'
+                  icon='hospit-icon'
+                  onClick={() => handleClick('hospit')}
+                />
+              </div>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nové očkovanie'
+                  icon='vaccine-icon'
+                  onClick={() => handleClick('vacci')}
+                />
+              </div>
+            </div>
 
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nová choroba'
-              icon='disease-icon'
-              onClick={() => handleClick('disease')}
-            />
-          </div>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nové ZŤP'
-              icon='disabled-icon'
-              onClick={() => handleClick('ZTP')}
-            />
-          </div>
-        </div>
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nová choroba'
+                  icon='disease-icon'
+                  onClick={() => handleClick('disease')}
+                />
+              </div>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nové ZŤP'
+                  icon='disabled-icon'
+                  onClick={() => handleClick('ZTP')}
+                />
+              </div>
+            </div>
 
-        <div className='col-2 m-4'>
-          <div className='p-3'>
-            <Button
-              style={{ width: '100%' }}
-              label='Nový recept'
-              icon='recipe-icon'
-              onClick={() => handleClick('recipe')}
-            />
+            <div className='col-2 m-4'>
+              <div className='p-3'>
+                <Button
+                  style={{ width: '100%' }}
+                  label='Nový recept'
+                  icon='recipe-icon'
+                  onClick={() => handleClick('recipe')}
+                />
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-      <Dialog visible={show} onHide={onHide} header={header}>
-        {renderDialog()}
-      </Dialog>
+          <Dialog visible={show} onHide={onHide} header={header}>
+            {renderDialog()}
+          </Dialog>
+        </>
+      ) : (
+        ''
+      )}
     </div>
   );
 }

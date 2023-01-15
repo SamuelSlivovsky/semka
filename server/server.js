@@ -29,13 +29,13 @@ app.use(cookieParser()); //middleware for cookies
 
 app.use('/auth', require('./routes/authRoute'));
 
+app.use('/sklad', storageRoute);
 app.use(verifyJWT);
 app.use('/lekar', lekarRoute);
 app.use('/selects', selectsRoute);
 app.use('/calendar', calendarRoute);
 app.use('/patient', patientRoute);
 app.use('/recept', receptRoute);
-app.use('/sklad', storageRoute);
 app.use('/lieky', drugsRoute);
 app.use('/zaznamy', medRecordsRoute);
 app.use('/add', addRoute);
