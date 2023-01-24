@@ -16,7 +16,7 @@ import '../styles/homepage.css';
 function Home() {
   const [userData, setUserData] = useState(null);
   useEffect(() => {
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem('hospit-user');
     setUserData(GetUserData(token));
   }, []);
   const cards = [

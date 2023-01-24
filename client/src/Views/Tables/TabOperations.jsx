@@ -6,7 +6,7 @@ export default function TabOperations() {
   const [operacie, setOperacie] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("user");
+    const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`/lekar/operacie/${userDataHelper.UserInfo.userid}`, {

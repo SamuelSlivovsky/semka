@@ -6,7 +6,7 @@ export default function TabHospitalizations() {
   const [hospitalizacie, setHospitalizacie] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("user");
+    const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`/lekar/hospitalizacie/${userDataHelper.UserInfo.userid}`, {

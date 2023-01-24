@@ -30,7 +30,7 @@ export default function Statistics() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
     if (id !== null && year !== null) {
       setRender(true);

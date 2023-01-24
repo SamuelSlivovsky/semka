@@ -34,7 +34,7 @@ export const Login = () => {
     fetch('/auth/login', requestOptions)
       .then((response) => response.json())
       .then((res) => {
-        localStorage.setItem('user', res.accessToken);
+        localStorage.setItem('hospit-user', res.accessToken);
         navigate('/');
       });
 

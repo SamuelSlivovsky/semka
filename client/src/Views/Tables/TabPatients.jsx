@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react';
-import { DataTable } from 'primereact/datatable';
-import { Column } from 'primereact/column';
-import { Dialog } from 'primereact/dialog';
-import { Button } from 'primereact/button';
-import { InputText } from 'primereact/inputtext';
-import { FilterMatchMode, FilterOperator } from 'primereact/api';
-import { useNavigate } from 'react-router';
-import GetUserData from '../../Auth/GetUserData';
+import React, { useState, useEffect } from "react";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
+import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
+import { InputText } from "primereact/inputtext";
+import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { useNavigate } from "react-router";
+import GetUserData from "../../Auth/GetUserData";
 
 export default function TabPatients() {
-  const [globalFilterValue, setGlobalFilterValue] = useState('');
+  const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -17,9 +17,9 @@ export default function TabPatients() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
-    const headers = { authorization: 'Bearer ' + token };
+    const headers = { authorization: "Bearer " + token };
     fetch(`/lekar/pacienti/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
@@ -36,7 +36,7 @@ export default function TabPatients() {
 
   const onSubmit = () => {
     setShowDialog(false);
-    navigate('/patient', { state: selectedRow.ID_PACIENTA });
+    navigate("/patient", { state: selectedRow.ID_PACIENTA });
   };
 
   const handleClick = (value) => {
@@ -48,14 +48,14 @@ export default function TabPatients() {
     return (
       <div>
         <Button
-          label='Zatvoriť'
-          icon='pi pi-times'
-          className='p-button-danger'
+          label="Zatvoriť"
+          icon="pi pi-times"
+          className="p-button-danger"
           onClick={() => onHide()}
         />
         <Button
-          label='Detail'
-          icon='pi pi-check'
+          label="Detail"
+          icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
         />
@@ -65,15 +65,15 @@ export default function TabPatients() {
 
   const renderHeader = () => {
     return (
-      <div className='flex justify-content-between'>
-        <div className='table-header'>
+      <div className="flex justify-content-between">
+        <div className="table-header">
           Pacienti
-          <span className='p-input-icon-left'>
-            <i className='pi pi-search' />
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
-              placeholder='Keyword Search'
+              placeholder="Keyword Search"
             />
           </span>
         </div>
@@ -84,7 +84,7 @@ export default function TabPatients() {
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
-    _filters['global'].value = value;
+    _filters["global"].value = value;
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
@@ -113,24 +113,24 @@ export default function TabPatients() {
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
     });
-    setGlobalFilterValue('');
+    setGlobalFilterValue("");
   };
 
   const getPohlavie = () => {
     if (selectedRow !== null)
-      return selectedRow.ROD_CISLO.substring(2, 3) === '5' ||
-        selectedRow.ROD_CISLO.substring(2, 3) === '6'
-        ? 'Žena'
-        : 'Muž';
+      return selectedRow.ROD_CISLO.substring(2, 3) === "5" ||
+        selectedRow.ROD_CISLO.substring(2, 3) === "6"
+        ? "Žena"
+        : "Muž";
   };
   const getVek = () => {
     if (selectedRow != null) {
       let birthDate =
-        '19' +
+        "19" +
         selectedRow.ROD_CISLO.substring(0, 2) +
-        '-' +
+        "-" +
         (selectedRow.ROD_CISLO.substring(2, 4) % 50) +
-        '-' +
+        "-" +
         selectedRow.ROD_CISLO.substring(4, 6);
 
       birthDate = new Date(birthDate);
@@ -148,39 +148,39 @@ export default function TabPatients() {
   const header = renderHeader();
   return (
     <div>
-      <div className='card'>
+      <div className="card">
         <DataTable
           value={pacienti}
-          responsiveLayout='scroll'
-          selectionMode='single'
+          responsiveLayout="scroll"
+          selectionMode="single"
           selection={selectedRow}
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}
-          filterDisplay='menu'
-          globalFilterFields={['ROD_CISLO', 'MENO', 'PRIEZVISKO', 'PSC']}
-          emptyMessage='Žiadne výsledky nevyhovujú vyhľadávaniu'
+          filterDisplay="menu"
+          globalFilterFields={["ROD_CISLO", "MENO", "PRIEZVISKO", "PSC"]}
+          emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
-          <Column field='ROD_CISLO' header={'Rodné číslo'} filter></Column>
-          <Column field='MENO' header={'Meno'} filter></Column>
-          <Column field='PRIEZVISKO' header={'Priezvisko'} filter></Column>
-          <Column field='PSC' header={'PSČ'} filter></Column>
+          <Column field="ROD_CISLO" header={"Rodné číslo"} filter></Column>
+          <Column field="MENO" header={"Meno"} filter></Column>
+          <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
+          <Column field="PSC" header={"PSČ"} filter></Column>
         </DataTable>
       </div>
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO + ' ' + selectedRow.PRIEZVISKO
-            : ''
+            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            : ""
         }
         visible={showDialog}
-        style={{ width: '50vw' }}
+        style={{ width: "50vw" }}
         footer={renderDialogFooter()}
         onHide={() => onHide()}
       >
         <p>{getPohlavie()}</p>
-        <p>{getVek() + ' rokov'}</p>
-        <p>{selectedRow != null ? 'PSČ ' + selectedRow.PSC : ''}</p>
+        <p>{getVek() + " rokov"}</p>
+        <p>{selectedRow != null ? "PSČ " + selectedRow.PSC : ""}</p>
       </Dialog>
     </div>
   );

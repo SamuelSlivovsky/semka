@@ -35,7 +35,7 @@ export default function RecipeForm() {
   };
 
   const onSubmit = async (data, form) => {
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem('hospit-user');
     const userData = GetUserData(token);
     const requestOptions = {
       method: 'POST',

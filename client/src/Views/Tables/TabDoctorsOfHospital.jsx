@@ -6,7 +6,7 @@ function TabDoctorsOfHospital() {
   const [lekari, setLekari] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("user");
+    const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`/lekar/lekari/${userDataHelper.UserInfo.userid}`, { headers })

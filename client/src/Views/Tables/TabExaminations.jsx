@@ -6,7 +6,7 @@ export default function TabExaminations() {
   const [vysetrenia, setVysetrenia] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem("user");
+    const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`/lekar/vysetrenia/${userDataHelper.UserInfo.userid}`, { headers })

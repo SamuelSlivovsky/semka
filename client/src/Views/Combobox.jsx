@@ -313,7 +313,7 @@ export default function Combobox() {
 
   const handleSubmit = () => {
     setLoading(true);
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
     fetch(
       `/${select.path}/${inputVal1 !== null ? inputVal1 : ''}/${
@@ -368,7 +368,7 @@ export default function Combobox() {
 
   const handleSelectedRow = (employee) => {
     setSelectedRow(employee);
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
     setShowDialog(true);
     fetch(`selects/zamestnanciFotka/${employee.Id}`, { headers })

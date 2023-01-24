@@ -13,7 +13,7 @@ export default function PatientForm() {
   const [filteredPsc, setFilteredPsc] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
     fetch('/add/psc', { headers })
       .then((response) => response.json())
@@ -54,7 +54,7 @@ export default function PatientForm() {
   };
 
   const onSubmit = async (data, form) => {
-    const token = localStorage.getItem('user');
+    const token = localStorage.getItem('hospit-user');
     const userData = GetUserData(token);
     const requestOptionsPatient = {
       method: 'POST',

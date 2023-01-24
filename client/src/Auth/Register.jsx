@@ -1,20 +1,20 @@
-import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Password } from 'primereact/password';
-import { Dialog } from 'primereact/dialog';
-import { classNames } from 'primereact/utils';
-import { InputMask } from 'primereact/inputmask';
-import '../styles/auth.css';
+import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { Password } from "primereact/password";
+import { Dialog } from "primereact/dialog";
+import { classNames } from "primereact/utils";
+import { InputMask } from "primereact/inputmask";
+import "../styles/auth.css";
 
 export const Register = () => {
   const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData] = useState({});
   const defaultValues = {
-    rc: '',
-    email: '',
-    password: '',
+    rc: "",
+    email: "",
+    password: "",
   };
 
   const {
@@ -32,15 +32,15 @@ export const Register = () => {
 
   const getFormErrorMessage = (name) => {
     return (
-      errors[name] && <small className='p-error'>{errors[name].message}</small>
+      errors[name] && <small className="p-error">{errors[name].message}</small>
     );
   };
 
   const dialogFooter = (
-    <div className='flex justify-content-center'>
+    <div className="flex justify-content-center">
       <Button
-        label='OK'
-        className='p-button-text'
+        label="OK"
+        className="p-button-text"
         autoFocus
         onClick={() => setShowMessage(false)}
       />
@@ -48,68 +48,68 @@ export const Register = () => {
   );
   const passwordHeader = <h6>Pick a password</h6>;
   return (
-    <div className='auth-form-container'>
+    <div className="auth-form-container">
       <Dialog
         visible={showMessage}
         onHide={() => setShowMessage(false)}
-        position='top'
+        position="top"
         footer={dialogFooter}
         showHeader={false}
-        breakpoints={{ '960px': '80vw' }}
-        style={{ width: '30vw' }}
+        breakpoints={{ "960px": "80vw" }}
+        style={{ width: "30vw" }}
       >
-        <div className='flex justify-content-center flex-column pt-6 px-3'>
+        <div className="flex justify-content-center flex-column pt-6 px-3">
           <i
-            className='pi pi-check-circle'
-            style={{ fontSize: '5rem', color: 'var(--green-500)' }}
+            className="pi pi-check-circle"
+            style={{ fontSize: "5rem", color: "var(--green-500)" }}
           ></i>
           <h5>Registrácia prebehla úspešne pod mailom {formData.rc}</h5>
         </div>
       </Dialog>
 
-      <div className='flex justify-content-center'>
-        <div className='card'>
-          <h5 className='text-center'>Registrácia</h5>
-          <form onSubmit={handleSubmit(onSubmit)} className='p-fluid'>
-            <div className='field'>
-              <span className='p-float-label'>
+      <div className="flex justify-content-center">
+        <div className="card">
+          <h5 className="text-center">Registrácia</h5>
+          <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+            <div className="field">
+              <span className="p-float-label">
                 <Controller
-                  name='rc'
+                  name="rc"
                   control={control}
-                  rules={{ required: 'Rodné číslo je povinné' }}
+                  rules={{ required: "Rodné číslo je povinné" }}
                   render={({ field, fieldState }) => (
                     <InputMask
                       id={field.name}
                       {...field}
                       autoFocus
-                      mask='999999/9999'
+                      mask="999999/9999"
                       className={classNames({
-                        'p-invalid': fieldState.invalid,
+                        "p-invalid": fieldState.invalid,
                       })}
                     />
                   )}
                 />
                 <label
-                  htmlFor='rc'
-                  className={classNames({ 'p-error': errors.rc })}
+                  htmlFor="rc"
+                  className={classNames({ "p-error": errors.rc })}
                 >
                   Rodné číslo*
                 </label>
               </span>
-              {getFormErrorMessage('rc')}
+              {getFormErrorMessage("rc")}
             </div>
-            <div className='field'>
-              <span className='p-float-label p-input-icon-right'>
-                <i className='pi pi-envelope' />
+            <div className="field">
+              <span className="p-float-label p-input-icon-right">
+                <i className="pi pi-envelope" />
                 <Controller
-                  name='email'
+                  name="email"
                   control={control}
                   rules={{
-                    required: 'Email je povinnný.',
+                    required: "Email je povinnný.",
                     pattern: {
                       value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
                       message:
-                        'Nesprávny tvar e-mail adresa, napríklad: meno@email.com',
+                        "Nesprávny tvar e-mail adresa, napríklad: meno@email.com",
                     },
                   }}
                   render={({ field, fieldState }) => (
@@ -117,52 +117,52 @@ export const Register = () => {
                       id={field.name}
                       {...field}
                       className={classNames({
-                        'p-invalid': fieldState.invalid,
+                        "p-invalid": fieldState.invalid,
                       })}
                     />
                   )}
                 />
                 <label
-                  htmlFor='email'
-                  className={classNames({ 'p-error': !!errors.email })}
+                  htmlFor="email"
+                  className={classNames({ "p-error": !!errors.email })}
                 >
                   Email*
                 </label>
               </span>
-              {getFormErrorMessage('email')}
+              {getFormErrorMessage("email")}
             </div>
-            <div className='field'>
-              <span className='p-float-label'>
+            <div className="field">
+              <span className="p-float-label">
                 <Controller
-                  name='password'
+                  name="password"
                   control={control}
-                  rules={{ required: 'Heslo je povinné.' }}
+                  rules={{ required: "Heslo je povinné." }}
                   render={({ field, fieldState }) => (
                     <Password
                       id={field.name}
                       {...field}
                       toggleMask
                       className={classNames({
-                        'p-invalid': fieldState.invalid,
+                        "p-invalid": fieldState.invalid,
                       })}
                       header={passwordHeader}
                     />
                   )}
                 />
                 <label
-                  htmlFor='password'
-                  className={classNames({ 'p-error': errors.password })}
+                  htmlFor="password"
+                  className={classNames({ "p-error": errors.password })}
                 >
                   Heslo*
                 </label>
               </span>
-              {getFormErrorMessage('password')}
+              {getFormErrorMessage("password")}
             </div>
             <Button
-              type='submit'
-              label='Zadaj'
-              className='mt-2'
-              style={{ marginTop: '10px' }}
+              type="submit"
+              label="Zadaj"
+              className="mt-2"
+              style={{ marginTop: "10px" }}
             />
           </form>
         </div>
