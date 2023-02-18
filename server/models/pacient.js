@@ -14,8 +14,8 @@ async function getPacienti() {
 
 async function getIdPacienta(rod_cislo) {
   rod_cislo = String(rod_cislo);
-  rod_cislo = rod_cislo.substring(0, 6) + 'R' + rod_cislo.substring(6);
-  rod_cislo = rod_cislo.replace('R', '/');
+  rod_cislo = rod_cislo.substring(0, 6) + "R" + rod_cislo.substring(6);
+  rod_cislo = rod_cislo.replace("R", "/");
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
@@ -157,16 +157,16 @@ async function getInfo(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select id_pacienta, meno, priezvisko, rod_cislo,
-        trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
-        to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, tel, mail,
-        krvna_skupina, PSC, obec.nazov as nazov_obce, poistovna.nazov as nazov_poistovne 
-         from os_udaje join pacient using(rod_cislo)
-          join krvna_skupina using(id_typu_krvnej_skupiny)
-          join obec using(PSC) 
-          join poistenec using(id_poistenca)
-          join poistovna using(id_poistovne)
-            where id_pacienta = :id`,
+      `select distinct id_pacienta, meno, priezvisko, rod_cislo,
+      trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
+      to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,
+      typ_krvi, PSC, mesto.nazov as nazov_obce, poistovna.nazov as nazov_poistovne 
+       from os_udaje join pacient using(rod_cislo)
+        join zdravotna_karta using(id_pacienta)
+        join mesto using(PSC) 
+        join poistenie using(id_pacienta)
+        join poistovna using(ICO)
+          where id_pacienta = :id`,
       [id]
     );
 
@@ -198,8 +198,8 @@ async function getDoctorsOfPatient(id) {
 
 async function getUdalosti(rod_cislo) {
   rod_cislo = String(rod_cislo);
-  rod_cislo = rod_cislo.substring(0, 6) + 'R' + rod_cislo.substring(6);
-  rod_cislo = rod_cislo.replace('R', '/');
+  rod_cislo = rod_cislo.substring(0, 6) + "R" + rod_cislo.substring(6);
+  rod_cislo = rod_cislo.replace("R", "/");
   try {
     let udalosti = [];
 
@@ -312,7 +312,7 @@ async function getHospitalizacie(rod_cislo) {
 
 async function getRecepty(pid_pacienta) {
   try {
-    let conn = await database.getConnection();
+    /*let conn = await database.getConnection();
     const recepty = await conn.execute(
       `select nazov, to_char(datum, 'DD.MM.YYYY') as datum, meno || ' ' || priezvisko as lekar
             from recept join liek using(id_lieku)
@@ -325,7 +325,8 @@ async function getRecepty(pid_pacienta) {
       { pid_pacienta }
     );
 
-    return recepty.rows;
+    return recepty.rows;*/
+    return null;
   } catch (err) {
     console.log(err);
   }
@@ -336,11 +337,11 @@ async function getZdravZaznamy(pid_pacienta) {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
       `select id_zaznamu as "id", to_char(datum, 'DD.MM.YYYY') DATUM, get_typ_zdrav_zaznamu(id_zaznamu) as typ, 
-                                                     get_nazov_oddelenia(id_zaznamu) as oddelenie, 
-                                                     get_nazov_lekara(id_zaznamu) as lekar  
-          from zdravotny_zaznam  
+                                                     get_nazov_oddelenia(id_zaznamu) as oddelenie   
+          from zdravotny_zaz 
+          join zdravotna_karta using(id_karty)
             where id_pacienta = :pid_pacienta
-                  order by zdravotny_zaznam.datum`,
+                  order by zdravotny_zaz.datum`,
       { pid_pacienta }
     );
 
@@ -354,9 +355,9 @@ async function getChoroby(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const choroby = await conn.execute(
-      `select nazov, typ, to_char(datum_od,'MM.DD.YYYY') dat_od, nvl(to_char(datum_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
-            from zoznam_chorob join choroba using(id_choroby)
-                               join typ_choroby using(id_typu_choroby)
+      `select nazov, typ, to_char(dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+            from zoznam_ochoreni join choroba using(id_choroby)
+                          join zdravotna_karta using(id_karty)
                           where id_pacienta = :pid_pacienta
                           order by datum_od, datum_do`,
       { pid_pacienta }
@@ -372,8 +373,9 @@ async function getTypyZTP(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const typyZTP = await conn.execute(
-      `select nazov, to_char(dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
-          from pacient_ZTP join typ_ZTP using (id_typu_ztp)
+      `select nazov, to_char(datum_od,'MM.DD.YYYY') datum_od, nvl(to_char(datum_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+          from zoznam_postihnuti join postihnutie using (id_postihnutia)
+                              join zdravotna_karta using (id_karty)
                               where id_pacienta = :pid_pacienta`,
       { pid_pacienta }
     );

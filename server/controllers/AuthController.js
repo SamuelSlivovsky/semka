@@ -1,14 +1,14 @@
-const bcrypt = require('bcrypt');
-const userModel = require('../models/user');
-var jwt = require('jsonwebtoken');
-require('dotenv').config();
+const bcrypt = require("bcrypt");
+const userModel = require("../models/user");
+var jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const handleRegister = async (req, res) => {
   const { userid, pwd } = req.body;
   if (!userid || !pwd)
     return res
       .status(400)
-      .json({ message: 'Username and password are required.' });
+      .json({ message: "Username and password are required." });
   // check for duplicate usernames in the db
 
   try {
@@ -27,7 +27,7 @@ const handleRegister = async (req, res) => {
 
           let body = req.body;
           body.userid = userid;
-          body.role = 3;
+          body.role = 2;
           body.pwd = hash;
 
           userModel.insertUser(body);
@@ -46,12 +46,11 @@ const handleLogin = async (req, res) => {
   if (!userid || !pwd)
     return res
       .status(400)
-      .json({ message: 'Username and password are required.' });
+      .json({ message: "Username and password are required." });
 
   if (!(await userModel.userExists(userid))) return res.sendStatus(401); //Unauthorized
 
   const foundUser = await userModel.getUserByUserId(userid);
-  console.log(foundUser.USERID);
   const match = await bcrypt.compare(pwd, foundUser.PWD);
   if (match == true) {
     const accessToken = jwt.sign(
@@ -62,13 +61,13 @@ const handleLogin = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '3600s' }
+      { expiresIn: "3600s" }
     );
 
     const refreshToken = jwt.sign(
       { userid: foundUser.USERID },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: '1d' }
+      { expiresIn: "1d" }
     );
 
     userModel.updateUserRefreshToken({
@@ -76,10 +75,10 @@ const handleLogin = async (req, res) => {
       refresh_token: refreshToken,
     });
 
-    res.cookie('jwt', refreshToken, { httpOnly: true }); //1 day httponly cookie is not available to javascript
+    res.cookie("jwt", refreshToken, { httpOnly: true }); //1 day httponly cookie is not available to javascript
     res.status(200).json({ accessToken }); //store in memory not in local storage
   } else {
-    res.status(409).json({ message: 'Passwords not matching' });
+    res.status(409).json({ message: "Passwords not matching" });
   }
 };
 
@@ -92,7 +91,7 @@ const handleLogout = async (req, res) => {
   // Is refreshToken in db?
   const foundUser = await userModel.getUserByRefreshToken(refreshToken);
   if (!foundUser) {
-    res.clearCookie('jwt', { httpOnly: true }); // vymazat sameSite, secure ak budu bugy
+    res.clearCookie("jwt", { httpOnly: true }); // vymazat sameSite, secure ak budu bugy
     return res.sendStatus(204);
   }
 
@@ -102,7 +101,7 @@ const handleLogout = async (req, res) => {
     refresh_token: null,
   });
 
-  res.clearCookie('jwt', { httpOnly: true });
+  res.clearCookie("jwt", { httpOnly: true });
   res.sendStatus(204);
 };
 
@@ -129,7 +128,7 @@ const handleRefreshToken = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: '3600s' }
+      { expiresIn: "3600s" }
     );
     res.json({ accessToken });
   });

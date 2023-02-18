@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
-import { useForm, Controller } from 'react-hook-form';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Password } from 'primereact/password';
-import { Dialog } from 'primereact/dialog';
-import { classNames } from 'primereact/utils';
-import { useNavigate } from 'react-router';
-import '../styles/auth.css';
+import React, { useState } from "react";
+import { useForm, Controller } from "react-hook-form";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { Password } from "primereact/password";
+import { Dialog } from "primereact/dialog";
+import { classNames } from "primereact/utils";
+import { useNavigate } from "react-router";
+import "../styles/auth.css";
 
 export const Login = () => {
   const [showMessage, setShowMessage] = useState(false);
   const navigate = useNavigate();
   const defaultValues = {
-    userid: '',
-    password: '',
+    userid: "",
+    password: "",
   };
   const {
     control,
@@ -24,18 +24,19 @@ export const Login = () => {
 
   const onSubmit = (data) => {
     const requestOptions = {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         userid: data.userid,
         pwd: data.password,
       }),
     };
-    fetch('/auth/login', requestOptions)
+    fetch("/auth/login", requestOptions)
       .then((response) => response.json())
       .then((res) => {
-        localStorage.setItem('hospit-user', res.accessToken);
-        navigate('/');
+        console.log(res);
+         localStorage.setItem("hospit-user", res.accessToken);
+        navigate("/");
       });
 
     reset();
@@ -43,15 +44,15 @@ export const Login = () => {
 
   const getFormErrorMessage = (name) => {
     return (
-      errors[name] && <small className='p-error'>{errors[name].message}</small>
+      errors[name] && <small className="p-error">{errors[name].message}</small>
     );
   };
 
   const dialogFooter = (
-    <div className='flex justify-content-center'>
+    <div className="flex justify-content-center">
       <Button
-        label='OK'
-        className='p-button-text'
+        label="OK"
+        className="p-button-text"
         autoFocus
         onClick={() => setShowMessage(false)}
       />
@@ -59,38 +60,38 @@ export const Login = () => {
   );
 
   return (
-    <div className='auth-form-container'>
+    <div className="auth-form-container">
       <Dialog
         visible={showMessage}
         onHide={() => setShowMessage(false)}
-        position='top'
+        position="top"
         footer={dialogFooter}
         showHeader={false}
-        breakpoints={{ '960px': '80vw' }}
-        style={{ width: '30vw' }}
+        breakpoints={{ "960px": "80vw" }}
+        style={{ width: "30vw" }}
       >
-        <div className='flex justify-content-center flex-column pt-6 px-3'>
+        <div className="flex justify-content-center flex-column pt-6 px-3">
           <i
-            className='pi pi-check-circle'
-            style={{ fontSize: '5rem', color: 'var(--green-500)' }}
+            className="pi pi-check-circle"
+            style={{ fontSize: "5rem", color: "var(--green-500)" }}
           ></i>
         </div>
       </Dialog>
 
-      <div className='flex justify-content-center'>
-        <div className='card'>
-          <h5 className='text-center'>Prihlásenie</h5>
-          <form onSubmit={handleSubmit(onSubmit)} className='p-fluid'>
-            <div className='field'>
-              <span className='p-float-label p-input-icon-right'>
-                <i className='pi pi-user' />
+      <div className="flex justify-content-center">
+        <div className="card">
+          <h5 className="text-center">Prihlásenie</h5>
+          <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+            <div className="field">
+              <span className="p-float-label p-input-icon-right">
+                <i className="pi pi-user" />
                 <Controller
-                  name='userid'
+                  name="userid"
                   control={control}
                   rules={{
-                    required: 'Identifikácia je povinná',
+                    required: "Identifikácia je povinná",
                     pattern: {
-                      message: 'Nesprávna identifikácia',
+                      message: "Nesprávna identifikácia",
                     },
                   }}
                   render={({ field, fieldState }) => (
@@ -98,52 +99,52 @@ export const Login = () => {
                       id={field.name}
                       {...field}
                       className={classNames({
-                        'p-invalid': fieldState.invalid,
+                        "p-invalid": fieldState.invalid,
                       })}
                     />
                   )}
                 />
                 <label
-                  htmlFor='userid'
-                  className={classNames({ 'p-error': !!errors.userid })}
+                  htmlFor="userid"
+                  className={classNames({ "p-error": !!errors.userid })}
                 >
                   Prihlasovacie číslo*
                 </label>
               </span>
-              {getFormErrorMessage('userid')}
+              {getFormErrorMessage("userid")}
             </div>
-            <div className='field'>
-              <span className='p-float-label'>
+            <div className="field">
+              <span className="p-float-label">
                 <Controller
-                  name='password'
+                  name="password"
                   control={control}
-                  rules={{ required: 'Password is required.' }}
+                  rules={{ required: "Password is required." }}
                   render={({ field, fieldState }) => (
                     <Password
                       id={field.name}
                       {...field}
                       toggleMask
                       className={classNames({
-                        'p-invalid': fieldState.invalid,
+                        "p-invalid": fieldState.invalid,
                       })}
                       feedback={false}
                     />
                   )}
                 />
                 <label
-                  htmlFor='password'
-                  className={classNames({ 'p-error': errors.password })}
+                  htmlFor="password"
+                  className={classNames({ "p-error": errors.password })}
                 >
                   Password*
                 </label>
               </span>
-              {getFormErrorMessage('password')}
+              {getFormErrorMessage("password")}
             </div>
             <Button
-              type='submit'
-              label='Zadaj'
-              className='mt-2'
-              style={{ marginTop: '10px' }}
+              type="submit"
+              label="Zadaj"
+              className="mt-2"
+              style={{ marginTop: "10px" }}
             />
           </form>
         </div>

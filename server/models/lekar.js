@@ -26,7 +26,12 @@ async function getPacienti(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT * FROM os_udaje join pacient using(rod_cislo) join lekar_pacient using(id_pacienta) where id_lekara = :pid_lekara`,
+      `SELECT o.meno, p.rod_cislo, o.priezvisko, o.psc,p.id_pacienta
+      FROM pacient p
+      JOIN os_udaje o on(p.rod_cislo = o.rod_cislo)
+      JOIN nemocnica using (id_nemocnice)
+      JOIN zamestnanci using (id_nemocnice)
+      WHERE cislo_zam = :pid_lekara`,
       { pid_lekara }
     );
     return result.rows;
@@ -59,11 +64,11 @@ async function getUdalosti(id) {
   try {
     let udalosti = [];
 
-    let operacie = await getOperacie(id);
+    /*let operacie = await getOperacie(id);
     console.log(operacie);
     operacie.forEach((element) => {
       udalosti.push(element);
-    });
+    });*/
 
     let vysetrenia = await getVysetrenia(id);
     console.log(vysetrenia);
@@ -71,10 +76,10 @@ async function getUdalosti(id) {
       udalosti.push(element);
     });
 
-    let hospitalizacie = await getHospitalizacie(id);
+    /*let hospitalizacie = await getHospitalizacie(id);
     hospitalizacie.forEach((element) => {
       udalosti.push(element);
-    });
+    });*/
 
     console.log(udalosti);
     return udalosti;
@@ -91,7 +96,7 @@ async function getOperacie(id) {
                 join operacia using(id_zaznamu)
                  join operacia_lekar using(id_operacie) 
                   join pacient using(id_pacienta)
-                   join os_udaje using(rod_cislo) where id_lekara = :id`,
+                   join os_udaje using(rod_cislo) where cislo_zam = :id`,
       [id]
     );
 
@@ -109,11 +114,11 @@ async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id", to_char(datum,'DD.MM.YYYY') datum  from zdravotny_zaznam
-                join vysetrenie using(id_zaznamu)
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_vysetrenia as "id", to_char(datum,'DD.MM.YYYY') datum  from vysetrenie
+            join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)
                   join os_udaje using(rod_cislo) 
-                   where id_lekara = :id`,
+                   where cislo_zam = :id`,
       [id]
     );
 
@@ -131,12 +136,11 @@ async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id", to_char(datum,'DD.MM.YYYY') || '-' || nvl(to_char(dat_do,'DD.MM.YYYY'),'Neukončená') datum
-       from zdravotny_zaznam
-                join hospitalizacia using(id_zaznamu)
+      `select rod_cislo, meno, priezvisko, to_char(dat_od,'YYYY-MM-DD') || 'T' || to_char(dat_od, 'HH24:MI:SS') as "start", id_hospitalizacie as "id", to_char(dat_od,'DD.MM.YYYY') || '-' || nvl(to_char(dat_od,'DD.MM.YYYY'),'Neukončená') datum
+       from hospitalizacia
                  join pacient using(id_pacienta)
                   join os_udaje using(rod_cislo) 
-                  where id_lekara = :id`,
+                  where cislo_zam = :id`,
       [id]
     );
 

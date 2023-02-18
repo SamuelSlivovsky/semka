@@ -6,11 +6,13 @@ import { Password } from "primereact/password";
 import { Dialog } from "primereact/dialog";
 import { classNames } from "primereact/utils";
 import { InputMask } from "primereact/inputmask";
+import { useNavigate } from "react-router";
 import "../styles/auth.css";
 
 export const Register = () => {
   const [showMessage, setShowMessage] = useState(false);
   const [formData, setFormData] = useState({});
+  const navigate = useNavigate();
   const defaultValues = {
     rc: "",
     email: "",
@@ -26,7 +28,21 @@ export const Register = () => {
 
   const onSubmit = (data) => {
     setFormData(data);
-    setShowMessage(true);
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userid: data.rc,
+        pwd: data.password,
+      }),
+    };
+    fetch("/auth/register", requestOptions)
+      .then((response) => response.json())
+      .then((res) => {
+        console.log(res);
+        localStorage.setItem("hospit-user", res.accessToken);
+        navigate("/");
+      });
     reset();
   };
 
@@ -82,7 +98,7 @@ export const Register = () => {
                       id={field.name}
                       {...field}
                       autoFocus
-                      mask="999999/9999"
+                      mask="999"
                       className={classNames({
                         "p-invalid": fieldState.invalid,
                       })}

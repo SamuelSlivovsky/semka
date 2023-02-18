@@ -337,7 +337,7 @@ export default function ProfileCard(props) {
           <div className="flex">
             <div className="col-5 text-center m-0">
               <h4>Krvna skupina</h4>
-              <div>{profile.KRVNA_SKUPINA}</div>
+              <div>{profile.TYP_KRVI}</div>
             </div>
             <div className="col-5 text-center m-0">
               <h4>Poistovňa</h4>
