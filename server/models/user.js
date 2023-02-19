@@ -7,7 +7,6 @@ async function userExists(userid) {
       `SELECT count(*) as pocet FROM user_tab where userid = :userid`,
       [userid]
     );
-    console.log(result);
 
     if (result.rows[0].POCET === 1) {
       return true;
@@ -23,7 +22,6 @@ async function insertUser(body) {
   try {
     let conn = await database.getConnection();
 
-    console.log(body);
 
     const result = await conn.execute(
       `insert into user_tab values(:userid, :pwd, null, :role)`,

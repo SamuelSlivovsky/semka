@@ -4,7 +4,6 @@ const verifyRoles = (...allowedRoles) => {
     const rolesArray = [...allowedRoles];
     let result = false;
     rolesArray.forEach((element) => {
-      console.log(element);
       if (element === req.role) {
         result = true;
         return;

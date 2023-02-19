@@ -1,6 +1,6 @@
 module.exports = {
   insertPacientZTP: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
       ret_val = await pacient.insertPacientZTP(req.body);
@@ -12,7 +12,7 @@ module.exports = {
   },
 
   getNajviacChoriPocet: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
       ret_val = await pacient.getNajviacChoriPocet(req.params.pocet);
@@ -24,7 +24,7 @@ module.exports = {
   },
 
   getNajviacOperovanyPercenta: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
       ret_val = await pacient.getNajviacOperovanyPercenta(req.params.percent);
@@ -36,7 +36,7 @@ module.exports = {
   },
 
   getNajviacHospitalizovaniPercenta: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
       ret_val = await pacient.getNajviacHospitalizovaniPercenta(
@@ -50,7 +50,7 @@ module.exports = {
   },
 
   getTopZamestnanciVyplatyPocet: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getTopZamestnanciVyplatyPocet(req.params.pocet);
@@ -62,7 +62,7 @@ module.exports = {
   },
 
   getTopZamestnanciVyplatyOddelenie: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getTopZamestnanciVyplatyOddelenie(
@@ -77,7 +77,7 @@ module.exports = {
   },
 
   getNajviacPredpisovaneLiekyRoka: (req, res) => {
-    const liek = require('../models/liek');
+    const liek = require("../models/liek");
     console.log(req.params);
     (async () => {
       ret_val = await liek.getNajviacPredpisovaneLiekyRoka(req.params.rok);
@@ -89,7 +89,7 @@ module.exports = {
   },
 
   getSumaVyplatRoka: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getSumaVyplatRoka(
@@ -104,8 +104,7 @@ module.exports = {
   },
 
   getTypyChoroby: (req, res) => {
-    const typ_choroby = require('../models/typ_choroby');
-    console.log(req.params);
+    const typ_choroby = require("../models/typ_choroby");
     (async () => {
       ret_val = await typ_choroby.getTypyChoroby();
       res.status(200).json(ret_val);
@@ -113,7 +112,7 @@ module.exports = {
   },
 
   getChoroby: (req, res) => {
-    const choroba = require('../models/choroba');
+    const choroba = require("../models/choroba");
     console.log(req.params);
     (async () => {
       ret_val = await choroba.getChoroby(req.params.id_typu_choroby);
@@ -122,7 +121,7 @@ module.exports = {
   },
 
   getTypyZtp: (req, res) => {
-    const typ_ztp = require('../models/typ_ztp');
+    const typ_ztp = require("../models/typ_ztp");
     console.log(req.params);
     (async () => {
       ret_val = await typ_ztp.getTypyZtp();
@@ -131,8 +130,8 @@ module.exports = {
   },
 
   getTypyOckovania: (req, res) => {
-    const typ_ockovania = require('../models/typ_ockovania');
-    console.log(req.params);
+    const typ_ockovania = require("../models/typ_ockovania");
+
     (async () => {
       ret_val = await typ_ockovania.getTypyOckovania();
       res.status(200).json(ret_val);
@@ -140,7 +139,7 @@ module.exports = {
   },
 
   getTypyOckovaniaPacienti: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
       ret_val = await pacient.getTypyOckovaniaPacienti();
@@ -152,7 +151,7 @@ module.exports = {
   },
 
   getZamestnanciOddeleni: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getZamestnanciOddeleni();
@@ -164,7 +163,7 @@ module.exports = {
   },
 
   getNajcastejsieChorobyRokaPocet: (req, res) => {
-    const choroba = require('../models/choroba');
+    const choroba = require("../models/choroba");
     console.log(req.params);
     (async () => {
       ret_val = await choroba.getNajcastejsieChorobyRokaPocet(
@@ -179,7 +178,7 @@ module.exports = {
   },
 
   getNeobsadeneLozkaOddeleniaTyzden: (req, res) => {
-    const lozko = require('../models/lozko');
+    const lozko = require("../models/lozko");
     console.log(req.params);
     (async () => {
       ret_val = await lozko.getNeobsadeneLozkaOddeleniaTyzden(
@@ -193,7 +192,7 @@ module.exports = {
   },
 
   getLiekyMenejAkoPocet: (req, res) => {
-    const sklad = require('../models/sklad');
+    const sklad = require("../models/sklad");
     console.log(req.params);
     (async () => {
       ret_val = await sklad.getLiekyMenejAkoPocet(req.params.pocet);
@@ -205,7 +204,7 @@ module.exports = {
   },
 
   getMenovciPacientLekar: (req, res) => {
-    const os_udaje = require('../models/os_udaje');
+    const os_udaje = require("../models/os_udaje");
     console.log(req.params);
     (async () => {
       ret_val = await os_udaje.getMenovciPacientLekar();
@@ -217,7 +216,7 @@ module.exports = {
   },
 
   getOperaciePocetLekarovTrvanie: (req, res) => {
-    const operacia = require('../models/operacia');
+    const operacia = require("../models/operacia");
     console.log(req.params);
     (async () => {
       ret_val = await operacia.getOperaciePocetLekarovTrvanie(
@@ -232,7 +231,7 @@ module.exports = {
   },
 
   getKrajePodlaPoctuOperovanych: (req, res) => {
-    const kraj = require('../models/kraj');
+    const kraj = require("../models/kraj");
     console.log(req.params);
     (async () => {
       ret_val = await kraj.getKrajePodlaPoctuOperovanych();
@@ -244,7 +243,7 @@ module.exports = {
   },
 
   getPacientiChorobaP13: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
       ret_val = await pacient.getPacientiChorobaP13();
@@ -256,7 +255,7 @@ module.exports = {
   },
 
   getPriemernyVek: (req, res) => {
-    const lekar = require('../models/lekar');
+    const lekar = require("../models/lekar");
     console.log(req.params);
     (async () => {
       ret_val = await lekar.getPriemernyVek();
@@ -268,7 +267,7 @@ module.exports = {
   },
 
   getPocetPacientiPodlaVeku: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
       ret_val = await pacient.getPocetPacientiPodlaVeku();
@@ -280,7 +279,7 @@ module.exports = {
   },
 
   getPomerMuziZeny: (req, res) => {
-    const os_udaje = require('../models/os_udaje');
+    const os_udaje = require("../models/os_udaje");
     console.log(req.params);
     (async () => {
       ret_val = await os_udaje.getPomerMuziZeny(req.params.id_oddelenia);
@@ -292,8 +291,8 @@ module.exports = {
   },
 
   getHospitalizacieNemocniceXML: (req, res) => {
-    res.header('Content-Type', 'application/xml');
-    const nemocnica = require('../models/nemocnica');
+    res.header("Content-Type", "application/xml");
+    const nemocnica = require("../models/nemocnica");
     console.log(req.params);
     (async () => {
       ret_val = await nemocnica.getHospitalizacieNemocniceXML(
@@ -307,8 +306,8 @@ module.exports = {
   },
 
   getOperacieNemocniceXML: (req, res) => {
-    res.header('Content-Type', 'application/xml');
-    const nemocnica = require('../models/nemocnica');
+    res.header("Content-Type", "application/xml");
+    const nemocnica = require("../models/nemocnica");
     console.log(req.params);
     (async () => {
       ret_val = await nemocnica.getOperacieNemocniceXML(
@@ -322,8 +321,8 @@ module.exports = {
   },
 
   getOckovaniaNemocniceXML: (req, res) => {
-    res.header('Content-Type', 'application/xml');
-    const nemocnica = require('../models/nemocnica');
+    res.header("Content-Type", "application/xml");
+    const nemocnica = require("../models/nemocnica");
     console.log(req.params);
     (async () => {
       ret_val = await nemocnica.getOckovaniaNemocniceXML(
@@ -337,8 +336,8 @@ module.exports = {
   },
 
   getVysetreniaNemocniceXML: (req, res) => {
-    res.header('Content-Type', 'application/xml');
-    const nemocnica = require('../models/nemocnica');
+    res.header("Content-Type", "application/xml");
+    const nemocnica = require("../models/nemocnica");
     console.log(req.params);
     (async () => {
       ret_val = await nemocnica.getVysetreniaNemocniceXML(
@@ -352,13 +351,13 @@ module.exports = {
   },
 
   getZamestnanciFotka: (req, res) => {
-    const zamestnanec = require('../models/zamestnanec');
+    const zamestnanec = require("../models/zamestnanec");
     (async () => {
       ret_val = await zamestnanec.getZamestnanciFotka(
         req.params.id_zamestnanca
       );
-      res.status(200).write(ret_val.FOTKA, 'binary');
-      res.end(null, 'binary');
+      res.status(200).write(ret_val.FOTKA, "binary");
+      res.end(null, "binary");
     })().catch((err) => {
       console.error(err);
       res.status(403).send(err);
@@ -366,7 +365,7 @@ module.exports = {
   },
 
   getZamestnanciOddelenia: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getZamestnanciOddelenia(
@@ -380,7 +379,7 @@ module.exports = {
   },
 
   getPocetPacientovOddelenia: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetPacientovOddelenia(
@@ -393,7 +392,7 @@ module.exports = {
     });
   },
   getPocetOperaciiOddelenia: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetOperaciiOddelenia(
@@ -407,7 +406,7 @@ module.exports = {
     });
   },
   getPocetHospitalizaciiOddelenia: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetHospitalizaciiOddelenia(
@@ -421,7 +420,7 @@ module.exports = {
     });
   },
   getPocetVysetreniOddelenia: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetVysetreniOddelenia(
@@ -435,7 +434,7 @@ module.exports = {
     });
   },
   getPocetZamOddelenia: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetZamOddelenia(
@@ -450,7 +449,7 @@ module.exports = {
   },
 
   getKrvneSkupinyOddelenia: (req, res) => {
-    const oddelenie = require('../models/oddelenie');
+    const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getKrvneSkupinyOddelenia(
@@ -464,7 +463,7 @@ module.exports = {
   },
 
   getZamestnanec: (req, res) => {
-    const zamestnanec = require('../models/zamestnanec');
+    const zamestnanec = require("../models/zamestnanec");
     console.log(req.params);
     (async () => {
       ret_val = await zamestnanec.getZamestnanec(req.params.id_zamestnanca);

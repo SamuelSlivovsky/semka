@@ -355,14 +355,14 @@ async function getChoroby(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const choroby = await conn.execute(
-      `select nazov, typ, to_char(dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
-            from zoznam_ochoreni join choroba using(id_choroby)
-                          join zdravotna_karta using(id_karty)
+      `select nazov, typ, to_char(zo.dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(zo.dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+            from zoznam_ochoreni zo join choroba on(zo.id_choroby = choroba.id_choroby)
+                          join zdravotna_karta zk on(zo.id_karty = zk.id_karty)
                           where id_pacienta = :pid_pacienta
-                          order by datum_od, datum_do`,
+                          order by dat_od, dat_do`,
       { pid_pacienta }
     );
-
+    console.log(choroby);
     return choroby.rows;
   } catch (err) {
     console.log(err);
@@ -373,7 +373,7 @@ async function getTypyZTP(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const typyZTP = await conn.execute(
-      `select nazov, to_char(datum_od,'MM.DD.YYYY') datum_od, nvl(to_char(datum_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+      `select nazov, to_char(dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
           from zoznam_postihnuti join postihnutie using (id_postihnutia)
                               join zdravotna_karta using (id_karty)
                               where id_pacienta = :pid_pacienta`,
