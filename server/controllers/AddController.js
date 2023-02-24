@@ -4,7 +4,7 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await recept.insertRecept(req.body);
-      res.status(200).json('success');
+      res.status(200).json("success");
     })().catch((err) => {
       console.error(err);
       res.status(500).send(err);

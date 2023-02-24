@@ -97,7 +97,7 @@ async function insertVysetrenie(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        vysetrenie_insert(:rod_cislo, :priloha, :popis, :datum, :id_lekara);
+        vysetrenie_insert(:rod_cislo, :id_lekara, :datum, :priloha, :nazov, :popis  );
         END;`;
 
     let buffer = Buffer.from([0x00]);
@@ -111,6 +111,7 @@ async function insertVysetrenie(body) {
       popis: body.popis,
       datum: body.datum,
       id_lekara: body.id_lekara,
+      nazov: body.nazov,
     });
   } catch {
     throw new Error("Error");
