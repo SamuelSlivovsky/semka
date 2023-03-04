@@ -390,20 +390,19 @@ async function insertPacient(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-    pacient_insert(:meno, :priezvisko, :psc, :telefon, :email, :rod_cislo, :id_poistenca, :id_typu_krvnej_skupiny, :id_lekara);
+    pacient_insert(:meno, :priezvisko, :psc, :rod_cislo, :id_lekara, :ulica, :dat_od, :dat_do);
     END;`;
 
     let result = await conn.execute(sqlStatement, {
       rod_cislo: body.rod_cislo,
-      id_poistenca: body.id_poistenca,
-      id_typu_krvnej_skupiny: body.id_typu_krvnej_skupiny,
       meno: body.meno,
       priezvisko: body.priezvisko,
       rod_cislo: body.rod_cislo,
-      email: body.email,
-      telefon: body.telefon,
       psc: body.psc,
       id_lekara: body.id_lekara,
+      ulica: body.ulica,
+      dat_od: body.dat_od,
+      dat_do: body.dat_do,
     });
 
     console.log("Rows inserted " + result.rowsAffected);

@@ -15,7 +15,7 @@ module.exports = {
       ret_val = await zaznam.getPriloha(req.params.id);
       console.log(ret_val);
       if (typeof ret_val !== "undefined") {
-        res.status(200).write(ret_val.PRILOHA, "binary");
+        res.status(200).write(ret_val, "binary");
         res.end(null, "binary");
       } else {
         res.status(200).write("");

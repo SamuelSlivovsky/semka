@@ -20,6 +20,7 @@ export default function TableMedic(props) {
     tableScrollHeight,
   } = props;
   const [popis, setPopis] = useState(null);
+  const [nazov, setNazov] = useState(null);
 
   const onHide = () => {
     setImgUrl(null);
@@ -41,11 +42,13 @@ export default function TableMedic(props) {
       .then((response) => response.json())
       .then((data) => {
         setPopis(data[0].POPIS);
+        setNazov(data[0].NAZOV);
       });
   };
 
   const getRecordDetails = () => {
     let popis;
+    console.log(cellData);
     cellData.map((data) => {
       if (data.id === selectedRow.id) {
         data.LEKAR === data.ODDELENIE
@@ -145,7 +148,7 @@ export default function TableMedic(props) {
           selectedRow != null
             ? selectedRow.MENO != null
               ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
-              : selectedRow.TYP
+              : selectedRow.type
             : ""
         }
         visible={showDialog && dialog}
@@ -156,11 +159,11 @@ export default function TableMedic(props) {
           <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
 
           {selectedRow != null
-            ? selectedRow.TYP != null
+            ? selectedRow.type != null
               ? getRecordDetails()
               : ""
             : ""}
-
+          <h2>{selectedRow != null ? nazov : ""}</h2>
           <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
           <div>{selectedRow != null ? popis : ""}</div>
         </div>

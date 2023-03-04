@@ -4,15 +4,13 @@ async function getLekari(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT meno, priezvisko, typ_oddelenia.nazov as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, mail 
-          from lekar join zamestnanec using(id_zamestnanca) 
+      `SELECT meno, priezvisko, oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov 
+          from zamestnanci
                     join os_udaje using(rod_cislo)
-                    join oddelenie using(id_oddelenia)
-                    join typ_oddelenia using(id_typu_oddelenia)
-                    join nemocnica using(id_nemocnice)
-              where id_nemocnice = get_id_nemocnice(:pid_lekara)
-              and id_lekara <> :pid_lekara
-              order by id_oddelenia`,
+                    join nemocnica on(zamestnanci.id_nemocnice = nemocnica.id_nemocnice)
+                    join oddelenie on(zamestnanci.cislo_zam = oddelenie.cislo_zam)
+              where zamestnanci.id_nemocnice = get_id_nemocnice(:pid_lekara)
+              order by oddelenie.id_oddelenia`,
       { pid_lekara }
     );
 

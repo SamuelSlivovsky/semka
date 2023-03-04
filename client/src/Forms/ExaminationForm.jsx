@@ -42,7 +42,7 @@ export default function ExaminationForm(props) {
         popis: data.popis,
         id_lekara: userData.UserInfo.userid,
         priloha: base64Data,
-        nazov: "blabla",
+        nazov: data.nazov,
       }),
     };
     const responsePatient = await fetch(

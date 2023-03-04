@@ -13,11 +13,11 @@ function TabDoctorsOfHospital() {
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
-        setLekari(data);
+        setLekari(<TabDoctors lekari={data} />);
       });
   }, []);
 
-  return <div>{lekari && <TabDoctors lekari={lekari} />}</div>;
+  return <div>{lekari}</div>;
 }
 
 export default TabDoctorsOfHospital;

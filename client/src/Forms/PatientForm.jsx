@@ -1,21 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Form, Field } from 'react-final-form';
-import { InputText } from 'primereact/inputtext';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { InputMask } from 'primereact/inputmask';
-import { classNames } from 'primereact/utils';
-import { AutoComplete } from 'primereact/autocomplete';
-import GetUserData from '../Auth/GetUserData';
+import React, { useState, useEffect } from "react";
+import { Form, Field } from "react-final-form";
+import { InputText } from "primereact/inputtext";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { InputMask } from "primereact/inputmask";
+import { classNames } from "primereact/utils";
+import { AutoComplete } from "primereact/autocomplete";
+import { Calendar } from "primereact/calendar";
+import GetUserData from "../Auth/GetUserData";
 export default function PatientForm() {
   const [showMessage, setShowMessage] = useState(false);
   const [cities, setCities] = useState([]);
   const [filteredPsc, setFilteredPsc] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem('hospit-user');
-    const headers = { authorization: 'Bearer ' + token };
-    fetch('/add/psc', { headers })
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    fetch("/add/psc", { headers })
       .then((response) => response.json())
       .then((res) => {
         console.log(res);
@@ -29,38 +30,31 @@ export default function PatientForm() {
     let errors = {};
 
     if (!data.meno) {
-      errors.meno = 'Meno je povinné';
+      errors.meno = "Meno je povinné";
     }
     if (!data.priezvisko) {
-      errors.priezvisko = 'Priezvisko je povinné';
+      errors.priezvisko = "Priezvisko je povinné";
     }
     if (!data.rod_cislo) {
-      errors.rod_cislo = 'Rodné číslo je povinné';
+      errors.rod_cislo = "Rodné číslo je povinné";
     }
     if (!data.psc) {
-      errors.psc = 'PSČ je povinné';
+      errors.psc = "PSČ je povinné";
     }
-    if (!data.telefon) {
-      errors.telefon = 'Telefónne číslo je povinné';
-    }
-    if (
-      data.email &&
-      !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i.test(data.email)
-    ) {
-      errors.email =
-        'Nesprávny tvar e-mailovej adresz, napr. priklad@priklad.com';
+    if (!data.dat_od) {
+      errors.dat_od = "Dátum zápisu je povinný";
     }
     return errors;
   };
 
   const onSubmit = async (data, form) => {
-    const token = localStorage.getItem('hospit-user');
+    const token = localStorage.getItem("hospit-user");
     const userData = GetUserData(token);
     const requestOptionsPatient = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        authorization: 'Bearer ' + token,
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
       },
 
       body: JSON.stringify({
@@ -68,15 +62,14 @@ export default function PatientForm() {
         meno: data.meno,
         priezvisko: data.priezvisko,
         psc: data.psc.psc,
-        telefon: data.telefon,
-        email: data.email === '' ? null : data.email,
-        id_poistenca: null,
-        id_typu_krvnej_skupiny: 1,
         id_lekara: userData.UserInfo.userid,
+        ulica: data.ulica,
+        dat_od: data.dat_od.toLocaleString("en-GB").replace(",", ""),
+        dat_do: null,
       }),
     };
     const responsePatient = await fetch(
-      '/add/pacient',
+      "/add/pacient",
       requestOptionsPatient
     ).then(() => setShowMessage(true));
     console.log(responsePatient);
@@ -87,7 +80,7 @@ export default function PatientForm() {
   const isFormFieldValid = (meta) => !!(meta.touched && meta.error);
   const getFormErrorMessage = (meta) => {
     return (
-      isFormFieldValid(meta) && <small className='p-error'>{meta.error}</small>
+      isFormFieldValid(meta) && <small className="p-error">{meta.error}</small>
     );
   };
 
@@ -107,10 +100,10 @@ export default function PatientForm() {
   };
 
   const dialogFooter = (
-    <div className='flex justify-content-center'>
+    <div className="flex justify-content-center">
       <Button
-        label='OK'
-        className='p-button-text'
+        label="OK"
+        className="p-button-text"
         autoFocus
         onClick={() => setShowMessage(false)}
       />
@@ -118,58 +111,58 @@ export default function PatientForm() {
   );
   return (
     <div
-      style={{ width: '100%', marginTop: '2rem' }}
-      className='p-fluid grid formgrid'
+      style={{ width: "100%", marginTop: "2rem" }}
+      className="p-fluid grid formgrid"
     >
       <Dialog
         visible={showMessage}
         onHide={() => setShowMessage(false)}
-        position='top'
+        position="top"
         footer={dialogFooter}
         showHeader={false}
-        breakpoints={{ '960px': '80vw' }}
-        style={{ width: '30vw' }}
+        breakpoints={{ "960px": "80vw" }}
+        style={{ width: "30vw" }}
       >
-        <div className='flex align-items-center flex-column pt-6 px-3'>
+        <div className="flex align-items-center flex-column pt-6 px-3">
           <i
-            className='pi pi-check-circle'
-            style={{ fontSize: '5rem', color: 'var(--green-500)' }}
+            className="pi pi-check-circle"
+            style={{ fontSize: "5rem", color: "var(--green-500)" }}
           ></i>
           <h5>Úspešné odoslanie údajov</h5>
         </div>
       </Dialog>
 
-      <div className='field col-12'>
+      <div className="field col-12">
         <Form
           onSubmit={onSubmit}
           initialValues={{
-            rod_cislo: '',
-            email: '',
-            meno: '',
-            priezvisko: '',
-            psc: '',
-            telefon: '',
+            rod_cislo: "",
+            email: "",
+            meno: "",
+            priezvisko: "",
+            psc: "",
+            telefon: "",
           }}
           validate={validate}
           render={({ handleSubmit }) => (
-            <form onSubmit={handleSubmit} className='p-fluid'>
+            <form onSubmit={handleSubmit} className="p-fluid">
               <Field
-                name='meno'
+                name="meno"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label'>
+                  <div className="field col-12">
+                    <span className="p-float-label">
                       <InputText
-                        id='meno'
+                        id="meno"
                         {...input}
                         autoFocus
                         className={classNames({
-                          'p-invalid': isFormFieldValid(meta),
+                          "p-invalid": isFormFieldValid(meta),
                         })}
                       />
                       <label
-                        htmlFor='meno'
+                        htmlFor="meno"
                         className={classNames({
-                          'p-error': isFormFieldValid(meta),
+                          "p-error": isFormFieldValid(meta),
                         })}
                       >
                         Meno*
@@ -180,21 +173,21 @@ export default function PatientForm() {
                 )}
               />
               <Field
-                name='priezvisko'
+                name="priezvisko"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label '>
+                  <div className="field col-12">
+                    <span className="p-float-label ">
                       <InputText
-                        id='priezvisko'
+                        id="priezvisko"
                         {...input}
                         className={classNames({
-                          'p-invalid': isFormFieldValid(meta),
+                          "p-invalid": isFormFieldValid(meta),
                         })}
                       />
                       <label
-                        htmlFor='priezvisko'
+                        htmlFor="priezvisko"
                         className={classNames({
-                          'p-error': isFormFieldValid(meta),
+                          "p-error": isFormFieldValid(meta),
                         })}
                       >
                         Priezvisko*
@@ -205,22 +198,22 @@ export default function PatientForm() {
                 )}
               />
               <Field
-                name='rod_cislo'
+                name="rod_cislo"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label'>
+                  <div className="field col-12">
+                    <span className="p-float-label">
                       <InputMask
-                        id='rod_cislo'
-                        mask='999999/9999'
+                        id="rod_cislo"
+                        mask="999999/9999"
                         {...input}
                         className={classNames({
-                          'p-invalid': isFormFieldValid(meta),
+                          "p-invalid": isFormFieldValid(meta),
                         })}
                       />
                       <label
-                        htmlFor='rod_cislo'
+                        htmlFor="rod_cislo"
                         className={classNames({
-                          'p-error': isFormFieldValid(meta),
+                          "p-error": isFormFieldValid(meta),
                         })}
                       >
                         Rodné číslo*
@@ -231,24 +224,24 @@ export default function PatientForm() {
                 )}
               />
               <Field
-                name='psc'
+                name="psc"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label'>
+                  <div className="field col-12">
+                    <span className="p-float-label">
                       <AutoComplete
                         {...input}
                         suggestions={filteredPsc}
                         completeMethod={searchPsc}
-                        field='name'
+                        field="name"
                         className={classNames({
-                          'p-invalid': isFormFieldValid(meta),
+                          "p-invalid": isFormFieldValid(meta),
                         })}
                       />
 
                       <label
-                        htmlFor='psc'
+                        htmlFor="psc"
                         className={classNames({
-                          'p-error': isFormFieldValid(meta),
+                          "p-error": isFormFieldValid(meta),
                         })}
                       >
                         PSČ*
@@ -259,68 +252,67 @@ export default function PatientForm() {
                 )}
               />
               <Field
-                name='telefon'
+                name="ulica"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label'>
-                      <InputMask
-                        id='telefon'
-                        mask='+421999999999'
-                        {...input}
-                        className={classNames({
-                          'p-invalid': isFormFieldValid(meta),
-                        })}
-                      />
-                      <label
-                        htmlFor='telefon'
-                        className={classNames({
-                          'p-error': isFormFieldValid(meta),
-                        })}
-                      >
-                        Telefónne číslo*
-                      </label>
-                    </span>
+                  <div className="field col-12">
+                    <label
+                      htmlFor="ulica"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Ulica
+                    </label>
+                    <InputText
+                      id="ulica"
+                      {...input}
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
+              <Field
+                name="dat_od"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label
+                      htmlFor="dat_od"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Dátum zápisu pacienta*
+                    </label>
+                    <Calendar
+                      id="basic"
+                      {...input}
+                      dateFormat="dd.mm.yy"
+                      mask="99.99.9999"
+                      showIcon
+                      showTime
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
                     {getFormErrorMessage(meta)}
                   </div>
                 )}
               />
 
-              <Field
-                name='email'
-                render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label'>
-                      <InputText
-                        id='email'
-                        {...input}
-                        className={classNames({
-                          'p-invalid': isFormFieldValid(meta),
-                        })}
-                      />
-                      <label
-                        htmlFor='email'
-                        className={classNames({
-                          'p-error': isFormFieldValid(meta),
-                        })}
-                      >
-                        E-mail
-                      </label>
-                    </span>
-                    {getFormErrorMessage(meta)}
-                  </div>
-                )}
-              />
               <div
-                className='field col-12 '
-                style={{ justifyContent: 'center', display: 'grid' }}
+                className="field col-12 "
+                style={{ justifyContent: "center", display: "grid" }}
               >
                 <Button
-                  type='submit'
-                  style={{ width: '50vh' }}
-                  className='p-button-lg'
-                  label='Odoslať'
-                  icon='pi pi-check'
-                  iconPos='right'
+                  type="submit"
+                  style={{ width: "50vh" }}
+                  className="p-button-lg"
+                  label="Odoslať"
+                  icon="pi pi-check"
+                  iconPos="right"
                 />
               </div>
             </form>

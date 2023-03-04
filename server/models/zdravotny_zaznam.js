@@ -20,7 +20,7 @@ async function getPopisZaznamu(id) {
     let conn = await database.getConnection();
     database.oracledb.fetchAsString = [database.oracledb.CLOB];
     const zaznam = await conn.execute(
-      `SELECT popis FROM zdravotny_zaznam where id_zaznamu=:id`,
+      `SELECT popis, nazov FROM zdravotny_zaz where id_zaznamu=:id`,
       { id }
     );
     return zaznam.rows;
@@ -33,11 +33,11 @@ async function getPriloha(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT priloha FROM priloha join zdravotny_zaznam using(id_prilohy) WHERE id_zaznamu = :id`,
+      `SELECT data FROM blob_data WHERE id_zaznamu = :id`,
       { id }
     );
-    console.log(result.rows[0]);
-    return result.rows[0];
+    console.log(result);
+    return result.rows[0].DATA;
   } catch (err) {
     console.log(err);
   }
@@ -113,8 +113,8 @@ async function insertVysetrenie(body) {
       id_lekara: body.id_lekara,
       nazov: body.nazov,
     });
-  } catch {
-    throw new Error("Error");
+  } catch (err) {
+    console.log(err);
   }
 }
 

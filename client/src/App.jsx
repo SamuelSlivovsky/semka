@@ -117,6 +117,13 @@ function App() {
       icon="patient-icon"
     />,
     <SidebarButton
+      key="4"
+      visibleLeft={visibleLeft}
+      path="/doctors"
+      label="Lekári"
+      icon="doctor-icon"
+    />,
+    <SidebarButton
       key="5"
       visibleLeft={visibleLeft}
       path="/examinations"
