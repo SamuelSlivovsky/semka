@@ -112,7 +112,8 @@ async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_vysetrenia as "id", to_char(datum,'DD.MM.YYYY') datum  from vysetrenie
+      `select rod_cislo, meno, priezvisko, to_char(vysetrenie_new.datum,'YYYY-MM-DD') || 'T' || to_char(vysetrenie_new.datum, 'HH24:MI:SS') as "start", id_vysetrenia as "id", to_char(vysetrenie_new.datum,'DD.MM.YYYY') datum  from vysetrenie_new
+        join zdravotny_zaz_new using(id_zaznamu)
             join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)
                   join os_udaje using(rod_cislo) 
@@ -134,11 +135,18 @@ async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(dat_od,'YYYY-MM-DD') || 'T' || to_char(dat_od, 'HH24:MI:SS') as "start", id_hospitalizacie as "id", to_char(dat_od,'DD.MM.YYYY') || '-' || nvl(to_char(dat_od,'DD.MM.YYYY'),'Neukončená') datum
-       from hospitalizacia
+      `select os_udaje.rod_cislo, meno, priezvisko, to_char(hospitalizacia_new.dat_od,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia_new.dat_od, 'HH24:MI:SS') 
+      as "start", id_hosp as "id", to_char(hospitalizacia_new.dat_od,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia_new.dat_od,'DD.MM.YYYY'),'Neukončená') datum
+       from hospitalizacia_new
+        join zdravotny_zaz_new using(id_zaznamu)
+          join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)
-                  join os_udaje using(rod_cislo) 
-                  where cislo_zam = :id`,
+                  join os_udaje on(os_udaje.rod_cislo = pacient.rod_cislo) 
+                  join lozko using(id_lozka)
+                  join oddelenie using(id_oddelenia)
+                  join nemocnica on(oddelenie.id_nemocnice = nemocnica.id_nemocnice)
+                  join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
+                    where zamestnanci.cislo_zam = :id`,
       [id]
     );
 
