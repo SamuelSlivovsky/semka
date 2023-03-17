@@ -28,17 +28,18 @@ export default function TableMedic(props) {
   };
 
   const handleClick = (value) => {
+    console.log(value);
     setShowDialog(true);
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
-    fetch(`/zaznamy/priloha/${value.id}`, { headers })
+    fetch(`/zaznamy/priloha/${value.id_zaz}`, { headers })
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
         console.log(result);
       });
-    fetch(`/zaznamy/popis/${value.id}`, { headers })
+    fetch(`/zaznamy/popis/${value.id_zaz}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setPopis(data[0].POPIS);

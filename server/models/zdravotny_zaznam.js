@@ -23,6 +23,7 @@ async function getPopisZaznamu(id) {
       `SELECT popis, nazov FROM zdravotny_zaz where id_zaznamu=:id`,
       { id }
     );
+    console.log(zaznam);
     return zaznam.rows;
   } catch (err) {
     console.log(err);
@@ -47,7 +48,7 @@ async function insertHospitalizacia(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        hospitalizacia_insert(:rod_cislo, :priloha, :popis, :datum, :id_lekara, :datum_do);
+        hospitalizacia_insert(:rod_cislo, :id_lekara, :datum, :datum_do, :priloha, :nazov, :popis );
         END;`;
 
     let buffer = Buffer.from([0x00]);
@@ -62,6 +63,7 @@ async function insertHospitalizacia(body) {
       datum: body.datum,
       id_lekara: body.id_lekara,
       datum_do: body.datum_do,
+      nazov: body.nazov,
     });
   } catch (err) {
     throw new Error("Database error: " + err);
@@ -124,7 +126,7 @@ async function updateZaznam(body) {
     let conn = await database.getConnection();
 
     await conn.execute(
-      `UPDATE ZDRAVOTNY_ZAZNAM SET DATUM = to_date(to_char(to_timestamp(:datum,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS'))
+      `UPDATE ZDRAVOTNY_ZAZ SET DATUM = to_date(to_char(to_timestamp(:datum,'DD/MM/YYYY HH24:MI:SS'),'DD/MM/YYYY HH24:MI:SS'))
       WHERE ID_ZAZNAMU = to_number(:id)`,
       { datum: body.datum, id: body.id },
       { autoCommit: true } // type and direction are optional for IN binds

@@ -276,7 +276,7 @@ async function getVysetrenia(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
+      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam_new
         join vysetrenie using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
       [rod_cislo]
     );
@@ -336,15 +336,14 @@ async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
-      `select id_zaznamu as "id", to_char(datum, 'DD.MM.YYYY') DATUM, get_typ_zdrav_zaznamu(id_zaznamu) as typ, 
-                                                     get_nazov_oddelenia(id_zaznamu) as oddelenie   
+      `select id_zaznamu as "id_zaz", to_char(datum, 'DD.MM.YYYY') DATUM, get_typ_zdrav_zaznamu(id_zaznamu) as typ   
           from zdravotny_zaz 
           join zdravotna_karta using(id_karty)
             where id_pacienta = :pid_pacienta
                   order by zdravotny_zaz.datum`,
       { pid_pacienta }
     );
-
+    console.log(zdravZaznamy.rows);
     return zdravZaznamy.rows;
   } catch (err) {
     console.log(err);

@@ -74,12 +74,11 @@ async function getUdalosti(id) {
       udalosti.push(element);
     });
 
-    /*let hospitalizacie = await getHospitalizacie(id);
+    let hospitalizacie = await getHospitalizacie(id);
     hospitalizacie.forEach((element) => {
       udalosti.push(element);
-    });*/
+    });
 
-    console.log(udalosti);
     return udalosti;
   } catch (err) {
     console.log(err);
@@ -112,8 +111,9 @@ async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(vysetrenie_new.datum,'YYYY-MM-DD') || 'T' || to_char(vysetrenie_new.datum, 'HH24:MI:SS') as "start", id_vysetrenia as "id", to_char(vysetrenie_new.datum,'DD.MM.YYYY') datum  from vysetrenie_new
-        join zdravotny_zaz_new using(id_zaznamu)
+      `select rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(zdravotny_zaz.datum, 'HH24:MI:SS') as "start", id_vysetrenia as "id", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') datum,
+      id_zaznamu as "id_zaz" from vysetrenie
+        join zdravotny_zaz using(id_zaznamu)
             join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)
                   join os_udaje using(rod_cislo) 
@@ -135,10 +135,10 @@ async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select os_udaje.rod_cislo, meno, priezvisko, to_char(hospitalizacia_new.dat_od,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia_new.dat_od, 'HH24:MI:SS') 
-      as "start", id_hosp as "id", to_char(hospitalizacia_new.dat_od,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia_new.dat_od,'DD.MM.YYYY'),'Neukončená') datum
-       from hospitalizacia_new
-        join zdravotny_zaz_new using(id_zaznamu)
+      `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
+      as "start", id_hosp as "id",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
+       from hospitalizacia
+        join zdravotny_zaz using(id_zaznamu)
           join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)
                   join os_udaje on(os_udaje.rod_cislo = pacient.rod_cislo) 

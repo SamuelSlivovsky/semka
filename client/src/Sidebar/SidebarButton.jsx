@@ -10,7 +10,13 @@ export default function SidebarButton(props) {
       <Button
         icon={props.icon}
         onClick={() => navigate(props.path)}
-        label={`${props.visibleLeft ? props.label : ""}`}
+        label={`${
+          props.icon !== ""
+            ? props.visibleLeft
+              ? props.label
+              : ""
+            : props.label
+        }`}
         style={{
           marginTop: "1rem",
           marginRight: "8px",

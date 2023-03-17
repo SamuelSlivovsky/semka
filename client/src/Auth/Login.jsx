@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
@@ -15,12 +15,20 @@ export const Login = () => {
     userid: "",
     password: "",
   };
+
   const {
     control,
     formState: { errors },
     handleSubmit,
     reset,
   } = useForm({ defaultValues });
+
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    if (token !== null) {
+      navigate("/");
+    }
+  }, []);
 
   const onSubmit = (data) => {
     const requestOptions = {
@@ -34,9 +42,8 @@ export const Login = () => {
     fetch("/auth/login", requestOptions)
       .then((response) => response.json())
       .then((res) => {
-        console.log(res);
-         localStorage.setItem("hospit-user", res.accessToken);
-        navigate("/");
+        localStorage.setItem("hospit-user", res.accessToken);
+        window.location.reload(false);
       });
 
     reset();

@@ -7,7 +7,7 @@ async function getOddelenia() {
 
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -34,7 +34,7 @@ async function getTopZamestnanciVyplatyPocet(pocet) {
 
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -60,7 +60,7 @@ async function getTopZamestnanciVyplatyOddelenie(id_oddelenia, rok) {
 
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -79,7 +79,7 @@ async function getZamestnanciOddeleni() {
 
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -98,7 +98,7 @@ async function getZamestnanciOddelenia(id_oddelenia) {
 
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -106,7 +106,7 @@ async function getPocetZamOddelenia(id_oddelenia, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(id_zamestnanca) as pocet_zamestnancov from oddelenie o 
+      `select count(cislo_zam) as pocet_zamestnancov from oddelenie o 
         join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
         where z.id_oddelenia = :id_oddelenia
         and (to_char(dat_od, 'YYYY') <= :rok 
@@ -117,7 +117,7 @@ async function getPocetZamOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -135,7 +135,7 @@ async function getPocetPacientovOddelenia(id_oddelenia) {
     console.log(result);
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -154,7 +154,7 @@ async function getPocetOperaciiOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -174,7 +174,7 @@ async function getPocetHospitalizaciiOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -194,7 +194,7 @@ async function getPocetVysetreniOddelenia(id_oddelenia, rok) {
     console.log(result);
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -213,7 +213,7 @@ async function getKrvneSkupinyOddelenia(id_oddelenia) {
 
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -242,10 +242,9 @@ async function getSumaVyplatRoka(id_oddelenia, rok) {
     console.log(result.rows);
     return result.rows;
   } catch (err) {
-     throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
-
 
 module.exports = {
   getOddelenia,
@@ -259,5 +258,5 @@ module.exports = {
   getPocetPacientovOddelenia,
   getKrvneSkupinyOddelenia,
   getTopZamestnanciVyplatyOddelenie,
-  getSumaVyplatRoka
+  getSumaVyplatRoka,
 };

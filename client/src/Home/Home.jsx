@@ -18,15 +18,6 @@ function Home() {
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     setUserData(GetUserData(token));
-    const userDataHelper = GetUserData(token);
-    const headers = { authorization: "Bearer " + token };
-    fetch(`/lozko/obsadeneLozka/${userDataHelper.UserInfo.userid}`, {
-      headers,
-    })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-      });
   }, []);
   const cards = [
     <HomeCard

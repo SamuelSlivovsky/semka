@@ -25,6 +25,7 @@ import Combobox from "./Views/Combobox";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
+  const [beds, setBeds] = useState(null);
   const navigate = useNavigate();
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
@@ -46,6 +47,20 @@ function App() {
         .then((response) => response.json())
         .then((data) => {
           setPatientId(data[0].ID_PACIENTA);
+        });
+    } else if (
+      typeof userDataHelper !== "undefined" &&
+      userDataHelper !== null &&
+      userDataHelper.UserInfo.role === 2
+    ) {
+      const token = localStorage.getItem("hospit-user");
+      const headers = { authorization: "Bearer " + token };
+      fetch(`/lozko/obsadeneLozka/${userDataHelper.UserInfo.userid}`, {
+        headers,
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          setBeds(data.pocet);
         });
     }
     if (userDataHelper === null) {
@@ -159,11 +174,25 @@ function App() {
       icon="storage-icon"
     />,
     <SidebarButton
+      key="13"
+      visibleLeft={visibleLeft}
+      path="/statistics"
+      label="Štatistiky"
+      icon="stat-icon"
+    />,
+    <SidebarButton
       key="11"
       visibleLeft={visibleLeft}
       path="/user"
       label="Meno usera"
       icon="user-icon"
+    />,
+    <SidebarButton
+      key="12"
+      visibleLeft={visibleLeft}
+      path=""
+      label={visibleLeft ? `Pocet neobsadenych lozok: ${beds}` : beds}
+      icon=""
     />,
   ];
   const sidebarButtonsPatient = [

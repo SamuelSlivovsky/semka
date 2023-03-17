@@ -7,7 +7,7 @@ async function getOsobneUdaje() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -26,7 +26,7 @@ async function getMenovciPacientLekar() {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -37,16 +37,14 @@ async function getPomerMuziZeny(id_oddelenia) {
       `select trunc(zeny, 2) as zeny, trunc(100-zeny, 2) as muzi from
           (select count(case when (substr(os.rod_cislo, 3, 1)) in ('5','6') then 1 else null end)/count(*)*100 as zeny
               from os_udaje os join pacient p on(p.rod_cislo = os.rod_cislo)
-              join lekar_pacient lp on (lp.id_pacienta = p.id_pacienta)
-              join lekar l on (l.id_lekara = lp.id_lekara)
-              join zamestnanec z on (z.id_zamestnanca = l.id_zamestnanca)
-              where z.id_oddelenia = :id_oddelenia)`,
+              join nemocnica using(id_nemocnice)
+              join oddelenie using (id_nemocnice)
+              where id_oddelenia = :id_oddelenia)`,
       [id_oddelenia]
     );
-
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -57,20 +55,18 @@ async function insertOsUdaje(body) {
       os_udaje_insert(:rod_cislo, :PSC, :meno, :priezvisko, :tel, :mail);
     END;`;
 
-    let result = await conn.execute(sqlStatement,
-      {
-        rod_cislo: body.rod_cislo,
-        PSC: body.PSC,
-        meno: body.meno,
-        priezvisko: body.priezvisko,
-        tel: body.tel,
-        mail: body.mail
-      }
-    );
+    let result = await conn.execute(sqlStatement, {
+      rod_cislo: body.rod_cislo,
+      PSC: body.PSC,
+      meno: body.meno,
+      priezvisko: body.priezvisko,
+      tel: body.tel,
+      mail: body.mail,
+    });
 
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -78,5 +74,5 @@ module.exports = {
   getOsobneUdaje,
   getMenovciPacientLekar,
   getPomerMuziZeny,
-  insertOsUdaje
+  insertOsUdaje,
 };

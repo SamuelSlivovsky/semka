@@ -82,7 +82,7 @@ function EventCalendar(props) {
         setEventType(clickInfo.event._def.extendedProps.type);
         break;
     }
-    setCurrEventId(clickInfo.event._def.publicId);
+    setCurrEventId(clickInfo.event._def.extendedProps.id_zaz);
     setEventDateStart(new Date(clickInfo.event._instance.range.start));
     setCurrEventTitle(
       clickInfo.event._def.extendedProps.type +
