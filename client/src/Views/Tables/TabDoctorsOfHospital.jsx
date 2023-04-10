@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import TabDoctors from "./TabDoctors";
 import GetUserData from "../../Auth/GetUserData";
-
 function TabDoctorsOfHospital() {
   const [lekari, setLekari] = useState(null);
 
@@ -12,7 +11,6 @@ function TabDoctorsOfHospital() {
     fetch(`/lekar/lekari/${userDataHelper.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setLekari(<TabDoctors lekari={data} />);
       });
   }, []);

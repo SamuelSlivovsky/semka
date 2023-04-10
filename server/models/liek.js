@@ -5,10 +5,9 @@ async function getLieky() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(`SELECT nazov FROM liek`);
-
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -29,7 +28,7 @@ async function getNajviacPredpisovaneLiekyRoka(rok) {
 
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 

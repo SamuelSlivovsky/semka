@@ -19,7 +19,7 @@ function Home() {
     const token = localStorage.getItem("hospit-user");
     setUserData(GetUserData(token));
   }, []);
-  const cards = [
+  const doctorCards = [
     <HomeCard
       title="Kalendár"
       isCalendar={true}
@@ -33,13 +33,6 @@ function Home() {
       path="/patients"
       icon={patientIcon}
       key="2"
-    ></HomeCard>,
-    <HomeCard
-      title="Lekári"
-      isCalendar={false}
-      path="/doctors"
-      icon={doctorsIcon}
-      key="3"
     ></HomeCard>,
     <HomeCard
       title="Vyšetrenia"
@@ -85,6 +78,16 @@ function Home() {
     ></HomeCard>,
   ];
 
+  const chiefCards = [
+    <HomeCard
+      title="Lekári"
+      isCalendar={false}
+      path="/doctors"
+      icon={doctorsIcon}
+      key="3"
+    ></HomeCard>,
+  ];
+
   const adminCards = [
     <HomeCard
       title="Štatistiky"
@@ -126,23 +129,21 @@ function Home() {
     ></HomeCard>,
   ];
 
-  return (
-    <div>
-      {userData !== null &&
-      typeof userData !== "undefined" &&
-      userData.UserInfo.role === 1
-        ? adminCards
-        : userData !== null &&
-          typeof userData !== "undefined" &&
-          userData.UserInfo.role === 2
-        ? cards
-        : userData !== null &&
-          typeof userData !== "undefined" &&
-          userData.UserInfo.role === 3
-        ? patientCards
-        : ""}
-    </div>
-  );
+  const renderHomeCards = () => {
+    if (userData !== null && typeof userData !== "undefined") {
+      if (userData.UserInfo.role === 1) return adminCards;
+      else if (userData.UserInfo.role === 2) return doctorCards;
+      else if (userData.UserInfo.role === 3)
+        return (
+          <>
+            {doctorCards} {chiefCards}
+          </>
+        );
+      else if (userData.UserInfo.role === 4) return patientCards;
+    }
+  };
+
+  return <div>{renderHomeCards()}</div>;
 }
 
 export default Home;

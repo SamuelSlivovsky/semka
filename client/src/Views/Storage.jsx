@@ -10,14 +10,13 @@ import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { FilterMatchMode } from "primereact/api";
-
 import "../App.css";
 
 export default function Storage() {
   let emptyProduct = {
-    ID_SARZE: null,
+    ID_LIEK: null,
     NAZOV: null,
-    POCET_LIEKOV: null,
+    POCET: null,
     DAT_EXPIRACIE: null,
   };
 
@@ -34,12 +33,15 @@ export default function Storage() {
   const [filter, setFilter] = useState(null);
   const toast = useRef(null);
 
-  const oddelenie = 2;
+  const oddelenie = 3;
 
   useEffect(() => {
-    fetch(`sklad/all/${oddelenie}`)
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    fetch(`sklad/all/${oddelenie}`, { headers })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setProducts(data);
       });
     initFilter();
@@ -63,7 +65,9 @@ export default function Storage() {
 
   const openNew = () => {
     if (drugs == null) {
-      fetch(`lieky/all`)
+      const token = localStorage.getItem("hospit-user");
+      const headers = { authorization: "Bearer " + token };
+      fetch(`lieky/all`, { headers })
         .then((response) => response.json())
         .then((data) => {
           setDrugs(data);
@@ -92,7 +96,7 @@ export default function Storage() {
   const findIndexById = (id) => {
     let index = -1;
     for (let i = 0; i < products.length; i++) {
-      if (products[i].ID_SARZE === id) {
+      if (products[i].ID_LIEK === id) {
         index = i;
         break;
       }
@@ -102,18 +106,21 @@ export default function Storage() {
   };
 
   async function insertData() {
+    const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
       body: JSON.stringify({
-        id_sarze: product.ID_SARZE,
         id_oddelenia: oddelenie,
         nazov_lieku: product.NAZOV,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
           ",",
           ""
         ),
-        pocet_liekov: product.POCET_LIEKOV,
+        pocet: product.POCET,
       }),
     };
     const response = await fetch("/sklad/add", requestOptions).catch((err) =>
@@ -129,7 +136,7 @@ export default function Storage() {
     let _product = { ...product };
 
     let checkPocet = true;
-    if (product.POCET_LIEKOV <= 0) {
+    if (product.POCET <= 0) {
       toast.current.show({
         severity: "error",
         summary: "Error",
@@ -143,7 +150,7 @@ export default function Storage() {
     if (addProductDialog) {
       let sarzaExists = false;
       products.map((p) => {
-        if (p.ID_SARZE === product.ID_SARZE) {
+        if (p.ID_LIEK === product.ID_LIEK) {
           toast.current.show({
             severity: "error",
             summary: "Error",
@@ -160,8 +167,8 @@ export default function Storage() {
         if (
           product.NAZOV &&
           product.DAT_EXPIRACIE &&
-          product.POCET_LIEKOV &&
-          product.ID_SARZE
+          product.POCET &&
+          product.ID_LIEK
         ) {
           insertData();
           _product.DAT_EXPIRACIE =
@@ -193,7 +200,7 @@ export default function Storage() {
       }
     } else {
       if (checkPocet) {
-        const index = findIndexById(product.ID_SARZE);
+        const index = findIndexById(product.ID_LIEK);
         _products[index] = _product;
         setProduct(product);
         editDrug(_product);
@@ -225,7 +232,7 @@ export default function Storage() {
   };
 
   const deleteProduct = () => {
-    let _products = products.filter((val) => val.ID_SARZE !== product.ID_SARZE);
+    let _products = products.filter((val) => val.ID_LIEK !== product.ID_LIEK);
     deleteSarza(product);
     setProducts(_products);
     setDeleteProductDialog(false);
@@ -281,12 +288,20 @@ export default function Storage() {
   };
 
   async function editDrug(_product) {
+    const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
       body: JSON.stringify({
-        id_sarze: product.ID_SARZE,
-        pocet_liekov: product.POCET_LIEKOV,
+        id_liek: product.ID_LIEK,
+        pocet: product.POCET,
+        dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
+          ",",
+          ""
+        ),
       }),
     };
     const response = await fetch("/sklad/updateQuantity", requestOptions);
@@ -294,11 +309,16 @@ export default function Storage() {
   }
 
   async function deleteSarza(_product) {
+    const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
       body: JSON.stringify({
-        id_sarze: _product.ID_SARZE,
+        id_liek: _product.ID_LIEK,
+        datum: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(",", ""),
       }),
     };
     const response = await fetch("/sklad/deleteSarza", requestOptions);
@@ -418,14 +438,9 @@ export default function Storage() {
           value={products}
           selection={selectedProducts}
           onSelectionChange={(e) => setSelectedProducts(e.value)}
-          dataKey="ID_SARZE"
+          dataKey="ID_LIEK"
           globalFilter={globalFilter}
-          globalFilterFields={[
-            "ID_SARZE",
-            "NAZOV",
-            "POCET_LIEKOV",
-            "DAT_EXPIRACIE",
-          ]}
+          globalFilterFields={["ID_LIEK", "NAZOV", "POCET", "DAT_EXPIRACIE"]}
           filters={filter}
           header={header}
           responsiveLayout="scroll"
@@ -435,8 +450,8 @@ export default function Storage() {
             headerStyle={{ width: "3rem" }}
           ></Column>
           <Column
-            field="ID_SARZE"
-            header="Id šarže"
+            field="ID_LIEK"
+            header="Id lieku"
             style={{ minWidth: "12rem" }}
           ></Column>
           <Column
@@ -445,13 +460,13 @@ export default function Storage() {
             style={{ minWidth: "16rem" }}
           ></Column>
           <Column
-            field="POCET_LIEKOV"
+            field="POCET"
             header="Počet liekov"
             style={{ minWidth: "10rem" }}
           ></Column>
           <Column
             field="DAT_EXPIRACIE"
-            header="Dátum exspirácie"
+            header="Dátum expirácie"
             style={{ minWidth: "10rem" }}
           ></Column>
           <Column
@@ -470,17 +485,6 @@ export default function Storage() {
         footer={productDialogFooter}
         onHide={hideDialog}
       >
-        <div className="formgird grid">
-          <div className="field col">
-            <label htmlFor="ID_SARZE">Šarža</label>
-            <InputNumber
-              id="ID_SARZE"
-              value={product.ID_SARZE}
-              onValueChange={(e) => onInputNumberChange(e, "ID_SARZE")}
-              integeronly
-            />
-          </div>
-        </div>
         <div className="formgrid grid">
           <div className="field col">
             <Dropdown
@@ -500,11 +504,11 @@ export default function Storage() {
         </div>
         <div className="formgrid grid">
           <div className="field col">
-            <label htmlFor="POCET_LIEKOV">Počet</label>
+            <label htmlFor="POCET">Počet</label>
             <InputNumber
-              id="POCET_LIEKOV"
-              value={product.POCET_LIEKOV}
-              onValueChange={(e) => onInputNumberChange(e, "POCET_LIEKOV")}
+              id="POCET"
+              value={product.POCET}
+              onValueChange={(e) => onInputNumberChange(e, "POCET")}
               integeronly
             />
           </div>
@@ -533,11 +537,11 @@ export default function Storage() {
       >
         <div className="formgrid grid">
           <div className="field col">
-            <label htmlFor="POCET_LIEKOV">Počet</label>
+            <label htmlFor="POCET">Počet</label>
             <InputNumber
-              id="POCET_LIEKOV"
-              value={product.POCET_LIEKOV}
-              onValueChange={(e) => onInputNumberChange(e, "POCET_LIEKOV")}
+              id="POCET"
+              value={product.POCET}
+              onValueChange={(e) => onInputNumberChange(e, "POCET")}
               integeronly
               required
             />

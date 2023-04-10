@@ -39,7 +39,6 @@ export const Register = () => {
     fetch("/auth/register", requestOptions)
       .then((response) => response.json())
       .then((res) => {
-        console.log(res);
         localStorage.setItem("hospit-user", res.accessToken);
         navigate("/");
       });

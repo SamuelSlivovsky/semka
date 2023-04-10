@@ -24,14 +24,27 @@ const handleRegister = async (req, res) => {
           if (err) {
             return next(err);
           }
+          const accessToken = jwt.sign(
+            {
+              UserInfo: {
+                userid: userid,
+                role: 3,
+              },
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            { expiresIn: "3600s" }
+          );
 
           let body = req.body;
           body.userid = userid;
-          body.role = 2;
+          body.role = 3;
           body.pwd = hash;
+          body.accessToken = accessToken;
 
           userModel.insertUser(body);
-          return res.status(200).json({ success: `New user created!` });
+          return res
+            .status(200)
+            .json({ success: `New user created!`, accessToken: accessToken });
         });
       });
     }

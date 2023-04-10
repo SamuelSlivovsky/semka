@@ -5,14 +5,14 @@ const verify = require('../middleware/verifyUser');
 
 router.get(
   '/udalostiPacienta/:id',
-  verify.verifyRoles(2, 3),
+  verify.verifyRoles(1, 2,3),
   verify.checkForCorrectId(),
   controller.getUdalostiPacienta
 );
 
 router.get(
   '/udalostiLekara/:id',
-  verify.verifyRoles(1, 2),
+  verify.verifyRoles(1, 2,3),
   verify.checkForCorrectId(),
   controller.getUdalostiLekara
 );

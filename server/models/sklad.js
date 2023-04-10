@@ -1,18 +1,18 @@
 const database = require("../database/Database");
 
-async function getDrugsOfDepartment(id) {
+async function getDrugsOfDepartment() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT sz.id_sarze, l.nazov, to_char(sz.dat_expiracie,'DD.MM.YYYY') DAT_EXPIRACIE , sz.pocet_liekov 
-                    FROM sarza sz join sklad sk on (sk.id_skladu = sz.id_skladu and sk.id_oddelenia = :id)
-                                  join liek l on (l.id_lieku = sz.id_lieku)`,
-      { id }
+      `SELECT tl.id_liek, l.nazov, to_char(tl.datum_trvanlivosti,'DD.MM.YYYY') DAT_EXPIRACIE , tl.pocet 
+      FROM trvanlivost_lieku tl join sklad sk on (sk.id_sklad = tl.id_sklad)
+                    join liek l on (l.id_liek = tl.id_liek)
+                    join oddelenie on (sk.id_oddelenia = oddelenie.id_oddelenia)
+                    where oddelenie.id_oddelenia = 3`
     );
-    console.log(result);
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
@@ -20,11 +20,10 @@ async function insertDrug(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-            insert_sarza(:id_sarze, :id_oddelenia, :nazov_lieku, :dat_expiracie, :pocet_liekov);
+            insert_liek_sklad(:id_oddelenia, :nazov_lieku, :dat_expiracie, :pocet_liekov);
         END;`;
     console.log(body);
     let result = await conn.execute(sqlStatement, {
-      id_sarze: body.id_sarze,
       id_oddelenia: body.id_oddelenia,
       nazov_lieku: body.nazov_lieku,
       dat_expiracie: body.dat_expiracie,
@@ -42,12 +41,13 @@ async function updateQuantity(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-                          update_sarza(:pocet_liekov,:id_sarze);
+                          update_liek_sklad(:pocet,:id_liek,:datum);
                           END;`;
     console.log(body);
     let result = await conn.execute(sqlStatement, {
-      id_sarze: body.id_sarze,
-      pocet_liekov: body.pocet_liekov,
+      id_liek: body.id_liek,
+      pocet: body.pocet,
+      datum: body.dat_expiracie,
     });
 
     console.log("Rows inserted " + result.rowsAffected);
@@ -60,16 +60,17 @@ async function deleteSarza(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-                          delete_sarza(:id_sarze);
+        delete_liek(:id_liek, :datum);
                           END;`;
     console.log(body);
     let result = await conn.execute(sqlStatement, {
-      id_sarze: body.id_sarze,
+      id_liek: body.id_liek,
+      datum: body.datum,
     });
 
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 

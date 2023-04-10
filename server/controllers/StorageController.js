@@ -3,7 +3,7 @@ module.exports = {
     const storage = require("../models/sklad");
     (async () => {
       console.log(req.params);
-      ret_val = await storage.getDrugsOfDepartment(req.params.id);
+      ret_val = await storage.getDrugsOfDepartment();
       res.status(200).json(ret_val);
     })();
   },

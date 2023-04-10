@@ -5,33 +5,35 @@ const verify = require("../middleware/verifyUser");
 
 router.get(
   "/lekari/:id",
-  verify.verifyRoles(1, 2),
+  verify.verifyRoles(1, 3),
   verify.checkForCorrectId(),
   controller.getLekari
 );
 router.get(
   "/operacie/:id",
-  verify.verifyRoles(1, 2),
+  verify.verifyRoles(1, 2, 3),
   verify.checkForCorrectId(),
   controller.getOperacie
 );
 router.get(
   "/vysetrenia/:id",
-  verify.verifyRoles(1, 2),
+  verify.verifyRoles(1, 2, 3),
   verify.checkForCorrectId(),
   controller.getVysetrenia
 );
 router.get(
   "/hospitalizacie/:id",
-  verify.verifyRoles(1, 2),
+  verify.verifyRoles(1, 2, 3),
   verify.checkForCorrectId(),
   controller.getHospitalizacie
 );
 router.get(
   "/pacienti/:id",
-  verify.verifyRoles(1, 2),
+  verify.verifyRoles(1, 2, 3),
   verify.checkForCorrectId(),
   controller.getPacienti
 );
+
+router.get("/info/:id", verify.verifyRoles(1, 3), controller.getLekarInfo);
 
 module.exports = router;

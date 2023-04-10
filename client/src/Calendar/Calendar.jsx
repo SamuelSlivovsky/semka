@@ -37,9 +37,9 @@ function EventCalendar(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     let route =
-      props.userData.UserInfo.role === 2
+      props.userData.UserInfo.role === 2 || props.userData.UserInfo.role === 3
         ? "calendar/udalostiLekara/"
-        : props.userData.UserInfo.role === 3
+        : props.userData.UserInfo.role === 4
         ? "calendar/udalostiPacienta/"
         : "calendar/udalostiLekara/";
     fetch(`${route}${props.userData.UserInfo.userid}`, { headers })

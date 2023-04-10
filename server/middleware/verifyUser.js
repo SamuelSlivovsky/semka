@@ -9,9 +9,7 @@ const verifyRoles = (...allowedRoles) => {
         return;
       }
     });
-
     if (!result) return res.sendStatus(401);
-
     next();
   };
 };

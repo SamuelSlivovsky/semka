@@ -234,7 +234,7 @@ async function getOperacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
+      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaz
         join operacia using(id_zaznamu) 
         join pacient using(id_pacienta)
         where rod_cislo = :rod_cislo`,
@@ -255,7 +255,7 @@ async function getOckovania(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const ockovania = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
+      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaz
         join ockovanie using(id_zaznamu)
         join pacient using(id_pacienta)
          where rod_cislo = :rod_cislo`,

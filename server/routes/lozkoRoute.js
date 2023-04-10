@@ -5,7 +5,7 @@ const verify = require("../middleware/verifyUser");
 
 router.get(
   "/obsadeneLozka/:id",
-  verify.verifyRoles(1, 2),
+  verify.verifyRoles(1, 2,3),
   controller.getNeobsadeneLozka
 );
 

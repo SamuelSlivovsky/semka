@@ -20,13 +20,15 @@ import Storage from "./Views/Storage";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import Combobox from "./Views/Combobox";
+import DoctorCard from "./Profile/DoctorCard";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
   const [beds, setBeds] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
   const handleShowSidebar = () => {
     setVisibleLeft(!visibleLeft);
   };
@@ -36,36 +38,33 @@ function App() {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     setUserData(userDataHelper);
-    if (
-      typeof userDataHelper !== "undefined" &&
-      userDataHelper !== null &&
-      userDataHelper.UserInfo.role === 3
-    ) {
-      const token = localStorage.getItem("hospit-user");
-      const headers = { authorization: "Bearer " + token };
-      fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, { headers })
-        .then((response) => response.json())
-        .then((data) => {
-          setPatientId(data[0].ID_PACIENTA);
-        });
-    } else if (
-      typeof userDataHelper !== "undefined" &&
-      userDataHelper !== null &&
-      userDataHelper.UserInfo.role === 2
-    ) {
-      const token = localStorage.getItem("hospit-user");
-      const headers = { authorization: "Bearer " + token };
-      fetch(`/lozko/obsadeneLozka/${userDataHelper.UserInfo.userid}`, {
-        headers,
-      })
-        .then((response) => response.json())
-        .then((data) => {
-          setBeds(data.pocet);
-        });
-    }
-    if (userDataHelper === null) {
+    if (typeof userDataHelper !== "undefined" && userDataHelper !== null) {
+      if (userDataHelper.UserInfo.role === 4) {
+        const token = localStorage.getItem("hospit-user");
+        const headers = { authorization: "Bearer " + token };
+        fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, {
+          headers,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setPatientId(data[0].ID_PACIENTA);
+          });
+      } else if (
+        userDataHelper.UserInfo.role === 2 ||
+        userDataHelper.UserInfo.role === 3
+      ) {
+        const token = localStorage.getItem("hospit-user");
+        const headers = { authorization: "Bearer " + token };
+        fetch(`/lozko/obsadeneLozka/${userDataHelper.UserInfo.userid}`, {
+          headers,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            setBeds(data.pocet);
+          });
+      }
+    } else if (location.pathname !== "/register") {
       navigate("/login");
-    } else {
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -109,7 +108,7 @@ function App() {
     />,
   ];
 
-  const sidebarButtons = [
+  const sidebarButtonsDoctor = [
     <SidebarButton
       key="1"
       visibleLeft={visibleLeft}
@@ -131,13 +130,7 @@ function App() {
       label="Pacienti"
       icon="patient-icon"
     />,
-    <SidebarButton
-      key="4"
-      visibleLeft={visibleLeft}
-      path="/doctors"
-      label="Lekári"
-      icon="doctor-icon"
-    />,
+
     <SidebarButton
       key="5"
       visibleLeft={visibleLeft}
@@ -195,6 +188,17 @@ function App() {
       icon=""
     />,
   ];
+
+  const sidebarButtonsChief = [
+    <SidebarButton
+      key="4"
+      visibleLeft={visibleLeft}
+      path="/doctors"
+      label="Lekári"
+      icon="doctor-icon"
+    />,
+  ];
+
   const sidebarButtonsPatient = [
     <SidebarButton
       key="1"
@@ -233,11 +237,6 @@ function App() {
             <Patient patientId={patientId} userData={userData}></Patient>
           }
         ></Route>
-
-        <Route
-          path="/doctors"
-          element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
-        ></Route>
         <Route
           path="/examinations"
           element={<TabExaminations></TabExaminations>}
@@ -253,6 +252,21 @@ function App() {
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
         <Route path="/add" element={<Add></Add>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
+      </>
+    );
+  };
+
+  const renderChiefRoutes = () => {
+    return (
+      <>
+        <Route
+          path="/doctors"
+          element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
+        ></Route>
+        <Route
+          path="/doctor"
+          element={<DoctorCard></DoctorCard>}
+        ></Route>
       </>
     );
   };
@@ -301,13 +315,19 @@ function App() {
         />
         {typeof userData !== "undefined" &&
         userData !== null &&
-        userData.UserInfo.role === 1
-          ? sidebarButtonsAdmin
-          : userData !== null && userData.UserInfo.role === 2
-          ? sidebarButtons
-          : userData !== null && userData.UserInfo.role === 3
-          ? sidebarButtonsPatient
-          : ""}
+        userData.UserInfo.role === 1 ? (
+          sidebarButtonsAdmin
+        ) : userData !== null && userData.UserInfo.role === 2 ? (
+          sidebarButtonsDoctor
+        ) : userData !== null && userData.UserInfo.role === 3 ? (
+          <>
+            {sidebarButtonsDoctor} {sidebarButtonsChief}
+          </>
+        ) : userData !== null && userData.UserInfo.role === 4 ? (
+          sidebarButtonsPatient
+        ) : (
+          ""
+        )}
         {typeof userData !== "undefined" && userData !== null ? (
           <SidebarButton
             key="12"
@@ -330,17 +350,25 @@ function App() {
           <Route path="/logout" element={<Logout></Logout>}></Route>
           {typeof userData !== "undefined" &&
           userData !== null &&
-          userData.UserInfo.role === 1
-            ? renderAdminRoutes()
-            : typeof userData !== "undefined" &&
-              userData !== null &&
-              userData.UserInfo.role === 2
-            ? renderDoctorRoutes()
-            : typeof userData !== "undefined" &&
-              userData !== null &&
-              userData.UserInfo.role === 3
-            ? renderPatientRoutes()
-            : ""}
+          userData.UserInfo.role === 1 ? (
+            renderAdminRoutes()
+          ) : typeof userData !== "undefined" &&
+            userData !== null &&
+            userData.UserInfo.role === 2 ? (
+            renderDoctorRoutes()
+          ) : typeof userData !== "undefined" &&
+            userData !== null &&
+            userData.UserInfo.role === 3 ? (
+            <>
+              {renderChiefRoutes()} {renderDoctorRoutes()}
+            </>
+          ) : typeof userData !== "undefined" &&
+            userData !== null &&
+            userData.UserInfo.role === 4 ? (
+            renderPatientRoutes()
+          ) : (
+            ""
+          )}
         </Routes>
       </div>
     </div>

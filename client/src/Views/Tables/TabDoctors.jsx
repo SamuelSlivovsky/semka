@@ -3,16 +3,51 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { useNavigate } from "react-router";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
 
 export default function TabDoctors(props) {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
-
+  const [showDialog, setShowDialog] = useState(false);
   const [lekari, setLekari] = useState(null);
+  const navigate = useNavigate();
+
+  const onHide = () => {
+    setSelectedRow(null);
+    setShowDialog(false);
+  };
+
+  const onSubmit = () => {
+    setShowDialog(false);
+    navigate("/doctor", { state: selectedRow.CISLO_ZAM });
+  };
 
   const handleClick = (value) => {
+    console.log(value);
+    setShowDialog(true);
     setSelectedRow(value);
+  };
+
+  const renderDialogFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Zatvoriť"
+          icon="pi pi-times"
+          className="p-button-danger"
+          onClick={() => onHide()}
+        />
+        <Button
+          label="Detail"
+          icon="pi pi-check"
+          onClick={() => onSubmit()}
+          autoFocus
+        />
+      </div>
+    );
   };
 
   const renderHeader = () => {
@@ -95,9 +130,19 @@ export default function TabDoctors(props) {
           <Column field="ODDELENIE_NAZOV" header={"Oddelenie"} filter></Column>
           <Column field="MENO" header={"Meno"} filter></Column>
           <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
-          <Column field="MAIL" header={"E-mail"}></Column>
         </DataTable>
       </div>
+      <Dialog
+        header={
+          selectedRow != null
+            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            : ""
+        }
+        visible={showDialog}
+        style={{ width: "50vw" }}
+        footer={renderDialogFooter()}
+        onHide={() => onHide()}
+      ></Dialog>
     </div>
   );
 }

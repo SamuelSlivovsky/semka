@@ -4,11 +4,11 @@ async function getLekari(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT meno, priezvisko, oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov 
+      `SELECT meno, priezvisko, oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, zamestnanci.cislo_zam 
           from zamestnanci
                     join os_udaje using(rod_cislo)
                     join nemocnica on(zamestnanci.id_nemocnice = nemocnica.id_nemocnice)
-                    join oddelenie on(zamestnanci.cislo_zam = oddelenie.cislo_zam)
+                    left join oddelenie on(zamestnanci.cislo_zam = oddelenie.cislo_zam)
               where zamestnanci.id_nemocnice = get_id_nemocnice(:pid_lekara)
               order by oddelenie.id_oddelenia`,
       { pid_lekara }
@@ -160,6 +160,26 @@ async function getHospitalizacie(id) {
   }
 }
 
+async function getLekarInfo(id) {
+  try {
+    let conn = await database.getConnection();
+    const info = await conn.execute(
+      `select os_udaje.rod_cislo, meno, priezvisko,trunc(months_between(sysdate, to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) 
+      || '.' || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek, to_char(to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) || '.' 
+      || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,
+      PSC, mesto.nazov as nazov_obce from zamestnanci
+                  join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
+                  join mesto using(PSC) 
+                    where zamestnanci.cislo_zam = :id`,
+      [id]
+    );
+
+    return info.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getLekari,
   getPacienti,
@@ -168,4 +188,5 @@ module.exports = {
   getOperacie,
   getVysetrenia,
   getHospitalizacie,
+  getLekarInfo,
 };
