@@ -18,6 +18,7 @@ const drugsRoute = require("./routes/drugsRoute");
 const medRecordsRoute = require("./routes/medRecordsRoute");
 const addRoute = require("./routes/addRoute");
 const lozkoRoute = require("./routes/lozkoRoute");
+const equipmentRoute = require("./routes/equipmentRoute");
 
 app.use(credentials);
 //app.use(cors(corsOptions));
@@ -40,6 +41,7 @@ app.use("/lieky", drugsRoute);
 app.use("/zaznamy", medRecordsRoute);
 app.use("/add", addRoute);
 app.use("/lozko", lozkoRoute);
+app.use("/vybavenie", equipmentRoute);
 app.listen(port, () => {
   console.log(`Aplikacia bezi na porte ${port}`);
 });

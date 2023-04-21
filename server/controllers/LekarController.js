@@ -52,4 +52,13 @@ module.exports = {
       res.status(200).json(info);
     })();
   },
+
+  getNemocnicaOddelenia: (req, res) => {
+    const lekar = require("../models/lekar");
+    (async () => {
+      info = await lekar.getNemocnicaOddelenia(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+  
 };

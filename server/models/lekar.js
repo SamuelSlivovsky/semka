@@ -180,6 +180,24 @@ async function getLekarInfo(id) {
   }
 }
 
+async function getNemocnicaOddelenia(id) {
+  try {
+    let conn = await database.getConnection();
+    console.log(id);
+    const info = await conn.execute(
+      `select oddelenie.id_oddelenia, oddelenie.typ_oddelenia as NAZOV from oddelenie 
+      join nemocnica on(nemocnica.id_nemocnice = oddelenie.id_nemocnice)
+      join zamestnanci on (nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
+      where zamestnanci.cislo_zam =:id`,
+      [id]
+    );
+
+    return info.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getLekari,
   getPacienti,
@@ -189,4 +207,5 @@ module.exports = {
   getVysetrenia,
   getHospitalizacie,
   getLekarInfo,
+  getNemocnicaOddelenia,
 };

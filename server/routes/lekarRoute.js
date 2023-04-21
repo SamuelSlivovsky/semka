@@ -35,5 +35,10 @@ router.get(
 );
 
 router.get("/info/:id", verify.verifyRoles(1, 3), controller.getLekarInfo);
+router.get(
+  "/oddelenia/:id",
+  verify.verifyRoles(1, 3),
+  controller.getNemocnicaOddelenia
+);
 
 module.exports = router;

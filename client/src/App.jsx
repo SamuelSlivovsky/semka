@@ -23,6 +23,7 @@ import Logout from "./Auth/Logout";
 import { useNavigate, useLocation } from "react-router-dom";
 import Combobox from "./Views/Combobox";
 import DoctorCard from "./Profile/DoctorCard";
+import Equipment from "./Views/Equipment";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -263,10 +264,8 @@ function App() {
           path="/doctors"
           element={<TabDoctorsOfHospital></TabDoctorsOfHospital>}
         ></Route>
-        <Route
-          path="/doctor"
-          element={<DoctorCard></DoctorCard>}
-        ></Route>
+        <Route path="/doctor" element={<DoctorCard></DoctorCard>}></Route>
+        <Route path="/equipment" element={<Equipment></Equipment>}></Route>
       </>
     );
   };
