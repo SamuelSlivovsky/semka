@@ -34,7 +34,7 @@ export default function Equipment() {
   const [departments, setDepartments] = useState([]);
   const toast = useRef(null);
 
-  const oddelenie = 3;
+  const oddelenie = 25;
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -89,7 +89,7 @@ export default function Equipment() {
     return index;
   };
 
-  /*async function insertData() {
+  async function insertData() {
     const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",
@@ -99,68 +99,38 @@ export default function Equipment() {
       },
       body: JSON.stringify({
         id_oddelenia: oddelenie,
-        nazov_lieku: product.NAZOV,
-        dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
+        typ: product.TYP,
+        dat_zaobstarania: product.ZAOBSTARANIE.toLocaleString("en-GB").replace(
           ",",
           ""
         ),
-        pocet: product.POCET,
       }),
     };
-    const response = await fetch("/sklad/add", requestOptions).catch((err) =>
+    const response = await fetch("/vybavenie/addEquip", requestOptions).catch((err) =>
       console.log(err)
     );
     console.log(response);
-  }*/
+  }
 
-  /* const saveProduct = () => {
+   const saveProduct = () => {
     let filledCells = false;
 
     let _products = [...products];
     let _product = { ...product };
 
-    let checkPocet = true;
-    if (product.POCET <= 0) {
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Počet liekov musí byť kladný",
-        life: 3000,
-      });
-      console.log("Pocet je zaporny");
-      checkPocet = false;
-    }
-
-    if (addProductDialog) {
-      let sarzaExists = false;
-      products.map((p) => {
-        if (p.ID_LIEK === product.ID_LIEK) {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Šarža musí byť unikátna",
-            life: 3000,
-          });
-          console.log("Sarza uz existuje");
-          sarzaExists = true;
-        }
-        return "";
-      });
-
-      if (!sarzaExists && checkPocet) {
         if (
-          product.NAZOV &&
-          product.DAT_EXPIRACIE &&
-          product.POCET &&
-          product.ID_LIEK
+          product.TYP &&
+          product.ZAOBSTARANIE &&
+          product.ECV ||
+          product.ID_ODDELENIA
         ) {
           insertData();
-          _product.DAT_EXPIRACIE =
-            product.DAT_EXPIRACIE.getDate() +
+          _product.ZAOBSTARANIE =
+            product.ZAOBSTARANIE.getDate() +
             "." +
-            (product.DAT_EXPIRACIE.getMonth() + 1) +
+            (product.ZAOBSTARANIE.getMonth() + 1) +
             "." +
-            product.DAT_EXPIRACIE.getFullYear();
+            product.ZAOBSTARANIE.getFullYear();
           _products.push(_product);
           console.log("_products po pushnuti");
           console.log(_products);
@@ -172,7 +142,7 @@ export default function Equipment() {
           });
           filledCells = true;
           setAddProductDialog(false);
-          setSelectedDrug(null);
+          setSelectedEquipment(null);
         } else {
           toast.current.show({
             severity: "error",
@@ -181,29 +151,11 @@ export default function Equipment() {
             life: 3000,
           });
         }
-      }
-    } else {
-      if (checkPocet) {
-        const index = findIndexById(product.ID_LIEK);
-        _products[index] = _product;
-        setProduct(product);
-        editDrug(_product);
-        toast.current.show({
-          severity: "success",
-          summary: "Successful",
-          detail: "Liek bol upravený",
-          life: 3000,
-        });
-        filledCells = true;
-        setChangeProductDialog(false);
-      }
-    }
-
     if (filledCells) {
       setProducts(_products);
       setProduct(emptyProduct);
     }
-  };*/
+  };
 
   const editProduct = (rowData) => {
     setProduct({ ...rowData });
@@ -216,8 +168,8 @@ export default function Equipment() {
   };
 
   const deleteProduct = () => {
-    let _products = products.filter((val) => val.ID_LIEK !== product.ID_LIEK);
-    deleteSarza(product);
+    let _products = products.filter((val) => val.ID_VYBAVENIA !== product.ID_VYBAVENIA);
+    deleteEquip(product);
     setProducts(_products);
     setDeleteProductDialog(false);
     setProduct(emptyProduct);
@@ -229,22 +181,12 @@ export default function Equipment() {
     });
   };
 
-  const setSelectedDrugFromDropdown = (e) => {
-    if (typeof e.target.value === "undefined") {
-      selectedEquipment(null);
-      onInputChange(null, "NAZOV");
-    } else {
-      setSelectedEquipment(e.target.value);
-      onInputChange(e.target.value.NAZOV, "NAZOV");
-    }
-  };
-
   const confirmDeleteSelected = () => {
     setDeleteProductsDialog(true);
   };
 
   const deleteSelectedProducts = () => {
-    selectedProducts.map((selProduct) => deleteSarza(selProduct));
+    selectedProducts.map((selProduct) => deleteProduct(selProduct));
     let _products = products.filter((val) => !selectedProducts.includes(val));
     setProducts(_products);
     setDeleteProductsDialog(false);
@@ -271,7 +213,7 @@ export default function Equipment() {
     setProduct(_product);
   };
 
-  async function editDrug(_product) {
+  async function editEquipment(_product) {
     const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",
@@ -280,18 +222,17 @@ export default function Equipment() {
         authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        id_liek: product.ID_LIEK,
-        pocet: product.POCET,
-        dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
+        id_vybavenia: product.ID_VYBAVENIA,
+        dat_zaobstarania: product.ZAOBSTARANIE.toLocaleString("en-GB").replace(
           ",",
           ""
         ),
       }),
     };
-    await fetch("/sklad/updateQuantity", requestOptions);
+    await fetch("/sklad/updateEquipment", requestOptions);
   }
 
-  async function deleteSarza(_product) {
+  async function deleteEquip(_product) {
     const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",
@@ -447,9 +388,8 @@ export default function Equipment() {
           globalFilter={globalFilter}
           globalFilterFields={[
             "ID_VYBAVENIA",
-            "NAZOV",
-            "POCET",
-            "DAT_EXPIRACIE",
+            "TYP",
+            "ZAOBSTARANIE",
           ]}
           filters={filter}
           header={header}
@@ -536,7 +476,7 @@ export default function Equipment() {
       <Dialog
         visible={changeProductDialog}
         style={{ width: "500px" }}
-        header={product.NAZOV}
+        header={product.TYP}
         modal
         className="p-fluid"
         footer={productDialogFooter}

@@ -172,6 +172,7 @@ export const Register = () => {
                 </label>
               </span>
               {getFormErrorMessage("password")}
+              <a href="login">Máte už vytvorený účet?</a>
             </div>
             <Button
               type="submit"

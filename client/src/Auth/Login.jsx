@@ -142,10 +142,11 @@ export const Login = () => {
                   htmlFor="password"
                   className={classNames({ "p-error": errors.password })}
                 >
-                  Password*
+                  Heslo*
                 </label>
               </span>
               {getFormErrorMessage("password")}
+              <a href="register">Nemáte účet?</a>
             </div>
             <Button
               type="submit"

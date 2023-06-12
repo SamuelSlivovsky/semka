@@ -33,7 +33,29 @@ async function deleteEquip(body) {
   }
 }
 
+async function insertVybavenie(body) {
+  try {
+    let conn = await database.getConnection();
+    console.log(body);
+    const sqlStatement = `BEGIN 
+    vybavenie_insert(:id_oddelenia, :ecv, :typ, :zaobstaranie);
+    END;`;
+
+
+    let result = await conn.execute(sqlStatement, {
+     id_oddelenia: body.id_oddelenia,
+     ecv: null,
+     typ : body.typ,
+     zaobstaranie: body.dat_zaobstarania,
+    });
+    console.log('Rows inserted ' + result.rowsAffected);
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
 module.exports = {
   getAllEquipment,
   deleteEquip,
+  insertVybavenie
 };
