@@ -26,7 +26,6 @@ export default function TabDoctors(props) {
   };
 
   const handleClick = (value) => {
-    console.log(value);
     setShowDialog(true);
     setSelectedRow(value);
   };

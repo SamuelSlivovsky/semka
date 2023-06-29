@@ -3,15 +3,19 @@ const database = require("../database/Database");
 async function getLekari(pid_lekara) {
   try {
     let conn = await database.getConnection();
+    const id_oddelenia = await conn.execute(
+      `SELECT id_oddelenia from zamestnanci where cislo_zam = :pid_lekara`,
+      { pid_lekara }
+    );
+    let id_odd = id_oddelenia.rows[0].ID_ODDELENIA;
     const result = await conn.execute(
       `SELECT meno, priezvisko, oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, zamestnanci.cislo_zam 
           from zamestnanci
                     join os_udaje using(rod_cislo)
-                    join nemocnica on(zamestnanci.id_nemocnice = nemocnica.id_nemocnice)
-                    left join oddelenie on(zamestnanci.cislo_zam = oddelenie.cislo_zam)
-              where zamestnanci.id_nemocnice = get_id_nemocnice(:pid_lekara)
-              order by oddelenie.id_oddelenia`,
-      { pid_lekara }
+                    join nemocnica using(id_nemocnice)
+                    left join oddelenie on(zamestnanci.id_oddelenia = oddelenie.id_oddelenia)
+              where oddelenie.id_oddelenia = :id_odd`,
+      { id_odd }
     );
 
     return result.rows;
@@ -89,11 +93,11 @@ async function getOperacie(id) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", id_zaznamu as "id", to_char(datum,'DD.MM.YYYY') datum from zdravotny_zaznam
+      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start",id_operacie as "id" ,id_zaznamu as "id_zaz", to_char(datum,'DD.MM.YYYY') datum from zdravotny_zaz
                 join operacia using(id_zaznamu)
-                 join operacia_lekar using(id_operacie) 
-                  join pacient using(id_pacienta)
-                   join os_udaje using(rod_cislo) where cislo_zam = :id`,
+                  join zdravotna_karta using(id_karty)
+                    join pacient using(id_pacienta)
+                      join os_udaje using(rod_cislo) where cislo_zam = :id`,
       [id]
     );
 

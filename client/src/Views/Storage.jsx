@@ -10,6 +10,7 @@ import { InputText } from "primereact/inputtext";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import { FilterMatchMode } from "primereact/api";
+import GetUserData from "../Auth/GetUserData";
 import "../App.css";
 
 export default function Storage() {
@@ -33,15 +34,13 @@ export default function Storage() {
   const [filter, setFilter] = useState(null);
   const toast = useRef(null);
 
-  const oddelenie = 3;
-
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
-    fetch(`sklad/all/${oddelenie}`, { headers })
+    fetch(`sklad/all/${userDataHelper.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setProducts(data);
       });
     initFilter();
@@ -114,7 +113,7 @@ export default function Storage() {
         authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        id_oddelenia: oddelenie,
+        id_oddelenia: 1,
         nazov_lieku: product.NAZOV,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
           ",",

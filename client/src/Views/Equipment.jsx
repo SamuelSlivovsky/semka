@@ -33,13 +33,11 @@ export default function Equipment() {
   const [department, setDepartment] = useState(null);
   const [departments, setDepartments] = useState([]);
   const toast = useRef(null);
-
-  const oddelenie = 25;
-
+  const token = localStorage.getItem("hospit-user");
+  const userDataHelper = GetUserData(token);
   useEffect(() => {
-    const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
-    fetch(`vybavenie/all/${oddelenie}`, { headers })
+    fetch(`vybavenie/all/${userDataHelper.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setProducts(data);
@@ -98,7 +96,7 @@ export default function Equipment() {
         authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        id_oddelenia: oddelenie,
+        cis_zam: userDataHelper.UserInfo.userid,
         typ: product.TYP,
         dat_zaobstarania: product.ZAOBSTARANIE.toLocaleString("en-GB").replace(
           ",",
@@ -106,51 +104,49 @@ export default function Equipment() {
         ),
       }),
     };
-    const response = await fetch("/vybavenie/addEquip", requestOptions).catch((err) =>
-      console.log(err)
+    const response = await fetch("/vybavenie/addEquip", requestOptions).catch(
+      (err) => console.log(err)
     );
     console.log(response);
   }
 
-   const saveProduct = () => {
+  const saveProduct = () => {
     let filledCells = false;
 
     let _products = [...products];
     let _product = { ...product };
 
-        if (
-          product.TYP &&
-          product.ZAOBSTARANIE &&
-          product.ECV ||
-          product.ID_ODDELENIA
-        ) {
-          insertData();
-          _product.ZAOBSTARANIE =
-            product.ZAOBSTARANIE.getDate() +
-            "." +
-            (product.ZAOBSTARANIE.getMonth() + 1) +
-            "." +
-            product.ZAOBSTARANIE.getFullYear();
-          _products.push(_product);
-          console.log("_products po pushnuti");
-          console.log(_products);
-          toast.current.show({
-            severity: "success",
-            summary: "Successful",
-            detail: "Liek bol pridaný",
-            life: 3000,
-          });
-          filledCells = true;
-          setAddProductDialog(false);
-          setSelectedEquipment(null);
-        } else {
-          toast.current.show({
-            severity: "error",
-            summary: "Error",
-            detail: "Je potrebné vyplniť všetky polia",
-            life: 3000,
-          });
-        }
+    if (
+      (product.TYP && product.ZAOBSTARANIE && product.ECV) ||
+      product.ID_ODDELENIA
+    ) {
+      insertData();
+      _product.ZAOBSTARANIE =
+        product.ZAOBSTARANIE.getDate() +
+        "." +
+        (product.ZAOBSTARANIE.getMonth() + 1) +
+        "." +
+        product.ZAOBSTARANIE.getFullYear();
+      _products.push(_product);
+      console.log("_products po pushnuti");
+      console.log(_products);
+      toast.current.show({
+        severity: "success",
+        summary: "Successful",
+        detail: "Liek bol pridaný",
+        life: 3000,
+      });
+      filledCells = true;
+      setAddProductDialog(false);
+      setSelectedEquipment(null);
+    } else {
+      toast.current.show({
+        severity: "error",
+        summary: "Error",
+        detail: "Je potrebné vyplniť všetky polia",
+        life: 3000,
+      });
+    }
     if (filledCells) {
       setProducts(_products);
       setProduct(emptyProduct);
@@ -168,7 +164,9 @@ export default function Equipment() {
   };
 
   const deleteProduct = () => {
-    let _products = products.filter((val) => val.ID_VYBAVENIA !== product.ID_VYBAVENIA);
+    let _products = products.filter(
+      (val) => val.ID_VYBAVENIA !== product.ID_VYBAVENIA
+    );
     deleteEquip(product);
     setProducts(_products);
     setDeleteProductDialog(false);
@@ -215,6 +213,7 @@ export default function Equipment() {
 
   async function editEquipment(_product) {
     const token = localStorage.getItem("hospit-user");
+
     const requestOptions = {
       method: "POST",
       headers: {
@@ -249,10 +248,7 @@ export default function Equipment() {
 
   const openNew = () => {
     if (departments.length < 1) {
-      const token = localStorage.getItem("hospit-user");
-      const userDataHelper = GetUserData(token);
       const headers = { authorization: "Bearer " + token };
-      console.log(userDataHelper);
       fetch(`lekar/oddelenia/${userDataHelper.UserInfo.userid}`, { headers })
         .then((response) => response.json())
         .then((data) => {
@@ -386,11 +382,7 @@ export default function Equipment() {
           onSelectionChange={(e) => setSelectedProducts(e.value)}
           dataKey="ID_VYBAVENIA"
           globalFilter={globalFilter}
-          globalFilterFields={[
-            "ID_VYBAVENIA",
-            "TYP",
-            "ZAOBSTARANIE",
-          ]}
+          globalFilterFields={["ID_VYBAVENIA", "TYP", "ZAOBSTARANIE"]}
           filters={filter}
           header={header}
           responsiveLayout="scroll"

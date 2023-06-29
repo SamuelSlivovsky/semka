@@ -33,6 +33,7 @@ async function getPopisZaznamu(id) {
 async function getPriloha(id) {
   try {
     let conn = await database.getConnection();
+    console.log(id);
     const result = await conn.execute(
       `SELECT data FROM blob_data WHERE id_zaznamu = :id`,
       { id }
@@ -74,7 +75,7 @@ async function insertOperacia(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        operacia_insert(:rod_cislo, :priloha, :popis, :datum, :id_miestnosti, :trvanie, :id_lekara);
+        operacia_insert(:rod_cislo, :id_lekara, :datum, :priloha, :nazov, :popis, :trvanie);
         END;`;
 
     let buffer = Buffer.from([0x00]);
@@ -86,11 +87,12 @@ async function insertOperacia(body) {
       priloha: buffer,
       popis: body.popis,
       datum: body.datum,
-      id_miestnosti: body.id_miestnosti,
       trvanie: body.trvanie,
       id_lekara: body.id_lekara,
+      priloha: buffer !== null ? buffer : body.priloha,
+      nazov: body.nazov,
     });
-  } catch {
+  } catch (err) {
     throw new Error("Database error: " + err);
   }
 }
