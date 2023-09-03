@@ -88,7 +88,6 @@ export default function Statistics() {
       fetch(`/selects/priemernyVek`, { headers })
         .then((res) => res.json())
         .then((result) => {
-          console.log(result);
         });
 
       fetch(`/selects/pocetZamOddelenia/${id}/${year.getFullYear()}`, {

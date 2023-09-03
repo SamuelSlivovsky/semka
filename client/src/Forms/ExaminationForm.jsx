@@ -49,7 +49,6 @@ export default function ExaminationForm(props) {
       "/add/vysetrenie",
       requestOptionsPatient
     ).then(() => setShowMessage(true));
-    console.log(responsePatient);
 
     form.restart();
   };
@@ -96,7 +95,6 @@ export default function ExaminationForm(props) {
     reader.readAsDataURL(blob);
     reader.onloadend = function () {
       setBase64Data(reader.result.substring(reader.result.indexOf(",") + 1));
-      console.log(reader.result);
     };
   };
   return (

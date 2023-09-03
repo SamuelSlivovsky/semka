@@ -12,7 +12,6 @@ export default function TabExaminations() {
     fetch(`/lekar/vysetrenia/${userDataHelper.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setVysetrenia(data);
       });
   }, []);

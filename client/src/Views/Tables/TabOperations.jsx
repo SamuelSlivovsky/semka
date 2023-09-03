@@ -14,12 +14,10 @@ export default function TabOperations() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setOperacie(data);
       });
   }, []);
 
-  console.log(operacie);
   const data = {
     tableName: "Operácie",
     cellData: operacie,

@@ -93,28 +93,24 @@ export default function ProfileCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(...data);
         setProfile(...data);
       });
 
     fetch(`selects/typyOckovania`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setVaccinationTypes(data);
       });
 
     fetch(`selects/typyChoroby`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setDiseaseTypes(data);
       });
 
     fetch(`selects/typyZTP`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setZTPTypes(data);
       });
 
@@ -126,7 +122,6 @@ export default function ProfileCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setPatientRecipes(data);
       });
 
@@ -138,7 +133,6 @@ export default function ProfileCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setPatientDiseases(data);
       });
 
@@ -150,7 +144,6 @@ export default function ProfileCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setPatientZTPTypes(data);
       });
 
@@ -162,7 +155,6 @@ export default function ProfileCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setPatientMedicalRecords(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -226,11 +218,9 @@ export default function ProfileCard(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedDiseaseType(e.value);
-    console.log(e.value.ID_TYPU_CHOROBY);
     fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setDiseases(data);
       });
   };

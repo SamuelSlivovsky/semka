@@ -25,7 +25,6 @@ export default function TabPatients() {
     })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setPacienti(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps

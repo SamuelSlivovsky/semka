@@ -70,7 +70,6 @@ export default function Storage() {
         .then((response) => response.json())
         .then((data) => {
           setDrugs(data);
-          console.log(data);
         });
     }
 
@@ -125,7 +124,6 @@ export default function Storage() {
     const response = await fetch("/sklad/add", requestOptions).catch((err) =>
       console.log(err)
     );
-    console.log(response);
   }
 
   const saveProduct = () => {
@@ -142,7 +140,6 @@ export default function Storage() {
         detail: "Počet liekov musí byť kladný",
         life: 3000,
       });
-      console.log("Pocet je zaporny");
       checkPocet = false;
     }
 
@@ -156,7 +153,6 @@ export default function Storage() {
             detail: "Šarža musí byť unikátna",
             life: 3000,
           });
-          console.log("Sarza uz existuje");
           sarzaExists = true;
         }
         return "";
@@ -177,8 +173,6 @@ export default function Storage() {
             "." +
             product.DAT_EXPIRACIE.getFullYear();
           _products.push(_product);
-          console.log("_products po pushnuti");
-          console.log(_products);
           toast.current.show({
             severity: "success",
             summary: "Successful",
@@ -304,7 +298,6 @@ export default function Storage() {
       }),
     };
     const response = await fetch("/sklad/updateQuantity", requestOptions);
-    console.log(response);
   }
 
   async function deleteSarza(_product) {
@@ -321,7 +314,6 @@ export default function Storage() {
       }),
     };
     const response = await fetch("/sklad/deleteSarza", requestOptions);
-    console.log(response);
   }
 
   const leftToolbarTemplate = () => {

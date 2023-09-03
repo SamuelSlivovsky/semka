@@ -160,14 +160,12 @@ export default function Combobox() {
     setIsDates(false);
     setInput1(null);
     setInput2(null);
-    console.log(e.value);
     if (
       typeof e.value.attribute1 !== 'undefined' &&
       e.value.attribute1 != null
     ) {
       renderInput(e.value.attribute1, 1);
     } else {
-      console.log('nullujem');
       setInputVal1(null);
     }
     if (
@@ -176,7 +174,6 @@ export default function Combobox() {
     ) {
       renderInput(e.value.attribute2, 2);
     } else {
-      console.log('nullujem');
       setInputVal2(null);
     }
   };
@@ -379,7 +376,6 @@ export default function Combobox() {
     fetch(`selects/zamestnanec/${employee.Id}`, { headers })
       .then((res) => res.json())
       .then((result) => {
-        console.log(result);
         setZamestnanec(result);
       });
   };

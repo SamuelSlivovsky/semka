@@ -19,10 +19,8 @@ export default function PatientForm() {
     fetch("/add/psc", { headers })
       .then((response) => response.json())
       .then((res) => {
-        console.log(res);
         let array = [];
         array = res.map((item) => item);
-        console.log(array[0].name);
         setCities(array);
       });
   }, []); // eslint-disable-line;
@@ -72,7 +70,6 @@ export default function PatientForm() {
       "/add/pacient",
       requestOptionsPatient
     ).then(() => setShowMessage(true));
-    console.log(responsePatient);
 
     form.restart();
   };

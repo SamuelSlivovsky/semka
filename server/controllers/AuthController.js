@@ -55,7 +55,6 @@ const handleRegister = async (req, res) => {
 
 const handleLogin = async (req, res) => {
   const { userid, pwd } = req.body;
-  console.log(req.body);
   if (!userid || !pwd)
     return res
       .status(400)
@@ -119,7 +118,6 @@ const handleLogout = async (req, res) => {
 };
 
 const handleRefreshToken = async (req, res) => {
-  console.log(req.cookies);
 
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(401);
@@ -130,7 +128,6 @@ const handleRefreshToken = async (req, res) => {
   if (!foundUser) return res.sendStatus(403); //Forbidden
   // evaluate jwt
   jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-    console.log(decoded);
     if (err || foundUser.USERID !== decoded.userid) return res.sendStatus(403);
 
     const accessToken = jwt.sign(

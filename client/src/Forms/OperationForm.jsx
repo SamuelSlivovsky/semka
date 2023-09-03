@@ -54,7 +54,6 @@ export default function OperationForm(props) {
       "/add/operacia",
       requestOptionsPatient
     ).then(() => setShowMessage(true));
-    console.log(responsePatient);
 
     form.restart();
   };
@@ -101,7 +100,6 @@ export default function OperationForm(props) {
     reader.readAsDataURL(blob);
     reader.onloadend = function () {
       setBase64Data(reader.result.substring(reader.result.indexOf(",") + 1));
-      console.log(reader.result);
     };
   };
 

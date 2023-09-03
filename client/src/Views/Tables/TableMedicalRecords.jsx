@@ -28,7 +28,6 @@ export default function TableMedic(props) {
   };
 
   const handleClick = (value) => {
-    console.log(value);
     setShowDialog(true);
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
@@ -37,7 +36,6 @@ export default function TableMedic(props) {
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
-        console.log(result);
       });
     fetch(`/zaznamy/popis/${value.id_zaz}`, { headers })
       .then((response) => response.json())
@@ -49,7 +47,6 @@ export default function TableMedic(props) {
 
   const getRecordDetails = () => {
     let popis;
-    console.log(cellData);
     cellData.map((data) => {
       if (data.id === selectedRow.id) {
         data.LEKAR === data.ODDELENIE

@@ -54,7 +54,6 @@ export default function RecipeForm() {
     const response = await fetch('/add/recept', requestOptions).then(() =>
       setShowMessage(true)
     );
-    console.log(response);
 
     form.restart();
   };

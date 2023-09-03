@@ -55,7 +55,6 @@ export default function HospitForm(props) {
       "/add/hospitalizacia",
       requestOptionsPatient
     ).then(() => setShowMessage(true));
-    console.log(responsePatient);
 
     form.restart();
   };
@@ -102,7 +101,6 @@ export default function HospitForm(props) {
     reader.readAsDataURL(blob);
     reader.onloadend = function () {
       setBase64Data(reader.result.substring(reader.result.indexOf(",") + 1));
-      console.log(reader.result);
     };
   };
   return (

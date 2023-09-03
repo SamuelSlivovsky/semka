@@ -12,7 +12,6 @@ function TabDoctorsOfPatient() {
     fetch(`/patient/doctors/${userDataHelper.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setLekari(data);
       });
   }, []);

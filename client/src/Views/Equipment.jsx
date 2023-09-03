@@ -107,7 +107,6 @@ export default function Equipment() {
     const response = await fetch("/vybavenie/addEquip", requestOptions).catch(
       (err) => console.log(err)
     );
-    console.log(response);
   }
 
   const saveProduct = () => {
@@ -128,8 +127,6 @@ export default function Equipment() {
         "." +
         product.ZAOBSTARANIE.getFullYear();
       _products.push(_product);
-      console.log("_products po pushnuti");
-      console.log(_products);
       toast.current.show({
         severity: "success",
         summary: "Successful",
@@ -437,7 +434,6 @@ export default function Equipment() {
               options={departments}
               onChange={(e) => {
                 setDepartment(e.target.value);
-                console.log(e.target.value);
               }}
             />
           </div>
