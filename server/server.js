@@ -1,5 +1,7 @@
 const port = 5000;
 const express = require("express");
+const http = require("http"); // Import the HTTP module
+const socketIo = require("socket.io"); // Import Socket.io
 const app = express();
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -7,7 +9,7 @@ const cookieParser = require("cookie-parser");
 const corsOptions = require("./config/corsOptions");
 const verifyJWT = require("./middleware/verifyJWT");
 const credentials = require("./middleware/credentials");
-//ROUTES
+// ROUTES
 const lekarRoute = require("./routes/lekarRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
@@ -20,14 +22,17 @@ const addRoute = require("./routes/addRoute");
 const lozkoRoute = require("./routes/lozkoRoute");
 const equipmentRoute = require("./routes/equipmentRoute");
 
+const server = http.createServer(app); // Create an HTTP server using your Express app
+const io = socketIo(server); // Initialize Socket.io with the HTTP server
+
 app.use(credentials);
-//app.use(cors(corsOptions));
+// app.use(cors(corsOptions)); // You can add this back if needed
 app.use(express.json({ limit: "50mb" }));
 app.use(
   express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 })
 );
 
-app.use(cookieParser()); //middleware for cookies
+app.use(cookieParser()); // Middleware for cookies
 
 app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
@@ -42,6 +47,22 @@ app.use("/zaznamy", medRecordsRoute);
 app.use("/add", addRoute);
 app.use("/lozko", lozkoRoute);
 app.use("/vybavenie", equipmentRoute);
-app.listen(port, () => {
+
+io.on("connection", (socket) => {
+  console.log(`User connected with socket id: ${socket.id}`);
+
+  socket.on("sendMessage", (message, groupName) => {
+    // Broadcast the message to all connected clients
+    console.log(message);
+    console.log(groupName)
+    io.emit("newMessage", message);
+  });
+
+  socket.on("disconnect", () => {
+    console.log(`User disconnected with socket id: ${socket.id}`);
+  });
+});
+
+server.listen(port, () => {
   console.log(`Aplikacia bezi na porte ${port}`);
 });
