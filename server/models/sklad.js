@@ -33,7 +33,7 @@ async function insertDrug(body) {
       id_oddelenia: body.id_oddelenia,
       nazov_lieku: body.nazov_lieku,
       dat_expiracie: body.dat_expiracie,
-      pocet_liekov: body.pocet_liekov,
+      pocet_liekov: body.pocet,
     });
 
     console.log("Rows inserted " + result.rowsAffected);

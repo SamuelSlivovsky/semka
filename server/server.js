@@ -54,7 +54,7 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", (message, groupName) => {
     // Broadcast the message to all connected clients
     console.log(message);
-    console.log(groupName)
+    console.log(groupName);
     io.emit("newMessage", message);
   });
 

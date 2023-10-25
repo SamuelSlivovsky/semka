@@ -69,6 +69,7 @@ export default function Storage() {
       fetch(`lieky/all`, { headers })
         .then((response) => response.json())
         .then((data) => {
+          console.log(data);
           setDrugs(data);
         });
     }
@@ -112,7 +113,7 @@ export default function Storage() {
         authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        id_oddelenia: 1,
+        id_oddelenia: 216,
         nazov_lieku: product.NAZOV,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
           ",",
@@ -128,7 +129,6 @@ export default function Storage() {
 
   const saveProduct = () => {
     let filledCells = false;
-
     let _products = [...products];
     let _product = { ...product };
 
@@ -157,7 +157,6 @@ export default function Storage() {
         }
         return "";
       });
-
       if (!sarzaExists && checkPocet) {
         if (
           product.NAZOV &&
@@ -241,10 +240,10 @@ export default function Storage() {
   const setSelectedDrugFromDropdown = (e) => {
     if (typeof e.target.value === "undefined") {
       setSelectedDrug(null);
-      onInputChange(null, "NAZOV");
+      onInputChange(null);
     } else {
       setSelectedDrug(e.target.value);
-      onInputChange(e.target.value.NAZOV, "NAZOV");
+      onInputChange(e.target.value);
     }
   };
 
@@ -274,9 +273,10 @@ export default function Storage() {
     setProduct(_product);
   };
 
-  const onInputChange = (val, name) => {
+  const onInputChange = (val) => {
     let _product = { ...product };
-    _product[`${name}`] = val;
+    _product[`NAZOV`] = val.NAZOV;
+    _product["ID_LIEK"] = val.ID_LIEK;
     setProduct(_product);
   };
 
@@ -506,12 +506,14 @@ export default function Storage() {
         </div>
         <div className="formgird grid">
           <div className="field col">
-            <label htmlFor="DAT_EXPIRACIE">Dátum exspirácie</label>
+            <label htmlFor="DAT_EXPIRACIE">Dátum expirácie</label>
             <Calendar
               value={product.DAT_EXPIRACIE}
               inline
               dateFormat="dd.mm.yy"
-              onChange={(e) => onInputChange(e.value, "DAT_EXPIRACIE")}
+              onChange={(e) =>
+                setProduct({ ...product, DAT_EXPIRACIE: e.value })
+              }
             ></Calendar>
           </div>
         </div>
