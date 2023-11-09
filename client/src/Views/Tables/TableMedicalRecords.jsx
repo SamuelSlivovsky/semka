@@ -4,6 +4,7 @@ import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -11,6 +12,7 @@ export default function TableMedic(props) {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [imgUrl, setImgUrl] = useState("");
+  const [loading, setLoading] = useState(false);
   const {
     tableName,
     cellData,
@@ -25,10 +27,14 @@ export default function TableMedic(props) {
   const onHide = () => {
     setImgUrl(null);
     setShowDialog(false);
+    setPopis(null);
+    setNazov(null);
+    setSelectedRow(null);
   };
 
   const handleClick = (value) => {
     setShowDialog(true);
+    setLoading(true);
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
@@ -42,6 +48,7 @@ export default function TableMedic(props) {
       .then((data) => {
         setPopis(data[0].POPIS);
         setNazov(data[0].NAZOV);
+        setLoading(false);
       });
   };
 
@@ -153,18 +160,28 @@ export default function TableMedic(props) {
         style={{ width: "50vw" }}
         onHide={() => onHide()}
       >
-        <div>
-          <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
+        {loading ? (
+          <div style={{ width: "100%", display: "flex" }}>
+            <ProgressSpinner />
+          </div>
+        ) : (
+          <div style={{ maxWidth: "100%", overflowWrap: "break-word" }}>
+            <img
+              src={imgUrl}
+              alt=""
+              style={{ maxWidth: 400, maxHeight: 400 }}
+            />
 
-          {selectedRow != null
-            ? selectedRow.type != null
-              ? getRecordDetails()
-              : ""
-            : ""}
-          <h2>{selectedRow != null ? nazov : ""}</h2>
-          <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
-          <div>{selectedRow != null ? popis : ""}</div>
-        </div>
+            {selectedRow != null
+              ? selectedRow.type != null
+                ? getRecordDetails()
+                : ""
+              : ""}
+            <h2>{selectedRow != null ? nazov : ""} </h2>
+            <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
+            <div>{selectedRow != null ? popis : ""}</div>
+          </div>
+        )}
       </Dialog>
     </div>
   );

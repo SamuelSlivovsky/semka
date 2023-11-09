@@ -5,47 +5,47 @@ const verify = require("../middleware/verifyUser");
 
 router.get(
   "/liekyMenejAkoPocet/:pocet",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getLiekyMenejAkoPocet
 );
 router.get(
   "/najviacPredpisovaneLiekyRoka/:rok",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getNajviacPredpisovaneLiekyRoka
 );
 router.get(
   "/najviacChoriPocet/:pocet",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getNajviacChoriPocet
 ); //11
 router.get(
   "/najviacOperovanyPercenta/:percent",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getNajviacOperovanyPercenta
 ); //12
 router.get(
   "/najviacHospitalizovaniPercenta/:percent",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getNajviacHospitalizovaniPercenta
 ); //13
 router.get(
   "/topZamestnanciVyplaty/:pocet",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getTopZamestnanciVyplatyPocet
 ); //14
 router.get(
   "/typyOckovania",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getTypyOckovania
 );
 router.get(
   "/zamestnanciOddeleni",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getZamestnanciOddeleni
 );
 router.get(
   "/najcastejsieChorobyRokaPocet/:pocet/:rok",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getNajcastejsieChorobyRokaPocet
 );
 
@@ -53,123 +53,124 @@ router.get("/typyZTP", controller.getTypyZtp);
 
 router.get(
   "/neobsadeneLozkaOddeleniaTyzden/:id_oddelenia",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getNeobsadeneLozkaOddeleniaTyzden
 );
 router.get(
   "/menovciPacientLekar",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getMenovciPacientLekar
 );
 router.get("/typyChoroby", controller.getTypyChoroby);
+router.get("/choroby/:typ", controller.getChoroby);
 router.get(
   "/operaciePocetLekarovTrvanie/:pocetLekarov/:trvanie",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getOperaciePocetLekarovTrvanie
 );
 router.get(
   "/krajePodlaPoctuOperovanych",
-  verify.verifyRoles(1, 2,3),
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
+  verify.verifyRoles(1, 2, 3),
   controller.getKrajePodlaPoctuOperovanych
 );
 router.get(
   "/priemernyVek/",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getPriemernyVek
 );
 
 router.get(
   "/priemernyVekRole",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getPriemernyVek
 );
 
 router.get(
   "/zamestnanciFotka/:id_zamestnanca",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getZamestnanciFotka
 );
 router.get(
   "/zamestnanec/:id_zamestnanca",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getZamestnanec
 );
 
 router.get(
   "/hospitalizacieNemocniceXML/:id_nemocnice",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getHospitalizacieNemocniceXML
 );
 router.get(
   "/operacieNemocniceXML/:id_nemocnice",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getOperacieNemocniceXML
 );
 router.get(
   "/ockovaniaNemocniceXML/:id_nemocnice",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getOckovaniaNemocniceXML
 );
 router.get(
   "/vysetreniaNemocniceXML/:id_nemocnice",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getVysetreniaNemocniceXML
 );
 
 router.get(
   "/zamestnanciOddelenia/:id_oddelenia",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getZamestnanciOddelenia
 );
 router.get(
-  "/pocetZamOddelenia/:id_oddelenia/:rok",
-  verify.verifyRoles(1, 2,3),
+  "/pocetZamOddelenia/:cislo_zam/:rok",
+  verify.verifyRoles(1, 2, 3),
   controller.getPocetZamOddelenia
 );
 router.get(
-  "/pocetPacOddelenia/:id_oddelenia",
-  verify.verifyRoles(1, 2,3),
+  "/pocetPacOddelenia/:cislo_zam",
+  verify.verifyRoles(1, 2, 3),
   controller.getPocetPacientovOddelenia
 );
 router.get(
-  "/pocetOperOddelenia/:id_oddelenia/:rok",
-  verify.verifyRoles(1, 2,3),
+  "/pocetOperOddelenia/:cislo_zam/:rok",
+  verify.verifyRoles(1, 2, 3),
   controller.getPocetOperaciiOddelenia
 );
 router.get(
-  "/pocetHospitOddelenia/:id_oddelenia/:rok",
-  verify.verifyRoles(1, 2,3),
+  "/pocetHospitOddelenia/:cislo_zam/:rok",
+  verify.verifyRoles(1, 2, 3),
   controller.getPocetHospitalizaciiOddelenia
 );
 router.get(
-  "/pocetVyseOddelenia/:id_oddelenia/:rok",
-  verify.verifyRoles(1, 2,3),
+  "/pocetVyseOddelenia/:cislo_zam/:rok",
+  verify.verifyRoles(1, 2, 3),
   controller.getPocetVysetreniOddelenia
 );
 router.get(
-  "/krvneSkupinyOddelenia/:id_oddelenia",
-  verify.verifyRoles(1, 2,3),
+  "/krvneSkupinyOddelenia/:cislo_zam",
+  verify.verifyRoles(1, 2, 3),
   controller.getKrvneSkupinyOddelenia
 );
 router.get(
-  "/pomerMuziZeny/:id_oddelenia",
-  verify.verifyRoles(1, 2,3),
+  "/pomerMuziZeny/:cislo_zam",
+  verify.verifyRoles(1, 2, 3),
   controller.getPomerMuziZeny
 );
 router.get(
   "/pocetPacientiPodlaVeku/",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getPocetPacientiPodlaVeku
 );
 router.get(
   "/sumaVyplatRoka/:id_oddelenia/:rok",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getSumaVyplatRoka
 );
 router.get(
   "/topZamestnanciVyplatyOddelenie/:id_oddelenia/:rok",
-  verify.verifyRoles(1, 2,3),
+  verify.verifyRoles(1, 2, 3),
   controller.getTopZamestnanciVyplatyOddelenie
 );
 

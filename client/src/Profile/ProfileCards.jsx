@@ -218,9 +218,10 @@ export default function ProfileCard(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedDiseaseType(e.value);
-    fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`, { headers })
+    fetch(`selects/choroby/${e.value.TYP}`, { headers })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setDiseases(data);
       });
   };
@@ -380,7 +381,7 @@ export default function ProfileCard(props) {
           <TableMedicalRecords {...diseasesTable} />
         </Card>
       </div>
-      {props.userData.UserInfo.role !== 3 ? (
+      {props.userData.UserInfo.role === 3 ? (
         <>
           <div className="flex ">
             <div className="col-2 m-4">

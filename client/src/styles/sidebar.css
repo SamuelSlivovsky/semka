@@ -7,6 +7,7 @@
   transform: translateX(-12rem);
   height: 100vh;
   transition: 0.5s;
+  overflow-y: auto;
 }
 .sidebar-content {
   width: 100%;

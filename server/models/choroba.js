@@ -1,13 +1,13 @@
 const database = require("../database/Database");
 const oracledb = database.oracledb;
 
-async function getChoroby(pid_typu_choroby) {
+async function getChoroby(typ) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `SELECT * FROM choroba
-          where id_typu_choroby = :pid_typu_choroby`,
-      { pid_typu_choroby }
+          where typ = :typ`,
+      { typ }
     );
 
     return result.rows;
