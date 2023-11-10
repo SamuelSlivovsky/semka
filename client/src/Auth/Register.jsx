@@ -91,7 +91,15 @@ export const Register = () => {
                 <Controller
                   name="rc"
                   control={control}
-                  rules={{ required: "Rodné číslo je povinné" }}
+                  rules={{
+                    required: "Rodné číslo je povinné",
+                    //  ,
+                    //  pattern: {
+                    //   value: //TODO Pridat kontrolu rodneho cisla
+                    //   message:
+                    //     "Nesprávny tvar e-mail adresa, napríklad: meno@email.com",
+                    // },
+                  }}
                   render={({ field, fieldState }) => (
                     <InputMask
                       id={field.name}
