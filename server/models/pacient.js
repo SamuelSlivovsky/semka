@@ -354,7 +354,7 @@ async function getChoroby(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const choroby = await conn.execute(
-      `select nazov, typ, to_char(zo.dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(zo.dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+      `select nazov, typ, to_char(zo.dat_od,'DD.MM.YYYY') dat_od, nvl(to_char(zo.dat_do,'DD.MM.YYYY'), 'Súčasnosť') dat_do
             from zoznam_ochoreni zo join choroba on(zo.id_choroby = choroba.id_choroby)
                           join zdravotna_karta zk on(zo.id_karty = zk.id_karty)
                           where id_pacienta = :pid_pacienta

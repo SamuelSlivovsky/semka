@@ -72,7 +72,10 @@ export default function HospitForm(props) {
         label="OK"
         className="p-button-text"
         autoFocus
-        onClick={() => setShowMessage(false)}
+        onClick={() => {
+          setShowMessage(false);
+          props.hideDialog();
+        }}
       />
     </div>
   );

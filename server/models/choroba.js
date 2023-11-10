@@ -20,12 +20,13 @@ async function insertChoroba(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        typZtp_insert(:rod_cislo , :id_choroby, :datum_od, :datum_do);
+        choroba_insert(:rod_cislo , :typ, :nazov, :datum_od, :datum_do);
         END;`;
 
     let result = await conn.execute(sqlStatement, {
       rod_cislo: body.rod_cislo,
-      id_typu_ztp: body.id_typu_ztp,
+      typ: body.typ,
+      nazov: body.nazov,
       datum_od: body.datum_od,
       datum_do: body.datum_do,
     });

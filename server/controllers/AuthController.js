@@ -32,7 +32,7 @@ const handleRegister = async (req, res) => {
               },
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "3600s" }
+            { expiresIn: "1d" }
           );
 
           let body = req.body;
@@ -73,7 +73,7 @@ const handleLogin = async (req, res) => {
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "3600s" }
+      { expiresIn: "1d" }
     );
 
     const refreshToken = jwt.sign(
@@ -118,7 +118,6 @@ const handleLogout = async (req, res) => {
 };
 
 const handleRefreshToken = async (req, res) => {
-
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(401);
 

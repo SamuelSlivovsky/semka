@@ -71,7 +71,10 @@ export default function OperationForm(props) {
         label="OK"
         className="p-button-text"
         autoFocus
-        onClick={() => setShowMessage(false)}
+        onClick={() => {
+          setShowMessage(false);
+          props.hideDialog();
+        }}
       />
     </div>
   );

@@ -276,12 +276,12 @@ function EventCalendar(props) {
         }
         onHide={() => onHide()}
       >
-        {!showAddEvent || props.userData.UserInfo.role !== 3 ? (
+        {!showAddEvent || props.userData.UserInfo.role !== 4 ? (
           <div className="p-fluid grid formgrid">
             <SelectButton
               value={selectButtonValue}
               options={
-                props.userData.UserInfo.role === 3 ? patientOptions : options
+                props.userData.UserInfo.role === 4 ? patientOptions : options
               }
               onChange={(e) => setSelectButtonValue(e.value)}
               style={{

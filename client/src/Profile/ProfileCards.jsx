@@ -9,8 +9,9 @@ import HospitForm from "../Forms/HospitForm";
 //import RecipeForm from '../Forms/RecipeForm';
 import OperationForm from "../Forms/OperationForm";
 import ExaminationForm from "../Forms/ExaminationForm";
-import "../icons.css";
 import TableMedicalRecords from "../Views/Tables/TableMedicalRecords";
+import "../icons.css";
+import DiseaseForm from "../Forms/DiseaseForm";
 
 export default function ProfileCard(props) {
   const [profile, setProfile] = useState("");
@@ -214,47 +215,6 @@ export default function ProfileCard(props) {
     );
   };
 
-  const onDiseaseTypeChange = (e) => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
-    setSelectedDiseaseType(e.value);
-    fetch(`selects/choroby/${e.value.TYP}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-        setDiseases(data);
-      });
-  };
-
-  const onDiseaseChange = (e) => {
-    setSelectedDisease(e.value);
-  };
-
-  const diseaseDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedDiseaseType}
-            options={diseaseTypes}
-            onChange={onDiseaseTypeChange}
-            optionLabel="TYP"
-            placeholder="Vyber typ choroby"
-          />
-        </div>
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedDisease}
-            options={diseases}
-            onChange={onDiseaseChange}
-            optionLabel="NAZOV"
-            placeholder="Vyber chorobu"
-          />
-        </div>
-      </div>
-    );
-  };
-
   const onZTPTypeChange = (e) => {
     setSelectedZTPType(e.value);
   };
@@ -278,15 +238,35 @@ export default function ProfileCard(props) {
   const renderDialog = () => {
     switch (eventType) {
       case "examination":
-        return <ExaminationForm rod_cislo={profile.ROD_CISLO} />;
+        return (
+          <ExaminationForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+          />
+        );
       case "operation":
-        return <OperationForm rod_cislo={profile.ROD_CISLO} />;
+        return (
+          <OperationForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+          />
+        );
       case "hospit":
-        return <HospitForm rod_cislo={profile.ROD_CISLO} />;
+        return (
+          <HospitForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+          />
+        );
       case "vacci":
         return vacciDialog();
       case "disease":
-        return diseaseDialog();
+        return (
+          <DiseaseForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+          />
+        );
       case "ZTP":
         return ZTPDialog();
       default:
@@ -452,7 +432,12 @@ export default function ProfileCard(props) {
               </div>
             </div>
           </div>
-          <Dialog visible={show} onHide={onHide} header={header}>
+          <Dialog
+            visible={show}
+            onHide={onHide}
+            header={header}
+            style={{ width: "80%" }}
+          >
             {renderDialog()}
           </Dialog>
         </>
