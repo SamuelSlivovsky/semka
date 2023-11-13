@@ -14,7 +14,9 @@ const handleRegister = async (req, res) => {
     try {
         if (await userModel.userExists(userid)) {
             return res.status(409).json({message: `Already exists`});
-            // TODO pridat ak user neexistuje v databaze
+            // Kontrola ci uzivatel existuje v pacientoch/zamestnancoch
+        } else if (await userModel.userExistsInDB(userid)) {
+            return res.status(409).json({message: `No user in database with that ID`});
         } else {
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {

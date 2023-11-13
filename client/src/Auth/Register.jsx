@@ -8,6 +8,7 @@ import {classNames} from "primereact/utils";
 import {InputMask} from "primereact/inputmask";
 import {useNavigate} from "react-router";
 import "../styles/auth.css";
+import {redirect} from "react-router-dom";
 
 export const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
@@ -39,9 +40,15 @@ export const Register = () => {
         fetch("/auth/register", requestOptions)
             .then((response) => response.json())
             .then((res) => {
-                localStorage.setItem("hospit-user", res.accessToken);
-                navigate("/");
-                window.location.reload();
+                if (res.message !== undefined) {
+                    navigate("/logout");
+                    navigate("/register")
+                    alert(res.message);
+                } else {
+                    localStorage.setItem("hospit-user", res.accessToken);
+                    navigate("/");
+                    window.location.reload();
+                }
             });
         reset();
     };
@@ -96,9 +103,6 @@ export const Register = () => {
                         required: "Rodné číslo je povinné"
                     }}
                     render={({field, fieldState}) => (
-                        /*
-                      Prvy sposob osetrenia
-                       */
 
                         // <InputMask
                         //     id={field.name}
