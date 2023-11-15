@@ -12,6 +12,7 @@ import ExaminationForm from "../Forms/ExaminationForm";
 import TableMedicalRecords from "../Views/Tables/TableMedicalRecords";
 import "../icons.css";
 import DiseaseForm from "../Forms/DiseaseForm";
+import DisablesForm from "../Forms/DisablesForm";
 
 export default function ProfileCard(props) {
   const [profile, setProfile] = useState("");
@@ -22,15 +23,6 @@ export default function ProfileCard(props) {
 
   const [vaccinationTypes, setVaccinationTypes] = useState("");
   const [selectedVaccinationType, setSelectedVaccinationType] = useState("");
-
-  const [diseaseTypes, setDiseaseTypes] = useState("");
-  const [selectedDiseaseType, setSelectedDiseaseType] = useState("");
-
-  const [diseases, setDiseases] = useState("");
-  const [selectedDisease, setSelectedDisease] = useState("");
-
-  const [ZTPTypes, setZTPTypes] = useState("");
-  const [selectedZTP, setSelectedZTPType] = useState("");
 
   const [patientMedicalRecords, setPatientMedicalRecords] = useState("");
 
@@ -101,18 +93,6 @@ export default function ProfileCard(props) {
       .then((response) => response.json())
       .then((data) => {
         setVaccinationTypes(data);
-      });
-
-    fetch(`selects/typyChoroby`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setDiseaseTypes(data);
-      });
-
-    fetch(`selects/typyZTP`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setZTPTypes(data);
       });
 
     fetch(
@@ -215,26 +195,6 @@ export default function ProfileCard(props) {
     );
   };
 
-  const onZTPTypeChange = (e) => {
-    setSelectedZTPType(e.value);
-  };
-
-  const ZTPDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedZTP}
-            options={ZTPTypes}
-            onChange={onZTPTypeChange}
-            optionLabel="NAZOV"
-            placeholder="Vyber typ ZŤP"
-          />
-        </div>
-      </div>
-    );
-  };
-
   const renderDialog = () => {
     switch (eventType) {
       case "examination":
@@ -268,7 +228,15 @@ export default function ProfileCard(props) {
           />
         );
       case "ZTP":
-        return ZTPDialog();
+        return (
+          <DisablesForm
+            patientId={
+              props.patientId !== null ? props.patientId : location.state
+            }
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+          />
+        );
       default:
         break;
     }
@@ -322,11 +290,22 @@ export default function ProfileCard(props) {
               <div>{profile.NAZOV_OBCE + " " + profile.PSC}</div>
             </div>
             <div className="col-5 text-center m-0">
-              <h4>Typ ZŤP</h4>
+              <h4>ZŤP</h4>
               <div>
-                {patientZTPTypes.length !== 0
-                  ? patientZTPTypes.map((item) => <div>{item.NAZOV}</div>)
-                  : ""}
+                {patientZTPTypes.length !== 0 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "20px",
+                    }}
+                  >
+                    Áno <Button label="Zoznam"></Button>
+                  </div>
+                ) : (
+                  "Nie"
+                )}
               </div>
             </div>
           </div>

@@ -68,7 +68,9 @@ const handleLogin = async (req, res) => {
     const accessToken = jwt.sign(
       {
         UserInfo: {
-          userid: foundUser.USERID,
+          userid: isNaN(foundUser.USERID)
+            ? foundUser.USERID
+            : Number(foundUser.USERID),
           role: foundUser.ROLE,
         },
       },
@@ -77,7 +79,11 @@ const handleLogin = async (req, res) => {
     );
 
     const refreshToken = jwt.sign(
-      { userid: foundUser.USERID },
+      {
+        userid: isNaN(foundUser.USERID)
+          ? foundUser.USERID
+          : Number(foundUser.USERID),
+      },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
@@ -132,7 +138,9 @@ const handleRefreshToken = async (req, res) => {
     const accessToken = jwt.sign(
       {
         UserInfo: {
-          userid: foundUser.USERID,
+          userid: isNaN(foundUser.USERID)
+            ? foundUser.USERID
+            : Number(foundUser.USERID),
           role: foundUser.ROLE,
         },
       },

@@ -81,7 +81,7 @@ module.exports = {
   insertTypZtp: (req, res) => {
     const typZtp = require("../models/typ_ztp");
     (async () => {
-      ret_val = await choroba.insertTypZtp(req.body);
+      ret_val = await typZtp.insertTypZtp(req.body);
       res.status(200).json("success");
     })().catch((err) => {
       // error handling logic 1
