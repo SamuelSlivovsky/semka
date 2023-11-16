@@ -5,6 +5,7 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Calendar } from "primereact/calendar";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -20,6 +21,7 @@ export default function TableMedic(props) {
     allowFilters,
     dialog,
     tableScrollHeight,
+    editor,
   } = props;
   const [popis, setPopis] = useState(null);
   const [nazov, setNazov] = useState(null);
@@ -124,27 +126,80 @@ export default function TableMedic(props) {
     setGlobalFilterValue1("");
   };
 
+  const onRowEditComplete = (e) => {
+    let _products = [...cellData];
+    let { newData, index } = e;
+
+    _products[index] = newData;
+
+    props.setCellData(_products);
+    props.onEditDate(newData);
+  };
+
+  const dateEditor = (options) => {
+    return (
+      <Calendar
+        value={options.value !== null ? formatDate(options.value) : null}
+        onChange={(e) =>
+          options.editorCallback(
+            e.target.value.toLocaleDateString("de", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          )
+        }
+        dateFormat="dd.mm.yy"
+      />
+    );
+  };
+
+  const formatDate = (dateString) => {
+    var dateArray = dateString.split(".");
+    var formattedDateString =
+      dateArray[2] + "-" + dateArray[1] + "-" + dateArray[0];
+    return new Date(formattedDateString);
+  };
+
   const header = allowFilters ? renderHeader() : "";
   return (
     <div>
       <div className="card">
         <DataTable
+          editMode={editor ? "row" : ""}
           value={cellData}
-          responsiveLayout="scroll"
+          scrollable
           selectionMode="single"
           selection={selectedRow}
-          onSelectionChange={(e) => handleClick(e.value)}
+          onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
           header={header}
           filters={filters}
           scrollHeight={tableScrollHeight}
           filterDisplay={allowFilters ? "menu" : ""}
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+          onRowEditComplete={onRowEditComplete}
         >
           <Column field="id"></Column>
           {titles.map((title) => (
-            <Column field={title.field} header={title.header} filter></Column>
+            <Column
+              field={title.field}
+              header={title.header}
+              filter
+              editor={
+                title.field === "DAT_DO" ? (options) => dateEditor(options) : ""
+              }
+            ></Column>
           ))}
+          {editor ? (
+            <Column
+              rowEditor
+              headerStyle={{ width: "10%", minWidth: "8rem" }}
+              bodyStyle={{ textAlign: "center" }}
+            ></Column>
+          ) : (
+            ""
+          )}
         </DataTable>
       </div>
 

@@ -372,13 +372,13 @@ async function getTypyZTP(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const typyZTP = await conn.execute(
-      `select nazov, to_char(dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+      `select nazov, to_char(dat_od,'DD.MM.YYYY') dat_od, nvl(to_char(dat_do,'DD.MM.YYYY'), 'Súčasnosť') dat_do
           from zoznam_postihnuti join postihnutie using (id_postihnutia)
                               join zdravotna_karta using (id_karty)
                               where id_pacienta = :pid_pacienta`,
       { pid_pacienta }
     );
-
+    console.log(typyZTP.rows);
     return typyZTP.rows;
   } catch (err) {
     console.log(err);

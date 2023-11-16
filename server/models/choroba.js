@@ -16,6 +16,22 @@ async function getChoroby(typ) {
   }
 }
 
+async function updateChoroba(body) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `UPDATE zoznam_ochoreni SET DAT_DO = to_date(to_char(to_timestamp(:datum_do,'DD/MM/YYYY HH24:MI:SS'),
+      'DD/MM/YYYY HH24:MI:SS')) WHERE DAT_OD = :datum_od`,
+      { datum_do: body.datum_do, datum_od: body.datum_od },
+      { autoCommit: true }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 async function insertChoroba(body) {
   try {
     let conn = await database.getConnection();
@@ -66,4 +82,5 @@ module.exports = {
   getChoroby,
   insertChoroba,
   getNajcastejsieChorobyRokaPocet,
+  updateChoroba,
 };

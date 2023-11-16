@@ -20,7 +20,7 @@ export default function ProfileCard(props) {
   const location = useLocation();
   const [eventType, setEventType] = useState("");
   const [header, setHeader] = useState("");
-
+  const [showDisables, setShowDisables] = useState(false);
   const [vaccinationTypes, setVaccinationTypes] = useState("");
   const [selectedVaccinationType, setSelectedVaccinationType] = useState("");
 
@@ -43,12 +43,14 @@ export default function ProfileCard(props) {
     allowFilters: false,
     dialog: true,
     tableScrollHeight: "500px",
+    editor: false,
   };
 
   const recipesTable = {
     tableName: "Predpísané recepty",
     route: "/pacient",
     cellData: patientRecipes,
+
     titles: [
       { field: "NAZOV", header: "Názov" },
       { field: "LEKAR", header: "Lekár" },
@@ -56,12 +58,33 @@ export default function ProfileCard(props) {
     allowFilters: false,
     dialog: false,
     tableScrollHeight: "500px",
+    editor: true,
+  };
+
+  const onEditDisableDate = (date) => {
+    console.log(date);
+  };
+
+  const onEditDiseaseDate = (data) => {
+    const token = localStorage.getItem("hospit-user");
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({ datum_od: data.DAT_OD, datum_do: data.DAT_DO }),
+    };
+    console.log(requestOptions);
+    fetch("/update/choroba", requestOptions);
   };
 
   const diseasesTable = {
     tableName: "Choroby",
     route: "/pacient",
     cellData: patientDiseases,
+    setCellData: setPatientDiseases,
+    onEditDate: onEditDiseaseDate,
     titles: [
       { field: "NAZOV", header: "Názov choroby" },
       { field: "TYP", header: "Typ choroby" },
@@ -71,6 +94,24 @@ export default function ProfileCard(props) {
     allowFilters: false,
     dialog: false,
     tableScrollHeight: "500px",
+    editor: true,
+  };
+
+  const disablesTable = {
+    tableName: "Postihnutia",
+    route: "/pacient",
+    cellData: patientZTPTypes,
+    setCellData: setPatientZTPTypes,
+    onEditDate: onEditDisableDate,
+    titles: [
+      { field: "NAZOV", header: "Postihnutie" },
+      { field: "DAT_OD", header: "Od" },
+      { field: "DAT_DO", header: "Do" },
+    ],
+    allowFilters: false,
+    dialog: false,
+    tableScrollHeight: "500px",
+    editor: true,
   };
 
   useEffect(() => {
@@ -301,7 +342,11 @@ export default function ProfileCard(props) {
                       gap: "20px",
                     }}
                   >
-                    Áno <Button label="Zoznam"></Button>
+                    Áno{" "}
+                    <Button
+                      label="Zoznam"
+                      onClick={() => setShowDisables(true)}
+                    ></Button>
                   </div>
                 ) : (
                   "Nie"
@@ -418,6 +463,14 @@ export default function ProfileCard(props) {
             style={{ width: "80%" }}
           >
             {renderDialog()}
+          </Dialog>
+          <Dialog
+            visible={showDisables}
+            onHide={() => setShowDisables(false)}
+            style={{ width: "1000px" }}
+          >
+            {" "}
+            <TableMedicalRecords {...disablesTable} />
           </Dialog>
         </>
       ) : (
