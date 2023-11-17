@@ -157,6 +157,7 @@ export default function HospitForm(props) {
                       Rodné číslo
                     </label>
                     <InputMask
+                      autoFocus
                       id="rod_cislo"
                       mask="999999/9999"
                       disabled={

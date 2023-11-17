@@ -147,24 +147,23 @@ export default function PatientForm() {
                 name="meno"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <span className="p-float-label">
-                      <InputText
-                        id="meno"
-                        {...input}
-                        autoFocus
-                        className={classNames({
-                          "p-invalid": isFormFieldValid(meta),
-                        })}
-                      />
-                      <label
-                        htmlFor="meno"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        Meno*
-                      </label>
-                    </span>
+                    <label
+                      htmlFor="meno"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Meno*
+                    </label>
+                    <InputText
+                      id="meno"
+                      {...input}
+                      autoFocus
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+
                     {getFormErrorMessage(meta)}
                   </div>
                 )}
@@ -173,23 +172,22 @@ export default function PatientForm() {
                 name="priezvisko"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <span className="p-float-label ">
-                      <InputText
-                        id="priezvisko"
-                        {...input}
-                        className={classNames({
-                          "p-invalid": isFormFieldValid(meta),
-                        })}
-                      />
-                      <label
-                        htmlFor="priezvisko"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        Priezvisko*
-                      </label>
-                    </span>
+                    <label
+                      htmlFor="priezvisko"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Priezvisko*
+                    </label>
+                    <InputText
+                      id="priezvisko"
+                      {...input}
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+
                     {getFormErrorMessage(meta)}
                   </div>
                 )}
@@ -198,24 +196,23 @@ export default function PatientForm() {
                 name="rod_cislo"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <span className="p-float-label">
-                      <InputMask
-                        id="rod_cislo"
-                        mask="999999/9999"
-                        {...input}
-                        className={classNames({
-                          "p-invalid": isFormFieldValid(meta),
-                        })}
-                      />
-                      <label
-                        htmlFor="rod_cislo"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        Rodné číslo*
-                      </label>
-                    </span>
+                    <label
+                      htmlFor="rod_cislo"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Rodné číslo*
+                    </label>
+                    <InputMask
+                      id="rod_cislo"
+                      mask="999999/9999"
+                      {...input}
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+
                     {getFormErrorMessage(meta)}
                   </div>
                 )}
@@ -224,26 +221,23 @@ export default function PatientForm() {
                 name="psc"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <span className="p-float-label">
-                      <AutoComplete
-                        {...input}
-                        suggestions={filteredPsc}
-                        completeMethod={searchPsc}
-                        field="name"
-                        className={classNames({
-                          "p-invalid": isFormFieldValid(meta),
-                        })}
-                      />
-
-                      <label
-                        htmlFor="psc"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        PSČ*
-                      </label>
-                    </span>
+                    <label
+                      htmlFor="psc"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      PSČ*
+                    </label>
+                    <AutoComplete
+                      {...input}
+                      suggestions={filteredPsc}
+                      completeMethod={searchPsc}
+                      field="name"
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
                     {getFormErrorMessage(meta)}
                   </div>
                 )}

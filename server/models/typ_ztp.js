@@ -29,7 +29,30 @@ async function insertTypZtp(body) {
   }
 }
 
+async function updateZtp(body) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `UPDATE zoznam_postihnuti SET DATUM_DO = to_date(to_char(to_timestamp(:datum_do,'DD/MM/YYYY HH24:MI:SS'),
+      'DD/MM/YYYY HH24:MI:SS')) WHERE DATUM_OD = :datum_od AND id_karty = (select id_karty from zdravotna_karta where id_pacienta = :id_pacienta)
+      AND id_postihnutia = :id_postihnutia`,
+      {
+        datum_do: body.datum_do,
+        datum_od: body.datum_od,
+        id_pacienta: body.id_pacienta,
+        id_postihnutia: body.id_postihnutia,
+      },
+      { autoCommit: true }
+    );
+    console.log(result);
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 module.exports = {
   getTypyZtp,
   insertTypZtp,
+  updateZtp,
 };

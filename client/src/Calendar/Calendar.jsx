@@ -60,6 +60,7 @@ function EventCalendar(props) {
               break;
           }
         });
+        console.log(data);
         setCurrentEvents(data);
         setCalendarVisible(true);
       });
@@ -82,8 +83,10 @@ function EventCalendar(props) {
         setEventType(clickInfo.event._def.extendedProps.type);
         break;
     }
-    setCurrEventId(clickInfo.event._def.extendedProps.id_zaz);
-    setEventDateStart(new Date(clickInfo.event._instance.range.start));
+    setCurrEventId(clickInfo.event._def.publicId);
+    const startDate = new Date(clickInfo.event._instance.range.start);
+    startDate.setHours(startDate.getHours() - 1);
+    setEventDateStart(startDate);
     setCurrEventTitle(
       clickInfo.event._def.extendedProps.type +
         " - " +
@@ -115,8 +118,8 @@ function EventCalendar(props) {
       const token = localStorage.getItem("hospit-user");
       let calendarApi = calendarRef.current.getApi();
       let currentEvent = calendarApi.getEventById(currEventId);
-      let endDate = new Date(eventDateStart.getTime() + 3600000);
-      let startDate = new Date(eventDateStart.getTime() - 3600000);
+      let endDate = new Date(eventDateStart.getTime());
+      let startDate = new Date(eventDateStart.getTime());
       const requestOptions = {
         method: "POST",
         headers: {
@@ -134,6 +137,7 @@ function EventCalendar(props) {
           currentEvent.setDates(startDate, endDate, {
             allDay: false,
           });
+          console.log("first");
           setShowConfirmChanges(false);
           setShowDialog(false);
         });
@@ -215,8 +219,9 @@ function EventCalendar(props) {
         <div className="field col-12 ">
           <h3 htmlFor="basic">Začiatok udalosti</h3>
           <p>
+            {console.log(eventDateStart)}
             {eventDateStart !== null
-              ? eventDateStart.toLocaleString("sk-SK").replace(". ", ".")
+              ? eventDateStart.toLocaleString("sk").replaceAll(". ", ".")
               : ""}
           </p>
         </div>
@@ -260,7 +265,7 @@ function EventCalendar(props) {
               initialEvents={currentEvents}
               eventClick={handleEventClick}
               eventsSet={handleEvents}
-              locale="sk"
+              locale="SK"
             />
           )}
         </Suspense>

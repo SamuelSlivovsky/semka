@@ -61,8 +61,25 @@ export default function ProfileCard(props) {
     editor: true,
   };
 
-  const onEditDisableDate = (date) => {
-    console.log(date);
+  const onEditDisableDate = (data) => {
+    const token = localStorage.getItem("hospit-user");
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        datum_od: data.DAT_OD,
+        datum_do: data.DAT_DO,
+        id_pacienta:
+          typeof props.patientId !== "undefined" && props.patientId !== null
+            ? props.patientId
+            : location.state,
+        id_postihnutia: data.ID_POSTIHNUTIA,
+      }),
+    };
+    fetch("/update/ztp", requestOptions);
   };
 
   const onEditDiseaseDate = (data) => {
@@ -73,9 +90,15 @@ export default function ProfileCard(props) {
         "Content-Type": "application/json",
         authorization: "Bearer " + token,
       },
-      body: JSON.stringify({ datum_od: data.DAT_OD, datum_do: data.DAT_DO }),
+      body: JSON.stringify({
+        datum_od: data.DAT_OD,
+        datum_do: data.DAT_DO,
+        id_pacienta:
+          typeof props.patientId !== "undefined" && props.patientId !== null
+            ? props.patientId
+            : location.state,
+      }),
     };
-    console.log(requestOptions);
     fetch("/update/choroba", requestOptions);
   };
 

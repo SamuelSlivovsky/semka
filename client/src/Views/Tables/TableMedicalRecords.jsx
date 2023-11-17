@@ -6,6 +6,9 @@ import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Calendar } from "primereact/calendar";
+import GeneratePdf from "../../Forms/GeneratePdf";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Pdf } from "../../Forms/Pdf";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -40,12 +43,12 @@ export default function TableMedic(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
-    fetch(`/zaznamy/priloha/${value.id_zaz}`, { headers })
+    fetch(`/zaznamy/priloha/${value.id}`, { headers })
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
       });
-    fetch(`/zaznamy/popis/${value.id_zaz}`, { headers })
+    fetch(`/zaznamy/popis/${value.id}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setPopis(data[0].POPIS);
@@ -219,23 +222,29 @@ export default function TableMedic(props) {
           <div style={{ width: "100%", display: "flex" }}>
             <ProgressSpinner />
           </div>
-        ) : (
+        ) : selectedRow !== null ? (
           <div style={{ maxWidth: "100%", overflowWrap: "break-word" }}>
+            <PDFDownloadLink
+              document={<Pdf />}
+              fileName={`${selectedRow.PRIEZVISKO}${selectedRow.type}.pdf`}
+            >
+              {({ blob, url, loading, error }) =>
+                loading ? "Loading document..." : "Download now!"
+              }
+            </PDFDownloadLink>
             <img
               src={imgUrl}
               alt=""
               style={{ maxWidth: 400, maxHeight: 400 }}
             />
 
-            {selectedRow != null
-              ? selectedRow.type != null
-                ? getRecordDetails()
-                : ""
-              : ""}
-            <h2>{selectedRow != null ? nazov : ""} </h2>
-            <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
-            <div>{selectedRow != null ? popis : ""}</div>
+            {selectedRow.type != null ? getRecordDetails() : ""}
+            <h2>{nazov} </h2>
+            <h5>{"Dátum: " + selectedRow.DATUM} </h5>
+            <div>{popis}</div>
           </div>
+        ) : (
+          ""
         )}
       </Dialog>
     </div>

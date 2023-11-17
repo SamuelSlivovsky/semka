@@ -21,8 +21,12 @@ async function updateChoroba(body) {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `UPDATE zoznam_ochoreni SET DAT_DO = to_date(to_char(to_timestamp(:datum_do,'DD/MM/YYYY HH24:MI:SS'),
-      'DD/MM/YYYY HH24:MI:SS')) WHERE DAT_OD = :datum_od`,
-      { datum_do: body.datum_do, datum_od: body.datum_od },
+      'DD/MM/YYYY HH24:MI:SS')) WHERE DAT_OD = :datum_od AND id_karty = (select id_karty from zdravotna_karta where id_pacienta = :id_pacienta)`,
+      {
+        datum_do: body.datum_do,
+        datum_od: body.datum_od,
+        id_pacienta: body.id_pacienta,
+      },
       { autoCommit: true }
     );
 
