@@ -7,7 +7,7 @@ module.exports = {
     (async () => {
       pacienti = await lekar.getPacienti(req.params.id);
       //TODO Ddplnit podmienky Upravit Role === 0 aby bol admin
-      if (req.role === 2) {
+      if (req.role === 0) {
         pacienti = hashPacienti(pacienti)
       }
       res.status(200).json(pacienti);
