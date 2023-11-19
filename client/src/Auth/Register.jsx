@@ -114,10 +114,6 @@ export const Register = () => {
                         //     })}
                         // />
 
-                        /*
-                        Druhy sposob osetrenia
-                         */
-                        //
                         <InputText
                             id={field.name}
                             {...field}
