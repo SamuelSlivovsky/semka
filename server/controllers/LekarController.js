@@ -1,14 +1,14 @@
 
 const lekar = require("../models/lekar");
-const {hashPacienti} = require("../Utils/hashData");
+const {hashPacienti} = require("../utils/hashData");
 module.exports = {
   getPacienti: (req, res) => {
     const lekar = require("../models/lekar");
     (async () => {
       pacienti = await lekar.getPacienti(req.params.id);
       //TODO Ddplnit podmienky Upravit Role === 0 aby bol admin
-      if (req.role === 0) {
-        hashPacienti()
+      if (req.role === 2) {
+        pacienti = hashPacienti(pacienti)
       }
       res.status(200).json(pacienti);
     })();
