@@ -20,6 +20,12 @@
   margin-bottom: 8px;
   padding: 8px;
   border-radius: 5px;
+  display: flex;
+  align-items: center;
+}
+
+.current-user {
+  background-color: #4caf50;
 }
 
 .user {
@@ -29,6 +35,7 @@
 
 .chat-input {
   display: flex;
+  flex-direction: column;
   padding: 10px;
   background-color: #f2f2f2;
 }
@@ -48,4 +55,22 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.image-preview {
+  cursor: pointer;
+  max-width: 100px; /* Adjust the max-width as needed */
+}
+
+/* Add this style to ensure the image doesn't overflow its container */
+.image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px; /* Adjust the height as needed */
+  border-radius: 50%;
+  margin-right: 8px; /* Adjust the margin as needed */
 }
