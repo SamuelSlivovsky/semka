@@ -2,7 +2,7 @@
 const fs = require('fs');
 
 function generujRodneCislo(pohlavie) {
-    let rok = Math.floor(Math.random() * (1999 - 1940 + 1)) + 1940;
+    let rok = Math.floor(Math.random() * (1999 - 1954 + 1)) + 1954;
     rok = rok % 100;
     const mesiac = Math.floor(Math.random() * 12) + 1;
     const den = Math.floor(Math.random() * 28) + 1;
@@ -12,7 +12,7 @@ function generujRodneCislo(pohlavie) {
     if (pohlavie === 'muz') {
         formatovanyMesiac = (mesiac < 10) ? '0' + mesiac : mesiac;
     } else {
-        formatovanyMesiac = '5' + mesiac;
+        formatovanyMesiac = 50 + mesiac;
     }
 
     // Pridanie nuly pred číslice menšie ako 10
