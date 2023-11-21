@@ -24,6 +24,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Combobox from "./Views/Combobox";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
+import InteractiveMap from "./Views/InteractiveMap";
 import User from "./Views/User";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -299,21 +300,21 @@ function App() {
 
   return (
     <div>
-      <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
+      <div className={`side-box ${visibleLeft ? 'side-box-opened' : ''}`}>
         <Button
-          icon={`${visibleLeft ? "pi pi-times" : "pi pi-bars"}`}
+          icon={`${visibleLeft ? 'pi pi-times' : 'pi pi-bars'}`}
           onClick={() => handleShowSidebar()}
-          iconPos="right"
+          iconPos='right'
           style={{
-            marginTop: "1rem",
-            marginRight: "8px",
-            marginLeft: "auto",
-            display: "flex",
-            background: "none",
-            border: "none",
+            marginTop: '1rem',
+            marginRight: '8px',
+            marginLeft: 'auto',
+            display: 'flex',
+            background: 'none',
+            border: 'none',
           }}
         />
-        {typeof userData !== "undefined" &&
+        {typeof userData !== 'undefined' &&
         userData !== null &&
         userData.UserInfo.role === 1 ? (
           sidebarButtonsAdmin
@@ -326,49 +327,53 @@ function App() {
         ) : userData !== null && userData.UserInfo.role === 4 ? (
           sidebarButtonsPatient
         ) : (
-          ""
+          ''
         )}
-        {typeof userData !== "undefined" && userData !== null ? (
+        {typeof userData !== 'undefined' && userData !== null ? (
           <SidebarButton
-            key="12"
+            key='12'
             visibleLeft={visibleLeft}
-            path="/logout"
-            label="Odhlas"
-            icon="logout-icon"
+            path='/logout'
+            label='Odhlas'
+            icon='logout-icon'
           />
         ) : (
-          ""
+          ''
         )}
       </div>
       <div
-        className={`page-content ${visibleLeft ? "page-content-opened" : ""}`}
+        className={`page-content ${visibleLeft ? 'page-content-opened' : ''}`}
       >
         <Routes>
-          <Route path="/" element={<Home userData={userData}></Home>}></Route>
-          <Route path="/register" element={<Register></Register>}></Route>
-          <Route path="/login" element={<Login></Login>}></Route>
-          <Route path="/logout" element={<Logout></Logout>}></Route>
-          <Route path="/user" element={<User></User>}></Route>
-          {typeof userData !== "undefined" &&
+          <Route path='/' element={<Home userData={userData}></Home>}></Route>
+          <Route path='/register' element={<Register></Register>}></Route>
+          <Route path='/login' element={<Login></Login>}></Route>
+          <Route path='/logout' element={<Logout></Logout>}></Route>
+          <Route path='/user' element={<User></User>}></Route>
+          <Route
+            path='/map'
+            element={<InteractiveMap></InteractiveMap>}
+          ></Route>
+          {typeof userData !== 'undefined' &&
           userData !== null &&
           userData.UserInfo.role === 1 ? (
             renderAdminRoutes()
-          ) : typeof userData !== "undefined" &&
+          ) : typeof userData !== 'undefined' &&
             userData !== null &&
             userData.UserInfo.role === 2 ? (
             renderDoctorRoutes()
-          ) : typeof userData !== "undefined" &&
+          ) : typeof userData !== 'undefined' &&
             userData !== null &&
             userData.UserInfo.role === 3 ? (
             <>
               {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
-          ) : typeof userData !== "undefined" &&
+          ) : typeof userData !== 'undefined' &&
             userData !== null &&
             userData.UserInfo.role === 4 ? (
             renderPatientRoutes()
           ) : (
-            ""
+            ''
           )}
         </Routes>
       </div>
