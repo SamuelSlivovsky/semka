@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
+import { InputTextarea } from "primereact/inputtextarea";
+import { FileUpload } from "primereact/fileupload";
+import { Button } from "primereact/button";
 import socketService from "../service/socketService.js";
+import GetUserData from "../Auth/GetUserData.jsx";
 import "../styles/chat.css";
 
 const Chat = () => {
@@ -7,6 +11,7 @@ const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
   const [image, setImage] = useState(null);
   const [mySocketId, setMySocketId] = useState("");
+  const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
 
   useEffect(() => {
     socketService.connect();
@@ -30,11 +35,15 @@ const Chat = () => {
   const sendMessage = () => {
     if (image) {
       // If an image is selected, send it as a separate event
-      socketService.emit("sendImage", image, "group1");
+      socketService.emit("sendImage", image, {
+        userId: userDataHelper.UserInfo.userid,
+      });
       setImage(null);
     } else if (newMessage.trim() !== "") {
       // Send regular text message
-      socketService.emit("sendMessage", newMessage, "group1");
+      socketService.emit("sendMessage", newMessage, {
+        userId: userDataHelper.UserInfo.userid,
+      });
     }
 
     setNewMessage("");
@@ -45,7 +54,7 @@ const Chat = () => {
   };
 
   const handleImageChange = (e) => {
-    const file = e.target.files[0];
+    const file = e.files[0];
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -60,31 +69,34 @@ const Chat = () => {
   };
 
   const isCurrentUser = (sender) => {
-    return sender === mySocketId;
+    return sender === userDataHelper.UserInfo.userid;
   };
 
   return (
     <div className="chat-container">
       <div className="chat-messages">
         {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`message ${message.sender} ${
-              isCurrentUser(message.sender) ? "current-user" : ""
-            }`}
-          >
+          <div key={index} className={`message-container  ${message.sender} `}>
             {isCurrentUser(message.sender) ? (
               <>
-                {message.type === "image" ? (
-                  <img
-                    src={message.content}
-                    alt="sent"
-                    onClick={() => openImageInNewTab(message.content)}
-                    className="image-preview"
-                  />
-                ) : (
-                  <p style={{ marginLeft: "auto" }}>{message.content}</p>
-                )}{" "}
+                <div
+                  className={`message ${
+                    isCurrentUser(message.sender) ? "current-user" : ""
+                  }`}
+                >
+                  {message.type === "image" ? (
+                    <img
+                      src={message.content}
+                      alt="sent"
+                      onClick={() => openImageInNewTab(message.content)}
+                      className="image-preview"
+                    />
+                  ) : (
+                    <span style={{ marginLeft: "auto" }}>
+                      {message.content}
+                    </span>
+                  )}{" "}
+                </div>
                 <div
                   className={`avatar`}
                   style={{ backgroundColor: "#3498db" }}
@@ -96,16 +108,22 @@ const Chat = () => {
                   className={`avatar`}
                   style={{ backgroundColor: "#3498db" }}
                 ></div>
-                {message.type === "image" ? (
-                  <img
-                    src={message.content}
-                    alt="sent"
-                    onClick={() => openImageInNewTab(message.content)}
-                    className="image-preview"
-                  />
-                ) : (
-                  message.content
-                )}{" "}
+                <div
+                  className={`message ${
+                    isCurrentUser(message.sender) ? "current-user" : ""
+                  }`}
+                >
+                  {message.type === "image" ? (
+                    <img
+                      src={message.content}
+                      alt="sent"
+                      onClick={() => openImageInNewTab(message.content)}
+                      className="image-preview"
+                    />
+                  ) : (
+                    message.content
+                  )}{" "}
+                </div>
               </>
             )}
           </div>
@@ -113,20 +131,34 @@ const Chat = () => {
       </div>
       <div className="chat-input">
         <div className="input-with-preview">
-          <input
-            type="text"
+          <InputTextarea
+            style={{
+              width: "100%",
+              marginBottom: "10px",
+              resize: "none",
+            }}
+            rows={5}
             placeholder="Type a message..."
             value={newMessage}
             onChange={handleInputChange}
           />
-          {image && (
-            <div className="image-preview">
-              <img src={image} alt="preview" />
-            </div>
-          )}
         </div>
-        <input type="file" accept="image/*" onChange={handleImageChange} />
-        <button onClick={sendMessage}>Send</button>
+        <FileUpload
+          customUpload
+          accept="image/*"
+          maxFileSize={1000000}
+          onSelect={handleImageChange}
+          style={{ marginBottom: "10px" }}
+          emptyTemplate={
+            <p className="m-0">Drag and drop files to here to upload.</p>
+          }
+        />
+
+        <Button
+          onClick={sendMessage}
+          style={{ width: "100px" }}
+          label="Send"
+        ></Button>
       </div>
     </div>
   );

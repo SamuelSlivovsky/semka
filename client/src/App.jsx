@@ -315,7 +315,7 @@ function App() {
         />
         {typeof userData !== "undefined" &&
         userData !== null &&
-        userData.UserInfo.role === 1 ? (
+        userData.UserInfo.role === 0 ? (
           sidebarButtonsAdmin
         ) : userData !== null && userData.UserInfo.role === 2 ? (
           sidebarButtonsDoctor
@@ -351,7 +351,7 @@ function App() {
           <Route path="/user" element={<User></User>}></Route>
           {typeof userData !== "undefined" &&
           userData !== null &&
-          userData.UserInfo.role === 1 ? (
+          userData.UserInfo.role === 0 ? (
             renderAdminRoutes()
           ) : typeof userData !== "undefined" &&
             userData !== null &&

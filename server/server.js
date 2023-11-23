@@ -51,22 +51,24 @@ app.use("/vybavenie", equipmentRoute);
 app.use("/update", updateRoute);
 
 io.on("connection", (socket) => {
-  console.log(socket);
   socket.emit("yourSocketId", socket.id);
   // Listen for text messages
-  socket.on("sendMessage", (message, groupName) => {
-    // Broadcast the text message to all connected clients
+  socket.on("sendMessage", (message, params) => {
     io.emit("newMessage", {
       content: message,
-      sender: socket.id,
+      sender: params.userId,
       type: "text",
     });
   });
 
   // Listen for image messages
-  socket.on("sendImage", (image, groupName) => {
+  socket.on("sendImage", (image, params) => {
     // Broadcast the image message to all connected clients
-    io.emit("newMessage", { content: image, sender: socket.id, type: "image" });
+    io.emit("newMessage", {
+      content: image,
+      sender: params.userId,
+      type: "image",
+    });
   });
 
   socket.on("disconnect", () => {
