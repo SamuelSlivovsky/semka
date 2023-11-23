@@ -51,6 +51,7 @@ app.use("/vybavenie", equipmentRoute);
 app.use("/update", updateRoute);
 
 io.on("connection", (socket) => {
+  console.log(socket);
   socket.emit("yourSocketId", socket.id);
   // Listen for text messages
   socket.on("sendMessage", (message, groupName) => {

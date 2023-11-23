@@ -17,11 +17,24 @@
 }
 
 .message {
+  position: relative; /* Added for positioning the tail */
   margin-bottom: 8px;
   padding: 8px;
-  border-radius: 5px;
+  border-radius: 10px;
   display: flex;
   align-items: center;
+}
+
+.message::after {
+  content: "";
+  position: absolute;
+  bottom: -8px; /* Adjust this value to control how far the tail extends beyond the div */
+  right: 0;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0 16px 16px 0; /* Adjust the values to change the tail size */
+  border-color: transparent #4caf50 transparent transparent; /* Use your background color instead of #ffffff */
 }
 
 .current-user {
