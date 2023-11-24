@@ -110,6 +110,13 @@ function Home() {
       icon={storageIcon}
       key="9"
     ></HomeCard>,
+    <HomeCard
+        title="Pacienti"
+        isCalendar={false}
+        path="/patients"
+        icon={patientIcon}
+        key="2"
+    ></HomeCard>,
   ];
 
   const patientCards = [
@@ -131,7 +138,7 @@ function Home() {
 
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
-      if (userData.UserInfo.role === 1) return adminCards;
+      if (userData.UserInfo.role === 0) return adminCards;
       else if (userData.UserInfo.role === 2) return doctorCards;
       else if (userData.UserInfo.role === 3)
         return (
