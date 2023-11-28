@@ -13,10 +13,10 @@ const handleRegister = async (req, res) => {
 
     try {
         if (await userModel.userExists(userid)) {
-            return res.status(409).json({message: `Already exists`});
+            return res.status(409).json({message: `User with this name already exist`});
             // Kontrola ci uzivatel existuje v pacientoch/zamestnancoch
         } else if (await userModel.userExistsInDB(userid)) {
-            return res.status(409).json({message: `No user in database with that ID`});
+            return res.status(409).json({message: `User does not exist in database`});
         } else {
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
@@ -65,7 +65,7 @@ const handleLogin = async (req, res) => {
             .status(400)
             .json({message: "Username and password are required."});
 
-    if (!(await userModel.userExists(userid))) return res.sendStatus(401); //Unauthorized
+    if (!(await userModel.userExists(userid))) return res.status(400).json({message: "User with this login does not exist"}); //Does not exist
 
     const foundUser = await userModel.getUserByUserId(userid);
     const match = await bcrypt.compare(pwd, foundUser.PWD);

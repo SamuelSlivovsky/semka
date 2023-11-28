@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useState, useRef} from "react";
 import {useForm, Controller} from "react-hook-form";
 import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
@@ -9,11 +9,14 @@ import {InputMask} from "primereact/inputmask";
 import {useNavigate} from "react-router";
 import "../styles/auth.css";
 import {redirect} from "react-router-dom";
+import { Toast } from 'primereact/toast';
+
 
 export const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
     const navigate = useNavigate();
+    const toast = useRef(null);
     const defaultValues = {
         rc: "",
         email: "",
@@ -43,7 +46,7 @@ export const Register = () => {
                 if (res.message !== undefined) {
                     navigate("/logout");
                     navigate("/register")
-                    alert(res.message);
+                    toast.current.show({severity:'error', summary: res.message, life: 999999999});
                 } else {
                     localStorage.setItem("hospit-user", res.accessToken);
                     navigate("/");
@@ -72,6 +75,7 @@ export const Register = () => {
     const passwordHeader = <h6>Pick a password</h6>;
     return (
         <div className="auth-form-container">
+            <Toast ref={toast} position="top-center" />
             <Dialog
                 visible={showMessage}
                 onHide={() => setShowMessage(false)}
