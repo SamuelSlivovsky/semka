@@ -27,6 +27,7 @@ export default function TabExaminations() {
     ],
     allowFilters: true,
     dialog: true,
+    eventType: "Vyšetrenie",
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;

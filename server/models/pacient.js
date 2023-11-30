@@ -208,11 +208,6 @@ async function getUdalosti(rod_cislo) {
       udalosti.push(element);
     });
 
-    let ockovania = await getOckovania(rod_cislo);
-    ockovania.forEach((element) => {
-      udalosti.push(element);
-    });
-
     let vysetrenia = await getVysetrenia(rod_cislo);
     vysetrenia.forEach((element) => {
       udalosti.push(element);
@@ -251,15 +246,16 @@ async function getOperacie(rod_cislo) {
   }
 }
 
-async function getOckovania(rod_cislo) {
+async function getOckovania(id) {
   try {
     let conn = await database.getConnection();
     const ockovania = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaz
-        join ockovanie using(id_zaznamu)
-        join pacient using(id_pacienta)
-         where rod_cislo = :rod_cislo`,
-      [rod_cislo]
+      `select nazov, typ, to_char(dat_ockovania,'DD.MM.YYYY') as "DATUM" from zdravotna_karta
+        join zoznam_vakcin using(id_karty)
+        join vakcina using(id_vakciny)
+
+         where id_pacienta = :id`,
+      [id]
     );
 
     ockovania.rows.forEach((element) => {
@@ -428,4 +424,5 @@ module.exports = {
   getDoctorsOfPatient,
   insertPacient,
   getIdPacienta,
+  getOckovania,
 };

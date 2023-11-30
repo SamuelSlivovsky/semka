@@ -6,9 +6,9 @@ import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Calendar } from "primereact/calendar";
-import GeneratePdf from "../../Forms/GeneratePdf";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Pdf } from "../../Forms/Pdf";
+import GetUserData from "../../Auth/GetUserData";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -17,6 +17,7 @@ export default function TableMedic(props) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [imgUrl, setImgUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const userData = GetUserData(localStorage.getItem("hospit-user"));
   const {
     tableName,
     cellData,
@@ -25,6 +26,7 @@ export default function TableMedic(props) {
     dialog,
     tableScrollHeight,
     editor,
+    eventType,
   } = props;
   const [popis, setPopis] = useState(null);
   const [nazov, setNazov] = useState(null);
@@ -59,6 +61,7 @@ export default function TableMedic(props) {
 
   const getRecordDetails = () => {
     let popis;
+    console.log(cellData);
     cellData.map((data) => {
       if (data.id === selectedRow.id) {
         data.LEKAR === data.ODDELENIE
@@ -164,6 +167,17 @@ export default function TableMedic(props) {
     return new Date(formattedDateString);
   };
 
+  const getDoctor = () => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    console.log("first");
+    fetch(`/lekar/info/${props.doctorId}`, { headers })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+      });
+  };
+
   const header = allowFilters ? renderHeader() : "";
   return (
     <div>
@@ -225,7 +239,13 @@ export default function TableMedic(props) {
         ) : selectedRow !== null ? (
           <div style={{ maxWidth: "100%", overflowWrap: "break-word" }}>
             <PDFDownloadLink
-              document={<Pdf />}
+              document={
+                <Pdf
+                  eventType={eventType}
+                  data={selectedRow}
+                  doctor={userData}
+                />
+              }
               fileName={`${selectedRow.PRIEZVISKO}${selectedRow.type}.pdf`}
             >
               {({ blob, url, loading, error }) =>

@@ -21,6 +21,7 @@ export default function ProfileCard(props) {
   const [eventType, setEventType] = useState("");
   const [header, setHeader] = useState("");
   const [showDisables, setShowDisables] = useState(false);
+  const [showVac, setShowVac] = useState(false);
   const [vaccinationTypes, setVaccinationTypes] = useState("");
   const [selectedVaccinationType, setSelectedVaccinationType] = useState("");
 
@@ -31,6 +32,7 @@ export default function ProfileCard(props) {
   const [patientDiseases, setPatientDiseases] = useState("");
 
   const [patientZTPTypes, setPatientZTPTypes] = useState([]);
+  const [patientVac, setPatientVac] = useState([]);
 
   const medicalRecordsTable = {
     tableName: "Zdravotné záznamy",
@@ -137,6 +139,22 @@ export default function ProfileCard(props) {
     editor: true,
   };
 
+  const vacTable = {
+    tableName: "Očkovania",
+    route: "/pacient",
+    cellData: patientVac,
+    setCellData: setPatientVac,
+    titles: [
+      { field: "NAZOV", header: "Očkovanie" },
+      { field: "TYP", header: "Typ" },
+      { field: "DATUM", header: "Dátum" },
+    ],
+    allowFilters: false,
+    dialog: false,
+    tableScrollHeight: "500px",
+    editor: false,
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
@@ -201,6 +219,18 @@ export default function ProfileCard(props) {
       .then((response) => response.json())
       .then((data) => {
         setPatientMedicalRecords(data);
+      });
+
+    fetch(
+      `patient/ockovania/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        setPatientVac(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -310,50 +340,50 @@ export default function ProfileCard(props) {
     <div>
       <div className="flex col-12 ">
         <Card
-          className="col-5 shadow-4"
+          className="col-5 shadow-4 "
           style={{ width: "50rem", height: "40rem" }}
           title={profile.MENO + " " + profile.PRIEZVISKO}
         >
           <div className="flex ">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Rok narodenia</h4>
               <div>{profile.DATUM_NARODENIA}</div>
             </div>
 
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Mobil</h4>
               <div>{profile.TEL}</div>
             </div>
           </div>
 
           <div className="flex w-100">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Vek</h4>
               <div>{profile.VEK}</div>
             </div>
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Email</h4>
               <div>{profile.MAIL}</div>
             </div>
           </div>
 
           <div className="flex">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Krvna skupina</h4>
               <div>{profile.TYP_KRVI}</div>
             </div>
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Poistovňa</h4>
               <div>{profile.NAZOV_POISTOVNE}</div>
             </div>
           </div>
 
           <div className="flex w-100">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Adresa</h4>
               <div>{profile.NAZOV_OBCE + " " + profile.PSC}</div>
             </div>
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>ZŤP</h4>
               <div>
                 {patientZTPTypes.length !== 0 ? (
@@ -377,8 +407,17 @@ export default function ProfileCard(props) {
               </div>
             </div>
           </div>
-          <div className="mt-5 text-center">
-            <Button label="Poslať správu" icon="pi pi-send" />
+          <div className="flex">
+            <div className="mt-5 text-center col-6 text-center m-0">
+              <Button label="Poslať správu" icon="pi pi-send" />
+            </div>
+            <div className="mt-5 text-center col-6 text-center m-0">
+              <Button
+                label="Zoznam Očkovaní"
+                icon="pi pi-list"
+                onClick={() => setShowVac(true)}
+              ></Button>
+            </div>
           </div>
         </Card>
 
@@ -494,6 +533,14 @@ export default function ProfileCard(props) {
           >
             {" "}
             <TableMedicalRecords {...disablesTable} />
+          </Dialog>
+          <Dialog
+            visible={showVac}
+            onHide={() => setShowVac(false)}
+            style={{ width: "1000px" }}
+          >
+            {" "}
+            <TableMedicalRecords {...vacTable} />
           </Dialog>
         </>
       ) : (

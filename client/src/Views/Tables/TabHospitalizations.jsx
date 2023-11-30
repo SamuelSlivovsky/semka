@@ -29,6 +29,7 @@ export default function TabHospitalizations() {
     ],
     allowFilters: true,
     dialog: true,
+    eventType: "Hospitalizácia",
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;
