@@ -14,6 +14,11 @@ const handleRegister = async (req, res) => {
   try {
     if (await userModel.userExists(userid)) {
       return res.status(409).json({ message: `Already exists` });
+      // Kontrola ci uzivatel existuje v pacientoch/zamestnancoch
+    } else if (await userModel.userExistsInDB(userid)) {
+      return res
+        .status(409)
+        .json({ message: `No user in database with that ID` });
     } else {
       bcrypt.genSalt(10, function (err, salt) {
         if (err) {
@@ -27,12 +32,12 @@ const handleRegister = async (req, res) => {
           const accessToken = jwt.sign(
             {
               UserInfo: {
-                userid: userid,
+                userid: !isNaN(userid) ? Number(userid) : userid,
                 role: 3,
               },
             },
             process.env.ACCESS_TOKEN_SECRET,
-            { expiresIn: "1d" }
+            { expiresIn: "3600s" }
           );
 
           let body = req.body;
@@ -68,22 +73,18 @@ const handleLogin = async (req, res) => {
     const accessToken = jwt.sign(
       {
         UserInfo: {
-          userid: isNaN(foundUser.USERID)
-            ? foundUser.USERID
-            : Number(foundUser.USERID),
+          userid: !isNaN(foundUser.USERID)
+            ? Number(foundUser.USERID)
+            : foundUser.USERID,
           role: foundUser.ROLE,
         },
       },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "3600s" }
     );
 
     const refreshToken = jwt.sign(
-      {
-        userid: isNaN(foundUser.USERID)
-          ? foundUser.USERID
-          : Number(foundUser.USERID),
-      },
+      { userid: foundUser.USERID },
       process.env.REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
@@ -138,9 +139,7 @@ const handleRefreshToken = async (req, res) => {
     const accessToken = jwt.sign(
       {
         UserInfo: {
-          userid: isNaN(foundUser.USERID)
-            ? foundUser.USERID
-            : Number(foundUser.USERID),
+          userid: foundUser.USERID,
           role: foundUser.ROLE,
         },
       },
