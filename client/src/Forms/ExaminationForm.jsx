@@ -69,6 +69,7 @@ export default function ExaminationForm(props) {
         onClick={() => {
           setShowMessage(false);
           props.hideDialog();
+          props.onInsert();
         }}
       />
     </div>

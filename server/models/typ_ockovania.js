@@ -4,7 +4,7 @@ async function getTypyOckovania() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT distinct typ, nazov FROM vakcina`
+      `SELECT distinct typ, nazov, id_vakciny FROM vakcina`
     );
 
     return result.rows;

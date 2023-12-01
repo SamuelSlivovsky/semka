@@ -336,7 +336,7 @@ async function getZdravZaznamy(pid_pacienta) {
           from zdravotny_zaz 
           join zdravotna_karta using(id_karty)
             where id_pacienta = :pid_pacienta
-                  order by zdravotny_zaz.datum`,
+                  order by zdravotny_zaz.datum desc`,
       { pid_pacienta }
     );
     console.log(zdravZaznamy.rows);

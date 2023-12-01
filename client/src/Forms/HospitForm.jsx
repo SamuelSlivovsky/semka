@@ -75,6 +75,7 @@ export default function HospitForm(props) {
         onClick={() => {
           setShowMessage(false);
           props.hideDialog();
+          props.onInsert();
         }}
       />
     </div>

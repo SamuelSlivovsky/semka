@@ -45,12 +45,12 @@ export default function TableMedic(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
-    fetch(`/zaznamy/priloha/${value.id}`, { headers })
+    fetch(`/zaznamy/priloha/${value.id_zaz}`, { headers })
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
       });
-    fetch(`/zaznamy/popis/${value.id}`, { headers })
+    fetch(`/zaznamy/popis/${value.id_zaz}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setPopis(data[0].POPIS);
@@ -165,17 +165,6 @@ export default function TableMedic(props) {
     var formattedDateString =
       dateArray[2] + "-" + dateArray[1] + "-" + dateArray[0];
     return new Date(formattedDateString);
-  };
-
-  const getDoctor = () => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
-    console.log("first");
-    fetch(`/lekar/info/${props.doctorId}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-      });
   };
 
   const header = allowFilters ? renderHeader() : "";

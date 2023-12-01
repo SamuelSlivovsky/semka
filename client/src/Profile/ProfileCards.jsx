@@ -3,8 +3,6 @@ import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { useLocation } from "react-router";
 import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";
 import HospitForm from "../Forms/HospitForm";
 //import RecipeForm from '../Forms/RecipeForm';
 import OperationForm from "../Forms/OperationForm";
@@ -13,6 +11,7 @@ import TableMedicalRecords from "../Views/Tables/TableMedicalRecords";
 import "../icons.css";
 import DiseaseForm from "../Forms/DiseaseForm";
 import DisablesForm from "../Forms/DisablesForm";
+import VacForm from "../Forms/VacForm";
 
 export default function ProfileCard(props) {
   const [profile, setProfile] = useState("");
@@ -22,17 +21,13 @@ export default function ProfileCard(props) {
   const [header, setHeader] = useState("");
   const [showDisables, setShowDisables] = useState(false);
   const [showVac, setShowVac] = useState(false);
-  const [vaccinationTypes, setVaccinationTypes] = useState("");
-  const [selectedVaccinationType, setSelectedVaccinationType] = useState("");
-
   const [patientMedicalRecords, setPatientMedicalRecords] = useState("");
-
   const [patientRecipes, setPatientRecipes] = useState("");
-
   const [patientDiseases, setPatientDiseases] = useState("");
-
   const [patientZTPTypes, setPatientZTPTypes] = useState([]);
   const [patientVac, setPatientVac] = useState([]);
+  const token = localStorage.getItem("hospit-user");
+  const headers = { authorization: "Bearer " + token };
 
   const medicalRecordsTable = {
     tableName: "Zdravotné záznamy",
@@ -155,9 +150,7 @@ export default function ProfileCard(props) {
     editor: false,
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
+  const fetchPatientInfo = () => {
     fetch(
       `patient/info/${
         typeof props.patientId !== "undefined" && props.patientId !== null
@@ -170,13 +163,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setProfile(...data);
       });
+  };
 
-    fetch(`selects/typyOckovania`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setVaccinationTypes(data);
-      });
-
+  const fetchRecipies = () => {
     fetch(
       `patient/recepty/${
         props.patientId !== null ? props.patientId : location.state
@@ -187,7 +176,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientRecipes(data);
       });
+  };
 
+  const fetchDiseases = () => {
     fetch(
       `patient/choroby/${
         props.patientId !== null ? props.patientId : location.state
@@ -198,7 +189,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientDiseases(data);
       });
+  };
 
+  const fetchDisables = () => {
     fetch(
       `patient/typyZTP/${
         props.patientId !== null ? props.patientId : location.state
@@ -209,7 +202,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientZTPTypes(data);
       });
+  };
 
+  const fetchMedRecords = () => {
     fetch(
       `patient/zdravZaznamy/${
         props.patientId !== null ? props.patientId : location.state
@@ -220,7 +215,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientMedicalRecords(data);
       });
+  };
 
+  const fetchVacs = () => {
     fetch(
       `patient/ockovania/${
         props.patientId !== null ? props.patientId : location.state
@@ -229,9 +226,17 @@ export default function ProfileCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         setPatientVac(data);
       });
+  };
+
+  useEffect(() => {
+    fetchPatientInfo();
+    fetchDisables();
+    fetchDiseases();
+    fetchMedRecords();
+    fetchPatientInfo();
+    fetchVacs();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClick = (eventType) => {
@@ -265,30 +270,6 @@ export default function ProfileCard(props) {
     setShow(false);
   };
 
-  const onVaccinationTypeChange = (e) => {
-    setSelectedVaccinationType(e.value);
-  };
-
-  const vacciDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum očkovania</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedVaccinationType}
-            options={vaccinationTypes}
-            onChange={onVaccinationTypeChange}
-            optionLabel="NAZOV"
-            placeholder="Vyber typ očkovania"
-          />
-        </div>
-      </div>
-    );
-  };
-
   const renderDialog = () => {
     switch (eventType) {
       case "examination":
@@ -296,6 +277,7 @@ export default function ProfileCard(props) {
           <ExaminationForm
             rod_cislo={profile.ROD_CISLO}
             hideDialog={() => onHide()}
+            onInsert={() => fetchMedRecords()}
           />
         );
       case "operation":
@@ -303,6 +285,7 @@ export default function ProfileCard(props) {
           <OperationForm
             rod_cislo={profile.ROD_CISLO}
             hideDialog={() => onHide()}
+            onInsert={() => fetchMedRecords()}
           />
         );
       case "hospit":
@@ -310,15 +293,23 @@ export default function ProfileCard(props) {
           <HospitForm
             rod_cislo={profile.ROD_CISLO}
             hideDialog={() => onHide()}
+            onInsert={() => fetchMedRecords()}
           />
         );
       case "vacci":
-        return vacciDialog();
+        return (
+          <VacForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchVacs()}
+          ></VacForm>
+        );
       case "disease":
         return (
           <DiseaseForm
             rod_cislo={profile.ROD_CISLO}
             hideDialog={() => onHide()}
+            onInsert={() => fetchDiseases()}
           />
         );
       case "ZTP":
@@ -329,6 +320,7 @@ export default function ProfileCard(props) {
             }
             rod_cislo={profile.ROD_CISLO}
             hideDialog={() => onHide()}
+            onInsert={() => fetchDisables()}
           />
         );
       default:
@@ -519,10 +511,11 @@ export default function ProfileCard(props) {
             </div>
           </div>
           <Dialog
+            blockScroll
             visible={show}
             onHide={onHide}
             header={header}
-            style={{ width: "80%" }}
+            style={{ width: "800px" }}
           >
             {renderDialog()}
           </Dialog>

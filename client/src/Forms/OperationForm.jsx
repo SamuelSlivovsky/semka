@@ -74,6 +74,7 @@ export default function OperationForm(props) {
         onClick={() => {
           setShowMessage(false);
           props.hideDialog();
+          props.onInsert();
         }}
       />
     </div>

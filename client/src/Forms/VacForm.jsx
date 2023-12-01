@@ -5,18 +5,17 @@ import { Dialog } from "primereact/dialog";
 import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
-export default function DiseaseForm(props) {
+export default function VacForm(props) {
   const [showMessage, setShowMessage] = useState(false);
-  const [diseaseTypes, setDiseaseTypes] = useState([]);
-  const [diseases, setDiseases] = useState([]);
+  const [vaccines, setVaccines] = useState([]);
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
 
-    fetch(`selects/typyChoroby`, { headers })
+    fetch(`selects/typyOckovania`, { headers })
       .then((response) => response.json())
       .then((data) => {
-        setDiseaseTypes(data);
+        setVaccines(data);
       });
   }, []);
 
@@ -30,14 +29,12 @@ export default function DiseaseForm(props) {
       },
       body: JSON.stringify({
         rod_cislo: data.rod_cislo === "" ? null : data.rod_cislo,
-        typ: data.type.TYP,
-        nazov: data.name.NAZOV,
-        datum_od: data.datum_od.toLocaleString("en-GB").replace(",", ""),
-        datum_do: data.datum_do.toLocaleString("en-GB").replace(",", ""),
+        id_vakciny: data.vac.ID_VAKCINY,
+        datum: data.datum.toLocaleString("en-GB").replace(",", ""),
       }),
     };
     const responsePatient = await fetch(
-      "/add/choroba",
+      "/add/ockovanie",
       requestOptionsPatient
     ).then(() => setShowMessage(true));
 
@@ -58,17 +55,6 @@ export default function DiseaseForm(props) {
       />
     </div>
   );
-
-  const onDiseaseTypeChange = (e, input) => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
-    input.onChange(e.value);
-    fetch(`selects/choroby/${e.value.TYP}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setDiseases(data);
-      });
-  };
 
   return (
     <div
@@ -91,7 +77,7 @@ export default function DiseaseForm(props) {
             className="pi pi-check-circle"
             style={{ fontSize: "5rem", color: "var(--green-500)" }}
           ></i>
-          <h5>Úspešné pridanie ochorenia</h5>
+          <h5>Úspešné pridanie očkovania</h5>
         </div>
       </Dialog>
 
@@ -103,10 +89,8 @@ export default function DiseaseForm(props) {
               props.rod_cislo !== null || typeof props.rod_cislo !== "undefined"
                 ? props.rod_cislo
                 : "",
-            type: null,
-            datum_od: null,
-            datum_do: null,
-            name: null,
+            vac: null,
+            datum: null,
           }}
           render={({ handleSubmit }) => (
             <form onSubmit={handleSubmit} className="p-fluid">
@@ -130,29 +114,14 @@ export default function DiseaseForm(props) {
                 )}
               />
               <Field
-                name="type"
+                name="vac"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <label htmlFor="type">Typ ochorenia*</label>
+                    <label htmlFor="vac">Očkovanie*</label>
                     <Dropdown
-                      id="type"
+                      id="vac"
                       {...input}
-                      options={diseaseTypes}
-                      onChange={(e) => onDiseaseTypeChange(e, input)}
-                      optionLabel="TYP"
-                    />
-                  </div>
-                )}
-              />
-              <Field
-                name="name"
-                render={({ input, meta }) => (
-                  <div className="field col-12">
-                    <label htmlFor="name">Názov ochorenia*</label>
-                    <Dropdown
-                      id="name"
-                      {...input}
-                      options={diseases}
+                      options={vaccines}
                       optionLabel="NAZOV"
                     />
                   </div>
@@ -160,10 +129,10 @@ export default function DiseaseForm(props) {
               />
 
               <Field
-                name="datum_od"
+                name="datum"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <label htmlFor="datum_od">Dátum od*</label>
+                    <label htmlFor="datum">Dátum očkovania*</label>
                     <Calendar
                       id="basic"
                       {...input}
@@ -175,23 +144,6 @@ export default function DiseaseForm(props) {
                   </div>
                 )}
               />
-              <Field
-                name="datum_do"
-                render={({ input, meta }) => (
-                  <div className="field col-12">
-                    <label htmlFor="datum_do">Dátum do*</label>
-                    <Calendar
-                      id="basic"
-                      {...input}
-                      dateFormat="dd.mm.yy"
-                      mask="99.99.9999"
-                      showIcon
-                      showTime
-                    />
-                  </div>
-                )}
-              />
-
               <div
                 className="field col-12 "
                 style={{ justifyContent: "center", display: "grid" }}
