@@ -11,6 +11,7 @@ const handleRegister = async (req, res) => {
             .json({message: "Username and password are required."});
     // check for duplicate usernames in the db
 
+    //TODO zmenit rolu pri registracii na rolu pacienta
     try {
         if (await userModel.userExists(userid)) {
             return res.status(409).json({message: `User with this name already exist`});
