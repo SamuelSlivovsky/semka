@@ -25,6 +25,7 @@ import Combobox from "./Views/Combobox";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
 import User from "./Views/User";
+import HospitalRoom from "./HospitalRoom/HospitalRoom";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -193,8 +194,8 @@ function App() {
       key="12"
       visibleLeft={visibleLeft}
       path=""
-      label={visibleLeft ? `Pocet neobsadenych lozok: ${beds}` : beds}
-      icon=""
+      label="Konzíliá"
+      icon="meeting-icon"
     />,
   ];
 
@@ -357,6 +358,7 @@ function App() {
           <Route path="/login" element={<Login></Login>}></Route>
           <Route path="/logout" element={<Logout></Logout>}></Route>
           <Route path="/user" element={<User></User>}></Route>
+          <Route path="/room" element={<HospitalRoom />}></Route>
           {typeof userData !== "undefined" &&
           userData !== null &&
           userData.UserInfo.role === 0 ? (

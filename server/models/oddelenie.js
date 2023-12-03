@@ -102,17 +102,17 @@ async function getZamestnanciOddelenia(id_oddelenia) {
   }
 }
 
-async function getPocetZamOddelenia(id_oddelenia, rok) {
+async function getPocetZamOddelenia(cislo_zam, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `select count(cislo_zam) as pocet_zamestnancov from oddelenie o 
-        join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
-        where z.id_oddelenia = :id_oddelenia
+        join zamestnanci z on (z.id_oddelenia = o.id_oddelenia)
+        where z.id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
         and (to_char(dat_od, 'YYYY') <= :rok 
           or to_char(dat_do, 'YYYY') >= :rok
         )`,
-      [id_oddelenia, rok]
+      [cislo_zam, rok]
     );
     console.log(result);
     return result.rows;
@@ -121,16 +121,16 @@ async function getPocetZamOddelenia(id_oddelenia, rok) {
   }
 }
 
-async function getPocetPacientovOddelenia(id_oddelenia) {
+async function getPocetPacientovOddelenia(cislo_zam) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(distinct lp.id_pacienta) as pocet_pacientov from oddelenie o 
-          join zamestnanec z on (z.id_oddelenia = o.id_oddelenia)
-          join lekar l on (l.id_zamestnanca = z.id_zamestnanca)
-          join lekar_pacient lp on (lp.id_lekara = l.id_lekara)
-          where z.id_oddelenia = :id_oddelenia`,
-      [id_oddelenia]
+      `select count(distinct p.id_pacienta) as pocet_pacientov from oddelenie o 
+          join zamestnanci z on (z.id_oddelenia = o.id_oddelenia)
+          join nemocnica n on (n.id_nemocnice = o.id_nemocnice)
+          join pacient p on (p.id_nemocnice = n.id_nemocnice)
+          where o.id_oddelenia = (select id_oddelenia from zamestnanci where cislo_zam =:cislo_zam)`,
+      [cislo_zam]
     );
     console.log(result);
     return result.rows;
@@ -139,17 +139,16 @@ async function getPocetPacientovOddelenia(id_oddelenia) {
   }
 }
 
-async function getPocetOperaciiOddelenia(id_oddelenia, rok) {
+async function getPocetOperaciiOddelenia(cislo_zam, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(id_operacie) as poc_operacii from operacia o 
-          join zdravotny_zaznam z on (z.id_zaznamu = o.id_zaznamu)
-          join miestnost m on (m.id_miestnosti = o.id_miestnosti)
-          where m.id_oddelenia = :id_oddelenia
-          and to_char(z.datum,'YYYY') = :rok
+      `select count(id_operacie) as poc_operacii from operacia
+          join zamestnanci using (cislo_zam)
+          where id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
+          and to_char(dat_operacie,'YYYY') = :rok
               `,
-      [id_oddelenia, rok]
+      [cislo_zam, rok]
     );
     console.log(result);
     return result.rows;
@@ -158,18 +157,17 @@ async function getPocetOperaciiOddelenia(id_oddelenia, rok) {
   }
 }
 
-async function getPocetHospitalizaciiOddelenia(id_oddelenia, rok) {
+async function getPocetHospitalizaciiOddelenia(cislo_zam, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(id_hospitalizacie) as poc_hospit from hospitalizacia h 
-          join zdravotny_zaznam z on (z.id_zaznamu = h.id_zaznamu)
-          join lozko l on (l.id_lozka = h.id_lozka)
-          join miestnost m on (m.id_miestnosti = l.id_miestnosti)
-          where m.id_oddelenia = :id_oddelenia
-          and to_char(z.datum,'YYYY') = :rok
-              `,
-      [id_oddelenia, rok]
+      `select count(id_hosp) as poc_hospitalizacii from hospitalizacia h
+      join lozko l on (l.id_lozka = h.id_lozka)
+      join oddelenie o on (o.id_oddelenia = l.id_oddelenia)
+      join zamestnanci z on (z.id_oddelenia = o.id_oddelenia)
+      where l.id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
+      and to_char(h.dat_od,'YYYY') = :rok`,
+      [cislo_zam, rok]
     );
     console.log(result);
     return result.rows;
@@ -178,18 +176,16 @@ async function getPocetHospitalizaciiOddelenia(id_oddelenia, rok) {
   }
 }
 
-async function getPocetVysetreniOddelenia(id_oddelenia, rok) {
+async function getPocetVysetreniOddelenia(cislo_zam, rok) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(id_vysetrenia) as poc_vys from vysetrenie v 
-      join zdravotny_zaznam z on (z.id_zaznamu = v.id_zaznamu)
-      join lekar l on (l.id_lekara = v.id_lekara)
-      join zamestnanec zam on (zam.id_zamestnanca = l.id_zamestnanca)
-      where zam.id_oddelenia = :id_oddelenia
-      and to_char(z.datum,'YYYY') = :rok
-              `,
-      [id_oddelenia, rok]
+      `select count(id_vysetrenia) as poc_vys from vysetrenie
+      join zamestnanci using (cislo_zam)
+      where id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
+      and to_char(datum,'YYYY') = :rok
+          `,
+      [cislo_zam, rok]
     );
     console.log(result);
     return result.rows;
@@ -198,17 +194,17 @@ async function getPocetVysetreniOddelenia(id_oddelenia, rok) {
   }
 }
 
-async function getKrvneSkupinyOddelenia(id_oddelenia) {
+async function getKrvneSkupinyOddelenia(cislo_zam) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select krvna_skupina, count(id_typu_krvnej_skupiny) as pocet from krvna_skupina join pacient using(id_typu_krvnej_skupiny)
-                                                                                    join lekar_pacient using(id_pacienta)
-                                                                                    join lekar using(id_lekara)
-                                                                                    join zamestnanec using(id_zamestnanca)
-                                                                                    where id_oddelenia = :id_oddelenia
-                                                                                        group by krvna_skupina`,
-      [id_oddelenia]
+      `select typ_krvi, count(typ_krvi) as pocet from zdravotna_karta
+      join pacient using(id_pacienta)
+      join nemocnica using(id_nemocnice)
+      join zamestnanci using(id_nemocnice)
+      where cislo_zam = :cislo_zam
+      group by typ_krvi`,
+      [cislo_zam]
     );
 
     return result.rows;

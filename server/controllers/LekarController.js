@@ -1,13 +1,12 @@
-
 const lekar = require("../models/lekar");
-const {hashPacienti} = require("../utils/hashData");
+const { hashPacienti } = require("../utils/hashData");
 module.exports = {
   getPacienti: (req, res) => {
     const lekar = require("../models/lekar");
     (async () => {
       pacienti = await lekar.getPacienti(req.params.id);
       if (req.role === 0) {
-        pacienti = hashPacienti(pacienti)
+        pacienti = hashPacienti(pacienti);
       }
       res.status(200).json(pacienti);
     })();
@@ -60,5 +59,4 @@ module.exports = {
       res.status(200).json(info);
     })();
   },
-
 };

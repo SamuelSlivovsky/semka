@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { PrimeReactProvider } from "primereact/api";
 import "./App.css";
 import "primereact/resources/themes/lara-light-teal/theme.css"; //theme
 import "primereact/resources/primereact.min.css"; //core css
@@ -11,7 +12,9 @@ import { BrowserRouter as Router } from "react-router-dom";
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <Router>
-    <App />
+    <PrimeReactProvider>
+      <App />
+    </PrimeReactProvider>
   </Router>
 );
 

@@ -208,11 +208,6 @@ async function getUdalosti(rod_cislo) {
       udalosti.push(element);
     });
 
-    let ockovania = await getOckovania(rod_cislo);
-    ockovania.forEach((element) => {
-      udalosti.push(element);
-    });
-
     let vysetrenia = await getVysetrenia(rod_cislo);
     vysetrenia.forEach((element) => {
       udalosti.push(element);
@@ -251,15 +246,16 @@ async function getOperacie(rod_cislo) {
   }
 }
 
-async function getOckovania(rod_cislo) {
+async function getOckovania(id) {
   try {
     let conn = await database.getConnection();
     const ockovania = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaz
-        join ockovanie using(id_zaznamu)
-        join pacient using(id_pacienta)
-         where rod_cislo = :rod_cislo`,
-      [rod_cislo]
+      `select nazov, typ, to_char(dat_ockovania,'DD.MM.YYYY') as "DATUM" from zdravotna_karta
+        join zoznam_vakcin using(id_karty)
+        join vakcina using(id_vakciny)
+
+         where id_pacienta = :id`,
+      [id]
     );
 
     ockovania.rows.forEach((element) => {
@@ -340,7 +336,7 @@ async function getZdravZaznamy(pid_pacienta) {
           from zdravotny_zaz 
           join zdravotna_karta using(id_karty)
             where id_pacienta = :pid_pacienta
-                  order by zdravotny_zaz.datum`,
+                  order by zdravotny_zaz.datum desc`,
       { pid_pacienta }
     );
     console.log(zdravZaznamy.rows);
@@ -354,7 +350,7 @@ async function getChoroby(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const choroby = await conn.execute(
-      `select nazov, typ, to_char(zo.dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(zo.dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+      `select nazov, typ, to_char(zo.dat_od,'DD.MM.YYYY') dat_od, nvl(to_char(zo.dat_do,'DD.MM.YYYY'), 'Súčasnosť') dat_do
             from zoznam_ochoreni zo join choroba on(zo.id_choroby = choroba.id_choroby)
                           join zdravotna_karta zk on(zo.id_karty = zk.id_karty)
                           where id_pacienta = :pid_pacienta
@@ -372,13 +368,13 @@ async function getTypyZTP(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const typyZTP = await conn.execute(
-      `select nazov, to_char(dat_od,'MM.DD.YYYY') dat_od, nvl(to_char(dat_do,'MM.DD.YYYY'), 'Súčasnosť') dat_do
+      `select id_postihnutia, nazov, to_char(datum_od,'DD.MM.YYYY') dat_od, nvl(to_char(datum_do,'DD.MM.YYYY'), 'Súčasnosť') dat_do
           from zoznam_postihnuti join postihnutie using (id_postihnutia)
                               join zdravotna_karta using (id_karty)
                               where id_pacienta = :pid_pacienta`,
       { pid_pacienta }
     );
-
+    console.log(typyZTP.rows);
     return typyZTP.rows;
   } catch (err) {
     console.log(err);
@@ -428,4 +424,5 @@ module.exports = {
   getDoctorsOfPatient,
   insertPacient,
   getIdPacienta,
+  getOckovania,
 };

@@ -1,12 +1,12 @@
 import React, { useState, useRef } from "react";
 import { Chart } from "primereact/chart";
-import { InputNumber } from "primereact/inputnumber";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { ProgressBar } from "primereact/progressbar";
 import { Calendar } from "primereact/calendar";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import GetUserData from "../Auth/GetUserData.jsx";
 
 import "../styles/stat.css";
 export default function Statistics() {
@@ -21,7 +21,6 @@ export default function Statistics() {
   const [pocetHosp, setPocetHosp] = useState(null);
   const [pocetVys, setPocetVys] = useState(null);
   const [krv, setKrv] = useState(null);
-  const [id, setId] = useState(null);
   const [year, setYear] = useState("");
   const [pacientiVek, setPacientiVek] = useState(null);
   const [pacientiVekOptions, setPacientiVekOptions] = useState(null);
@@ -31,11 +30,12 @@ export default function Statistics() {
 
   const handleSubmit = () => {
     const token = localStorage.getItem("hospit-user");
+    const userId = GetUserData(token).UserInfo.userid;
     const headers = { authorization: "Bearer " + token };
-    if (id !== null && year !== null) {
+    if (year !== null) {
       setRender(true);
       setLoading(true);
-      fetch(`/selects/pomerMuziZeny/${id}`, { headers })
+      fetch(`/selects/pomerMuziZeny/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setMuziZeny({
@@ -51,12 +51,12 @@ export default function Statistics() {
           });
         });
 
-      fetch(`/selects/krvneSkupinyOddelenia/${id}`, { headers })
+      fetch(`/selects/krvneSkupinyOddelenia/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setLoading(false);
           setKrv({
-            labels: result.map((item) => item.KRVNA_SKUPINA),
+            labels: result.map((item) => item.TYP_KRVI),
             datasets: [
               {
                 data: result.map((item) => item.POCET),
@@ -87,10 +87,9 @@ export default function Statistics() {
 
       fetch(`/selects/priemernyVek`, { headers })
         .then((res) => res.json())
-        .then((result) => {
-        });
+        .then((result) => {});
 
-      fetch(`/selects/pocetZamOddelenia/${id}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetZamOddelenia/${userId}/${year.getFullYear()}`, {
         headers,
       })
         .then((res) => res.json())
@@ -98,7 +97,7 @@ export default function Statistics() {
           setPocetZam(result[0].POCET_ZAMESTNANCOV);
         });
 
-      fetch(`/selects/pocetOperOddelenia/${id}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetOperOddelenia/${userId}/${year.getFullYear()}`, {
         headers,
       })
         .then((res) => res.json())
@@ -106,15 +105,15 @@ export default function Statistics() {
           setPocetOpe(result[0].POC_OPERACII);
         });
 
-      fetch(`/selects/pocetHospitOddelenia/${id}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetHospitOddelenia/${userId}/${year.getFullYear()}`, {
         headers,
       })
         .then((res) => res.json())
         .then((result) => {
-          setPocetHosp(result[0].POC_HOSPIT);
+          setPocetHosp(result[0].POC_HOSPITALIZACII);
         });
 
-      fetch(`/selects/pocetVyseOddelenia/${id}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetVyseOddelenia/${userId}/${year.getFullYear()}`, {
         headers,
       })
         .then((res) => res.json())
@@ -122,7 +121,7 @@ export default function Statistics() {
           setPocetVys(result[0].POC_VYS);
         });
 
-      fetch(`/selects/pocetPacOddelenia/${id}`, { headers })
+      fetch(`/selects/pocetPacOddelenia/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPocetPac(result[0].POCET_PACIENTOV);
@@ -273,19 +272,6 @@ export default function Statistics() {
     <div>
       <div className="grid" style={{ marginTop: "1rem" }}>
         <Toast ref={toast} />
-        <div className="field col-4 md:col-3">
-          <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
-            Zadajte id
-          </label>
-          <InputNumber
-            autoFocus
-            inputId="withoutgrouping"
-            value={id}
-            onValueChange={(e) => setId(e.value)}
-            mode="decimal"
-            useGrouping={false}
-          />
-        </div>
         <div className="field col-4 md:col-3">
           <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
             Zadajte rok

@@ -1,0 +1,78 @@
+/* ChatApp.css */
+
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: 20px auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+}
+
+.chat-messages {
+  padding: 10px;
+  overflow-y: auto;
+  flex-grow: 1;
+}
+
+.message-container {
+  display: flex;
+  align-items: center;
+}
+
+.message {
+  background-color: #cfcccc;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  margin-right: 8px;
+  margin-left: 8px;
+  padding: 8px;
+  width: 90%;
+  max-width: 90%;
+  word-wrap: break-word;
+  overflow: hidden;
+  min-height: 50px;
+}
+
+.current-user {
+  background-color: #58f7e4;
+}
+
+.user {
+  background-color: #e6e6e6;
+  align-self: flex-end;
+}
+
+.chat-input {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #f2f2f2;
+}
+
+.chat-container input {
+  flex-grow: 1;
+  padding: 8px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.image-preview {
+  cursor: pointer;
+  max-width: 100px; /* Adjust the max-width as needed */
+}
+
+/* Add this style to ensure the image doesn't overflow its container */
+.image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px; /* Adjust the height as needed */
+  border-radius: 50%;
+  margin-right: 8px; /* Adjust the margin as needed */
+}
