@@ -79,13 +79,13 @@ function App() {
       label="Domov"
       icon="home-icon"
     />,
-      <SidebarButton
-          key="3"
-          visibleLeft={visibleLeft}
-          path="/patients"
-          label="Pacienti"
-          icon="patient-icon"
-      />,
+    <SidebarButton
+      key="3"
+      visibleLeft={visibleLeft}
+      path="/patients"
+      label="Pacienti"
+      icon="patient-icon"
+    />,
 
     <SidebarButton
       key="8"
@@ -282,7 +282,6 @@ function App() {
     return (
       <>
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
-          <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/combobox" element={<Combobox />}></Route>
       </>
@@ -362,7 +361,9 @@ function App() {
           {typeof userData !== "undefined" &&
           userData !== null &&
           userData.UserInfo.role === 0 ? (
-            renderAdminRoutes()
+            <>
+              {renderChiefRoutes()} {renderDoctorRoutes()} {renderAdminRoutes()}
+            </>
           ) : typeof userData !== "undefined" &&
             userData !== null &&
             userData.UserInfo.role === 2 ? (
