@@ -13,6 +13,7 @@ function Bed(props) {
         backgroundColor: "#e4e6e4",
         borderRadius: "5px",
         border: "1px solid black",
+        marginBottom: "20px",
       }}
       onClick={props.onClick}
     >
