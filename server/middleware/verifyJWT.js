@@ -7,7 +7,13 @@ const verifyJWT = (req, res, next) => {
   //console.log(authHeader); // Bearer token
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) return res.sendStatus(403); //invalid token
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token has expired' });
+      } else {
+        return res.sendStatus(403); // Invalid token for other reasons
+      }
+    }
     req.userid = decoded.UserInfo.userid;
     req.role = decoded.UserInfo.role;
     next();

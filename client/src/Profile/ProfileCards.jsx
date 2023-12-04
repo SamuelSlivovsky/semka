@@ -235,7 +235,6 @@ export default function ProfileCard(props) {
     fetchDisables();
     fetchDiseases();
     fetchMedRecords();
-    fetchPatientInfo();
     fetchVacs();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

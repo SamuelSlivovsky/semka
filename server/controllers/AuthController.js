@@ -92,7 +92,7 @@ const handleLogin = async (req, res) => {
     const refreshToken = jwt.sign(
       { userid: foundUser.USERID },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: "1d" }
+      { expiresIn: "3600s" }
     );
 
     userModel.updateUserRefreshToken({
@@ -103,7 +103,7 @@ const handleLogin = async (req, res) => {
     res.cookie("jwt", refreshToken, { httpOnly: true }); //1 day httponly cookie is not available to javascript
     res.status(200).json({ accessToken }); //store in memory not in local storage
   } else {
-    res.status(409).json({ message: "Passwords not matching" });
+    res.status(409).json({ message: "Username or password is invalid" });
   }
 };
 
