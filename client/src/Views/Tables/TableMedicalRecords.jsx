@@ -176,6 +176,8 @@ export default function TableMedic(props) {
           value={cellData}
           scrollable
           selectionMode="single"
+          paginator
+          rows={25}
           selection={selectedRow}
           onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
           header={header}

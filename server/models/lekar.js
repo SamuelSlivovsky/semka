@@ -116,7 +116,7 @@ async function getVysetrenia(id) {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
       `select rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(zdravotny_zaz.datum, 'HH24:MI:SS') as "start", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') datum,
-      id_zaznamu as "id" from vysetrenie
+      id_zaznamu as "id_zaz" from vysetrenie
         join zdravotny_zaz using(id_zaznamu)
             join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)

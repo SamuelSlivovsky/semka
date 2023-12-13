@@ -1,13 +1,13 @@
-import React, { useState } from 'react';
-import { Form, Field } from 'react-final-form';
-import { Button } from 'primereact/button';
-import { Dialog } from 'primereact/dialog';
-import { InputMask } from 'primereact/inputmask';
-import { classNames } from 'primereact/utils';
-import { Calendar } from 'primereact/calendar';
-import { Dropdown } from 'primereact/dropdown';
-import GetUserData from '../Auth/GetUserData';
-export default function RecipeForm() {
+import React, { useState } from "react";
+import { Form, Field } from "react-final-form";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+import { InputMask } from "primereact/inputmask";
+import { classNames } from "primereact/utils";
+import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
+import GetUserData from "../Auth/GetUserData";
+export default function RecipeForm(props) {
   const [showMessage, setShowMessage] = useState(false);
   const drugs = [
     { id: 1 },
@@ -23,35 +23,35 @@ export default function RecipeForm() {
     let errors = {};
 
     if (!data.rod_cislo) {
-      errors.rod_cislo = 'Rodné číslo je povinné';
+      errors.rod_cislo = "Rodné číslo je povinné";
     }
     if (!data.datum) {
-      errors.datum = 'Dátum je povinný';
+      errors.datum = "Dátum je povinný";
     }
     if (!data.id_lieku) {
-      errors.id_lieku = 'Liek je povinný';
+      errors.id_lieku = "Liek je povinný";
     }
     return errors;
   };
 
   const onSubmit = async (data, form) => {
-    const token = localStorage.getItem('hospit-user');
+    const token = localStorage.getItem("hospit-user");
     const userData = GetUserData(token);
     const requestOptions = {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
-        authorization: 'Bearer ' + token,
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
       },
       body: JSON.stringify({
         rod_cislo: data.rod_cislo,
-        datum: data.datum.toLocaleString('en-GB').replace(',', ''),
+        datum_zapisu: data.datum.toLocaleString("en-GB").replace(",", ""),
         id_lieku: data.id_lieku.id,
-        id_lekara: userData.UserInfo.userid,
+        cislo_zam: userData.UserInfo.userid,
         datum_vyzdvihnutia: null,
       }),
     };
-    const response = await fetch('/add/recept', requestOptions).then(() =>
+    const response = await fetch("/add/recept", requestOptions).then(() =>
       setShowMessage(true)
     );
 
@@ -61,15 +61,15 @@ export default function RecipeForm() {
   const isFormFieldValid = (meta) => !!(meta.touched && meta.error);
   const getFormErrorMessage = (meta) => {
     return (
-      isFormFieldValid(meta) && <small className='p-error'>{meta.error}</small>
+      isFormFieldValid(meta) && <small className="p-error">{meta.error}</small>
     );
   };
 
   const dialogFooter = (
-    <div className='flex justify-content-center'>
+    <div className="flex justify-content-center">
       <Button
-        label='OK'
-        className='p-button-text'
+        label="OK"
+        className="p-button-text"
         autoFocus
         onClick={() => setShowMessage(false)}
       />
@@ -77,55 +77,60 @@ export default function RecipeForm() {
   );
   return (
     <div
-      style={{ width: '100%', marginTop: '2rem' }}
-      className='p-fluid grid formgrid'
+      style={{ width: "100%", marginTop: "2rem" }}
+      className="p-fluid grid formgrid"
     >
       <Dialog
         visible={showMessage}
         onHide={() => setShowMessage(false)}
-        position='top'
+        position="top"
         footer={dialogFooter}
         showHeader={false}
-        breakpoints={{ '960px': '80vw' }}
-        style={{ width: '30vw' }}
+        breakpoints={{ "960px": "80vw" }}
+        style={{ width: "30vw" }}
       >
-        <div className='flex align-items-center flex-column pt-6 px-3'>
+        <div className="flex align-items-center flex-column pt-6 px-3">
           <i
-            className='pi pi-check-circle'
-            style={{ fontSize: '5rem', color: 'var(--green-500)' }}
+            className="pi pi-check-circle"
+            style={{ fontSize: "5rem", color: "var(--green-500)" }}
           ></i>
           <h5>Úspešné vytvorenie receptu</h5>
         </div>
       </Dialog>
 
-      <div className='field col-12'>
+      <div className="field col-12">
         <Form
           onSubmit={onSubmit}
           initialValues={{
-            rod_cislo: '',
+            rod_cislo:
+              typeof props.rod_cislo !== "undefined" ? props.rod_cislo : "",
             datum: null,
             id_lieku: null,
           }}
           validate={validate}
           render={({ handleSubmit }) => (
-            <form onSubmit={handleSubmit} className='p-fluid'>
+            <form onSubmit={handleSubmit} className="p-fluid">
               <Field
-                name='rod_cislo'
+                name="rod_cislo"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label'>
+                  <div className="field col-12">
+                    <span className="p-float-label">
                       <InputMask
-                        id='rod_cislo'
-                        mask='999999/9999'
+                        autoFocus
+                        id="rod_cislo"
+                        mask="999999/9999"
                         {...input}
                         className={classNames({
-                          'p-invalid': isFormFieldValid(meta),
+                          "p-invalid": isFormFieldValid(meta),
                         })}
+                        disabled={
+                          typeof props.rod_cislo !== "undefined" ? true : false
+                        }
                       />
                       <label
-                        htmlFor='rod_cislo'
+                        htmlFor="rod_cislo"
                         className={classNames({
-                          'p-error': isFormFieldValid(meta),
+                          "p-error": isFormFieldValid(meta),
                         })}
                       >
                         Rodné číslo*
@@ -137,22 +142,22 @@ export default function RecipeForm() {
               />
 
               <Field
-                name='datum'
+                name="datum"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label'>
+                  <div className="field col-12">
+                    <span className="p-float-label">
                       <Calendar
-                        id='basic'
+                        id="basic"
                         {...input}
-                        dateFormat='dd.mm.yy'
-                        mask='99.99.9999'
+                        dateFormat="dd.mm.yy"
+                        mask="99.99.9999"
                         showIcon
                         showTime
                       />
                       <label
-                        htmlFor='datum'
+                        htmlFor="datum"
                         className={classNames({
-                          'p-error': isFormFieldValid(meta),
+                          "p-error": isFormFieldValid(meta),
                         })}
                       >
                         Dátum*
@@ -163,20 +168,20 @@ export default function RecipeForm() {
                 )}
               />
               <Field
-                name='id_lieku'
+                name="id_lieku"
                 render={({ input, meta }) => (
-                  <div className='field col-12'>
-                    <span className='p-float-label '>
+                  <div className="field col-12">
+                    <span className="p-float-label ">
                       <Dropdown
-                        id='id_lieku'
+                        id="id_lieku"
                         {...input}
                         options={drugs}
-                        optionLabel='id'
+                        optionLabel="id"
                       />
                       <label
-                        htmlFor='id_lieku'
+                        htmlFor="id_lieku"
                         className={classNames({
-                          'p-error': isFormFieldValid(meta),
+                          "p-error": isFormFieldValid(meta),
                         })}
                       >
                         Liek
@@ -187,16 +192,16 @@ export default function RecipeForm() {
                 )}
               />
               <div
-                className='field col-12 '
-                style={{ justifyContent: 'center', display: 'grid' }}
+                className="field col-12 "
+                style={{ justifyContent: "center", display: "grid" }}
               >
                 <Button
-                  type='submit'
-                  style={{ width: '50vh' }}
-                  className='p-button-lg'
-                  label='Odoslať'
-                  icon='pi pi-check'
-                  iconPos='right'
+                  type="submit"
+                  style={{ width: "50vh" }}
+                  className="p-button-lg"
+                  label="Odoslať"
+                  icon="pi pi-check"
+                  iconPos="right"
                 />
               </div>
             </form>

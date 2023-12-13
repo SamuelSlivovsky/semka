@@ -308,21 +308,18 @@ async function getHospitalizacie(rod_cislo) {
 
 async function getRecepty(pid_pacienta) {
   try {
-    /*let conn = await database.getConnection();
+    let conn = await database.getConnection();
     const recepty = await conn.execute(
-      `select nazov, to_char(datum, 'DD.MM.YYYY') as datum, meno || ' ' || priezvisko as lekar
-            from recept join liek using(id_lieku)
-                        join lekar using(id_lekara)
-                        join zamestnanec zc using(id_zamestnanca)
+      `select nazov, to_char(datum_zapisu, 'DD.MM.YYYY') as datum_zapisu, meno || ' ' || priezvisko as lekar
+            from recept join liek using(id_liek)
+                        join zamestnanci zc using(cislo_zam)
                         join os_udaje ou on(ou.rod_cislo = zc.rod_cislo) 
                   where id_pacienta = :pid_pacienta
-                  and datum_vyzdvihnutia is null
-                  order by recept.datum`,
+                  order by recept.datum_zapisu`,
       { pid_pacienta }
     );
-
-    return recepty.rows;*/
-    return null;
+    console.log(recepty.rows);
+    return recepty.rows;
   } catch (err) {
     console.log(err);
   }
