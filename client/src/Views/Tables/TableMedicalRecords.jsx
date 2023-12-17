@@ -4,6 +4,11 @@ import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { ProgressSpinner } from "primereact/progressspinner";
+import { Calendar } from "primereact/calendar";
+import { PDFDownloadLink } from "@react-pdf/renderer";
+import { Pdf } from "../../Forms/Pdf";
+import GetUserData from "../../Auth/GetUserData";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -11,6 +16,8 @@ export default function TableMedic(props) {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const [imgUrl, setImgUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const userData = GetUserData(localStorage.getItem("hospit-user"));
   const {
     tableName,
     cellData,
@@ -18,6 +25,8 @@ export default function TableMedic(props) {
     allowFilters,
     dialog,
     tableScrollHeight,
+    editor,
+    eventType,
   } = props;
   const [popis, setPopis] = useState(null);
   const [nazov, setNazov] = useState(null);
@@ -25,10 +34,14 @@ export default function TableMedic(props) {
   const onHide = () => {
     setImgUrl(null);
     setShowDialog(false);
+    setPopis(null);
+    setNazov(null);
+    setSelectedRow(null);
   };
 
   const handleClick = (value) => {
     setShowDialog(true);
+    setLoading(true);
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
@@ -42,11 +55,13 @@ export default function TableMedic(props) {
       .then((data) => {
         setPopis(data[0].POPIS);
         setNazov(data[0].NAZOV);
+        setLoading(false);
       });
   };
 
   const getRecordDetails = () => {
     let popis;
+    console.log(cellData);
     cellData.map((data) => {
       if (data.id === selectedRow.id) {
         data.LEKAR === data.ODDELENIE
@@ -117,27 +132,82 @@ export default function TableMedic(props) {
     setGlobalFilterValue1("");
   };
 
+  const onRowEditComplete = (e) => {
+    let _products = [...cellData];
+    let { newData, index } = e;
+
+    _products[index] = newData;
+
+    props.setCellData(_products);
+    props.onEditDate(newData);
+  };
+
+  const dateEditor = (options) => {
+    return (
+      <Calendar
+        value={options.value !== null ? formatDate(options.value) : null}
+        onChange={(e) =>
+          options.editorCallback(
+            e.target.value.toLocaleDateString("de", {
+              day: "2-digit",
+              month: "2-digit",
+              year: "numeric",
+            })
+          )
+        }
+        dateFormat="dd.mm.yy"
+      />
+    );
+  };
+
+  const formatDate = (dateString) => {
+    var dateArray = dateString.split(".");
+    var formattedDateString =
+      dateArray[2] + "-" + dateArray[1] + "-" + dateArray[0];
+    return new Date(formattedDateString);
+  };
+
   const header = allowFilters ? renderHeader() : "";
   return (
     <div>
       <div className="card">
         <DataTable
+          editMode={editor ? "row" : ""}
           value={cellData}
-          responsiveLayout="scroll"
+          scrollable
           selectionMode="single"
+          paginator
+          rows={25}
           selection={selectedRow}
-          onSelectionChange={(e) => handleClick(e.value)}
+          onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
           header={header}
           filters={filters}
           scrollHeight={tableScrollHeight}
           filterDisplay={allowFilters ? "menu" : ""}
           globalFilterFields={titles.field}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+          onRowEditComplete={onRowEditComplete}
         >
           <Column field="id"></Column>
           {titles.map((title) => (
-            <Column field={title.field} header={title.header} filter></Column>
+            <Column
+              field={title.field}
+              header={title.header}
+              filter
+              editor={
+                title.field === "DAT_DO" ? (options) => dateEditor(options) : ""
+              }
+            ></Column>
           ))}
+          {editor ? (
+            <Column
+              rowEditor
+              headerStyle={{ width: "10%", minWidth: "8rem" }}
+              bodyStyle={{ textAlign: "center" }}
+            ></Column>
+          ) : (
+            ""
+          )}
         </DataTable>
       </div>
 
@@ -153,18 +223,40 @@ export default function TableMedic(props) {
         style={{ width: "50vw" }}
         onHide={() => onHide()}
       >
-        <div>
-          <img src={imgUrl} alt="" style={{ maxWidth: 400, maxHeight: 400 }} />
+        {loading ? (
+          <div style={{ width: "100%", display: "flex" }}>
+            <ProgressSpinner />
+          </div>
+        ) : selectedRow !== null ? (
+          <div style={{ maxWidth: "100%", overflowWrap: "break-word" }}>
+            <PDFDownloadLink
+              document={
+                <Pdf
+                  eventType={eventType}
+                  data={selectedRow}
+                  doctor={userData}
+                />
+              }
+              fileName={`${selectedRow.PRIEZVISKO}${selectedRow.type}.pdf`}
+            >
+              {({ blob, url, loading, error }) =>
+                loading ? "Loading document..." : "Download now!"
+              }
+            </PDFDownloadLink>
+            <img
+              src={imgUrl}
+              alt=""
+              style={{ maxWidth: 400, maxHeight: 400 }}
+            />
 
-          {selectedRow != null
-            ? selectedRow.type != null
-              ? getRecordDetails()
-              : ""
-            : ""}
-          <h2>{selectedRow != null ? nazov : ""}</h2>
-          <h5>{selectedRow != null ? "Dátum: " + selectedRow.DATUM : ""} </h5>
-          <div>{selectedRow != null ? popis : ""}</div>
-        </div>
+            {selectedRow.type != null ? getRecordDetails() : ""}
+            <h2>{nazov} </h2>
+            <h5>{"Dátum: " + selectedRow.DATUM} </h5>
+            <div>{popis}</div>
+          </div>
+        ) : (
+          ""
+        )}
       </Dialog>
     </div>
   );

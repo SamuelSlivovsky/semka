@@ -31,6 +31,7 @@ export default function TabPatients() {
 
   const onHide = () => {
     setShowDialog(false);
+    setSelectedRow(null);
   };
 
   const onSubmit = () => {
@@ -39,8 +40,9 @@ export default function TabPatients() {
   };
 
   const handleClick = (value) => {
-    setShowDialog(true);
-    setSelectedRow(value);
+    navigate("/patient", { state: value.ID_PACIENTA });
+    // setShowDialog(true);
+    // setSelectedRow(value);
   };
 
   const renderDialogFooter = () => {

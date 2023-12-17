@@ -115,7 +115,7 @@ async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(zdravotny_zaz.datum, 'HH24:MI:SS') as "start", id_vysetrenia as "id", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') datum,
+      `select rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(zdravotny_zaz.datum, 'HH24:MI:SS') as "start", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') datum,
       id_zaznamu as "id_zaz" from vysetrenie
         join zdravotny_zaz using(id_zaznamu)
             join zdravotna_karta using(id_karty)
@@ -140,7 +140,7 @@ async function getHospitalizacie(id) {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
       `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
-      as "start", id_hosp as "id",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
+      as "start",id_zaznamu as "id", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
        from hospitalizacia
         join zdravotny_zaz using(id_zaznamu)
           join zdravotna_karta using(id_karty)

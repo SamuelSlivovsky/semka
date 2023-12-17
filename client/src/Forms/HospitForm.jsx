@@ -72,7 +72,11 @@ export default function HospitForm(props) {
         label="OK"
         className="p-button-text"
         autoFocus
-        onClick={() => setShowMessage(false)}
+        onClick={() => {
+          setShowMessage(false);
+          props.hideDialog();
+          props.onInsert();
+        }}
       />
     </div>
   );
@@ -154,6 +158,7 @@ export default function HospitForm(props) {
                       Rodné číslo
                     </label>
                     <InputMask
+                      autoFocus
                       id="rod_cislo"
                       mask="999999/9999"
                       disabled={

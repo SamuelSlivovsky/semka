@@ -29,6 +29,7 @@ export default function TabOperations() {
     ],
     allowFilters: true,
     dialog: true,
+    eventType: "Operácia",
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;
