@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Form, Field } from "react-final-form";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -7,17 +7,27 @@ import { classNames } from "primereact/utils";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
+import { InputText } from "primereact/inputtext";
+import { Checkbox } from "primereact/checkbox";
 export default function RecipeForm(props) {
   const [showMessage, setShowMessage] = useState(false);
-  const drugs = [
-    { id: 1 },
-    { id: 2 },
-    { id: 3 },
-    { id: 4 },
-    { id: 5 },
-    { id: 6 },
-    { id: 7 },
-  ];
+  const [drugs, setDrugs] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
+    };
+    fetch("/lieky/all", requestOptions)
+      .then((response) => response.json())
+      .then((data) => {
+        setDrugs(data);
+      });
+  }, []);
 
   const validate = (data) => {
     let errors = {};
@@ -28,8 +38,8 @@ export default function RecipeForm(props) {
     if (!data.datum) {
       errors.datum = "Dátum je povinný";
     }
-    if (!data.id_lieku) {
-      errors.id_lieku = "Liek je povinný";
+    if (!data.liek) {
+      errors.liek = "Liek je povinný";
     }
     return errors;
   };
@@ -46,14 +56,14 @@ export default function RecipeForm(props) {
       body: JSON.stringify({
         rod_cislo: data.rod_cislo,
         datum_zapisu: data.datum.toLocaleString("en-GB").replace(",", ""),
-        id_lieku: data.id_lieku.id,
+        id_lieku: data.liek.ID_LIEK,
         cislo_zam: userData.UserInfo.userid,
         datum_vyzdvihnutia: null,
+        poznamka: data.note,
+        opakujuci: data.check ? 1 : 0,
       }),
     };
-    const response = await fetch("/add/recept", requestOptions).then(() =>
-      setShowMessage(true)
-    );
+    await fetch("/add/recept", requestOptions).then(() => setShowMessage(true));
 
     form.restart();
   };
@@ -105,7 +115,9 @@ export default function RecipeForm(props) {
             rod_cislo:
               typeof props.rod_cislo !== "undefined" ? props.rod_cislo : "",
             datum: null,
-            id_lieku: null,
+            liek: null,
+            note: "",
+            check: false,
           }}
           validate={validate}
           render={({ handleSubmit }) => (
@@ -114,28 +126,27 @@ export default function RecipeForm(props) {
                 name="rod_cislo"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <span className="p-float-label">
-                      <InputMask
-                        autoFocus
-                        id="rod_cislo"
-                        mask="999999/9999"
-                        {...input}
-                        className={classNames({
-                          "p-invalid": isFormFieldValid(meta),
-                        })}
-                        disabled={
-                          typeof props.rod_cislo !== "undefined" ? true : false
-                        }
-                      />
-                      <label
-                        htmlFor="rod_cislo"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        Rodné číslo*
-                      </label>
-                    </span>
+                    <label
+                      htmlFor="rod_cislo"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Rodné číslo*
+                    </label>
+                    <InputMask
+                      autoFocus
+                      id="rod_cislo"
+                      mask="999999/9999"
+                      {...input}
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                      disabled={
+                        typeof props.rod_cislo !== "undefined" ? true : false
+                      }
+                    />
+
                     {getFormErrorMessage(meta)}
                   </div>
                 )}
@@ -145,49 +156,69 @@ export default function RecipeForm(props) {
                 name="datum"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <span className="p-float-label">
-                      <Calendar
-                        id="basic"
-                        {...input}
-                        dateFormat="dd.mm.yy"
-                        mask="99.99.9999"
-                        showIcon
-                        showTime
-                      />
-                      <label
-                        htmlFor="datum"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        Dátum*
-                      </label>
-                    </span>
+                    <label
+                      htmlFor="datum"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Dátum*
+                    </label>
+                    <Calendar
+                      id="basic"
+                      {...input}
+                      dateFormat="dd.mm.yy"
+                      mask="99.99.9999"
+                      showIcon
+                      showTime
+                    />
+
                     {getFormErrorMessage(meta)}
                   </div>
                 )}
               />
               <Field
-                name="id_lieku"
+                name="liek"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <span className="p-float-label ">
-                      <Dropdown
-                        id="id_lieku"
-                        {...input}
-                        options={drugs}
-                        optionLabel="id"
-                      />
-                      <label
-                        htmlFor="id_lieku"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        Liek
-                      </label>
-                    </span>
+                    <label
+                      htmlFor="liek"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Liek*
+                    </label>
+                    <Dropdown
+                      id="liek"
+                      {...input}
+                      options={drugs}
+                      optionLabel="NAZOV"
+                      filter
+                    />
                     {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
+              <Field
+                name="check"
+                type="checkbox"
+                render={({ input, meta }) => (
+                  <div
+                    className="field col-12"
+                    style={{ display: "flex", gap: "8px" }}
+                  >
+                    <Checkbox id="check" {...input} type="checkbox" />
+                    <label htmlFor="check">Opakujúci recept</label>
+                  </div>
+                )}
+              />
+              <Field
+                name="note"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label htmlFor="note">Poznámka</label>
+                    <InputText id="note" {...input} />
                   </div>
                 )}
               />

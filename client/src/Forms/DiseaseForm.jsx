@@ -140,6 +140,7 @@ export default function DiseaseForm(props) {
                       options={diseaseTypes}
                       onChange={(e) => onDiseaseTypeChange(e, input)}
                       optionLabel="TYP"
+                      filter
                     />
                   </div>
                 )}
@@ -154,6 +155,7 @@ export default function DiseaseForm(props) {
                       {...input}
                       options={diseases}
                       optionLabel="NAZOV"
+                      filter
                     />
                   </div>
                 )}

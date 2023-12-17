@@ -123,6 +123,7 @@ export default function VacForm(props) {
                       {...input}
                       options={vaccines}
                       optionLabel="NAZOV"
+                      filter
                     />
                   </div>
                 )}
