@@ -1,6 +1,7 @@
 const verifyRoles = (...allowedRoles) => {
   return (req, res, next) => {
-    if (!req?.role) return res.sendStatus(401);
+    //Upravene aby kontrolovalo len undefined alebo null a nechalo 0 pre admina prejst
+    if (req?.role === undefined || req?.role === null) return res.sendStatus(401);
     const rolesArray = [...allowedRoles];
     let result = false;
     rolesArray.forEach((element) => {

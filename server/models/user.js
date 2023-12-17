@@ -18,6 +18,31 @@ async function userExists(userid) {
   }
 }
 
+async function userExistsInDB(userid) {
+  try {
+    let conn = await database.getConnection();
+    let result;
+    if(!isNaN(userid)) {
+      userid = Number(userid);
+      result = await conn.execute(
+          `SELECT count(*) as pocet FROM zamestnanci where cislo_zam = :userid`,
+          [userid]
+      );
+    } else {
+      result = await conn.execute(
+          `SELECT count(*) as pocet FROM pacient where rod_cislo = :userid`,
+          [userid]
+      );
+    }
+
+    return result.rows[0].POCET === 0;
+
+
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 async function insertUser(body) {
   try {
     let conn = await database.getConnection();
@@ -96,6 +121,7 @@ async function updateUserRefreshToken(body) {
 
 module.exports = {
   userExists,
+  userExistsInDB,
   insertUser,
   getUserByUserId,
   getUserByRefreshToken,
