@@ -175,7 +175,7 @@ function Home() {
             {doctorCards} {chiefCards}
           </>
         );
-      else if (userData.UserInfo.role === 4) return patientCards;
+      else if (userData.UserInfo.role === 9999) return patientCards;
     }
   };
 
