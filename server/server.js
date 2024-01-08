@@ -72,7 +72,6 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {});
   socket.on("typing", (params) => {
-    console.log(params);
     io.emit("isTyping", {
       id: params.userId,
       isEmpty: params.isEmpty,

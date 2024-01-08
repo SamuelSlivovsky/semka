@@ -11,10 +11,21 @@ module.exports = {
   },
 
   insertSprava: (req, res) => {
-    console.log("first");
     const chat = require("../models/chat");
     (async () => {
       ret_val = await chat.insertSprava(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
+
+  insertUser: (req, res) => {
+    const chat = require("../models/chat");
+    (async () => {
+      ret_val = await chat.insertUser(req.body);
       res.status(200).json("success");
     })().catch((err) => {
       // error handling logic 1

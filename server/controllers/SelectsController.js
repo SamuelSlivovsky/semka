@@ -471,4 +471,16 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+
+  getZoznamLekarov: (req, res) => {
+    const lekar = require("../models/lekar");
+
+    (async () => {
+      ret_val = await lekar.getZoznamLekarov();
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
 };

@@ -40,7 +40,25 @@ async function insertSprava(body) {
   }
 }
 
+async function insertUser(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `insert into user_chat values(:userid, :id_skupiny)`;
+
+    let result = await conn.execute(sqlStatement, {
+      userid: body.userid,
+      id_skupiny: body.id_skupiny,
+    });
+
+    await conn.execute("commit");
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 module.exports = {
   getSpravy,
   insertSprava,
+  insertUser,
 };

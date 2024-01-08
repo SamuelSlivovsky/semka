@@ -56,7 +56,7 @@ export default function ProfileCard(props) {
     allowFilters: false,
     dialog: false,
     tableScrollHeight: "500px",
-    editor: true,
+    editor: false,
   };
 
   const onEditDisableDate = (data) => {

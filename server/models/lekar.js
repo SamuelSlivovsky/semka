@@ -1,5 +1,23 @@
 const database = require("../database/Database");
 
+async function getZoznamLekarov() {
+  try {
+    let conn = await database.getConnection();
+
+    const result = await conn.execute(
+      `SELECT meno || ', ' ||priezvisko as "meno", oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, cislo_zam
+      from  zamestnanci
+                    join os_udaje using(rod_cislo)
+                    join nemocnica using(id_nemocnice)
+                    left join oddelenie on(zamestnanci.id_oddelenia = oddelenie.id_oddelenia)`
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getLekari(pid_lekara) {
   try {
     let conn = await database.getConnection();
@@ -212,4 +230,5 @@ module.exports = {
   getHospitalizacie,
   getLekarInfo,
   getNemocnicaOddelenia,
+  getZoznamLekarov,
 };
