@@ -144,6 +144,40 @@ async function getOddeleniaByNemocnica(hospitalId) {
   }
 }
 
+async function getAllCurrentlyHospitalizedPatientsForHospital(hospitalId) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `
+      SELECT 
+          pl.id_pacient_lozko,
+          pl.id_pacienta,
+          pl.id_lozka,
+          ou.meno,
+          ou.priezvisko,
+          l.id_miestnost
+      FROM 
+          pacient_lozko pl
+      JOIN 
+          lozko l ON pl.id_lozka = l.id_lozka
+      JOIN 
+          pacient p ON pl.id_pacienta = p.id_pacienta
+      JOIN   
+          os_udaje ou ON ou.rod_cislo = p.rod_cislo
+      WHERE 
+          sysdate BETWEEN pl.pobyt_od AND pl.pobyt_do
+          AND 
+          l.id_nemocnice = :hospitalId
+      `,
+      { hospitalId: hospitalId }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
 async function insertMapa(body) {
   try {
     let conn = await database.getConnection();
@@ -174,4 +208,5 @@ module.exports = {
   insertMapa,
   getMapaNemocnice,
   getOddeleniaByNemocnica,
+  getAllCurrentlyHospitalizedPatientsForHospital,
 };

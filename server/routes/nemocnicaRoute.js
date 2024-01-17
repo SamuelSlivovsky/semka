@@ -23,5 +23,10 @@ router.get(
   verify.verifyRoles(0, 2, 3),
   controller.getAllNursesForHospital
 );
+router.get(
+  '/hospitalized/:hospitalId',
+  verify.verifyRoles(0, 2, 3),
+  controller.getAllCurrentlyHospitalizedPatientsForHospital
+);
 
 module.exports = router;

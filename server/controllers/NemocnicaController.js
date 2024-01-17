@@ -24,11 +24,9 @@ module.exports = {
     });
   },
   getAllDoctorsForHospital: (req, res) => {
-    const zamestnanec = require('../models/zamestnanec');
+    const employee = require('../models/zamestnanec');
     (async () => {
-      ret_val = await zamestnanec.getAllDoctorsForHospital(
-        req.params.hospitalId
-      );
+      ret_val = await employee.getAllDoctorsForHospital(req.params.hospitalId);
       res.status(200).json(ret_val);
     })().catch((err) => {
       // error handling logic 1
@@ -37,9 +35,20 @@ module.exports = {
     });
   },
   getAllNursesForHospital: (req, res) => {
-    const zamestnanec = require('../models/zamestnanec');
+    const employee = require('../models/zamestnanec');
     (async () => {
-      ret_val = await zamestnanec.getAllNursesForHospital(
+      ret_val = await employee.getAllNursesForHospital(req.params.hospitalId);
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
+  getAllCurrentlyHospitalizedPatientsForHospital: (req, res) => {
+    const hospital = require('../models/nemocnica');
+    (async () => {
+      ret_val = await hospital.getAllCurrentlyHospitalizedPatientsForHospital(
         req.params.hospitalId
       );
       res.status(200).json(ret_val);

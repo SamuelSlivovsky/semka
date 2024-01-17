@@ -12,10 +12,13 @@ export default function InteractiveMap() {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedNurse, setSelectedNurse] = useState(null);
+  const [selectedHospitalizedPatient, setSelectedHospitalizedPatient] =
+    useState(null);
   const [departments, setDepartments] = useState([]);
   const [rooms, setRooms] = useState([]);
   const [doctors, setDoctors] = useState([]);
   const [nurses, setNurses] = useState([]);
+  const [hospitalizedPatients, setHospitalizedPatients] = useState([]);
   const [hospitalMap, setHospitalMap] = useState('');
   const [beds, setBeds] = useState([]);
   const [equipment, setEquipment] = useState([]);
@@ -71,6 +74,16 @@ export default function InteractiveMap() {
   }, []);
 
   useEffect(() => {
+    const token = localStorage.getItem('hospit-user');
+    const headers = { authorization: 'Bearer ' + token };
+    fetch(`/nemocnica/hospitalized/40`, { headers })
+      .then((response) => response.json())
+      .then((data) => {
+        setHospitalizedPatients(data);
+      });
+  }, []);
+
+  useEffect(() => {
     changeRoomColors();
   }, [hospitalMap]);
 
@@ -96,6 +109,7 @@ export default function InteractiveMap() {
       feature.properties.room_number[
         getSelectedFloorFeature(feature.properties.level)
       ];
+    const room = rooms.find((room) => room?.ID_MIESTNOSTI === roomNumber);
     const departmentId =
       feature.properties.department[
         getSelectedFloorFeature(feature.properties.level)
@@ -107,6 +121,10 @@ export default function InteractiveMap() {
       feature.properties.ward_room[
         getSelectedFloorFeature(feature.properties.level)
       ];
+    const nurse = nurses.find((nurse) => nurse?.CISLO_ZAM === room?.CISLO_ZAM);
+    const doctor = doctors.find(
+      (doctor) => doctor?.CISLO_ZAM === room?.CISLO_ZAM
+    );
 
     layer.options.fillOpacity = 0.8;
     layer.options.color = '#000000';
@@ -115,12 +133,12 @@ export default function InteractiveMap() {
 
     layer.bindPopup(
       ReactDOMServer.renderToString(
-        roomPopup(roomNumber, isWardRoom, departmentName)
+        roomPopup(roomNumber, isWardRoom, departmentName, doctor, nurse)
       )
     );
   };
 
-  const roomPopup = (roomNumber, isWardRoom, departmentName) => {
+  const roomPopup = (roomNumber, isWardRoom, departmentName, doctor, nurse) => {
     return (
       <div className='room-popup-container'>
         <div className='room-popup-section-container room-popup-section-room-number'>
@@ -129,6 +147,16 @@ export default function InteractiveMap() {
         <div className='room-popup-section-container room-popup-section-room-number'>
           <span>Miestnosť {roomNumber}</span>
         </div>
+        {doctor ? (
+          <div className='room-popup-section-container room-popup-section-room-number'>
+            <span>Doktor {doctor?.MENO + ' ' + doctor?.PRIEZVISKO}</span>
+          </div>
+        ) : null}
+        {nurse ? (
+          <div className='room-popup-section-container room-popup-section-room-number'>
+            <span>Sestrička {nurse?.MENO + ' ' + nurse?.PRIEZVISKO}</span>
+          </div>
+        ) : null}
         {isWardRoom ? (
           <div className='room-popup-section-container room-popup-section-beds'>
             <span>Lôžka</span>
@@ -203,6 +231,17 @@ export default function InteractiveMap() {
     return selectedNurse === selectedRoom?.CISLO_ZAM || selectedNurse === null;
   };
 
+  const isHospitalizedPatientRoom = (roomNumber) => {
+    const selectedRoom = rooms.find(
+      (room) => room.ID_MIESTNOSTI === roomNumber
+    );
+
+    return (
+      selectedHospitalizedPatient?.ID_MIESTNOST ===
+        selectedRoom?.ID_MIESTNOSTI || selectedHospitalizedPatient === null
+    );
+  };
+
   const filterRooms = (feature) => {
     const selectedFloorFeature = getSelectedFloorFeature(
       feature?.properties.level
@@ -212,25 +251,26 @@ export default function InteractiveMap() {
 
     const isDoctorRoom = isDoctorsRoom(roomNumber);
     const isNurseRoom = isNursesRoom(roomNumber);
+    const isPatientRoom = isHospitalizedPatientRoom(roomNumber);
 
     const isRoomForSelectedDepartment =
       selectedDepartment === null || department === selectedDepartment;
 
     if (selectedDoctor !== null && selectedNurse !== null) {
       // Both doctor and nurse are selected, show rooms for both in the selected department
-      return (
-        (isDoctorRoom && isRoomForSelectedDepartment) ||
-        (isNurseRoom && isRoomForSelectedDepartment)
-      );
+      return (isDoctorRoom || isNurseRoom) && isRoomForSelectedDepartment;
     } else if (selectedDoctor !== null) {
       // Only doctor is selected, show only doctor rooms for the selected department
       return isDoctorRoom && isRoomForSelectedDepartment;
     } else if (selectedNurse !== null) {
       // Only nurse is selected, show only nurse rooms for the selected department
       return isNurseRoom && isRoomForSelectedDepartment;
+    } else if (selectedHospitalizedPatient !== null) {
+      // Only hospitalized patient is selected, show rooms for the selected patient
+      return isPatientRoom && isRoomForSelectedDepartment;
     }
 
-    // Neither doctor nor nurse is selected, show only the selected floor
+    // Neither doctor nor nurse nor patient is selected, show only the selected floor
     return (
       feature?.properties.level.some((level) => level === selectedFloor) &&
       isRoomForSelectedDepartment
@@ -282,12 +322,14 @@ export default function InteractiveMap() {
                 placeholder='Všetky oddelenia'
                 className='left-map-menu-container-department'
                 options={[
-                  { label: 'Všetky oddelenia', value: null },
+                  { label: 'Všetky oddelenia', value: null, disabled: true },
                   ...departments.map((department) => ({
                     label: department.TYP_ODDELENIA,
                     value: department.ID_ODDELENIA,
                   })),
                 ]}
+                disabled={selectedHospitalizedPatient != null}
+                showClear={true}
               />
               <Dropdown
                 value={selectedDoctor}
@@ -295,12 +337,14 @@ export default function InteractiveMap() {
                 placeholder='Všetci doktori'
                 className='left-map-menu-container-doctor'
                 options={[
-                  { label: 'Všetci doktori', value: null },
+                  { label: 'Všetci doktori', value: null, disabled: true },
                   ...doctors.map((doctor) => ({
                     label: doctor.MENO + ' ' + doctor.PRIEZVISKO,
                     value: doctor.CISLO_ZAM,
                   })),
                 ]}
+                disabled={selectedHospitalizedPatient != null}
+                showClear={true}
               />
               <Dropdown
                 value={selectedNurse}
@@ -308,12 +352,42 @@ export default function InteractiveMap() {
                 placeholder='Všetky sestričky'
                 className='left-map-menu-container-doctor'
                 options={[
-                  { label: 'Všetky sestričky', value: null },
+                  { label: 'Všetky sestričky', value: null, disabled: true },
                   ...nurses.map((nurse) => ({
                     label: nurse.MENO + ' ' + nurse.PRIEZVISKO,
                     value: nurse.CISLO_ZAM,
                   })),
                 ]}
+                disabled={selectedHospitalizedPatient != null}
+                showClear={true}
+              />
+              <Dropdown
+                value={selectedHospitalizedPatient}
+                onChange={(e) =>
+                  handleHospitalizedPatientChange(e.value || null)
+                }
+                placeholder='Hospitalizovaní pacienti'
+                className='left-map-menu-container-patient'
+                options={[
+                  {
+                    label: 'Hospitalizovaní pacienti',
+                    value: null,
+                    disabled: true,
+                  },
+                  ...hospitalizedPatients.map((hospitalizedPatient) => ({
+                    label:
+                      hospitalizedPatient.MENO +
+                      ' ' +
+                      hospitalizedPatient.PRIEZVISKO,
+                    value: hospitalizedPatient,
+                  })),
+                ]}
+                disabled={
+                  selectedDoctor !== null ||
+                  selectedNurse !== null ||
+                  selectedDepartment !== null
+                }
+                showClear={true}
               />
             </div>
           </div>
@@ -351,6 +425,10 @@ export default function InteractiveMap() {
 
   const handleNurseChange = (nurse) => {
     setSelectedNurse(nurse);
+  };
+
+  const handleHospitalizedPatientChange = (hospitalizedPatient) => {
+    setSelectedHospitalizedPatient(hospitalizedPatient);
   };
 
   return <div>{renderMap()}</div>;
