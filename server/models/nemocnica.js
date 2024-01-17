@@ -106,10 +106,72 @@ async function getVysetreniaNemocniceXML(id_nemocnice) {
   }
 }
 
+async function getMapaNemocnice(id_nemocnice) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `
+        SELECT mapa FROM nemocnica WHERE id_nemocnice = :id_nemocnice
+      `,
+      {
+        id_nemocnice: id_nemocnice,
+      }
+    );
+
+    return result.rows[0];
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
+async function getOddeleniaByNemocnica(hospitalId) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `SELECT 
+        id_oddelenia,
+        typ_oddelenia 
+      FROM 
+        oddelenie 
+      WHERE 
+        id_nemocnice = :hospitalId`,
+      { hospitalId: hospitalId }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
+async function insertMapa(body) {
+  try {
+    let conn = await database.getConnection();
+    console.log(body.mapa.trim());
+    const result = await conn.execute(
+      `
+      UPDATE nemocnica SET 
+      mapa = :mapa
+      `,
+      {
+        mapa: body.mapa.replace(/\s/g, ''),
+      },
+      { autoCommit: true }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
 module.exports = {
   getNemocnice,
   getHospitalizacieNemocniceXML,
   getOperacieNemocniceXML,
   getOckovaniaNemocniceXML,
   getVysetreniaNemocniceXML,
+  insertMapa,
+  getMapaNemocnice,
+  getOddeleniaByNemocnica,
 };

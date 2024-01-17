@@ -1,19 +1,19 @@
 module.exports = {
   insertRecept: (req, res) => {
-    const recept = require("../models/recept");
+    const recept = require('../models/recept');
     (async () => {
       ret_val = await recept.insertRecept(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       console.error(err);
       res.status(500).send(err);
     });
   },
   insertPriloha: (req, res) => {
-    const priloha = require("../models/priloha");
+    const priloha = require('../models/priloha');
     (async () => {
       ret_val = await priloha.insertPriloha(req.body.image);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -21,10 +21,10 @@ module.exports = {
     });
   },
   insertVysetrenie: (req, res) => {
-    const zdravotny_zaznam = require("../models/zdravotny_zaznam");
+    const zdravotny_zaznam = require('../models/zdravotny_zaznam');
     (async () => {
       ret_val = await zdravotny_zaznam.insertVysetrenie(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -32,10 +32,10 @@ module.exports = {
     });
   },
   insertHospitalizacia: (req, res) => {
-    const zdravotny_zaznam = require("../models/zdravotny_zaznam");
+    const zdravotny_zaznam = require('../models/zdravotny_zaznam');
     (async () => {
       ret_val = await zdravotny_zaznam.insertHospitalizacia(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -43,10 +43,10 @@ module.exports = {
     });
   },
   insertOperacia: (req, res) => {
-    const zdravotny_zaznam = require("../models/zdravotny_zaznam");
+    const zdravotny_zaznam = require('../models/zdravotny_zaznam');
     (async () => {
       ret_val = await zdravotny_zaznam.insertOperacia(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -55,10 +55,10 @@ module.exports = {
   },
 
   insertOckovanie: (req, res) => {
-    const ockovanie = require("../models/ockovanie");
+    const ockovanie = require('../models/ockovanie');
     (async () => {
       ret_val = await ockovanie.insertOckovanie(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -67,10 +67,10 @@ module.exports = {
   },
 
   insertChoroba: (req, res) => {
-    const choroba = require("../models/choroba");
+    const choroba = require('../models/choroba');
     (async () => {
       ret_val = await choroba.insertOperacia(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -79,10 +79,10 @@ module.exports = {
   },
 
   insertTypZtp: (req, res) => {
-    const typZtp = require("../models/typ_ztp");
+    const typZtp = require('../models/typ_ztp');
     (async () => {
       ret_val = await choroba.insertTypZtp(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -91,10 +91,10 @@ module.exports = {
   },
 
   insertPacient: (req, res) => {
-    const pacient = require("../models/pacient");
+    const pacient = require('../models/pacient');
     (async () => {
       ret_val = await pacient.insertPacient(req.body);
-      res.status(200).json("success");
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -103,7 +103,7 @@ module.exports = {
   },
 
   getObce: (req, res) => {
-    const obec = require("../models/obec");
+    const obec = require('../models/obec');
     (async () => {
       ret_val = await obec.getObce();
       res.status(200).json(ret_val);
@@ -113,7 +113,7 @@ module.exports = {
     });
   },
   getDostupneMiestnosti: (req, res) => {
-    const miestnost = require("../models/miestnost");
+    const miestnost = require('../models/miestnost');
     (async () => {
       ret_val = await miestnost.getDostupneMiestnosti(
         req.params.id_oddelenia,
@@ -121,6 +121,17 @@ module.exports = {
         req.params.datum
       );
       res.status(200).json(ret_val);
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
+  insertMapaToHospital: (req, res) => {
+    const nemocnica = require('../models/nemocnica');
+    (async () => {
+      ret_val = await nemocnica.insertMapa(req.body);
+      res.status(200).json('success');
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error

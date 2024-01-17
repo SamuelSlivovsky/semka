@@ -20,6 +20,11 @@ router.post('/ockovanie', verify.verifyRoles(0, 2,3), controller.insertOckovanie
 router.post('/choroba', verify.verifyRoles(0, 2,3), controller.insertChoroba);
 router.post('/typ_ztp', verify.verifyRoles(0, 2,3), controller.insertTypZtp);
 router.post('/pacient', verify.verifyRoles(0, 2,3), controller.insertPacient);
+router.post(
+  '/mapa',
+  verify.verifyRoles(0, 2, 3),
+  controller.insertMapaToHospital
+);
 router.get('/psc', controller.getObce);
 router.get(
   '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum',

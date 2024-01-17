@@ -21,32 +21,36 @@ const medRecordsRoute = require("./routes/medRecordsRoute");
 const addRoute = require("./routes/addRoute");
 const lozkoRoute = require("./routes/lozkoRoute");
 const equipmentRoute = require("./routes/equipmentRoute");
+const nemocnicaRoute = require('./routes/nemocnicaRoute');
+const miestnostRoute = require('./routes/miestnostRoute');
 
 const server = http.createServer(app); // Create an HTTP server using your Express app
 const io = socketIo(server); // Initialize Socket.io with the HTTP server
 
 app.use(credentials);
 // app.use(cors(corsOptions)); // You can add this back if needed
-app.use(express.json({ limit: "50mb" }));
+app.use(express.json({ limit: '50mb' }));
 app.use(
-  express.urlencoded({ limit: "50mb", extended: true, parameterLimit: 50000 })
+  express.urlencoded({ limit: '50mb', extended: true, parameterLimit: 50000 })
 );
 
 app.use(cookieParser()); // Middleware for cookies
 
-app.use("/auth", require("./routes/authRoute"));
+app.use('/auth', require('./routes/authRoute'));
 app.use(verifyJWT);
-app.use("/sklad", storageRoute);
-app.use("/lekar", lekarRoute);
-app.use("/selects", selectsRoute);
-app.use("/calendar", calendarRoute);
-app.use("/patient", patientRoute);
-app.use("/recept", receptRoute);
-app.use("/lieky", drugsRoute);
-app.use("/zaznamy", medRecordsRoute);
-app.use("/add", addRoute);
-app.use("/lozko", lozkoRoute);
-app.use("/vybavenie", equipmentRoute);
+app.use('/sklad', storageRoute);
+app.use('/lekar', lekarRoute);
+app.use('/selects', selectsRoute);
+app.use('/calendar', calendarRoute);
+app.use('/patient', patientRoute);
+app.use('/recept', receptRoute);
+app.use('/lieky', drugsRoute);
+app.use('/zaznamy', medRecordsRoute);
+app.use('/add', addRoute);
+app.use('/lozko', lozkoRoute);
+app.use('/vybavenie', equipmentRoute);
+app.use('/nemocnica', nemocnicaRoute);
+app.use('/miestnost', miestnostRoute);
 
 io.on("connection", (socket) => {
   console.log(`User connected with socket id: ${socket.id}`);

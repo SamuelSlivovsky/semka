@@ -15,6 +15,70 @@ async function getZamestnanci() {
   }
 }
 
+async function getAllDoctorsForHospital(hospitalId) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `
+      SELECT 
+        zam.cislo_zam,
+        zam.rod_cislo,
+        zam.id_typ,
+        zam.id_oddelenia,
+        ou.meno,
+        ou.priezvisko
+      FROM 
+        zamestnanci zam
+      JOIN 
+        os_udaje ou ON ou.rod_cislo = zam.rod_cislo
+      WHERE 
+        zam.id_nemocnice = :hospitalId
+        AND 
+        zam.id_typ IN (1, 3)
+    `,
+      {
+        hospitalId: hospitalId,
+      }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
+async function getAllNursesForHospital(hospitalId) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `
+      SELECT 
+        zam.cislo_zam,
+        zam.rod_cislo,
+        zam.id_typ,
+        zam.id_oddelenia,
+        ou.meno,
+        ou.priezvisko
+      FROM 
+        zamestnanci zam
+      JOIN 
+        os_udaje ou ON ou.rod_cislo = zam.rod_cislo
+      WHERE 
+        zam.id_nemocnice = :hospitalId
+        AND 
+        zam.id_typ = 2
+    `,
+      {
+        hospitalId: hospitalId,
+      }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
 async function getZamestnanciFotka(id_zamestnanca) {
   try {
     let conn = await database.getConnection();
@@ -67,4 +131,6 @@ module.exports = {
   getZamestnanci,
   getZamestnanciFotka,
   getZamestnanec,
+  getAllDoctorsForHospital,
+  getAllNursesForHospital,
 };

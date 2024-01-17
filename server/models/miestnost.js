@@ -10,6 +10,28 @@ async function getMiestnosti() {
     console.log(err);
   }
 }
+async function getRoomsForHospital(hospitalId) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `
+      SELECT 
+        * 
+      FROM 
+        miestnost
+      WHERE 
+        id_nemocnice = :hospitalId
+    `,
+      {
+        hospitalId: hospitalId,
+      }
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
 async function getDostupneMiestnosti(id_oddelenia, trv, dat_od) {
   try {
     const durat = (1 / 1440) * trv;
@@ -37,4 +59,5 @@ async function getDostupneMiestnosti(id_oddelenia, trv, dat_od) {
 module.exports = {
   getMiestnosti,
   getDostupneMiestnosti,
+  getRoomsForHospital,
 };

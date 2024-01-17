@@ -24,7 +24,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import Combobox from "./Views/Combobox";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
-import InteractiveMap from "./Views/InteractiveMap";
+import InteractiveMap from './Views/InteractiveMap/InteractiveMap';
 import User from "./Views/User";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
