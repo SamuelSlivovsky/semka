@@ -8,7 +8,7 @@ div.vehicles {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        
+
         button {
             height: 40px;
         }
@@ -20,7 +20,7 @@ div.vehicles {
     }
 
     .p-datatable {
-        max-width: 100rem;
+        max-width: 105rem;
     }
 
     .p-component * {
@@ -28,7 +28,7 @@ div.vehicles {
     }
 
     .field-hospital-name {
-        max-width: 20rem;
+      width: 30rem;
     }
 
     .icon-vehicle {

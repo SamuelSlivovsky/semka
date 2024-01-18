@@ -25,4 +25,5 @@ router.get(
   '/dostupneMiestnosti/:id_oddelenia/:trvanie/:datum',
   controller.getDostupneMiestnosti
 );
+router.get('/nemocnica/all', verify.verifyRoles(0, 4), controller.getNemocnice);
 module.exports = router;

@@ -127,4 +127,14 @@ module.exports = {
       res.status(500).send(err);
     });
   },
+  getNemocnice: (req, res) => {
+    const nemocnica = require("../models/nemocnica");
+    (async () => {
+      ret_val = await nemocnica.getNemocnice();
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  }
 };

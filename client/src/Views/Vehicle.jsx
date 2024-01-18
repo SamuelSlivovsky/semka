@@ -12,7 +12,6 @@ export default function Vehicle() {
 const [vehicles, setVehicles] = useState([]);
 const [selectedRow, setSelectedRow] = useState(null);
 const [newVehicleShowDialog, setNewVehicleShowDialog] = useState(false);
-const [dialogTitle, setDialogTitle] = useState(null);
 
 useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -35,15 +34,6 @@ const handleEdit = (value) => {
     console.log(value);
 }
 
-const showNewVehicleDialog = () => {
-    setNewVehicleShowDialog(true);
-    setDialogTitle("Nové vozidlo");
-}
-
-const onHideNewVehicle = () => {
-    setNewVehicleShowDialog(false);
-};
-
 const renderIsVehicleFree = (isFree) => {
     return isFree ? <div className="icon-vehicle free"></div> : <div className="icon-vehicle not-free"></div>;
 }
@@ -58,7 +48,7 @@ return (
     <div className="vehicles">
         <div className="vehicles-header">
             <h1>Vozidlá</h1>
-            <Button label="Pridať vozidlo" onClick={() => showNewVehicleDialog()}/>
+            <VehicleForm/> 
         </div>
         
         <div>
@@ -80,15 +70,6 @@ return (
           <Column field={ renderDeleteIcon }></Column>                
       </DataTable>
     </div> 
-      <Dialog
-        header={dialogTitle}
-        visible={newVehicleShowDialog}
-        style={{ width: "30vw" }}
-        //footer={renderDialogFooter()}
-        onHide={() => onHideNewVehicle()}
-      >
-        <VehicleForm/>
-      </Dialog>  
     </div>
   )
 };

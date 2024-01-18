@@ -8,7 +8,7 @@
 }
 
 .field {
-  min-width: 22rem;
+  min-width: 30rem;
   margin-bottom: 1.5rem;
 }
 
@@ -17,6 +17,6 @@
   justify-content: center;
 
   .p-button {
-    width: 75%;
+    width: 15rem;
   }
 }

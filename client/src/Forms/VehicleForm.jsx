@@ -6,19 +6,66 @@ import { Toast } from 'primereact/toast';
 import { InputText } from "primereact/inputtext";
 import { useState } from 'react';
 import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
+import { useEffect } from 'react';
+import { Dialog } from 'primereact/dialog';
 
 export default function VehicleForm(props) {
-  const [formData, setFormData] = useState({});
+  const [hospitals, setHospitals] = useState([]);
+  const [dialogTitle, setDialogTitle] = useState(null);
+  const [vehicleAllECV, setVehicleAllECV] = useState([]);
+  const [visible, setVisible] = useState(false);
+
+  const requiredMessage = "Toto pole je povinné.";
+  let today = new Date();
+  const toast = useRef(null);
+
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    
+    fetch(`/add/nemocnica/all`, { headers })
+      .then((response) => response.json())
+      .then((data) => {
+        setHospitals(data);
+      });
+  }, []);
+
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    
+    fetch(`/vozidla/ecvs`, { headers })
+      .then((response) => response.json())
+      .then((data) => {
+        setVehicleAllECV(data);
+      });
+  }, []);
+
   const defaultValues = {
     ecv: '',
+    hospital: null,
     vehicleType: '',
     stk: null
   }
-  const toast = useRef(null);
+
+
+  const showNewVehicleDialog = () => {
+    setVisible(true);
+    setDialogTitle("Nové vozidlo");
+  }
+
+  const onHideNewVehicle = () => {
+    setVisible(false);
+  };
 
   const show = () => {
-    toast.current.show({ severity: 'success', summary: 'Vozidlo úspešne vytvorené', detail: getValues('ecv') });
+    toast.current.show({ severity: 'success', summary: 'Vozidlo úspešne vytvorené' });
   };
+
+  const showError = () => {
+    toast.current.show({ severity: 'error', summary: 'Vozidlo sa nepodarilo vytvoriť', detail: 'Vozidlo s daným EČV už existuje!' });
+  }
 
   const {
     control,
@@ -28,10 +75,37 @@ export default function VehicleForm(props) {
     reset
   } = useForm({ defaultValues });
 
-  const onSubmit = (data) => {
-    setFormData(data);
-    data.value && show();
-    reset();
+  const onSubmit = async (data) => {
+    const token = localStorage.getItem("hospit-user");
+    let ecvExists = vehicleAllECV.find(ecv => ecv.ECV === data.ecv);
+
+    if (ecvExists === undefined) {
+      show();
+      const requestNewVehicle = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          ecv: data.ecv,
+          id_nemocnice: data.hospital.ID_NEMOCNICE,
+          typ_vozidla: data.vehicleType,
+          priradenie: today.toLocaleString("en-GB").replace(",", ""),
+          stk: data.stk.toLocaleString("en-GB").replace(",", "")
+        }),
+      };
+
+      const responseVehicle = await fetch(
+        "/vozidla/noveVozidlo",
+        requestNewVehicle
+      ).then();
+
+      reset();
+      setVisible(false);
+    } else {
+      showError();
+    }
   };
 
   const getFormErrorMessage = (name) => {
@@ -39,53 +113,83 @@ export default function VehicleForm(props) {
   };
 
   return (
-    <div className="card flex justify-content-center vehicle-form">
-      <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+    <div>
       <Toast ref={toast} />
-        <div className="field first">
-          <span className="p-float-label">
-          <Controller 
-            name="ecv" 
-            control={control} 
-            rules={{ required: 'Evidenčné číslo vozidla je povinné zadať.' }} 
-            render={({ field, fieldState }) => (
-              <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-            )} />
-            <label htmlFor="ecv" className={classNames({ 'p-error': errors.ecv })}>Evidenčné číslo vozidla*</label>
-          </span>
-          {getFormErrorMessage('ecv')}
+      <Button label="Pridať vozidlo" onClick={() => showNewVehicleDialog()}/>
+      <Dialog
+        header={dialogTitle}
+        visible={visible}
+        style={{ width: "30vw" }}
+        onHide={() => onHideNewVehicle()}
+      >
+        <div className="card flex justify-content-center vehicle-form">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+          
+            <div className="field first">
+              <span className="p-float-label">
+              <Controller 
+                name="ecv" 
+                control={control} 
+                rules={{required: requiredMessage}} 
+                render={({ field, fieldState }) => (
+                  <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                )} />
+                <label htmlFor="ecv" className={classNames({ 'p-error': errors.ecv })}>Evidenčné číslo vozidla*</label>
+              </span>
+              {getFormErrorMessage('ecv')}
+            </div>
+            <div className="field">
+              <span className="p-float-label">
+                <Controller 
+                  name="hospital" 
+                  control={control} 
+                  rules={{required: requiredMessage}} 
+                  render={({ field }) => (
+                  <Dropdown id={field.name} value={field.value} onChange={(e) => field.onChange(e.value)} options={hospitals} optionLabel="NAZOV" />
+                )} />
+                <label htmlFor="hospital" className={classNames({ 'p-error': errors.hospital })}>Nemocnica</label>
+              </span>
+              {getFormErrorMessage('hospital')}
+            </div>
+            <div className="field">
+              <span className="p-float-label">
+              <Controller 
+                name="vehicleType" 
+                control={control} 
+                rules={{required: requiredMessage}} 
+                render={({ field, fieldState }) => (
+                  <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                )} />
+                <label htmlFor="vehicleType" className={classNames({ 'p-error': errors.vehicleType })}>Typ vozidla*</label>
+              </span>
+              {getFormErrorMessage('vehicleType')}
+            </div>
+            <div className="field">
+              <span className="p-float-label">
+                <Controller 
+                  name="stk" 
+                  control={control} 
+                  rules={{required: requiredMessage}} 
+                  render={({ field }) => (
+                    <Calendar 
+                      id={field.name} 
+                      value={field.value} 
+                      onChange={(e) => field.onChange(e.value)} 
+                      maxDate={today}
+                      dateFormat="dd/mm/yy" 
+                      mask="99/99/9999" 
+                      showIcon />
+                  )} />
+                <label htmlFor="stk" className={classNames({ 'p-error': errors.stk })}>STK</label>
+              </span>
+              {getFormErrorMessage('stk')}
+            </div>
+            <div className="vehicle-form-submit-button">
+              <Button label="Vytvoriť vozidlo" type="Submit"/>
+            </div>
+          </form>
         </div>
-        <div className="field">
-          <span className="p-float-label">
-          <Controller 
-            name="vehicleType" 
-            control={control} 
-            rules={{ required: 'Typ vozidla je povinné zadať.' }} 
-            render={({ field, fieldState }) => (
-              <InputText id={field.name} {...field} autoFocus className={classNames({ 'p-invalid': fieldState.invalid })} />
-            )} />
-            <label htmlFor="vehicleType" className={classNames({ 'p-error': errors.vehicleType })}>Typ vozidla*</label>
-          </span>
-          {getFormErrorMessage('vehicleType')}
-        </div>
-        <div className="field">
-          <span className="p-float-label">
-            <Controller name="stk" control={control} render={({ field }) => (
-              <Calendar 
-                id={field.name} 
-                value={field.value} 
-                onChange={(e) => field.onChange(e.value)} 
-                dateFormat="dd/mm/yy" 
-                mask="99/99/9999" 
-                showIcon />
-             )} />
-            <label htmlFor="stk">STK</label>
-          </span>
-        </div>
-        <div className="vehicle-form-submit-button">
-          <Button label="Vytvoriť vozidlo" type="submit"/>
-        </div>
-      </form>
+      </Dialog> 
     </div>
   )
 }

@@ -21,6 +21,42 @@ async function getVehicles() {
       }
 }
 
+async function getVehiclesECV() {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `SELECT ecv FROM vozidla Order by ecv ASC`
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function insertVehicle(body) {
+  try {
+    console.log(body);
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+        vozidlo_insert(:ecv, :id_nemocnice, :typ_vozidla, :priradenie, :stk);
+      END;`;
+
+    let result = await conn.execute(sqlStatement, {
+      ecv: body.ecv,
+      id_nemocnice: body.id_nemocnice,
+      typ_vozidla: body.typ_vozidla,
+      priradenie: body.priradenie,
+      stk: body.stk
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
-  getVehicles
+  getVehicles,
+  getVehiclesECV,
+  insertVehicle,
 }
