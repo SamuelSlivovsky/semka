@@ -1,0 +1,22 @@
+.p-dialog .p-dialog-header .p-dialog-title {
+  color: #0d9488;
+  font-size: 30px;
+}
+
+.first {
+  margin-top: 20px;
+}
+
+.field {
+  min-width: 22rem;
+  margin-bottom: 1.5rem;
+}
+
+.vehicle-form-submit-button {
+  display: flex;
+  justify-content: center;
+
+  .p-button {
+    width: 75%;
+  }
+}

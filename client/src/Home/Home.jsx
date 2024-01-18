@@ -11,6 +11,7 @@ import HomeCard from "./HomeCard";
 import storageIcon from "../images/drugs.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
+import vehicleIcon from "../images/vehicle-icon.png"
 import "../styles/homepage.css";
 
 function Home() {
@@ -119,6 +120,16 @@ function Home() {
     ></HomeCard>,
   ];
 
+  const rescuerCards = [
+    <HomeCard
+      title="Vozidlá"
+      isCalendar={false}
+      path="/vehicles"
+      icon={vehicleIcon}
+      key="2"
+    ></HomeCard>,
+  ]
+
   const patientCards = [
     <HomeCard
       title="Kalendár"
@@ -138,7 +149,7 @@ function Home() {
 
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
-      if (userData.UserInfo.role === 0) return adminCards;
+      if (userData.UserInfo.role === 0) return rescuerCards; //return adminCards;
       else if (userData.UserInfo.role === 2) return doctorCards;
       else if (userData.UserInfo.role === 3)
         return (

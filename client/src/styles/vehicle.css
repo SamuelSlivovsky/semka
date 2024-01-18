@@ -1,0 +1,68 @@
+div.vehicles {
+    margin-top: 30px;
+    margin-left: 30px;
+    margin-bottom: 100px;
+
+    .vehicles-header {
+        max-width: 80rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        button {
+            height: 40px;
+        }
+    }
+
+    h1 {
+        font-size: 35px;
+        color: #565757;
+    }
+
+    .p-datatable {
+        max-width: 100rem;
+    }
+
+    .p-component * {
+        max-width: 80rem;
+    }
+
+    .field-hospital-name {
+        max-width: 20rem;
+    }
+
+    .icon-vehicle {
+        border-radius: 50%;
+        width: 10px;
+        height: 10px;
+        margin-left: 20px
+    }
+
+    .free {
+        background-color: green;
+    }
+
+    .not-free {
+        background-color: red;
+    }
+
+    .field-is-vehicle-free {
+        text-align: center;
+    }
+
+    .vehicle-edit-icon, .vehicle-delete-icon {
+        font-size: 1.3rem;
+    }
+
+    .vehicle-delete-icon {
+        color: red;
+    }
+
+    .vehicle-edit-icon {
+        color: #0d9488;
+    }
+
+    .vehicle-delete-icon:hover, .vehicle-edit-icon:hover {
+        cursor: pointer;
+    }
+}

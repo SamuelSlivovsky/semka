@@ -25,6 +25,8 @@ import Combobox from "./Views/Combobox";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
 import User from "./Views/User";
+import Vehicle from "./Views/Vehicle";
+
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -232,6 +234,23 @@ function App() {
     />,
   ];
 
+  const sidebarButtonsRescuer = [
+    <SidebarButton
+      key="1"
+      visibleLeft={visibleLeft}
+      path="/"
+      label="Domov"
+      icon="home-icon"
+    />,
+    <SidebarButton
+      key="2"
+      visibleLeft={visibleLeft}
+      path="/vehicles"
+      label="Vehicle"
+      icon="vehicle-icon"
+    />
+  ]
+
   const renderDoctorRoutes = () => {
     return (
       <>
@@ -277,7 +296,8 @@ function App() {
       </>
     );
   };
-  const renderAdminRoutes = () => {
+
+  /*const renderAdminRoutes = () => {
     return (
       <>
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
@@ -286,7 +306,7 @@ function App() {
         <Route path="/combobox" element={<Combobox />}></Route>
       </>
     );
-  };
+  };*/
 
   const renderPatientRoutes = () => {
     return (
@@ -304,6 +324,15 @@ function App() {
       </>
     );
   };
+
+  const renderRescuerRoutes = () => {
+    return (
+      <Route
+      path="/vehicles"
+      element={<Vehicle></Vehicle>}
+    ></Route> 
+    );
+  }
 
   return (
     <div>
@@ -324,7 +353,8 @@ function App() {
         {typeof userData !== "undefined" &&
         userData !== null &&
         userData.UserInfo.role === 0 ? (
-          sidebarButtonsAdmin
+          sidebarButtonsRescuer
+          //sidebarButtonsAdmin
         ) : userData !== null && userData.UserInfo.role === 2 ? (
           sidebarButtonsDoctor
         ) : userData !== null && userData.UserInfo.role === 3 ? (
@@ -360,7 +390,8 @@ function App() {
           {typeof userData !== "undefined" &&
           userData !== null &&
           userData.UserInfo.role === 0 ? (
-            renderAdminRoutes()
+            renderRescuerRoutes()
+            // povodne renderAdminRoutes
           ) : typeof userData !== "undefined" &&
             userData !== null &&
             userData.UserInfo.role === 2 ? (

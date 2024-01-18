@@ -155,3 +155,8 @@
   height: 44px;
   width: 44px;
 }
+.vehicle-icon {
+  content: url('./images/vehicle-icon.png');
+  height: 44px;
+  width: 44px;
+}

@@ -9,6 +9,7 @@ export default function TabHospitalizations() {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
+    
     fetch(`/lekar/hospitalizacie/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
