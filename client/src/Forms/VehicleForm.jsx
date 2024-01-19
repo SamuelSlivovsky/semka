@@ -9,10 +9,11 @@ import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
+import moment from 'moment';
+import "../styles/vehicleForm.css"
 
 export default function VehicleForm(props) {
   const [hospitals, setHospitals] = useState([]);
-  const [dialogTitle, setDialogTitle] = useState(null);
   const [vehicleAllECV, setVehicleAllECV] = useState([]);
   const [visible, setVisible] = useState(false);
 
@@ -43,19 +44,24 @@ export default function VehicleForm(props) {
   }, []);
 
   const defaultValues = {
-    ecv: '',
-    hospital: null,
-    vehicleType: '',
-    stk: null
+    ecv: props.edit ? props.body.ECV : '',
+    hospital: props.edit ? props.body.NAZOV :  null,
+    vehicleType: props.edit ? props.body.TYP_VOZIDLA :  '',
+    stk: props.edit ? props.body.DAT_STK :  null
   }
 
+  const getHospital = (name) => {
+    return hospitals.find(hospital => hospital.NAZOV === props.body.NAZOV);
+  }
 
   const showNewVehicleDialog = () => {
     setVisible(true);
-    setDialogTitle("Nové vozidlo");
   }
 
   const onHideNewVehicle = () => {
+    if (props != null) {
+      props.closeDialog();
+    }
     setVisible(false);
   };
 
@@ -91,7 +97,6 @@ export default function VehicleForm(props) {
           ecv: data.ecv,
           id_nemocnice: data.hospital.ID_NEMOCNICE,
           typ_vozidla: data.vehicleType,
-          priradenie: today.toLocaleString("en-GB").replace(",", ""),
           stk: data.stk.toLocaleString("en-GB").replace(",", "")
         }),
       };
@@ -117,9 +122,9 @@ export default function VehicleForm(props) {
       <Toast ref={toast} />
       <Button label="Pridať vozidlo" onClick={() => showNewVehicleDialog()}/>
       <Dialog
-        header={dialogTitle}
-        visible={visible}
-        style={{ width: "30vw" }}
+        header={props != null && props.edit ? "Vozidlo" : "Nové vozidlo"}
+        visible={visible || (props != null && props.edit)}
+        style={{width: "35rem"}}
         onHide={() => onHideNewVehicle()}
       >
         <div className="card flex justify-content-center vehicle-form">
@@ -132,7 +137,11 @@ export default function VehicleForm(props) {
                 control={control} 
                 rules={{required: requiredMessage}} 
                 render={({ field, fieldState }) => (
-                  <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                  <InputText 
+                    id={field.name} 
+                    {...field} 
+                    value={props != null && props.edit ? props.body.ECV : field.value}  
+                    className={classNames({ 'p-invalid': fieldState.invalid })} />
                 )} />
                 <label htmlFor="ecv" className={classNames({ 'p-error': errors.ecv })}>Evidenčné číslo vozidla*</label>
               </span>
@@ -145,7 +154,12 @@ export default function VehicleForm(props) {
                   control={control} 
                   rules={{required: requiredMessage}} 
                   render={({ field }) => (
-                  <Dropdown id={field.name} value={field.value} onChange={(e) => field.onChange(e.value)} options={hospitals} optionLabel="NAZOV" />
+                  <Dropdown 
+                    id={field.name} 
+                    value={props && props.edit ? getHospital(props.body.NAZOV) : field.value} 
+                    onChange={(e) => field.onChange(e.value)} 
+                    options={hospitals} 
+                    optionLabel="NAZOV" />
                 )} />
                 <label htmlFor="hospital" className={classNames({ 'p-error': errors.hospital })}>Nemocnica</label>
               </span>
@@ -158,7 +172,11 @@ export default function VehicleForm(props) {
                 control={control} 
                 rules={{required: requiredMessage}} 
                 render={({ field, fieldState }) => (
-                  <InputText id={field.name} {...field} className={classNames({ 'p-invalid': fieldState.invalid })} />
+                  <InputText 
+                    id={field.name} 
+                    {...field} 
+                    value={props && props.edit ? props.body.TYP_VOZIDLA : field.value}  
+                    className={classNames({ 'p-invalid': fieldState.invalid })} />
                 )} />
                 <label htmlFor="vehicleType" className={classNames({ 'p-error': errors.vehicleType })}>Typ vozidla*</label>
               </span>
@@ -173,7 +191,7 @@ export default function VehicleForm(props) {
                   render={({ field }) => (
                     <Calendar 
                       id={field.name} 
-                      value={field.value} 
+                      value={props && props.edit ? moment(props.body.DAT_STK, 'D.M.YYYY').toDate() : field.value} 
                       onChange={(e) => field.onChange(e.value)} 
                       maxDate={today}
                       dateFormat="dd/mm/yy" 
@@ -185,7 +203,7 @@ export default function VehicleForm(props) {
               {getFormErrorMessage('stk')}
             </div>
             <div className="vehicle-form-submit-button">
-              <Button label="Vytvoriť vozidlo" type="Submit"/>
+              <Button label={props && props.edit ? "Upraviť vozidlo" : "Vytvoriť vozidlo"} type="Submit"/>
             </div>
           </form>
         </div>

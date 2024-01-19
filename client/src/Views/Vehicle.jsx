@@ -3,52 +3,66 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import "../styles/vehicle.css";
 import 'primeicons/primeicons.css';
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
 import VehicleForm from "../Forms/VehicleForm";
-import "../styles/vehicleForm.css"
+import VehicleDetails from "./VehicleDetails";
 
 export default function Vehicle() {
-const [vehicles, setVehicles] = useState([]);
-const [selectedRow, setSelectedRow] = useState(null);
-const [newVehicleShowDialog, setNewVehicleShowDialog] = useState(false);
+  const [vehicles, setVehicles] = useState([]);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const [vehicleDetailsVisible, setVehicleDetailsVisible] = useState(false);
+  const [editVehicle, setEditVehicle] = useState(false);
 
-useEffect(() => {
-    const token = localStorage.getItem("hospit-user");
-    //const userDataHelper = GetUserData(token);
-    const headers = { authorization: "Bearer " + token };
-    
-    fetch(`/vozidla/all`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setVehicles(data);
-      });
-}, []);
+  useEffect(() => {
+      const token = localStorage.getItem("hospit-user");
+      //const userDataHelper = GetUserData(token);
+      const headers = { authorization: "Bearer " + token };
+      
+      fetch(`/vozidla/all`, { headers })
+        .then((response) => response.json())
+        .then((data) => {
+          setVehicles(data);
+        });
+  }, []);
 
-const handleClick = (value) => {
-    setSelectedRow(value);
-    console.log(value);
-};
+  const handleClick = (value) => {
+      setSelectedRow(value);
+  };
 
-const handleEdit = (value) => {
-    console.log(value);
-}
+  const handleDoubleClick = () => {
+    setVehicleDetailsVisible(true);
+  }
 
-const renderIsVehicleFree = (isFree) => {
-    return isFree ? <div className="icon-vehicle free"></div> : <div className="icon-vehicle not-free"></div>;
-}
-const renderEditIcon = () => {
-    return <i className="pi pi-pencil vehicle-edit-icon" onClick={ (e) => handleEdit(e.value) }></i>;
-}
-const renderDeleteIcon = () => {
-    return <i className="pi pi-trash vehicle-delete-icon"></i>;
-}
+  const closeEditVehicleDialog = () => {
+    setEditVehicle(false);
+  }
 
-return ( 
+  const closeVehicleDetailsDialog = () => {
+    setVehicleDetailsVisible(false);
+  }
+
+  const handleEdit = () => {
+    setEditVehicle(true);
+  }
+
+  const renderIsVehicleFree = (isFree) => {
+      return isFree ? <div className="icon-vehicle free"></div> : <div className="icon-vehicle not-free"></div>;
+  }
+  const renderEditIcon = () => {
+      return <i className="pi pi-pencil vehicle-edit-icon" onClick={ () => handleEdit() }></i>;
+  }
+  const renderDeleteIcon = () => {
+      return <i className="pi pi-trash vehicle-delete-icon"></i>;
+  }
+
+  return ( 
     <div className="vehicles">
         <div className="vehicles-header">
             <h1>Vozidlá</h1>
-            <VehicleForm/> 
+            <VehicleForm
+              edit={editVehicle}
+              body={selectedRow}
+              closeDialog={closeEditVehicleDialog}
+            /> 
         </div>
         
         <div>
@@ -57,6 +71,7 @@ return (
             selectionMode="single"
             selection={selectedRow}
             onSelectionChange={(e) => handleClick(e.value)}
+            onRowDoubleClick={(e) => handleDoubleClick()}
             paginator rows={10} 
             rowsPerPageOptions={[10, 20, 30]}
         >
@@ -70,6 +85,11 @@ return (
           <Column field={ renderDeleteIcon }></Column>                
       </DataTable>
     </div> 
+      <VehicleDetails 
+        visible={vehicleDetailsVisible}
+        body={selectedRow}
+        closeDialog={closeVehicleDetailsDialog}
+      />
     </div>
   )
 };

@@ -36,17 +36,15 @@ async function getVehiclesECV() {
 
 async function insertVehicle(body) {
   try {
-    console.log(body);
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        vozidlo_insert(:ecv, :id_nemocnice, :typ_vozidla, :priradenie, :stk);
+        vozidlo_insert(:ecv, :id_nemocnice, :typ_vozidla, :stk);
       END;`;
 
     let result = await conn.execute(sqlStatement, {
       ecv: body.ecv,
       id_nemocnice: body.id_nemocnice,
       typ_vozidla: body.typ_vozidla,
-      priradenie: body.priradenie,
       stk: body.stk
     });
 

@@ -1,0 +1,50 @@
+.vehicle-details-row {
+  .vehicle-details-left-card {
+    width: 40%;
+    margin: 0px;
+    margin-bottom: 25px;
+    margin-right: 25px;
+    margin-left: 10px;
+    min-height: 23rem;
+  }
+
+  .vehicle-details-right-card {
+    width: 55%;
+    margin: 0px;
+    margin-bottom: 25px;
+    min-height: 23rem;
+  }
+
+  .vehicle-details-first-row-left-card {
+    div.row {
+      display: flex;
+      margin-bottom: 5px;
+      font-size: 18px;
+      .left-element {
+        width: 12rem;
+        font-weight: 550;
+      }
+      .right-element {
+        width: 20rem;
+      }
+    }
+  }
+
+  .vehicle-details-second-row-left-card {
+    margin-bottom: 0px;
+  }
+
+  .vehicle-details-second-row-right-card {
+    margin-bottom: 0px;
+  }
+}
+
+@media screen and (max-width: 1610px) {
+  .vehicle-details-second-row-left-card {
+    margin-bottom: 15px;
+  }
+
+  .vehicle-details-second-row-right-card {
+    margin-bottom: 15px;
+  }
+}

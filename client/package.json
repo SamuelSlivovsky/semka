@@ -16,6 +16,7 @@
     "axios": "^0.24.0",
     "chart.js": "^4.0.1",
     "fullcalendar": "^5.11.3",
+    "moment": "^2.30.1",
     "primeflex": "^3.3.0",
     "primeicons": "^6.0.1",
     "primereact": "^8.7.2",
