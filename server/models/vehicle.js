@@ -53,8 +53,27 @@ async function insertVehicle(body) {
   }
 }
 
+async function updateVehicle(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+        vozidlo_update(:ecv, :id_nemocnice, :typ_vozidla, :stk);
+      END;`;
+
+    let result = await conn.execute(sqlStatement, {
+      ecv: body.ecv,
+      id_nemocnice: body.id_nemocnice,
+      typ_vozidla: body.typ_vozidla,
+      stk: body.stk
+    });
+  } catch (err) {
+    console.log(err);
+  }    
+}
+
 module.exports = {
   getVehicles,
   getVehiclesECV,
   insertVehicle,
+  updateVehicle
 }

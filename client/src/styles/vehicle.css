@@ -49,20 +49,19 @@ div.vehicles {
     .field-is-vehicle-free {
         text-align: center;
     }
-
     .vehicle-edit-icon, .vehicle-delete-icon {
-        font-size: 1.3rem;
-    }
+      font-size: 1.3rem;
+  }
 
-    .vehicle-delete-icon {
-        color: red;
-    }
+  .vehicle-delete-icon {
+      color: red;
+  }
 
-    .vehicle-edit-icon {
-        color: #0d9488;
-    }
+  .vehicle-edit-icon {
+      color: #0d9488;
+  }
 
-    .vehicle-delete-icon:hover, .vehicle-edit-icon:hover {
-        cursor: pointer;
-    }
+  .vehicle-delete-icon:hover, .vehicle-edit-icon:hover {
+      cursor: pointer;
+  }
 }

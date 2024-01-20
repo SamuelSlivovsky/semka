@@ -1,0 +1,47 @@
+.departure-plans-container {
+  margin-top: 30px;
+  margin-left: 30px;
+  margin-bottom: 100px;
+
+  .departure-plans-header {
+    max-width: 80rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    button {
+        height: 40px;
+        width: auto;
+        border-radius: 35%;
+    }
+  }
+
+  h1 {
+    font-size: 35px;
+    color: #565757;
+  }
+
+  .p-datatable {
+    max-width: 105rem;
+  }
+
+  .p-component * {
+    max-width: 80rem;
+  }
+
+  .vehicle-edit-icon, .vehicle-delete-icon {
+    font-size: 1.3rem;
+  }
+
+  .vehicle-delete-icon {
+    color: red;
+  }
+
+  .vehicle-edit-icon {
+    color: #0d9488;
+  }
+
+  .vehicle-delete-icon:hover, .vehicle-edit-icon:hover {
+    cursor: pointer;
+  }
+}

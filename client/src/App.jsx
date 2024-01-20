@@ -26,6 +26,7 @@ import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
 import User from "./Views/User";
 import Vehicle from "./Views/Vehicle";
+import DeparturePlans from "./Views/DeparturePlans";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -246,8 +247,15 @@ function App() {
       key="2"
       visibleLeft={visibleLeft}
       path="/vehicles"
-      label="Vehicle"
+      label="Vozidlá"
       icon="vehicle-icon"
+    />,
+    <SidebarButton
+      key="3"
+      visibleLeft={visibleLeft}
+      path="/departurePlan"
+      label="Plán výjazdov"
+      icon="departure-plans-icon"
     />
   ]
 
@@ -327,10 +335,16 @@ function App() {
 
   const renderRescuerRoutes = () => {
     return (
-      <Route
-      path="/vehicles"
-      element={<Vehicle></Vehicle>}
-    ></Route> 
+      <>
+        <Route
+        path="/vehicles"
+        element={<Vehicle></Vehicle>}
+        ></Route> 
+        <Route
+        path="/departurePlan"
+        element={<DeparturePlans></DeparturePlans>}
+        ></Route> 
+      </>
     );
   }
 

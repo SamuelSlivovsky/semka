@@ -12,6 +12,7 @@ import storageIcon from "../images/drugs.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import vehicleIcon from "../images/vehicle-icon.png"
+import departurePlansIcon from "../images/departure-plans-icon.png";
 import "../styles/homepage.css";
 
 function Home() {
@@ -127,6 +128,13 @@ function Home() {
       path="/vehicles"
       icon={vehicleIcon}
       key="2"
+    ></HomeCard>,
+    <HomeCard
+      title="Plán výjazdov"
+      isCalendar={false}
+      path="/departurePlan"
+      icon={departurePlansIcon}
+      key="3"
     ></HomeCard>,
   ]
 

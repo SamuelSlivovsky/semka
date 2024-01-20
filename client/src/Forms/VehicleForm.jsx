@@ -17,9 +17,34 @@ export default function VehicleForm(props) {
   const [vehicleAllECV, setVehicleAllECV] = useState([]);
   const [visible, setVisible] = useState(false);
 
+  const defaultValues = {
+    ecv: '',
+    hospital: null,
+    vehicleType: '',
+    stk: null
+  }
+
+  const {
+    control,
+    formState: { errors },
+    handleSubmit,
+    getValues,
+    setValue,
+    reset
+  } = useForm({ defaultValues });
+
   const requiredMessage = "Toto pole je povinné.";
   let today = new Date();
   const toast = useRef(null);
+
+  useEffect(() => {
+    if (props && props.edit) {
+      setValue('ecv', props.body.ECV);
+      setValue('hospital', getHospital(props.body.NAZOV));
+      setValue('vehicleType', props.body.TYP_VOZIDLA);
+      setValue('stk', moment(props.body.DAT_STK, 'D.M.YYYY').toDate());
+    }
+  }, [props, setValue]);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -43,13 +68,6 @@ export default function VehicleForm(props) {
       });
   }, []);
 
-  const defaultValues = {
-    ecv: props.edit ? props.body.ECV : '',
-    hospital: props.edit ? props.body.NAZOV :  null,
-    vehicleType: props.edit ? props.body.TYP_VOZIDLA :  '',
-    stk: props.edit ? props.body.DAT_STK :  null
-  }
-
   const getHospital = (name) => {
     return hospitals.find(hospital => hospital.NAZOV === props.body.NAZOV);
   }
@@ -59,7 +77,7 @@ export default function VehicleForm(props) {
   }
 
   const onHideNewVehicle = () => {
-    if (props != null) {
+    if (props) {
       props.closeDialog();
     }
     setVisible(false);
@@ -69,23 +87,19 @@ export default function VehicleForm(props) {
     toast.current.show({ severity: 'success', summary: 'Vozidlo úspešne vytvorené' });
   };
 
+  const showEdit = () => {
+    toast.current.show({ severity: 'success', summary: 'Vozidlo úspešne upravené' });
+  };
+
   const showError = () => {
     toast.current.show({ severity: 'error', summary: 'Vozidlo sa nepodarilo vytvoriť', detail: 'Vozidlo s daným EČV už existuje!' });
   }
-
-  const {
-    control,
-    formState: { errors },
-    handleSubmit,
-    getValues,
-    reset
-  } = useForm({ defaultValues });
 
   const onSubmit = async (data) => {
     const token = localStorage.getItem("hospit-user");
     let ecvExists = vehicleAllECV.find(ecv => ecv.ECV === data.ecv);
 
-    if (ecvExists === undefined) {
+    if (ecvExists === undefined && !props.edit) {
       show();
       const requestNewVehicle = {
         method: "POST",
@@ -101,13 +115,38 @@ export default function VehicleForm(props) {
         }),
       };
 
-      const responseVehicle = await fetch(
+      fetch(
         "/vozidla/noveVozidlo",
         requestNewVehicle
-      ).then();
+      ).then(() => {
+        reset();
+        setVisible(false);
+      }) 
+    } else if (props.edit) {
+      showEdit();
 
-      reset();
-      setVisible(false);
+      const requestVehicle = {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          ecv: data.ecv,
+          id_nemocnice: data.hospital.ID_NEMOCNICE,
+          typ_vozidla: data.vehicleType,
+          stk: data.stk.toLocaleString("en-GB").replace(",", "")
+        }),
+      };
+
+      fetch(
+        "/vozidla/editVozidlo",
+        requestVehicle
+      ).then(() => {
+        props.closeDialog();
+        reset();
+        setVisible(false);
+      })  
     } else {
       showError();
     }
@@ -135,12 +174,12 @@ export default function VehicleForm(props) {
               <Controller 
                 name="ecv" 
                 control={control} 
-                rules={{required: requiredMessage}} 
+                rules={{required: requiredMessage}}   
                 render={({ field, fieldState }) => (
                   <InputText 
                     id={field.name} 
-                    {...field} 
-                    value={props != null && props.edit ? props.body.ECV : field.value}  
+                    value={field.value}
+                    disabled={props != null && props.edit ? true : false}
                     className={classNames({ 'p-invalid': fieldState.invalid })} />
                 )} />
                 <label htmlFor="ecv" className={classNames({ 'p-error': errors.ecv })}>Evidenčné číslo vozidla*</label>
@@ -156,7 +195,7 @@ export default function VehicleForm(props) {
                   render={({ field }) => (
                   <Dropdown 
                     id={field.name} 
-                    value={props && props.edit ? getHospital(props.body.NAZOV) : field.value} 
+                    value={field.value}
                     onChange={(e) => field.onChange(e.value)} 
                     options={hospitals} 
                     optionLabel="NAZOV" />
@@ -174,8 +213,7 @@ export default function VehicleForm(props) {
                 render={({ field, fieldState }) => (
                   <InputText 
                     id={field.name} 
-                    {...field} 
-                    value={props && props.edit ? props.body.TYP_VOZIDLA : field.value}  
+                    {...field}
                     className={classNames({ 'p-invalid': fieldState.invalid })} />
                 )} />
                 <label htmlFor="vehicleType" className={classNames({ 'p-error': errors.vehicleType })}>Typ vozidla*</label>
@@ -191,7 +229,7 @@ export default function VehicleForm(props) {
                   render={({ field }) => (
                     <Calendar 
                       id={field.name} 
-                      value={props && props.edit ? moment(props.body.DAT_STK, 'D.M.YYYY').toDate() : field.value} 
+                      value={field.value}
                       onChange={(e) => field.onChange(e.value)} 
                       maxDate={today}
                       dateFormat="dd/mm/yy" 
