@@ -27,6 +27,7 @@ import Equipment from "./Views/Equipment";
 import User from "./Views/User";
 import Vehicle from "./Views/Vehicle";
 import DeparturePlans from "./Views/DeparturePlans";
+import Departures from "./Views/Departures";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -256,6 +257,13 @@ function App() {
       path="/departurePlan"
       label="Plán výjazdov"
       icon="departure-plans-icon"
+    />,
+    <SidebarButton
+      key="4"
+      visibleLeft={visibleLeft}
+      path="/departure"
+      label="Výjazdy"
+      icon="departures-icon"
     />
   ]
 
@@ -343,6 +351,10 @@ function App() {
         <Route
         path="/departurePlan"
         element={<DeparturePlans></DeparturePlans>}
+        ></Route> 
+        <Route
+        path="/departure"
+        element={<Departures></Departures>}
         ></Route> 
       </>
     );

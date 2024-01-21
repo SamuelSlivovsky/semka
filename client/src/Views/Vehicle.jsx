@@ -22,7 +22,7 @@ export default function Vehicle() {
         .then((data) => {
           setVehicles(data);
         });
-  }, []);
+  }, [vehicles]);
 
   const handleClick = (value) => {
       setSelectedRow(value);

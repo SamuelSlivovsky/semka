@@ -13,6 +13,7 @@ import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import vehicleIcon from "../images/vehicle-icon.png"
 import departurePlansIcon from "../images/departure-plans-icon.png";
+import departureIcon from "../images/departures-icon.png"
 import "../styles/homepage.css";
 
 function Home() {
@@ -135,6 +136,13 @@ function Home() {
       path="/departurePlan"
       icon={departurePlansIcon}
       key="3"
+    ></HomeCard>,
+    <HomeCard
+      title="Výjazdy"
+      isCalendar={false}
+      path="/departure"
+      icon={departureIcon}
+      key="4"
     ></HomeCard>,
   ]
 

@@ -160,3 +160,13 @@
   height: 44px;
   width: 44px;
 }
+.departure-plans-icon {
+  content: url('./images/departure-plans-icon.png');
+  height: 44px;
+  width: 44px;
+}
+.departures-icon {
+  content: url('./images/departures-icon.png');
+  height: 44px;
+  width: 44px;
+}

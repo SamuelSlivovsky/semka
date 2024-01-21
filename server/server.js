@@ -22,6 +22,7 @@ const addRoute = require("./routes/addRoute");
 const lozkoRoute = require("./routes/lozkoRoute");
 const equipmentRoute = require("./routes/equipmentRoute");
 const vehicleRoute = require("./routes/vehicleRoute");
+const departureRoute = require("./routes/vyjazdyRoute")
 
 const server = http.createServer(app); // Create an HTTP server using your Express app
 const io = socketIo(server); // Initialize Socket.io with the HTTP server
@@ -49,6 +50,7 @@ app.use("/add", addRoute);
 app.use("/lozko", lozkoRoute);
 app.use("/vybavenie", equipmentRoute);
 app.use("/vozidla", vehicleRoute);
+app.use("/vyjazdy", departureRoute)
 
 io.on("connection", (socket) => {
   console.log(`User connected with socket id: ${socket.id}`);

@@ -51,7 +51,7 @@ export default function VehicleDetails(props) {
           </Card>
         </div>
         <div className="vehicle-details-row">
-          <Card title="Vybavenie voidla" className="vehicle-details-second-row-left-card vehicle-details-left-card">
+          <Card title="Vybavenie vozidla" className="vehicle-details-second-row-left-card vehicle-details-left-card">
             <div className="row">
               <div className="left-element"> <span>Nemocnica:</span> </div>
               <div className="right-element"> <span>{props.body != null ? props.body.NAZOV : ""}</span> </div>

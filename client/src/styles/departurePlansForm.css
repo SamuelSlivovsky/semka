@@ -1,0 +1,30 @@
+.departure-plans-form {
+  .departure-plans-form-row {
+    display: flex;
+    gap: 15px;
+
+    .field {
+      width: 45%;
+    }
+  }
+
+  .departure-plans-form-row-first-row {
+    margin-top: 30px;
+  }
+
+  .departure-plans-form-row-second-row, .departure-plans-form-row-third-row {
+    margin-top: 5px;
+  }
+
+  .departure-plans-form-row-third-row {
+    max-width: 45%;
+  }
+
+  .departure-plan-form-submit-button {
+    margin-top: 35px;
+    text-align: right;
+    button {
+      width: 15rem;
+    }
+  }
+}
