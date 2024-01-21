@@ -24,8 +24,8 @@ module.exports = {
         const lekar = require("../models/lekar");
         (async () => {
             if (req.role === 0) {
-                // operacie = await lekar.getOperacieAdmin();
-                operacie = await lekar.getOperacie(req.params.id);
+                operacie = await lekar.getOperacieAdmin();
+                // operacie = await lekar.getOperacie(req.params.id);
                 operacie = hashMedical(operacie);
             } else {
                 operacie = await lekar.getOperacie(req.params.id);
@@ -51,8 +51,8 @@ module.exports = {
         const lekar = require("../models/lekar");
         (async () => {
             if (req.role === 0) {
-                // hospitalizacie = await lekar.getHospitalizacieAdmin();
-                hospitalizacie = await lekar.getHospitalizacie(req.params.id);
+                hospitalizacie = await lekar.getHospitalizacieAdmin();
+                // hospitalizacie = await lekar.getHospitalizacie(req.params.id);
                 hospitalizacie = hashMedical(hospitalizacie);
             } else {
                 hospitalizacie = await lekar.getHospitalizacie(req.params.id);

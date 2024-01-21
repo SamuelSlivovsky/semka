@@ -44,6 +44,7 @@ export const Login = () => {
         fetch("/auth/login", requestOptions)
             .then((response) => response.json())
             .then((res) => {
+                console.log(res.status)
                 if (res.message !== undefined) {
                     navigate("/logout");
                     navigate("/login")

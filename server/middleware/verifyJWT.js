@@ -9,7 +9,8 @@ const verifyJWT = (req, res, next) => {
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
     if (err) {
       if (err.name === 'TokenExpiredError') {
-        return res.status(401).json({ message: 'Token has expired' });
+        //TODO Pridat Expiraciu tokenu ku kazdemu fetchu je na res.status(410)
+        return res.status(410).json({ message: 'Token has expired' });
       } else {
         return res.sendStatus(403); // Invalid token for other reasons
       }

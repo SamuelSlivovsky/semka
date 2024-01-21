@@ -1,7 +1,8 @@
-import {useEffect, useRef, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import TableMedicalRecords from "./TableMedicalRecords";
 import GetUserData from "../../Auth/GetUserData";
 import {useNavigate} from "react-router";
+import {Toast} from "primereact/toast";
 
 export default function TabExaminations() {
     const [vysetrenia, setVysetrenia] = useState([]);
@@ -17,7 +18,8 @@ export default function TabExaminations() {
                 // Kontrola ci response je ok (status:200)
                 if (response.ok) {
                     return response.json();
-                } else if (response.status === 401) {
+                    // Kontrola ci je token expirovany (status:410)
+                } else if (response.status === 410) {
                     // Token expiroval redirect na logout
                     toast.current.show({
                         severity: 'error',
@@ -48,5 +50,7 @@ export default function TabExaminations() {
         eventType: "Vyšetrenie",
     };
 
-    return <div>{data && <TableMedicalRecords {...data} />}</div>;
+    return <div>
+        <Toast ref={toast} position="top-center"/>
+        {data && <TableMedicalRecords {...data} />}</div>;
 }
