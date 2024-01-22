@@ -167,3 +167,9 @@
   height: 20px;
   width: 20px;
 }
+
+.log-icon {
+  content: url("./images/log.png");
+  height: 15px;
+  width: 15px;
+}

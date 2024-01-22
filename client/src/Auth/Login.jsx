@@ -8,11 +8,13 @@ import {classNames} from "primereact/utils";
 import {useNavigate} from "react-router";
 import "../styles/auth.css";
 import {Toast} from "primereact/toast";
+import publicIP from 'react-native-public-ip';
 
 export const Login = () => {
     const [showMessage, setShowMessage] = useState(false);
     const navigate = useNavigate();
     const toast = useRef(null);
+    const [logDetails, setLogDetails] = useState(null);
     const defaultValues = {
         userid: "",
         password: "",
@@ -26,6 +28,7 @@ export const Login = () => {
     } = useForm({defaultValues});
 
     useEffect(() => {
+        getUserLogData()
         const token = localStorage.getItem("hospit-user");
         if (token !== null) {
             navigate("/");
@@ -44,8 +47,8 @@ export const Login = () => {
         fetch("/auth/login", requestOptions)
             .then((response) => response.json())
             .then((res) => {
-                console.log(res.status)
                 if (res.message !== undefined) {
+                    fetch("")
                     navigate("/logout");
                     navigate("/login")
                     toast.current.show({severity: 'error', summary: res.message, life: 999999999});
@@ -57,6 +60,16 @@ export const Login = () => {
 
         reset();
     };
+
+    const getUserLogData = () => {
+        publicIP()
+            .then(ip => {
+                setLogDetails(ip)
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
 
     const getFormErrorMessage = (name) => {
         return (

@@ -168,6 +168,8 @@ export default function TabPatients() {
                     value={pacienti}
                     responsiveLayout="scroll"
                     selectionMode="single"
+                    paginator
+                    rows={15}
                     selection={selectedRow}
                     onSelectionChange={(e) => handleClick(e.value)}
                     header={header}

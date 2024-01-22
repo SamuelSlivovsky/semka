@@ -107,7 +107,7 @@ function Home() {
     <HomeCard
       title="Admin Panel"
       isCalendar={false}
-      path="/combobox"
+      path="/adminPanel"
       icon={comboboxIcon}
       key="2"
     ></HomeCard>,

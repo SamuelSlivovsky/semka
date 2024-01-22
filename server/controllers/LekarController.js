@@ -41,7 +41,7 @@ module.exports = {
                 vysetrenia = await lekar.getVysetreniaAdmin();
                 vysetrenia = hashMedical(vysetrenia);
             } else {
-                ysetrenia = await lekar.getVysetrenia(req.params.id);
+                vysetrenia = await lekar.getVysetrenia(req.params.id);
             }
             res.status(200).json(vysetrenia);
         })();

@@ -21,7 +21,7 @@ import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
 import {useNavigate, useLocation} from "react-router-dom";
-import Combobox from "./Views/Combobox";
+import AdminPanel from "./Views/AdminPanel";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
 import User from "./Views/User";
@@ -52,19 +52,6 @@ function App() {
                     .then((response) => response.json())
                     .then((data) => {
                         setPatientId(data[0].ID_PACIENTA);
-                    });
-            } else if (
-                userDataHelper.UserInfo.role === 2 ||
-                userDataHelper.UserInfo.role === 3
-            ) {
-                const token = localStorage.getItem("hospit-user");
-                const headers = {authorization: "Bearer " + token};
-                fetch(`/lozko/obsadeneLozka/${userDataHelper.UserInfo.userid}`, {
-                    headers,
-                })
-                    .then((response) => response.json())
-                    .then((data) => {
-                        setBeds(data.pocet);
                     });
             }
         } else if (location.pathname !== "/register") {
@@ -104,7 +91,7 @@ function App() {
         <SidebarButton
             key="13"
             visibleLeft={visibleLeft}
-            path="/combobox"
+            path="/adminPanel"
             label="Admin Panel"
             icon="database-icon"
         />, <SidebarButton
@@ -295,7 +282,7 @@ function App() {
             <>
                 <Route path="/statistics" element={<Statistics></Statistics>}></Route>
                 <Route path="/sklad" element={<Storage/>}></Route>
-                <Route path="/combobox" element={<Combobox/>}></Route>
+                <Route path="/adminPanel" element={<AdminPanel/>}></Route>
             </>
         );
     };
