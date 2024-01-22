@@ -45,6 +45,7 @@ function EventCalendar(props) {
     fetch(`${route}${props.userData.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         data.forEach((element) => {
           switch (element.type) {
             case "OPE":
@@ -55,6 +56,9 @@ function EventCalendar(props) {
               break;
             case "HOS":
               element.backgroundColor = "#8499B1";
+              break;
+            case "KONZ":
+              element.backgroundColor = "blue";
               break;
             default:
               break;

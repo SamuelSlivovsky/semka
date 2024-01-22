@@ -1,3 +1,4 @@
+const { element } = require("xml");
 const database = require("../database/Database");
 
 async function getZoznamLekarov() {
@@ -84,11 +85,11 @@ async function getUdalosti(id) {
   try {
     let udalosti = [];
 
-    /*let operacie = await getOperacie(id);
+    let operacie = await getOperacie(id);
     console.log(operacie);
     operacie.forEach((element) => {
       udalosti.push(element);
-    });*/
+    });
 
     let vysetrenia = await getVysetrenia(id);
     console.log(vysetrenia);
@@ -98,6 +99,11 @@ async function getUdalosti(id) {
 
     let hospitalizacie = await getHospitalizacie(id);
     hospitalizacie.forEach((element) => {
+      udalosti.push(element);
+    });
+
+    let konzilia = await getKonzilia(id);
+    konzilia.forEach((element) => {
       udalosti.push(element);
     });
 
@@ -158,15 +164,15 @@ async function getHospitalizacie(id) {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
       `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
-      as "start",id_zaznamu as "id", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
+      as "start",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
        from hospitalizacia
         join zdravotny_zaz using(id_zaznamu)
           join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)
                   join os_udaje on(os_udaje.rod_cislo = pacient.rod_cislo) 
                   join lozko using(id_lozka)
-                  join oddelenie using(id_oddelenia)
-                  join nemocnica on(oddelenie.id_nemocnice = nemocnica.id_nemocnice)
+                  join miestnost on (lozko.id_miestnost = miestnost.id_miestnosti)
+                  join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
                   join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
                     where zamestnanci.cislo_zam = :id`,
       [id]
@@ -217,6 +223,26 @@ async function getNemocnicaOddelenia(id) {
     return info.rows;
   } catch (err) {
     console.log(err);
+  }
+}
+
+async function getKonzilia(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `SELECT dovod, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start"  from konzilium
+            JOIN zam_konzilium using (id_konzilia)
+            where cislo_zam =:id `,
+      { id }
+    );
+
+    result.rows.forEach((element) => {
+      element.type = "KONZ";
+    });
+
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
   }
 }
 

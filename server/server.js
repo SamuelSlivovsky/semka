@@ -55,6 +55,8 @@ app.use("/chat", chatRoute);
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
   socket.on("sendMessage", (message, params) => {
+
+    
     io.emit("newMessage", {
       content: message,
       sender: params.userId,

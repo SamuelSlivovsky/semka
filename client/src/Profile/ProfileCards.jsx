@@ -39,7 +39,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: true,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: false,
   };
 
@@ -55,7 +55,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: false,
   };
 
@@ -114,7 +114,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: true,
   };
 
@@ -131,7 +131,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: true,
   };
 
@@ -147,7 +147,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: false,
   };
 

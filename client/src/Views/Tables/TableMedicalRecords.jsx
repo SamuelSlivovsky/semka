@@ -45,6 +45,7 @@ export default function TableMedic(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
+    console.log(value);
     fetch(`/zaznamy/priloha/${value.id_zaz}`, { headers })
       .then((res) => res.blob())
       .then((result) => {

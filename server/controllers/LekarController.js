@@ -60,4 +60,12 @@ module.exports = {
       res.status(200).json(info);
     })();
   },
+
+  getKonzilia: (req, res) => {
+    const konzilium = require("../models/konzilium");
+    (async () => {
+      info = await konzilium.getKonzilia(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
 };

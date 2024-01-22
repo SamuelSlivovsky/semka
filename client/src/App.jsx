@@ -26,10 +26,12 @@ import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
 import User from "./Views/User";
 import HospitalRoom from "./HospitalRoom/HospitalRoom";
+import TabMeetings from "./Views/Tables/TabMeetings";
+import socketService from "./service/socketService";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
-  const [beds, setBeds] = useState(null);
+  const [notifications, setNotifications] = useState(0);
   const navigate = useNavigate();
   const location = useLocation();
   const handleShowSidebar = () => {
@@ -40,11 +42,11 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
+
     setUserData(userDataHelper);
     if (typeof userDataHelper !== "undefined" && userDataHelper !== null) {
+      const headers = { authorization: "Bearer " + token };
       if (userDataHelper.UserInfo.role === 4) {
-        const token = localStorage.getItem("hospit-user");
-        const headers = { authorization: "Bearer " + token };
         fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, {
           headers,
         })
@@ -52,24 +54,38 @@ function App() {
           .then((data) => {
             setPatientId(data[0].ID_PACIENTA);
           });
-      } else if (
-        userDataHelper.UserInfo.role === 2 ||
-        userDataHelper.UserInfo.role === 3
-      ) {
-        const token = localStorage.getItem("hospit-user");
-        const headers = { authorization: "Bearer " + token };
-        fetch(`/lozko/obsadeneLozka/${userDataHelper.UserInfo.userid}`, {
+      } else {
+        fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
           headers,
         })
-          .then((response) => response.json())
-          .then((data) => {
-            setBeds(data.pocet);
-          });
+          .then((res) => res.json())
+          .then((data) => setNotifications(data.POCET));
       }
     } else if (location.pathname !== "/register") {
       navigate("/login");
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
+    const headers = { authorization: "Bearer " + token };
+    socketService.connect();
+    socketService.on("newMessage", (message) => {
+      fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
+        headers,
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          console.log(data);
+          setNotifications(data.POCET);
+        });
+    });
+
+    return () => {
+      socketService.disconnect();
+    };
+  }, [location.pathname]);
 
   const sidebarButtonsAdmin = [
     <SidebarButton
@@ -79,13 +95,13 @@ function App() {
       label="Domov"
       icon="home-icon"
     />,
-      <SidebarButton
-          key="3"
-          visibleLeft={visibleLeft}
-          path="/patients"
-          label="Pacienti"
-          icon="patient-icon"
-      />,
+    <SidebarButton
+      key="3"
+      visibleLeft={visibleLeft}
+      path="/patients"
+      label="Pacienti"
+      icon="patient-icon"
+    />,
 
     <SidebarButton
       key="8"
@@ -101,13 +117,6 @@ function App() {
       path="/sklad"
       label="Sklad"
       icon="storage-icon"
-    />,
-    <SidebarButton
-      key="11"
-      visibleLeft={visibleLeft}
-      path="/user"
-      label="Meno usera"
-      icon="user-icon"
     />,
     <SidebarButton
       key="13"
@@ -184,16 +193,9 @@ function App() {
       icon="stat-icon"
     />,
     <SidebarButton
-      key="11"
-      visibleLeft={visibleLeft}
-      path="/user"
-      label="Meno usera"
-      icon="user-icon"
-    />,
-    <SidebarButton
       key="12"
       visibleLeft={visibleLeft}
-      path=""
+      path="/meetings"
       label="Konzíliá"
       icon="meeting-icon"
     />,
@@ -262,6 +264,7 @@ function App() {
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
         <Route path="/add" element={<Add></Add>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
+        <Route path="/meetings" element={<TabMeetings />}></Route>
       </>
     );
   };
@@ -282,7 +285,7 @@ function App() {
     return (
       <>
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
-          <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
+        <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/combobox" element={<Combobox />}></Route>
       </>
@@ -338,13 +341,24 @@ function App() {
           ""
         )}
         {typeof userData !== "undefined" && userData !== null ? (
-          <SidebarButton
-            key="12"
-            visibleLeft={visibleLeft}
-            path="/logout"
-            label="Odhlas"
-            icon="logout-icon"
-          />
+          <>
+            {" "}
+            <SidebarButton
+              key="11"
+              visibleLeft={visibleLeft}
+              path="/user"
+              label="Správy"
+              icon="chat-icon"
+              notifications={notifications}
+            />{" "}
+            <SidebarButton
+              key="12"
+              visibleLeft={visibleLeft}
+              path="/logout"
+              label="Odhlas"
+              icon="logout-icon"
+            />
+          </>
         ) : (
           ""
         )}

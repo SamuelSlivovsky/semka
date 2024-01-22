@@ -229,7 +229,7 @@ async function getOperacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaz
+      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaz
         join operacia using(id_zaznamu) 
         join pacient using(id_pacienta)
         where rod_cislo = :rod_cislo`,
@@ -272,7 +272,7 @@ async function getVysetrenia(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam_new
+      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaznam_new
         join vysetrenie using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
       [rod_cislo]
     );
@@ -291,7 +291,7 @@ async function getHospitalizacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const hospitalizacia = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id" from zdravotny_zaznam
+      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaznam
         join hospitalizacia using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
       [rod_cislo]
     );
