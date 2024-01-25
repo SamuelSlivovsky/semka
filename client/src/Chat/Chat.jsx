@@ -23,18 +23,16 @@ const Chat = () => {
             return (
               <div
                 style={{
-                  backgroundColor: `#${Math.floor(
-                    Math.random() * 16777215
-                  ).toString(16)}`,
-                  height: "60px",
-                  width: "60px",
+                  backgroundColor: `#1ecbe1`,
+                  height: "40px",
+                  width: "40px",
                   marginTop: "10px",
-                  borderRadius: "15px",
+                  borderRadius: "10px",
                   cursor: "pointer",
                   display: "flex",
                   justifyContent: "center",
                   alignItems: "center",
-                  fontSize: "40px",
+                  fontSize: "20px",
                 }}
                 onClick={() => setGroup(item.ID_SKUPINY)}
               >
