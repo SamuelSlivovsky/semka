@@ -28,8 +28,13 @@ function generujRodneCislo(pohlavie) {
     // Spojenie všetkých častí do rodného čísla
     const rodneCislo = `${rok}${formatovanyMesiac}${formatovanyDen}/${kontrolnyKod}`;
 
+    //TODO pridat kontrolu duplicity rodnehoCisla a zistit zlozitost
     return rodneCislo;
 }
+
+//TODO Pridat choroby hash
+//Zamysliet sa nad moznostou nahradenia a zasifrovania aby nebolo mozne spojit napriklad vzacne ochorenia s osobou
+//Ale toto vedie k tomu ze musim identifikovat skrite vazby
 
 function zistiPohlavie(rodneCislo) {
     //TODO pridat podmeniku aby kontrolovalo rodne cislo cudzinca muz 2-3 zena 7-8
