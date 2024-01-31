@@ -10,6 +10,7 @@ async function getMiestnosti() {
     console.log(err);
   }
 }
+
 async function getRoomsForHospital(hospitalId) {
   try {
     let conn = await database.getConnection();
@@ -32,6 +33,40 @@ async function getRoomsForHospital(hospitalId) {
     console.log(err);
   }
 }
+
+async function getWardRoomsAvailability() {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `
+      SELECT 
+          m.id_miestnosti,
+          m.kapacita,
+          COUNT(pl.id_lozka) AS pocet_pacientov
+      FROM 
+          miestnost m
+      LEFT JOIN 
+          lozko l ON l.id_miestnost = m.id_miestnosti AND l.id_nemocnice = m.id_nemocnice
+      LEFT JOIN 
+          pacient_lozko pl ON pl.id_lozka = l.id_lozka
+      LEFT JOIN 
+          pacient p ON p.id_pacienta = pl.id_pacienta
+      LEFT JOIN 
+          os_udaje ou ON ou.rod_cislo = p.rod_cislo
+      WHERE 
+          m.kapacita > 2
+      GROUP BY 
+          m.id_miestnosti, 
+          m.kapacita
+    `
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getDostupneMiestnosti(id_oddelenia, trv, dat_od) {
   try {
     const durat = (1 / 1440) * trv;
@@ -60,4 +95,5 @@ module.exports = {
   getMiestnosti,
   getDostupneMiestnosti,
   getRoomsForHospital,
+  getWardRoomsAvailability,
 };

@@ -56,7 +56,7 @@ function App() {
         userDataHelper.UserInfo.role === 2 ||
         userDataHelper.UserInfo.role === 3
       ) {
-        const token = localStorage.getItem("hospit-user");
+        /* const token = localStorage.getItem("hospit-user");
         const headers = { authorization: "Bearer " + token };
         fetch(`/lozko/obsadeneLozka/${userDataHelper.UserInfo.userid}`, {
           headers,
@@ -64,7 +64,7 @@ function App() {
           .then((response) => response.json())
           .then((data) => {
             setBeds(data.pocet);
-          });
+          }); */
       }
     } else if (location.pathname !== "/register") {
       navigate("/login");

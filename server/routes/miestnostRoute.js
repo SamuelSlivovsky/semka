@@ -4,9 +4,14 @@ const controller = require('../controllers/MiestnostController');
 const verify = require('../middleware/verifyUser');
 
 router.get(
-  '/:hospitalId',
+  '/hospital/:hospitalId',
   verify.verifyRoles(0, 2, 3),
   controller.getRoomsByHospital
+);
+router.get(
+  '/bedAvailability',
+  verify.verifyRoles(0, 2, 3),
+  controller.getWardRoomsAvailability
 );
 
 module.exports = router;

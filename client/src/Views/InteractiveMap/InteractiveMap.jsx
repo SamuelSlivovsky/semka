@@ -5,9 +5,15 @@ import { DataTable } from 'primereact/datatable';
 import { Dropdown } from 'primereact/dropdown';
 import React, { useEffect, useState } from 'react';
 import * as ReactDOMServer from 'react-dom/server';
-import { GeoJSON, MapContainer, TileLayer } from 'react-leaflet';
+import { GeoJSON, MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 
 export default function InteractiveMap() {
+  const REFRESH_INTERVAL = 300_000;
+  const BedInfo = {
+    MENO: 'meno',
+    POBYT_OD: 'pobyt_od',
+    POBYT_DO: 'pobyt_do',
+  };
   const [selectedFloor, setSelectedFloor] = useState(1);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -20,17 +26,11 @@ export default function InteractiveMap() {
   const [nurses, setNurses] = useState([]);
   const [hospitalizedPatients, setHospitalizedPatients] = useState([]);
   const [hospitalMap, setHospitalMap] = useState('');
-  const [beds, setBeds] = useState([]);
+  const [bedAvailability, setBedAvailability] = useState([]);
   const [equipment, setEquipment] = useState([]);
 
   useEffect(() => {
-    const token = localStorage.getItem('hospit-user');
-    const headers = { authorization: 'Bearer ' + token };
-    fetch(`/nemocnica/mapa/40`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setHospitalMap(JSON.parse(data.MAPA));
-      });
+    setEquipment([{ equipment: 'Teplomer', quantity: 3 }]);
   }, []);
 
   useEffect(() => {
@@ -46,7 +46,7 @@ export default function InteractiveMap() {
   useEffect(() => {
     const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
-    fetch(`/miestnost/40`, { headers })
+    fetch(`/miestnost/hospital/40`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setRooms(data);
@@ -84,27 +84,47 @@ export default function InteractiveMap() {
   }, []);
 
   useEffect(() => {
-    changeRoomColors();
-  }, [hospitalMap]);
+    async function refreshMap() {
+      await getWardRoomAvailability();
+      await getHospitalMapData();
+      const interval = setInterval(async () => {
+        await getWardRoomAvailability();
+        await getHospitalMapData();
+      }, REFRESH_INTERVAL);
 
-  const onMouseOver = (event) => {
-    event.target.bringToFront();
-    event.target.setStyle({
-      color: 'black',
-      weight: 3,
-    });
+      return () => clearInterval(interval);
+    }
+
+    refreshMap();
+  }, []);
+
+  const getHospitalMapData = async () => {
+    try {
+      const token = localStorage.getItem('hospit-user');
+      const headers = { authorization: 'Bearer ' + token };
+      let response = await fetch(`/nemocnica/mapa/40`, { headers });
+      response = await response.json();
+      setHospitalMap(JSON.parse(response.MAPA));
+    } catch (error) {
+      console.error('Error fetching hospital map data:', error);
+      throw error;
+    }
   };
 
-  //reseting the mouseover style, should use resetStyle() but it always error, so i did it
-  const onMouseOut = (event) => {
-    event.target.bringToBack();
-    event.target.setStyle({
-      color: 'white',
-      weight: 2,
-    });
+  const getWardRoomAvailability = async () => {
+    try {
+      const token = localStorage.getItem('hospit-user');
+      const headers = { authorization: 'Bearer ' + token };
+      let response = await fetch(`/miestnost/bedAvailability`, { headers });
+      response = await response.json();
+      setBedAvailability(response);
+    } catch (error) {
+      console.error('Error fetching bed data:', error);
+      throw error;
+    }
   };
 
-  const onEachFeature = (feature, layer) => {
+  const onEachFeature = async (feature, layer) => {
     const roomNumber =
       feature.properties.room_number[
         getSelectedFloorFeature(feature.properties.level)
@@ -133,12 +153,36 @@ export default function InteractiveMap() {
 
     layer.bindPopup(
       ReactDOMServer.renderToString(
-        roomPopup(roomNumber, isWardRoom, departmentName, doctor, nurse)
+        roomPopup(roomNumber, isWardRoom, departmentName, doctor, nurse, [])
       )
     );
+
+    layer.on('click', async () => {
+      const popup = layer.getPopup();
+
+      try {
+        const roomPopupWithBedData = await changeBeds(
+          roomNumber,
+          isWardRoom,
+          departmentName,
+          doctor,
+          nurse
+        );
+        popup.setContent(ReactDOMServer.renderToString(roomPopupWithBedData));
+      } catch (error) {
+        console.error('Error updating beds:', error);
+      }
+    });
   };
 
-  const roomPopup = (roomNumber, isWardRoom, departmentName, doctor, nurse) => {
+  const roomPopup = (
+    roomNumber,
+    isWardRoom,
+    departmentName,
+    doctor,
+    nurse,
+    bedData
+  ) => {
     return (
       <div className='room-popup-container'>
         <div className='room-popup-section-container room-popup-section-room-number'>
@@ -160,11 +204,23 @@ export default function InteractiveMap() {
         {isWardRoom ? (
           <div className='room-popup-section-container room-popup-section-beds'>
             <span>Lôžka</span>
-            <DataTable value={beds} size='small'>
-              <Column field='bedNumber' header='Lôžko'></Column>
-              <Column field='patient' header='Pacient'></Column>
-              <Column field='from' header='Pobyt od'></Column>
-              <Column field='to' header='Pobyt do'></Column>
+            <DataTable value={bedData} size='small'>
+              <Column field='ID_LOZKA' header='Lôžko'></Column>
+              <Column
+                field='MENO'
+                header='Pacient'
+                body={(rowData) => renderBedData(rowData, BedInfo.MENO)}
+              ></Column>
+              <Column
+                field='POBYT_OD'
+                header='Pobyt od'
+                body={(rowData) => renderBedData(rowData, BedInfo.POBYT_OD)}
+              ></Column>
+              <Column
+                field='POBYT_DO'
+                header='Pobyt do'
+                body={(rowData) => renderBedData(rowData, BedInfo.POBYT_DO)}
+              ></Column>
               <Column field='button'></Column>
             </DataTable>
           </div>
@@ -180,32 +236,85 @@ export default function InteractiveMap() {
     );
   };
 
+  const changeBeds = async (
+    roomNumber,
+    isWardRoom,
+    departmentName,
+    doctor,
+    nurse
+  ) => {
+    try {
+      const token = localStorage.getItem('hospit-user');
+      const headers = { authorization: 'Bearer ' + token };
+      let response = await fetch(`/lozko/room/${roomNumber}`, { headers });
+      response = await response.json();
+      return roomPopup(
+        roomNumber,
+        isWardRoom,
+        departmentName,
+        doctor,
+        nurse,
+        response
+      );
+    } catch (error) {
+      console.error('Error fetching bed data:', error);
+      throw error;
+    }
+  };
+
   const changeRoomColors = (feature) => {
     for (const room of rooms) {
-      const availability = Math.round(Math.random() * (3 - 1) + 1);
+      let availability = 0;
+      let bed = undefined;
+
+      if (room.KAPACITA > 1) {
+        bed = bedAvailability.find(
+          (bed) => bed.ID_MIESTNOSTI === room.ID_MIESTNOSTI
+        );
+
+        availability = bed?.POCET_PACIENTOV / bed?.KAPACITA;
+      } else {
+        availability = Math.round(Math.random());
+      }
 
       if (
         feature?.properties.room_number[
           getSelectedFloorFeature(feature?.properties.level)
         ] === room.ID_MIESTNOSTI
       ) {
-        return determineRoomColor(availability);
+        return determineRoomColor(availability, bed ? bed.KAPACITA : undefined);
       }
     }
 
     return { fillColor: '#3388ff' };
   };
 
-  const determineRoomColor = (availability) => {
-    switch (availability) {
-      case 1:
-        return { fillColor: '#FFFF00' };
-      case 2:
-        return { fillColor: '#FFA500' };
-      case 3:
+  const determineRoomColor = (availability, maxCapacity) => {
+    if (maxCapacity === undefined) {
+      maxCapacity = 1;
+    }
+
+    if (maxCapacity === 1) {
+      if (availability === 0) {
+        return { fillColor: '#50C878' };
+      } else {
         return { fillColor: '#FF0000' };
-      default:
-        return { fillColor: '#3388ff' };
+      }
+    }
+
+    const min = 1 / maxCapacity;
+    const mid = 1 / (maxCapacity / 2);
+
+    if (availability === 0) {
+      return { fillColor: '#50C878' };
+    } else if (availability <= min) {
+      return { fillColor: '#FFFF00' };
+    } else if (availability > min && availability <= mid) {
+      return { fillColor: '#FFA500' };
+    } else if (availability > mid) {
+      return { fillColor: '#FF0000' };
+    } else {
+      return { fillColor: '#3388ff' };
     }
   };
 
@@ -305,7 +414,9 @@ export default function InteractiveMap() {
           center={[49.05198629377708, 20.303411113943554]}
           zoom={100}
           style={{ height: '100vh', width: '100%' }}
+          zoomControl={false}
         >
+          <ZoomControl position='topright' />
           <div className='change-floors-container'>
             <Button onClick={() => handleFloorChange(1)}>Poschodie 1</Button>
             <Button onClick={() => handleFloorChange(2)}>Poschodie 2</Button>
@@ -429,6 +540,25 @@ export default function InteractiveMap() {
 
   const handleHospitalizedPatientChange = (hospitalizedPatient) => {
     setSelectedHospitalizedPatient(hospitalizedPatient);
+  };
+
+  const renderBedData = (rowData, bedInfo) => {
+    switch (bedInfo) {
+      case BedInfo.MENO:
+        return rowData?.MENO !== null ? rowData.MENO : '-';
+      case BedInfo.POBYT_OD:
+        return rowData?.POBYT_OD !== null ? formatDate(rowData.POBYT_OD) : '-';
+      case BedInfo.POBYT_DO:
+        return rowData?.POBYT_DO !== null ? formatDate(rowData.POBYT_DO) : '-';
+      default:
+        return;
+    }
+  };
+
+  const formatDate = (date) => {
+    if (!date) return;
+    const options = { year: 'numeric', month: 'numeric', day: 'numeric' };
+    return new Date(date).toLocaleDateString('sk-SK', options);
   };
 
   return <div>{renderMap()}</div>;

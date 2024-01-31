@@ -8,5 +8,10 @@ router.get(
   verify.verifyRoles(0, 2,3),
   controller.getNeobsadeneLozka
 );
+router.get(
+  '/room/:roomId',
+  verify.verifyRoles(0, 2, 3),
+  controller.getBedsForRoom
+);
 
 module.exports = router;
