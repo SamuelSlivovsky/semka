@@ -136,6 +136,23 @@ function Home() {
     ></HomeCard>,
   ];
 
+  const pharmacyManagerCards = [
+    <HomeCard
+      title="Kalendár"
+      isCalendar={true}
+      path="/calendar"
+      icon={calendarIcon}
+      key="1"
+    ></HomeCard>,
+    <HomeCard
+      title="Karta pacienta"
+      isCalendar={false}
+      path="/patient"
+      icon={patientIcon}
+      key="2"
+    ></HomeCard>,
+  ];
+
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
       if (userData.UserInfo.role === 0) return adminCards;
@@ -147,6 +164,7 @@ function Home() {
           </>
         );
       else if (userData.UserInfo.role === 4) return patientCards;
+      else if (userData.UserInfo.role === 10) return pharmacyManagerCards;
     }
   };
 

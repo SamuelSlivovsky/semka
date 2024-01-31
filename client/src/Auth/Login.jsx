@@ -150,7 +150,7 @@ export const Login = () => {
             </div>
             <Button
               type="submit"
-              label="Zadaj"
+              label="Prihlásiť sa"
               className="mt-2"
               style={{ marginTop: "10px" }}
             />
