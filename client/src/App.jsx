@@ -17,6 +17,7 @@ import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
+import PharmacyStorage from "./Views/PharmacyStorage";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
@@ -194,7 +195,7 @@ function App() {
       visibleLeft={visibleLeft}
       path=""
       label={visibleLeft ? `Pocet neobsadenych lozok: ${beds}` : beds}
-      icon=""
+      icon="pharmacy-storage-icon"
     />,
   ];
 
@@ -230,6 +231,37 @@ function App() {
       label="Pacient"
       icon="patient-icon"
     />,
+  ];
+
+  const sidebarButtonsPharmacyManager = [
+    <SidebarButton
+      key="1"
+      visibleLeft={visibleLeft}
+      path="/"
+      label="Domov"
+      icon="home-icon"
+    />,
+    <SidebarButton
+      key="3"
+      visibleLeft={visibleLeft}
+      path="/patients"
+      label="Pacienti"
+      icon="patient-icon"
+  />,
+    <SidebarButton
+    key="10"
+    visibleLeft={visibleLeft}
+    path="/sklad"
+    label="Sklad"
+    icon="storage-icon"
+  />,  
+    <SidebarButton
+      key="14"
+      visibleLeft={visibleLeft}
+      path="/lekarensky_sklad"
+      label="Lekárenský sklad"
+      icon=""
+  />,  
   ];
 
   const renderDoctorRoutes = () => {
@@ -305,6 +337,14 @@ function App() {
     );
   };
 
+  const renderPharmacyManagerRoutes = () => {
+    return (
+      <>
+          <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
+      </>
+    );
+  };
+
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
@@ -333,6 +373,8 @@ function App() {
           </>
         ) : userData !== null && userData.UserInfo.role === 4 ? (
           sidebarButtonsPatient
+        ) : userData !== null && userData.UserInfo.role === 10 ? (
+          sidebarButtonsPharmacyManager  
         ) : (
           ""
         )}
@@ -375,6 +417,9 @@ function App() {
             userData !== null &&
             userData.UserInfo.role === 4 ? (
             renderPatientRoutes()
+          ) : typeof userData !== "undefined" &&
+              userData.UserInfo.role === 10 ? (
+              renderPharmacyManagerRoutes     
           ) : (
             ""
           )}

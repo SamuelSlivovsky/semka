@@ -9,6 +9,7 @@ import plusIcon from "../images/plus.png";
 import statIcon from "../images/statistics.png";
 import HomeCard from "./HomeCard";
 import storageIcon from "../images/drugs.png";
+import pharmacyStorageIcon from "../images/pharmacy_storage_black.png"
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import "../styles/homepage.css";
@@ -138,19 +139,26 @@ function Home() {
 
   const pharmacyManagerCards = [
     <HomeCard
-      title="Kalendár"
-      isCalendar={true}
-      path="/calendar"
-      icon={calendarIcon}
-      key="1"
-    ></HomeCard>,
-    <HomeCard
-      title="Karta pacienta"
+      title="Pacienti"
       isCalendar={false}
-      path="/patient"
+      path="/patients"
       icon={patientIcon}
       key="2"
     ></HomeCard>,
+    <HomeCard
+    title="Sklad"
+    isCalendar={false}
+    path="/sklad"
+    icon={storageIcon}
+    key="9"
+  ></HomeCard>,
+  <HomeCard
+    title="Lekárenský sklad"
+    isCalendar={false}
+    path="/lekarensky_sklad"
+    icon={pharmacyStorageIcon}
+    key="14"
+  ></HomeCard>,      
   ];
 
   const renderHomeCards = () => {
