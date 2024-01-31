@@ -270,7 +270,7 @@ function App() {
       visibleLeft={visibleLeft}
       path="/lekarensky_sklad"
       label="Lekárenský sklad"
-      icon=""
+      icon="pharmacy-storage-icon"
   />,  
   ];
 
@@ -422,27 +422,18 @@ function App() {
           <Route path="/logout" element={<Logout></Logout>}></Route>
           <Route path="/user" element={<User></User>}></Route>
           <Route path="/room" element={<HospitalRoom />}></Route>
-          {typeof userData !== "undefined" &&
-          userData !== null &&
-          userData.UserInfo.role === 0 ? (
+          {userData && userData.UserInfo.role === 0 ? (
             renderAdminRoutes()
-          ) : typeof userData !== "undefined" &&
-            userData !== null &&
-            userData.UserInfo.role === 2 ? (
+          ) : userData && userData.UserInfo.role === 2 ? (
             renderDoctorRoutes()
-          ) : typeof userData !== "undefined" &&
-            userData !== null &&
-            userData.UserInfo.role === 3 ? (
+          ) : userData && userData.UserInfo.role === 3 ? (
             <>
               {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
-          ) : typeof userData !== "undefined" &&
-            userData !== null &&
-            userData.UserInfo.role === 4 ? (
+          ) : userData && userData.UserInfo.role === 4 ? (
             renderPatientRoutes()
-          ) : typeof userData !== "undefined" &&
-              userData.UserInfo.role === 10 ? (
-              renderPharmacyManagerRoutes     
+          ) : userData && userData.UserInfo.role === 10 ? (
+            renderPharmacyManagerRoutes
           ) : (
             ""
           )}
