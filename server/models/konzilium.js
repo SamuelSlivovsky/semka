@@ -1,10 +1,13 @@
 const database = require("../database/Database");
 
-async function getTypyOckovania() {
+async function getKonzilia(cislo_zam) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT distinct typ, nazov, id_vakciny FROM vakcina`
+      `SELECT * from konzilium
+            JOIN zam_konzilium using (id_konzilia)
+            where cislo_zam =:cislo_zam `,
+      { cislo_zam }
     );
 
     return result.rows;
@@ -14,5 +17,5 @@ async function getTypyOckovania() {
 }
 
 module.exports = {
-  getTypyOckovania,
+  getKonzilia,
 };

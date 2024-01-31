@@ -30,17 +30,17 @@ async function getMenovciPacientLekar() {
   }
 }
 
-async function getPomerMuziZeny(id_oddelenia) {
+async function getPomerMuziZeny(cislo_zam) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `select trunc(zeny, 2) as zeny, trunc(100-zeny, 2) as muzi from
           (select count(case when (substr(os.rod_cislo, 3, 1)) in ('5','6') then 1 else null end)/count(*)*100 as zeny
               from os_udaje os join pacient p on(p.rod_cislo = os.rod_cislo)
-              join nemocnica using(id_nemocnice)
-              join oddelenie using (id_nemocnice)
-              where id_oddelenia = :id_oddelenia)`,
-      [id_oddelenia]
+              JOIN nemocnica using (id_nemocnice)
+              JOIN zamestnanci using (id_nemocnice)
+              WHERE cislo_zam = :cislo_zam)`,
+      [cislo_zam]
     );
     return result.rows;
   } catch (err) {

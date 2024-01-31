@@ -1,13 +1,33 @@
 const database = require("../database/Database");
 const oracledb = database.oracledb;
 
-async function getChoroby(pid_typu_choroby) {
+async function getChoroby(typ) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `SELECT * FROM choroba
-          where id_typu_choroby = :pid_typu_choroby`,
-      { pid_typu_choroby }
+          where typ = :typ`,
+      { typ }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function updateChoroba(body) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `UPDATE zoznam_ochoreni SET DAT_DO = to_date(to_char(to_timestamp(:datum_do,'DD/MM/YYYY HH24:MI:SS'),
+      'DD/MM/YYYY HH24:MI:SS')) WHERE DAT_OD = :datum_od AND id_karty = (select id_karty from zdravotna_karta where id_pacienta = :id_pacienta)`,
+      {
+        datum_do: body.datum_do,
+        datum_od: body.datum_od,
+        id_pacienta: body.id_pacienta,
+      },
+      { autoCommit: true }
     );
 
     return result.rows;
@@ -20,12 +40,13 @@ async function insertChoroba(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        typZtp_insert(:rod_cislo , :id_choroby, :datum_od, :datum_do);
+        choroba_insert(:rod_cislo , :typ, :nazov, :datum_od, :datum_do);
         END;`;
 
     let result = await conn.execute(sqlStatement, {
       rod_cislo: body.rod_cislo,
-      id_typu_ztp: body.id_typu_ztp,
+      typ: body.typ,
+      nazov: body.nazov,
       datum_od: body.datum_od,
       datum_do: body.datum_do,
     });
@@ -65,4 +86,5 @@ module.exports = {
   getChoroby,
   insertChoroba,
   getNajcastejsieChorobyRokaPocet,
+  updateChoroba,
 };

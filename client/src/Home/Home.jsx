@@ -12,6 +12,7 @@ import storageIcon from "../images/drugs.png";
 import pharmacyStorageIcon from "../images/pharmacy_storage_black.png"
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
+import meetingIcon from "../images/meeting.png";
 import "../styles/homepage.css";
 
 function Home() {
@@ -76,6 +77,13 @@ function Home() {
       path="/sklad"
       icon={storageIcon}
       key="9"
+    ></HomeCard>,
+    <HomeCard
+      title="Konzíliá"
+      isCalendar={false}
+      path="/meetings"
+      icon={meetingIcon}
+      key="10"
     ></HomeCard>,
   ];
 

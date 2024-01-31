@@ -16,16 +16,13 @@ async function insertOckovanie(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        ockovanie_insert(:rod_cislo , :priloha, :popis , :datum,  :id_typu_ockovania, :id_nemocnice);
+        ockovanie_insert(:rod_cislo , :id_vakciny,:datum);
         END;`;
 
     let result = await conn.execute(sqlStatement, {
       rod_cislo: body.rod_cislo,
-      priloha: body.priloha,
-      popis: body.popis,
       datum: body.datum,
-      id_typu_ockovania: body.id_typu_ockovania,
-      id_nemocnice: body.id_nemocnice,
+      id_vakciny: body.id_vakciny,
     });
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {

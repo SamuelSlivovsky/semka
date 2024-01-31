@@ -21,6 +21,8 @@ const medRecordsRoute = require("./routes/medRecordsRoute");
 const addRoute = require("./routes/addRoute");
 const lozkoRoute = require("./routes/lozkoRoute");
 const equipmentRoute = require("./routes/equipmentRoute");
+const updateRoute = require("./routes/updateRoute");
+const chatRoute = require("./routes/chatRoute");
 
 const server = http.createServer(app); // Create an HTTP server using your Express app
 const io = socketIo(server); // Initialize Socket.io with the HTTP server
@@ -47,19 +49,35 @@ app.use("/zaznamy", medRecordsRoute);
 app.use("/add", addRoute);
 app.use("/lozko", lozkoRoute);
 app.use("/vybavenie", equipmentRoute);
+app.use("/update", updateRoute);
+app.use("/chat", chatRoute);
 
 io.on("connection", (socket) => {
-  console.log(`User connected with socket id: ${socket.id}`);
+  socket.emit("yourSocketId", socket.id);
+  socket.on("sendMessage", (message, params) => {
 
-  socket.on("sendMessage", (message, groupName) => {
-    // Broadcast the message to all connected clients
-    console.log(message);
-    console.log(groupName);
-    io.emit("newMessage", message);
+    
+    io.emit("newMessage", {
+      content: message,
+      sender: params.userId,
+      type: "text",
+    });
   });
 
-  socket.on("disconnect", () => {
-    console.log(`User disconnected with socket id: ${socket.id}`);
+  socket.on("sendImage", (image, params) => {
+    io.emit("newMessage", {
+      content: image,
+      sender: params.userId,
+      type: "image",
+    });
+  });
+
+  socket.on("disconnect", () => {});
+  socket.on("typing", (params) => {
+    io.emit("isTyping", {
+      id: params.userId,
+      isEmpty: params.isEmpty,
+    });
   });
 });
 

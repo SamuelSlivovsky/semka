@@ -1,6 +1,6 @@
 module.exports = {
   getPacientInfo: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.getInfo(req.params.id);
       res.status(200).json(ret_val);
@@ -8,7 +8,7 @@ module.exports = {
   },
 
   getRecepty: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.getRecepty(req.params.id);
       res.status(200).json(ret_val);
@@ -16,7 +16,7 @@ module.exports = {
   },
 
   getZdravZaznamy: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.getZdravZaznamy(req.params.id);
       res.status(200).json(ret_val);
@@ -24,7 +24,7 @@ module.exports = {
   },
 
   getChoroby: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.getChoroby(req.params.id);
       res.status(200).json(ret_val);
@@ -32,7 +32,7 @@ module.exports = {
   },
 
   getTypyZTP: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.getTypyZTP(req.params.id);
       res.status(200).json(ret_val);
@@ -40,7 +40,7 @@ module.exports = {
   },
 
   getDoctorsOfPatient: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.getDoctorsOfPatient(req.params.id);
       res.status(200).json(ret_val);
@@ -51,9 +51,20 @@ module.exports = {
   },
 
   getIdPacienta: (req, res) => {
-    const pacient = require('../models/pacient');
+    const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.getIdPacienta(req.params.id);
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+
+  getOckovania: (req, res) => {
+    const pacient = require("../models/pacient");
+    (async () => {
+      ret_val = await pacient.getOckovania(req.params.id);
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);
