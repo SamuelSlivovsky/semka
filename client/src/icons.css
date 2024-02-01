@@ -179,3 +179,19 @@
   height: 15px;
   width: 15px;
 }
+
+.pharmacy-storage-icon {
+  content: url('./images/pharmacy_storage_black.png');
+  height: 44px;
+  width: 44px;
+}
+.pharmacy-manager-icon {
+  content: url('./images/pharmacist_manager_black.png');
+  height: 44px;
+  width: 44px;
+}
+.pharmacist-icon {
+  content: url('./images/pharmacist_black.png');
+  height: 44px;
+  width: 44px;
+}

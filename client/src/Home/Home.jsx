@@ -217,6 +217,7 @@ function Home() {
           </>
         );
       else if (userData.UserInfo.role === 9999) return patientCards;
+      else if (userData.UserInfo.role === 10) return pharmacyManagerCards;
     }
   };
 
