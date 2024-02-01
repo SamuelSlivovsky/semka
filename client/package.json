@@ -24,6 +24,7 @@
     "react-dom": "^18.2.0",
     "react-final-form": "^6.5.9",
     "react-hook-form": "^7.39.3",
+    "react-native-public-ip": "^1.0.2",
     "react-router": "^6.4.3",
     "react-router-dom": "^6.4.3",
     "react-scripts": "^5.0.1",

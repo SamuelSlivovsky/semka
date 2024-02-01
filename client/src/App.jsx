@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect} from "react";
 import EventCalendar from "./Calendar/Calendar";
 import Home from "./Home/Home";
-import { Button } from "primereact/button";
-import { Routes, Route } from "react-router-dom";
+import {Button} from "primereact/button";
+import {Routes, Route} from "react-router-dom";
 import TabPatients from "./Views/Tables/TabPatients";
 import Patient from "./Views/Patient";
-import { Register } from "./Auth/Register";
-import { Login } from "./Auth/Login";
+import {Register} from "./Auth/Register";
+import {Login} from "./Auth/Login";
 import Statistics from "./Views/Statistics";
 import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
@@ -20,8 +20,8 @@ import Storage from "./Views/Storage";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
-import { useNavigate, useLocation } from "react-router-dom";
-import Combobox from "./Views/Combobox";
+import {useNavigate, useLocation} from "react-router-dom";
+import AdminPanel from "./Views/AdminPanel";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
 import User from "./Views/User";
@@ -46,7 +46,7 @@ function App() {
     setUserData(userDataHelper);
     if (typeof userDataHelper !== "undefined" && userDataHelper !== null) {
       const headers = { authorization: "Bearer " + token };
-      if (userDataHelper.UserInfo.role === 4) {
+      if (userDataHelper.UserInfo.role === 9999) {
         fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, {
           headers,
         })
@@ -87,68 +87,86 @@ function App() {
     };
   }, [location.pathname]);
 
-  const sidebarButtonsAdmin = [
-    <SidebarButton
-      key="1"
-      visibleLeft={visibleLeft}
-      path="/"
-      label="Domov"
-      icon="home-icon"
-    />,
-    <SidebarButton
-      key="3"
-      visibleLeft={visibleLeft}
-      path="/patients"
-      label="Pacienti"
-      icon="patient-icon"
-    />,
+    const sidebarButtonsAdmin = [
+        <SidebarButton
+            key="1"
+            visibleLeft={visibleLeft}
+            path="/"
+            label="Domov"
+            icon="home-icon"
+        />,
+        <SidebarButton
+            key="3"
+            visibleLeft={visibleLeft}
+            path="/patients"
+            label="Pacienti"
+            icon="patient-icon"
+        />,
+        <SidebarButton
+            key="8"
+            visibleLeft={visibleLeft}
+            path="/statistics"
+            label="Štatistiky"
+            icon="stat-icon"
+        />,
+        <SidebarButton
+            key="10"
+            visibleLeft={visibleLeft}
+            path="/sklad"
+            label="Sklad"
+            icon="storage-icon"
+        />,
+        <SidebarButton
+            key="13"
+            visibleLeft={visibleLeft}
+            path="/adminPanel"
+            label="Admin Panel"
+            icon="database-icon"
+        />, <SidebarButton
+            key="5"
+            visibleLeft={visibleLeft}
+            path="/examinations"
+            label="Vyšetrenia"
+            icon="examination-icon"
+        />,
+        <SidebarButton
+            key="6"
+            visibleLeft={visibleLeft}
+            path="/hospitalizations"
+            icon="hospit-icon"
+            label="Hospitalizácie"
+        />,
+        <SidebarButton
+            key="7"
+            visibleLeft={visibleLeft}
+            path="/operations"
+            label="Operácie"
+            icon="operation-icon"
+        />,
+    ];
 
-    <SidebarButton
-      key="8"
-      visibleLeft={visibleLeft}
-      path="/statistics"
-      label="Štatistiky"
-      icon="stat-icon"
-    />,
-
-    <SidebarButton
-      key="10"
-      visibleLeft={visibleLeft}
-      path="/sklad"
-      label="Sklad"
-      icon="storage-icon"
-    />,
-    <SidebarButton
-      key="13"
-      visibleLeft={visibleLeft}
-      path="/combobox"
-      label="Admin selecty"
-      icon="database-icon"
-    />,
-  ];
-
-  const sidebarButtonsDoctor = [
-    <SidebarButton
-      key="1"
-      visibleLeft={visibleLeft}
-      path="/"
-      label="Domov"
-      icon="home-icon"
-    />,
-    <SidebarButton
-      key="2"
-      visibleLeft={visibleLeft}
-      path="/calendar"
-      label="Kalendár"
-      icon="calendar-icon"
-    />,
-    <SidebarButton
-      key="3"
-      visibleLeft={visibleLeft}
-      path="/patients"
-      label="Pacienti"
-      icon="patient-icon"
-    />,
+    const sidebarButtonsDoctor = [
+        <SidebarButton
+            key="1"
+            visibleLeft={visibleLeft}
+            path="/"
+            label="Domov"
+            icon="home-icon"
+        />,
+        <SidebarButton
+            key="2"
+            visibleLeft={visibleLeft}
+            path="/calendar"
+            label="Kalendár"
+            icon="calendar-icon"
+        />,
+        <SidebarButton
+            key="3"
+            visibleLeft={visibleLeft}
+            path="/patients"
+            label="Pacienti"
+            icon="patient-icon"
+        />,
 
     <SidebarButton
       key="5"
@@ -201,39 +219,39 @@ function App() {
     />,
   ];
 
-  const sidebarButtonsChief = [
-    <SidebarButton
-      key="4"
-      visibleLeft={visibleLeft}
-      path="/doctors"
-      label="Lekári"
-      icon="doctor-icon"
-    />,
-  ];
+    const sidebarButtonsChief = [
+        <SidebarButton
+            key="4"
+            visibleLeft={visibleLeft}
+            path="/doctors"
+            label="Lekári"
+            icon="doctor-icon"
+        />,
+    ];
 
-  const sidebarButtonsPatient = [
-    <SidebarButton
-      key="1"
-      visibleLeft={visibleLeft}
-      path="/"
-      label="Domov"
-      icon="home-icon"
-    />,
-    <SidebarButton
-      key="2"
-      visibleLeft={visibleLeft}
-      path="/calendar"
-      label="Kalendár"
-      icon="calendar-icon"
-    />,
-    <SidebarButton
-      key="3"
-      visibleLeft={visibleLeft}
-      path="/patient"
-      label="Pacient"
-      icon="patient-icon"
-    />,
-  ];
+    const sidebarButtonsPatient = [
+        <SidebarButton
+            key="1"
+            visibleLeft={visibleLeft}
+            path="/"
+            label="Domov"
+            icon="home-icon"
+        />,
+        <SidebarButton
+            key="2"
+            visibleLeft={visibleLeft}
+            path="/calendar"
+            label="Kalendár"
+            icon="calendar-icon"
+        />,
+        <SidebarButton
+            key="3"
+            visibleLeft={visibleLeft}
+            path="/patient"
+            label="Pacient"
+            icon="patient-icon"
+        />,
+    ];
 
   const renderDoctorRoutes = () => {
     return (
@@ -287,27 +305,27 @@ function App() {
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
         <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
-        <Route path="/combobox" element={<Combobox />}></Route>
+          <Route path="/adminPanel" element={<AdminPanel/>}></Route>
       </>
     );
   };
 
-  const renderPatientRoutes = () => {
-    return (
-      <>
-        <Route
-          path="/calendar"
-          element={<EventCalendar userData={userData}></EventCalendar>}
-        ></Route>
-        <Route
-          path="/patient"
-          element={
-            <Patient userData={userData} patientId={patientId}></Patient>
-          }
-        ></Route>
-      </>
-    );
-  };
+    const renderPatientRoutes = () => {
+        return (
+            <>
+                <Route
+                    path="/calendar"
+                    element={<EventCalendar userData={userData}></EventCalendar>}
+                ></Route>
+                <Route
+                    path="/patient"
+                    element={
+                        <Patient userData={userData} patientId={patientId}></Patient>
+                    }
+                ></Route>
+            </>
+        );
+    };
 
   return (
     <div>
@@ -376,7 +394,9 @@ function App() {
           {typeof userData !== "undefined" &&
           userData !== null &&
           userData.UserInfo.role === 0 ? (
-            renderAdminRoutes()
+              <>
+                  {renderChiefRoutes()} {renderDoctorRoutes()} {renderAdminRoutes()}
+              </>
           ) : typeof userData !== "undefined" &&
             userData !== null &&
             userData.UserInfo.role === 2 ? (

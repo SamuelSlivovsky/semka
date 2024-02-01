@@ -105,9 +105,9 @@ function Home() {
       key="7"
     ></HomeCard>,
     <HomeCard
-      title="Databáza"
+      title="Admin Panel"
       isCalendar={false}
-      path="/combobox"
+      path="/adminPanel"
       icon={comboboxIcon}
       key="2"
     ></HomeCard>,
@@ -124,6 +124,27 @@ function Home() {
         path="/patients"
         icon={patientIcon}
         key="2"
+    ></HomeCard>,
+    <HomeCard
+        title="Vyšetrenia"
+        isCalendar={false}
+        path="/examinations"
+        icon={examinationIcon}
+        key="4"
+    ></HomeCard>,
+    <HomeCard
+        title="Hospitalizácie"
+        isCalendar={false}
+        path="/hospitalizations"
+        icon={hospitalizationIcon}
+        key="5"
+    ></HomeCard>,
+    <HomeCard
+        title="Operácie"
+        isCalendar={false}
+        path="/operations"
+        icon={operationIcon}
+        key="6"
     ></HomeCard>,
   ];
 
@@ -154,7 +175,7 @@ function Home() {
             {doctorCards} {chiefCards}
           </>
         );
-      else if (userData.UserInfo.role === 4) return patientCards;
+      else if (userData.UserInfo.role === 9999) return patientCards;
     }
   };
 

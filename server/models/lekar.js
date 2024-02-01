@@ -134,6 +134,27 @@ async function getOperacie(id) {
     console.log(err);
   }
 }
+//TODO pridat parameter z filtra podla id
+async function getOperacieAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const operacie = await conn.execute(
+        `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start",id_operacie as "id" ,id_zaznamu as "id_zaz", to_char(datum,'DD.MM.YYYY') datum from zdravotny_zaz
+                join operacia using(id_zaznamu)
+                  join zdravotna_karta using(id_karty)
+                    join pacient using(id_pacienta)
+                        join os_udaje using(rod_cislo)`
+    );
+
+    operacie.rows.forEach((element) => {
+      element.type = "OPE";
+    });
+
+    return operacie.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 async function getVysetrenia(id) {
   try {
@@ -159,6 +180,29 @@ async function getVysetrenia(id) {
   }
 }
 
+async function getVysetreniaAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const vysetrenia = await conn.execute(
+        `select rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(zdravotny_zaz.datum, 'HH24:MI:SS') as "start", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') datum,
+      id_zaznamu as "id_zaz" from vysetrenie
+        join zdravotny_zaz using(id_zaznamu)
+            join zdravotna_karta using(id_karty)
+                 join pacient using(id_pacienta)
+                  join os_udaje using(rod_cislo)`
+    );
+
+    vysetrenia.rows.forEach((element) => {
+      element.type = "VYS";
+    });
+
+    return vysetrenia.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+
 async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
@@ -175,7 +219,37 @@ async function getHospitalizacie(id) {
                   join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
                   join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
                     where zamestnanci.cislo_zam = :id`,
-      [id]
+        [id]
+    );
+
+    hospitalizacie.rows.forEach((element) => {
+      element.type = "HOS";
+    });
+
+    return hospitalizacie.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+//TODO pridat parameter z filtra podla id
+async function getHospitalizacieAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const hospitalizacie = await conn.execute(
+        `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
+      as "start",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
+       from hospitalizacia
+        join zdravotny_zaz using(id_zaznamu)
+          join zdravotna_karta using(id_karty)
+                 join pacient using(id_pacienta)
+                  join os_udaje on(os_udaje.rod_cislo = pacient.rod_cislo) 
+                  join lozko using(id_lozka)
+                  join miestnost on (lozko.id_miestnost = miestnost.id_miestnosti)
+                  join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
+                  join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
+                    where zamestnanci.cislo_zam is not null
+                    fetch first 10000 rows only`
     );
 
     hospitalizacie.rows.forEach((element) => {
@@ -251,8 +325,11 @@ module.exports = {
   getPacienti,
   getPriemernyVek,
   getUdalosti,
+  getOperacieAdmin,
+  getHospitalizacieAdmin,
   getOperacie,
   getVysetrenia,
+  getVysetreniaAdmin,
   getHospitalizacie,
   getLekarInfo,
   getNemocnicaOddelenia,
