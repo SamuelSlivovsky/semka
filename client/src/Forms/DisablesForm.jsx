@@ -143,6 +143,7 @@ export default function DisablesForm(props) {
                       {...input}
                       options={types}
                       optionLabel="NAZOV"
+                      filter
                     />
                   </div>
                 )}

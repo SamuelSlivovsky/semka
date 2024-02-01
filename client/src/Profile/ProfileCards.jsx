@@ -4,7 +4,7 @@ import { Button } from "primereact/button";
 import { useLocation } from "react-router";
 import { Dialog } from "primereact/dialog";
 import HospitForm from "../Forms/HospitForm";
-//import RecipeForm from '../Forms/RecipeForm';
+import RecipeForm from "../Forms/RecipeForm";
 import OperationForm from "../Forms/OperationForm";
 import ExaminationForm from "../Forms/ExaminationForm";
 import TableMedicalRecords from "../Views/Tables/TableMedicalRecords";
@@ -39,7 +39,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: true,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: false,
   };
 
@@ -51,11 +51,12 @@ export default function ProfileCard(props) {
     titles: [
       { field: "NAZOV", header: "Názov" },
       { field: "LEKAR", header: "Lekár" },
+      { field: "DATUM_ZAPISU", header: "Dátum zápisu" },
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
-    editor: true,
+    tableScrollHeight: "480px",
+    editor: false,
   };
 
   const onEditDisableDate = (data) => {
@@ -113,7 +114,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: true,
   };
 
@@ -130,7 +131,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: true,
   };
 
@@ -146,7 +147,7 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
     editor: false,
   };
 
@@ -235,6 +236,7 @@ export default function ProfileCard(props) {
     fetchDisables();
     fetchDiseases();
     fetchMedRecords();
+    fetchRecipies();
     fetchVacs();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -258,6 +260,9 @@ export default function ProfileCard(props) {
         break;
       case "ZTP":
         setHeader("Pridať nové ZŤP");
+        break;
+      case "recipe":
+        setHeader("Pridať nový recept");
         break;
       default:
         break;
@@ -314,6 +319,17 @@ export default function ProfileCard(props) {
       case "ZTP":
         return (
           <DisablesForm
+            patientId={
+              props.patientId !== null ? props.patientId : location.state
+            }
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchDisables()}
+          />
+        );
+      case "recipe":
+        return (
+          <RecipeForm
             patientId={
               props.patientId !== null ? props.patientId : location.state
             }

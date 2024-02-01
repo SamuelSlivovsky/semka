@@ -41,4 +41,10 @@ router.get(
     controller.getNemocnicaOddelenia
 );
 
+router.get(
+  "/konzilia/:id",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getKonzilia
+);
+
 module.exports = router;

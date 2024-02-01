@@ -168,6 +168,12 @@
   width: 20px;
 }
 
+.chat-icon {
+  content: url("./images/chat.png");
+  height: 44px;
+  width: 44px;
+}
+
 .log-icon {
   content: url("./images/log.png");
   height: 15px;

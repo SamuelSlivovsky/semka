@@ -22,6 +22,7 @@ const addRoute = require("./routes/addRoute");
 const lozkoRoute = require("./routes/lozkoRoute");
 const equipmentRoute = require("./routes/equipmentRoute");
 const updateRoute = require("./routes/updateRoute");
+const chatRoute = require("./routes/chatRoute");
 
 const server = http.createServer(app); // Create an HTTP server using your Express app
 const io = socketIo(server); // Initialize Socket.io with the HTTP server
@@ -49,11 +50,13 @@ app.use("/add", addRoute);
 app.use("/lozko", lozkoRoute);
 app.use("/vybavenie", equipmentRoute);
 app.use("/update", updateRoute);
+app.use("/chat", chatRoute);
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
-  // Listen for text messages
   socket.on("sendMessage", (message, params) => {
+
+    
     io.emit("newMessage", {
       content: message,
       sender: params.userId,
@@ -61,9 +64,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Listen for image messages
   socket.on("sendImage", (image, params) => {
-    // Broadcast the image message to all connected clients
     io.emit("newMessage", {
       content: image,
       sender: params.userId,
@@ -71,8 +72,12 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("disconnect", () => {
-    // Handle disconnection if needed
+  socket.on("disconnect", () => {});
+  socket.on("typing", (params) => {
+    io.emit("isTyping", {
+      id: params.userId,
+      isEmpty: params.isEmpty,
+    });
   });
 });
 

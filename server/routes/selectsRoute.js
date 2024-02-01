@@ -173,5 +173,10 @@ router.get(
   verify.verifyRoles(0,1, 2, 3),
   controller.getTopZamestnanciVyplatyOddelenie
 );
+router.get(
+  "/zoznamLekarov",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getZoznamLekarov
+);
 
 module.exports = router;

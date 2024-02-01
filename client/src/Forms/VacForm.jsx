@@ -33,10 +33,12 @@ export default function VacForm(props) {
         datum: data.datum.toLocaleString("en-GB").replace(",", ""),
       }),
     };
-    const responsePatient = await fetch(
-      "/add/ockovanie",
-      requestOptionsPatient
-    ).then(() => setShowMessage(true));
+    await fetch("/add/ockovanie", requestOptionsPatient)
+      .then((res) => {
+        if (res.ok) setShowMessage(true);
+        else throw Error(res);
+      })
+      .catch((err) => console.log(err));
 
     form.restart();
   };
@@ -123,6 +125,7 @@ export default function VacForm(props) {
                       {...input}
                       options={vaccines}
                       optionLabel="NAZOV"
+                      filter
                     />
                   </div>
                 )}
