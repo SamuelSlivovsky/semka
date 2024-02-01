@@ -305,7 +305,7 @@ function App() {
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
         <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
-        <Route path="/combobox" element={<Combobox />}></Route>
+          <Route path="/adminPanel" element={<AdminPanel/>}></Route>
       </>
     );
   };
