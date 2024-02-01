@@ -18,6 +18,7 @@ import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
 import PharmacyStorage from "./Views/PharmacyStorage";
+import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
@@ -365,7 +366,10 @@ function App() {
   const renderPharmacyManagerRoutes = () => {
     return (
       <>
+          <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
+          <Route path="/sklad" element={<Storage />}></Route>
           <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
+          <Route path="/pharmacy_managers" element={<TabPharmacyManagers></TabPharmacyManagers>}></Route>
       </>
     );
   };
