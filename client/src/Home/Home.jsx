@@ -9,7 +9,9 @@ import plusIcon from "../images/plus.png";
 import statIcon from "../images/statistics.png";
 import HomeCard from "./HomeCard";
 import storageIcon from "../images/drugs.png";
-import pharmacyStorageIcon from "../images/pharmacy_storage_black.png"
+import pharmacyStorageIcon from "../images/pharmacy_storage.png";
+import pharmacyManagerIcon from "../images/pharmacist_manager.png";
+import pharmacistIcon from "../images/pharmacist.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
@@ -166,7 +168,21 @@ function Home() {
     path="/lekarensky_sklad"
     icon={pharmacyStorageIcon}
     key="14"
-  ></HomeCard>,      
+  ></HomeCard>,
+  <HomeCard
+    title="Manažéri lekární"
+    isCalendar={false}
+    path="/pharmacy_managers"
+    icon={pharmacyManagerIcon}
+    key="15"
+  ></HomeCard>,
+  <HomeCard
+    title="Lekárnici"
+    isCalendar={false}
+    path="/pharmacists"
+    icon={pharmacistIcon}
+    key="16"
+  ></HomeCard>,        
   ];
 
   const renderHomeCards = () => {

@@ -272,6 +272,20 @@ function App() {
       label="Lekárenský sklad"
       icon="pharmacy-storage-icon"
   />,  
+    <SidebarButton
+      key="15"
+      visibleLeft={visibleLeft}
+      path="/pharmacy_managers"
+      label="Manažéri lekární"
+      icon="pharmacy-manager-icon"
+  />,  
+    <SidebarButton
+      key="16"
+      visibleLeft={visibleLeft}
+      path="/pharmacists"
+      label="Lekárnici"
+      icon="pharmacist-icon"
+  />,  
   ];
 
   const renderDoctorRoutes = () => {

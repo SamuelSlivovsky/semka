@@ -178,3 +178,13 @@
   height: 44px;
   width: 44px;
 }
+.pharmacy-manager-icon {
+  content: url('./images/pharmacist_manager_black.png');
+  height: 44px;
+  width: 44px;
+}
+.pharmacist-icon {
+  content: url('./images/pharmacist_black.png');
+  height: 44px;
+  width: 44px;
+}
