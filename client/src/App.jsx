@@ -433,7 +433,7 @@ function App() {
           ) : userData && userData.UserInfo.role === 4 ? (
             renderPatientRoutes()
           ) : userData && userData.UserInfo.role === 10 ? (
-            renderPharmacyManagerRoutes
+            renderPharmacyManagerRoutes()
           ) : (
             ""
           )}
