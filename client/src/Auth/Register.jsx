@@ -130,13 +130,18 @@ export const Register = () => {
                         }
                     }}
                 />
-                <label
-                    htmlFor="rc"
-                    className={classNames({"p-error": errors.rc})}
-                >
-                  Rodné číslo*
-                </label>
-              </span>
+                  {(() => {
+                      if (token) {
+                          return (<label htmlFor="rc" className={classNames({"p-error": errors.rc})}>ID
+                              zamestnanca*</label>);
+
+                      } else {
+                          return (
+                              <label htmlFor="rc" className={classNames({"p-error": errors.rc})}>Rodné číslo*</label>);
+                      }
+                  })()}
+
+                    </span>
                         {getFormErrorMessage("rc")}
                     </div>
                     <div className="field">
@@ -244,7 +249,8 @@ export const Register = () => {
                 </form>
             </div>
         </div>
-    </div>);
+    </div>)
+        ;
 };
 
 export default Register
