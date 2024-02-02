@@ -6,7 +6,7 @@ async function getZoznamManazerovLekarni() {
       let conn = await database.getConnection();
   
       const result = await conn.execute(
-        `SELECT meno || ', ' ||priezvisko as "meno", mesto.nazov as mesto_mazov, lekaren.nazov as lekaren_nazov, cislo_zam
+        `SELECT meno as meno, priezvisko as priezvisko, mesto.nazov as mesto, lekaren.nazov as lekaren_nazov, cislo_zam
         from  zamestnanci
                       join os_udaje using(rod_cislo)
                       join mesto using(PSC)
