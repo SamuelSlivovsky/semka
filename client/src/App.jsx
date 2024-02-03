@@ -305,6 +305,13 @@ function App() {
       label="Lekárnici"
       icon="pharmacist-icon"
   />,  
+    <SidebarButton
+      key="17"
+      visibleLeft={visibleLeft}
+      path="/prescriptions"
+      label="Recepty"
+      icon="prescriptions-icon"
+  />, 
   ];
 
   const renderDoctorRoutes = () => {

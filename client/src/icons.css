@@ -195,3 +195,8 @@
   height: 44px;
   width: 44px;
 }
+.prescriptions-icon {
+  content: url('./images/prescriptions_black.png');
+  height: 44px;
+  width: 44px;
+}

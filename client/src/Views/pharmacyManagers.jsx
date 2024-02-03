@@ -2,7 +2,7 @@ import React from "react";
 import TabPharmacyManagers from "./Tables/TabPharmacyManagers";
 import "../styles/patients.css";
 
-function pharmacyManager() {
+function pharmacyManagers() {
   return (
     <div>
       <TabPharmacyManagers></TabPharmacyManagers>
@@ -10,4 +10,4 @@ function pharmacyManager() {
   );
 }
 
-export default pharmacyManager;
+export default pharmacyManagers;

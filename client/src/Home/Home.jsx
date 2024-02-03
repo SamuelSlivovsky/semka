@@ -12,6 +12,7 @@ import storageIcon from "../images/drugs.png";
 import pharmacyStorageIcon from "../images/pharmacy_storage.png";
 import pharmacyManagerIcon from "../images/pharmacist_manager.png";
 import pharmacistIcon from "../images/pharmacist.png";
+import prescriptionsIcon from "../images/prescriptions.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
@@ -203,7 +204,14 @@ function Home() {
     path="/pharmacists"
     icon={pharmacistIcon}
     key="16"
-  ></HomeCard>,        
+  ></HomeCard>,     
+  <HomeCard
+    title="Recepty"
+    isCalendar={false}
+    path="/prescriptions"
+    icon={prescriptionsIcon}
+    key="17"
+  ></HomeCard>,   
   ];
 
   const renderHomeCards = () => {

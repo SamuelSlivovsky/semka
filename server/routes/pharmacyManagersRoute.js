@@ -8,6 +8,6 @@ router.get(
     verify.verifyRoles(0, 10),
     verify.checkForCorrectId(),
     controller.getManazeriLekarni
-  );
+);
 
-  module.exports = router;
+module.exports = router;

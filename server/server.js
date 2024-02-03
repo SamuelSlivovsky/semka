@@ -11,7 +11,7 @@ const verifyJWT = require("./middleware/verifyJWT");
 const credentials = require("./middleware/credentials");
 // ROUTES
 const lekarRoute = require("./routes/lekarRoute");
-const pharmacyManagerRoute = require("./routes/pharmacyManagerRoute");
+const pharmacyManagersRoute = require("./routes/pharmacyManagersRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
 const patientRoute = require("./routes/patientRoute");
@@ -41,7 +41,7 @@ app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
 app.use("/sklad", storageRoute);
 app.use("/lekar", lekarRoute);
-app.use("/pharmacyManager", pharmacyManagerRoute);
+app.use("/pharmacyManagers", pharmacyManagersRoute);
 app.use("/selects", selectsRoute);
 app.use("/calendar", calendarRoute);
 app.use("/patient", patientRoute);
