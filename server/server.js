@@ -17,6 +17,7 @@ const calendarRoute = require("./routes/calendarRoute");
 const patientRoute = require("./routes/patientRoute");
 const receptRoute = require("./routes/receptRoute");
 const storageRoute = require("./routes/storageRoute");
+const pharmacyStorageRoute = require("./routes/pharmacyStorageRoute");
 const drugsRoute = require("./routes/drugsRoute");
 const medRecordsRoute = require("./routes/medRecordsRoute");
 const addRoute = require("./routes/addRoute");
@@ -40,6 +41,7 @@ app.use(cookieParser()); // Middleware for cookies
 app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
 app.use("/sklad", storageRoute);
+app.use("/lekarenskySklad", pharmacyStorageRoute);
 app.use("/lekar", lekarRoute);
 app.use("/pharmacyManagers", pharmacyManagersRoute);
 app.use("/selects", selectsRoute);

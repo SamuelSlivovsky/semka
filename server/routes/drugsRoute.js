@@ -3,6 +3,6 @@ const router = express.Router();
 const controller = require("../controllers/DrugsController");
 const verify = require("../middleware/verifyUser");
 
-router.get("/all", verify.verifyRoles(0, 2, 3), controller.getAllDrugs);
+router.get("/all", verify.verifyRoles(0, 2, 3, 10), controller.getAllDrugs);
 
 module.exports = router;

@@ -9,20 +9,20 @@ import {useNavigate} from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import {Toast} from "primereact/toast";
 
-export default function TabPharmacyManagers() {
+export default function TabPharmacists() {
     const [globalFilterValue, setGlobalFilterValue] = useState("");
     const [filters, setFilters] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
     const toast = useRef(null);
-    const [manazeriLekarni, setManazeriLekarni] = useState([]);
+    const [lekarnici, setLekarnici] = useState([]);
     const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
         const userDataHelper = GetUserData(token);
         const headers = {authorization: "Bearer " + token};
-        fetch(`/pharmacyManagers/manazeriLekarni/${userDataHelper.UserInfo.userid}`, {
+        fetch(`/pharmacyManagers/lekarnici/${userDataHelper.UserInfo.userid}`, {
             headers,
         })
             .then((response) => {
@@ -38,7 +38,8 @@ export default function TabPharmacyManagers() {
                 }
             })
             .then((data) => {
-                setManazeriLekarni(data);
+                setLekarnici(data);
+                console.log(data);
             });
     }, []);
 
@@ -81,7 +82,7 @@ export default function TabPharmacyManagers() {
         return (
             <div className="flex justify-content-between">
                 <div className="table-header">
-                    <div className="mr-4"><h2>Manažéri lekární</h2></div>
+                    <div className="mr-4"><h2>Lekárnici</h2></div>
                     <span className="p-input-icon-left">
             <i className="pi pi-search"/>
             <InputText
@@ -145,7 +146,7 @@ export default function TabPharmacyManagers() {
             <Toast ref={toast} position="top-center"/>
             <div className="card">
                 <DataTable
-                    value={manazeriLekarni}
+                    value={lekarnici}
                     responsiveLayout="scroll"
                     selectionMode="single"
                     paginator
