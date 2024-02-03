@@ -1,22 +1,28 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../models/user");
 var jwt = require("jsonwebtoken");
+const sklad = require("../models/sklad");
 require("dotenv").config();
 
 const handleRegister = async (req, res) => {
-    const {userid, pwd} = req.body;
+    const {userid, pwd, role} = req.body;
     if (!userid || !pwd)
         return res
             .status(400)
             .json({message: "Username and password are required."});
     // check for duplicate usernames in the db
 
+    //TODO zmenit rolu pri registracii na rolu pacienta
     try {
         if (await userModel.userExists(userid)) {
-            return res.status(409).json({message: `Already exists`});
+            return res
+                .status(409)
+                .json({message: `User with this name already exist`});
             // Kontrola ci uzivatel existuje v pacientoch/zamestnancoch
         } else if (await userModel.userExistsInDB(userid)) {
-            return res.status(409).json({message: `No user in database with that ID`});
+            return res
+                .status(409)
+                .json({message: `User does not exist in database`});
         } else {
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
@@ -30,10 +36,8 @@ const handleRegister = async (req, res) => {
                     const accessToken = jwt.sign(
                         {
                             UserInfo: {
-                                userid: !isNaN(userid)
-                                    ? Number(userid)
-                                    : userid,
-                                role: 3,
+                                userid: !isNaN(userid) ? Number(userid) : userid,
+                                role: role,
                             },
                         },
                         process.env.ACCESS_TOKEN_SECRET,
@@ -42,7 +46,7 @@ const handleRegister = async (req, res) => {
 
                     let body = req.body;
                     body.userid = userid;
-                    body.role = 3;
+                    body.role = role;
                     body.pwd = hash;
                     body.accessToken = accessToken;
 
@@ -65,28 +69,31 @@ const handleLogin = async (req, res) => {
             .status(400)
             .json({message: "Username and password are required."});
 
-    if (!(await userModel.userExists(userid))) return res.sendStatus(401); //Unauthorized
+    if (!(await userModel.userExists(userid)))
+        return res
+            .status(400)
+            .json({message: "User with this login does not exist"}); //Does not exist
 
-    const foundUser = await userModel.getUserByUserId(userid);
-    const match = await bcrypt.compare(pwd, foundUser.PWD);
-    if (match == true) {
-        const accessToken = jwt.sign(
-            {
-                UserInfo: {
-                    userid: !isNaN(foundUser.USERID)
-                        ? Number(foundUser.USERID)
-                        : foundUser.USERID,
-                    role: foundUser.ROLE,
-                },
-            },
-            process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: "3600s"}
-        );
+  const foundUser = await userModel.getUserByUserId(userid);
+  const match = await bcrypt.compare(pwd, foundUser.PWD);
+  if (match == true) {
+    const accessToken = jwt.sign(
+      {
+        UserInfo: {
+          userid: !isNaN(foundUser.USERID)
+            ? Number(foundUser.USERID)
+            : foundUser.USERID,
+          role: foundUser.ROLE,
+        },
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
 
         const refreshToken = jwt.sign(
             {userid: foundUser.USERID},
             process.env.REFRESH_TOKEN_SECRET,
-            {expiresIn: "1d"}
+            {expiresIn: "3600s"}
         );
 
         userModel.updateUserRefreshToken({
@@ -97,7 +104,7 @@ const handleLogin = async (req, res) => {
         res.cookie("jwt", refreshToken, {httpOnly: true}); //1 day httponly cookie is not available to javascript
         res.status(200).json({accessToken}); //store in memory not in local storage
     } else {
-        res.status(409).json({message: "Passwords not matching"});
+        res.status(409).json({message: "Username or password is invalid"});
     }
 };
 
@@ -125,7 +132,6 @@ const handleLogout = async (req, res) => {
 };
 
 const handleRefreshToken = async (req, res) => {
-
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(401);
 
@@ -151,9 +157,22 @@ const handleRefreshToken = async (req, res) => {
     });
 };
 
+
 module.exports = {
     handleRegister,
     handleLogin,
     handleLogout,
     handleRefreshToken,
+    //TODO PRIDAT CONNECT NA TAB. LOGY
+    insertLog: (req, res) => {
+        const logy = require("../models/logy");
+        (async () => {
+            ret_val = await logy.insertLog(req.body);
+            res.status(200);
+        })().catch((err) => {
+            console.log("Error Kontroler");
+            console.error(err);
+            res.status(500).send(err);
+        });
+    },
 };

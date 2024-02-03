@@ -66,7 +66,11 @@ export default function ExaminationForm(props) {
         label="OK"
         className="p-button-text"
         autoFocus
-        onClick={() => setShowMessage(false)}
+        onClick={() => {
+          setShowMessage(false);
+          props.hideDialog();
+          props.onInsert();
+        }}
       />
     </div>
   );
@@ -147,6 +151,7 @@ export default function ExaminationForm(props) {
                       Rodné číslo
                     </label>
                     <InputMask
+                      autoFocus
                       id="rod_cislo"
                       mask="999999/9999"
                       disabled={

@@ -14,7 +14,7 @@ code {
 }
 
 .page-content {
-  width: calc(100% - 4rem - 8px);
+  width: calc(100% - 4rem - 18px);
   margin-left: auto;
   margin-right: 0;
   transition: 0.5s;
@@ -56,7 +56,7 @@ code {
 
 @media screen and (max-width: 960px) {
   .storage-table .table-header {
-      align-items: flex-start;
+    align-items: flex-start;
   }
 }
 
@@ -68,20 +68,21 @@ code {
 
 @media screen and (max-width: 960px) {
   .storage-table .p-toolbar {
-      flex-wrap: wrap;
+    flex-wrap: wrap;
   }
   .storage-table .p-toolbar .p-button {
-      margin-bottom: 0.25rem;
+    margin-bottom: 0.25rem;
   }
   .storage-table .table-header {
-      flex-direction: column;
+    flex-direction: column;
   }
-  .storage-table .table-header .p-input-icon-left, .datatable-crud-demo .table-header input {
-      width: 100%;
+  .storage-table .table-header .p-input-icon-left,
+  .datatable-crud-demo .table-header input {
+    width: 100%;
   }
 }
 
-.p-dropdown-panel{
+.p-dropdown-panel {
   width: 100%;
   max-width: 200px;
 }

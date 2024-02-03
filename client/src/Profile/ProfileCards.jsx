@@ -3,14 +3,15 @@ import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { useLocation } from "react-router";
 import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";
 import HospitForm from "../Forms/HospitForm";
-//import RecipeForm from '../Forms/RecipeForm';
+import RecipeForm from "../Forms/RecipeForm";
 import OperationForm from "../Forms/OperationForm";
 import ExaminationForm from "../Forms/ExaminationForm";
-import "../icons.css";
 import TableMedicalRecords from "../Views/Tables/TableMedicalRecords";
+import "../icons.css";
+import DiseaseForm from "../Forms/DiseaseForm";
+import DisablesForm from "../Forms/DisablesForm";
+import VacForm from "../Forms/VacForm";
 
 export default function ProfileCard(props) {
   const [profile, setProfile] = useState("");
@@ -18,26 +19,15 @@ export default function ProfileCard(props) {
   const location = useLocation();
   const [eventType, setEventType] = useState("");
   const [header, setHeader] = useState("");
-
-  const [vaccinationTypes, setVaccinationTypes] = useState("");
-  const [selectedVaccinationType, setSelectedVaccinationType] = useState("");
-
-  const [diseaseTypes, setDiseaseTypes] = useState("");
-  const [selectedDiseaseType, setSelectedDiseaseType] = useState("");
-
-  const [diseases, setDiseases] = useState("");
-  const [selectedDisease, setSelectedDisease] = useState("");
-
-  const [ZTPTypes, setZTPTypes] = useState("");
-  const [selectedZTP, setSelectedZTPType] = useState("");
-
+  const [showDisables, setShowDisables] = useState(false);
+  const [showVac, setShowVac] = useState(false);
   const [patientMedicalRecords, setPatientMedicalRecords] = useState("");
-
   const [patientRecipes, setPatientRecipes] = useState("");
-
   const [patientDiseases, setPatientDiseases] = useState("");
-
   const [patientZTPTypes, setPatientZTPTypes] = useState([]);
+  const [patientVac, setPatientVac] = useState([]);
+  const token = localStorage.getItem("hospit-user");
+  const headers = { authorization: "Bearer " + token };
 
   const medicalRecordsTable = {
     tableName: "Zdravotné záznamy",
@@ -49,26 +39,73 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: true,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
+    editor: false,
   };
 
   const recipesTable = {
     tableName: "Predpísané recepty",
     route: "/pacient",
     cellData: patientRecipes,
+
     titles: [
       { field: "NAZOV", header: "Názov" },
       { field: "LEKAR", header: "Lekár" },
+      { field: "DATUM_ZAPISU", header: "Dátum zápisu" },
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
+    editor: false,
+  };
+
+  const onEditDisableDate = (data) => {
+    const token = localStorage.getItem("hospit-user");
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        datum_od: data.DAT_OD,
+        datum_do: data.DAT_DO,
+        id_pacienta:
+          typeof props.patientId !== "undefined" && props.patientId !== null
+            ? props.patientId
+            : location.state,
+        id_postihnutia: data.ID_POSTIHNUTIA,
+      }),
+    };
+    fetch("/update/ztp", requestOptions);
+  };
+
+  const onEditDiseaseDate = (data) => {
+    const token = localStorage.getItem("hospit-user");
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
+      body: JSON.stringify({
+        datum_od: data.DAT_OD,
+        datum_do: data.DAT_DO,
+        id_pacienta:
+          typeof props.patientId !== "undefined" && props.patientId !== null
+            ? props.patientId
+            : location.state,
+      }),
+    };
+    fetch("/update/choroba", requestOptions);
   };
 
   const diseasesTable = {
     tableName: "Choroby",
     route: "/pacient",
     cellData: patientDiseases,
+    setCellData: setPatientDiseases,
+    onEditDate: onEditDiseaseDate,
     titles: [
       { field: "NAZOV", header: "Názov choroby" },
       { field: "TYP", header: "Typ choroby" },
@@ -77,12 +114,44 @@ export default function ProfileCard(props) {
     ],
     allowFilters: false,
     dialog: false,
-    tableScrollHeight: "500px",
+    tableScrollHeight: "480px",
+    editor: true,
   };
 
-  useEffect(() => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
+  const disablesTable = {
+    tableName: "Postihnutia",
+    route: "/pacient",
+    cellData: patientZTPTypes,
+    setCellData: setPatientZTPTypes,
+    onEditDate: onEditDisableDate,
+    titles: [
+      { field: "NAZOV", header: "Postihnutie" },
+      { field: "DAT_OD", header: "Od" },
+      { field: "DAT_DO", header: "Do" },
+    ],
+    allowFilters: false,
+    dialog: false,
+    tableScrollHeight: "480px",
+    editor: true,
+  };
+
+  const vacTable = {
+    tableName: "Očkovania",
+    route: "/pacient",
+    cellData: patientVac,
+    setCellData: setPatientVac,
+    titles: [
+      { field: "NAZOV", header: "Očkovanie" },
+      { field: "TYP", header: "Typ" },
+      { field: "DATUM", header: "Dátum" },
+    ],
+    allowFilters: false,
+    dialog: false,
+    tableScrollHeight: "480px",
+    editor: false,
+  };
+
+  const fetchPatientInfo = () => {
     fetch(
       `patient/info/${
         typeof props.patientId !== "undefined" && props.patientId !== null
@@ -95,25 +164,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setProfile(...data);
       });
+  };
 
-    fetch(`selects/typyOckovania`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setVaccinationTypes(data);
-      });
-
-    fetch(`selects/typyChoroby`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setDiseaseTypes(data);
-      });
-
-    fetch(`selects/typyZTP`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setZTPTypes(data);
-      });
-
+  const fetchRecipies = () => {
     fetch(
       `patient/recepty/${
         props.patientId !== null ? props.patientId : location.state
@@ -124,7 +177,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientRecipes(data);
       });
+  };
 
+  const fetchDiseases = () => {
     fetch(
       `patient/choroby/${
         props.patientId !== null ? props.patientId : location.state
@@ -135,7 +190,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientDiseases(data);
       });
+  };
 
+  const fetchDisables = () => {
     fetch(
       `patient/typyZTP/${
         props.patientId !== null ? props.patientId : location.state
@@ -146,7 +203,9 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientZTPTypes(data);
       });
+  };
 
+  const fetchMedRecords = () => {
     fetch(
       `patient/zdravZaznamy/${
         props.patientId !== null ? props.patientId : location.state
@@ -157,6 +216,28 @@ export default function ProfileCard(props) {
       .then((data) => {
         setPatientMedicalRecords(data);
       });
+  };
+
+  const fetchVacs = () => {
+    fetch(
+      `patient/ockovania/${
+        props.patientId !== null ? props.patientId : location.state
+      }`,
+      { headers }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setPatientVac(data);
+      });
+  };
+
+  useEffect(() => {
+    fetchPatientInfo();
+    fetchDisables();
+    fetchDiseases();
+    fetchMedRecords();
+    fetchRecipies();
+    fetchVacs();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClick = (eventType) => {
@@ -180,6 +261,9 @@ export default function ProfileCard(props) {
       case "ZTP":
         setHeader("Pridať nové ZŤP");
         break;
+      case "recipe":
+        setHeader("Pridať nový recept");
+        break;
       default:
         break;
     }
@@ -190,104 +274,70 @@ export default function ProfileCard(props) {
     setShow(false);
   };
 
-  const onVaccinationTypeChange = (e) => {
-    setSelectedVaccinationType(e.value);
-  };
-
-  const vacciDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <label htmlFor="basic">Dátum očkovania</label>
-          <Calendar id="basic" showTime showIcon dateFormat="dd.mm.yy" />
-        </div>
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedVaccinationType}
-            options={vaccinationTypes}
-            onChange={onVaccinationTypeChange}
-            optionLabel="NAZOV"
-            placeholder="Vyber typ očkovania"
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const onDiseaseTypeChange = (e) => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
-    setSelectedDiseaseType(e.value);
-    fetch(`selects/choroby/${e.value.ID_TYPU_CHOROBY}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setDiseases(data);
-      });
-  };
-
-  const onDiseaseChange = (e) => {
-    setSelectedDisease(e.value);
-  };
-
-  const diseaseDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedDiseaseType}
-            options={diseaseTypes}
-            onChange={onDiseaseTypeChange}
-            optionLabel="TYP"
-            placeholder="Vyber typ choroby"
-          />
-        </div>
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedDisease}
-            options={diseases}
-            onChange={onDiseaseChange}
-            optionLabel="NAZOV"
-            placeholder="Vyber chorobu"
-          />
-        </div>
-      </div>
-    );
-  };
-
-  const onZTPTypeChange = (e) => {
-    setSelectedZTPType(e.value);
-  };
-
-  const ZTPDialog = () => {
-    return (
-      <div className="p-fluid grid formgrid">
-        <div className="field col-12 ">
-          <Dropdown
-            value={selectedZTP}
-            options={ZTPTypes}
-            onChange={onZTPTypeChange}
-            optionLabel="NAZOV"
-            placeholder="Vyber typ ZŤP"
-          />
-        </div>
-      </div>
-    );
-  };
-
   const renderDialog = () => {
     switch (eventType) {
       case "examination":
-        return <ExaminationForm rod_cislo={profile.ROD_CISLO} />;
+        return (
+          <ExaminationForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchMedRecords()}
+          />
+        );
       case "operation":
-        return <OperationForm rod_cislo={profile.ROD_CISLO} />;
+        return (
+          <OperationForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchMedRecords()}
+          />
+        );
       case "hospit":
-        return <HospitForm rod_cislo={profile.ROD_CISLO} />;
+        return (
+          <HospitForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchMedRecords()}
+          />
+        );
       case "vacci":
-        return vacciDialog();
+        return (
+          <VacForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchVacs()}
+          ></VacForm>
+        );
       case "disease":
-        return diseaseDialog();
+        return (
+          <DiseaseForm
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchDiseases()}
+          />
+        );
       case "ZTP":
-        return ZTPDialog();
+        return (
+          <DisablesForm
+            patientId={
+              props.patientId !== null ? props.patientId : location.state
+            }
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchDisables()}
+          />
+        );
+      case "recipe":
+        return (
+          <RecipeForm
+            patientId={
+              props.patientId !== null ? props.patientId : location.state
+            }
+            rod_cislo={profile.ROD_CISLO}
+            hideDialog={() => onHide()}
+            onInsert={() => fetchDisables()}
+          />
+        );
       default:
         break;
     }
@@ -297,60 +347,84 @@ export default function ProfileCard(props) {
     <div>
       <div className="flex col-12 ">
         <Card
-          className="col-5 shadow-4"
+          className="col-5 shadow-4 "
           style={{ width: "50rem", height: "40rem" }}
           title={profile.MENO + " " + profile.PRIEZVISKO}
         >
           <div className="flex ">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Rok narodenia</h4>
               <div>{profile.DATUM_NARODENIA}</div>
             </div>
 
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Mobil</h4>
               <div>{profile.TEL}</div>
             </div>
           </div>
 
           <div className="flex w-100">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Vek</h4>
               <div>{profile.VEK}</div>
             </div>
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Email</h4>
               <div>{profile.MAIL}</div>
             </div>
           </div>
 
           <div className="flex">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Krvna skupina</h4>
               <div>{profile.TYP_KRVI}</div>
             </div>
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Poistovňa</h4>
               <div>{profile.NAZOV_POISTOVNE}</div>
             </div>
           </div>
 
           <div className="flex w-100">
-            <div className="col-5 text-center m-0">
+            <div className="col-6 text-center m-0">
               <h4>Adresa</h4>
               <div>{profile.NAZOV_OBCE + " " + profile.PSC}</div>
             </div>
-            <div className="col-5 text-center m-0">
-              <h4>Typ ZŤP</h4>
+            <div className="col-6 text-center m-0">
+              <h4>ZŤP</h4>
               <div>
-                {patientZTPTypes.length !== 0
-                  ? patientZTPTypes.map((item) => <div>{item.NAZOV}</div>)
-                  : ""}
+                {patientZTPTypes.length !== 0 ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      gap: "20px",
+                    }}
+                  >
+                    Áno{" "}
+                    <Button
+                      label="Zoznam"
+                      onClick={() => setShowDisables(true)}
+                    ></Button>
+                  </div>
+                ) : (
+                  "Nie"
+                )}
               </div>
             </div>
           </div>
-          <div className="mt-5 text-center">
-            <Button label="Poslať správu" icon="pi pi-send" />
+          <div className="flex">
+            <div className="mt-5 text-center col-6 text-center m-0">
+              <Button label="Poslať správu" icon="pi pi-send" />
+            </div>
+            <div className="mt-5 text-center col-6 text-center m-0">
+              <Button
+                label="Zoznam Očkovaní"
+                icon="pi pi-list"
+                onClick={() => setShowVac(true)}
+              ></Button>
+            </div>
           </div>
         </Card>
 
@@ -380,7 +454,10 @@ export default function ProfileCard(props) {
           <TableMedicalRecords {...diseasesTable} />
         </Card>
       </div>
-      {props.userData.UserInfo.role !== 3 ? (
+      {props.userData.UserInfo.role === 0 ||
+      props.userData.UserInfo.role === 1 ||
+      props.userData.UserInfo.role === 2 ||
+      props.userData.UserInfo.role === 3 ? (
         <>
           <div className="flex ">
             <div className="col-2 m-4">
@@ -451,8 +528,30 @@ export default function ProfileCard(props) {
               </div>
             </div>
           </div>
-          <Dialog visible={show} onHide={onHide} header={header}>
+          <Dialog
+            blockScroll
+            visible={show}
+            onHide={onHide}
+            header={header}
+            style={{ width: "800px" }}
+          >
             {renderDialog()}
+          </Dialog>
+          <Dialog
+            visible={showDisables}
+            onHide={() => setShowDisables(false)}
+            style={{ width: "1000px" }}
+          >
+            {" "}
+            <TableMedicalRecords {...disablesTable} />
+          </Dialog>
+          <Dialog
+            visible={showVac}
+            onHide={() => setShowVac(false)}
+            style={{ width: "1000px" }}
+          >
+            {" "}
+            <TableMedicalRecords {...vacTable} />
           </Dialog>
         </>
       ) : (

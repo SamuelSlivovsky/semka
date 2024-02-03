@@ -16,6 +16,7 @@ async function getZdravotneZaznamy() {
 }
 
 async function getPopisZaznamu(id) {
+  console.log(id);
   try {
     let conn = await database.getConnection();
     database.oracledb.fetchAsString = [database.oracledb.CLOB];

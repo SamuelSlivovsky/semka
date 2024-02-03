@@ -1,160 +1,185 @@
 .home-icon {
-  content: url('./images/home.png');
+  content: url("./images/home.png");
   height: 44px;
   width: 44px;
 }
 .calendar-icon {
-  content: url('./images/calendar-black.png');
+  content: url("./images/calendar-black.png");
   height: 44px;
   width: 44px;
 }
 .patient-icon {
-  content: url('./images/patient-black.png');
+  content: url("./images/patient-black.png");
   height: 44px;
   width: 44px;
 }
 .doctor-icon {
-  content: url('./images/doctors-black.png');
+  content: url("./images/doctors-black.png");
   height: 44px;
   width: 44px;
 }
 .examination-icon {
-  content: url('./images/examination-black.png');
+  content: url("./images/examination-black.png");
   height: 44px;
   width: 44px;
 }
 .hospit-icon {
-  content: url('./images/hospit-black.png');
+  content: url("./images/hospit-black.png");
   height: 44px;
   width: 44px;
 }
 .operation-icon {
-  content: url('./images/operation-black.png');
+  content: url("./images/operation-black.png");
   height: 44px;
   width: 44px;
 }
 .stat-icon {
-  content: url('./images/statistics-black.png');
+  content: url("./images/statistics-black.png");
   height: 44px;
   width: 44px;
 }
 .plus-icon {
-  content: url('./images/plus-black.png');
+  content: url("./images/plus-black.png");
   height: 44px;
   width: 44px;
 }
 
 .user-icon {
-  content: url('./images/user.png');
+  content: url("./images/user.png");
   height: 44px;
   width: 44px;
 }
 
 .examination-icon-small {
-  content: url('./images/examination-black.png');
+  content: url("./images/examination-black.png");
   height: 20px;
   width: 20px;
 }
 .hospit-icon-small {
-  content: url('./images/hospit-black.png');
+  content: url("./images/hospit-black.png");
   height: 20px;
   width: 20px;
 }
 .operation-icon-small {
-  content: url('./images/operation-black.png');
+  content: url("./images/operation-black.png");
   height: 20px;
   width: 20px;
 }
 .vax-icon-small {
-  content: url('./images/ock.png');
+  content: url("./images/ock.png");
   height: 20px;
   width: 20px;
 }
 .home-icon {
-  content: url('./images/home.png');
+  content: url("./images/home.png");
   height: 44px;
   width: 44px;
 }
 .calendar-icon {
-  content: url('./images/calendar-black.png');
+  content: url("./images/calendar-black.png");
   height: 44px;
   width: 44px;
 }
 .patient-icon {
-  content: url('./images/patient-black.png');
+  content: url("./images/patient-black.png");
   height: 44px;
   width: 44px;
 }
 .doctor-icon {
-  content: url('./images/doctors-black.png');
+  content: url("./images/doctors-black.png");
   height: 44px;
   width: 44px;
 }
 .examination-icon {
-  content: url('./images/examination-black.png');
+  content: url("./images/examination-black.png");
   height: 44px;
   width: 44px;
 }
 .hospit-icon {
-  content: url('./images/hospit-black.png');
+  content: url("./images/hospit-black.png");
   height: 44px;
   width: 44px;
 }
 .operation-icon {
-  content: url('./images/operation-black.png');
+  content: url("./images/operation-black.png");
   height: 44px;
   width: 44px;
 }
 .stat-icon {
-  content: url('./images/statistics-black.png');
+  content: url("./images/statistics-black.png");
   height: 44px;
   width: 44px;
 }
 .plus-icon {
-  content: url('./images/plus-black.png');
+  content: url("./images/plus-black.png");
   height: 44px;
   width: 44px;
 }
 
 .storage-icon {
-  content: url('./images/drugs-black.png');
+  content: url("./images/drugs-black.png");
   height: 44px;
   width: 44px;
 }
 
 .vaccine-icon {
-  content: url('./images/vaccine.png');
+  content: url("./images/vaccine.png");
   height: 44px;
   width: 44px;
 }
 
 .disease-icon {
-  content: url('./images/disease.png');
+  content: url("./images/disease.png");
   height: 44px;
   width: 44px;
 }
 
 .disabled-icon {
-  content: url('./images/disabled.png');
+  content: url("./images/disabled.png");
   height: 44px;
   width: 44px;
 }
 
 .recipe-icon {
-  content: url('./images/recipe.png');
+  content: url("./images/recipe.png");
   height: 44px;
   width: 44px;
 }
 .logout-icon {
-  content: url('./images/logout.png');
+  content: url("./images/logout.png");
   height: 44px;
   width: 44px;
 }
 .database-icon {
-  content: url('./images/database.png');
+  content: url("./images/database.png");
   height: 44px;
   width: 44px;
 }
+
+.meeting-icon {
+  content: url("./images/meeting-black.png");
+  height: 44px;
+  width: 44px;
+}
+
+.meeting-icon-small {
+  content: url("./images/meeting-black.png");
+  height: 20px;
+  width: 20px;
+}
+
+.chat-icon {
+  content: url("./images/chat.png");
+  height: 44px;
+  width: 44px;
+}
+
+.log-icon {
+  content: url("./images/log.png");
+  height: 15px;
+  width: 15px;
+}
+
 .vehicle-icon {
   content: url('./images/vehicle-icon.png');
   height: 44px;

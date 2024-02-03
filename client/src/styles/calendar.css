@@ -16,7 +16,7 @@
 .calendar-card-day {
   margin: 0;
   font-size: 7rem;
-  transform: translateY(30px);
+  transform: translateY(45px);
 }
 
 .fc-day {
