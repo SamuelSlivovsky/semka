@@ -54,8 +54,8 @@ export default function DeparturePlans() {
           <Column field="TRVANIE" header={"Trvanie v minútach"} filter></Column>
           <Column field={ renderEditIcon }></Column>
           <Column field={ renderDeleteIcon }></Column>                
-      </DataTable>
-    </div> 
+        </DataTable>
+      </div> 
     </div>
   );
 }

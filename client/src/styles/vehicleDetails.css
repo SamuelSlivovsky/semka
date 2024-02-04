@@ -1,4 +1,8 @@
 .vehicle-details-row {
+  .p-datatable .p-datatable-thead > tr > th {
+    background-color: white;
+  }
+
   .vehicle-details-left-card {
     width: 40%;
     margin: 0px;
@@ -16,6 +20,16 @@
   }
 
   .vehicle-details-first-row-left-card {
+    .p-card-content {
+      text-align: center;
+    }
+    .vehicle-details-img {
+      width: 65%;
+      height: 65%;
+    }
+  }
+
+  .vehicle-details-second-row-left-card {
     div.row {
       display: flex;
       margin-bottom: 5px;
@@ -36,6 +50,13 @@
 
   .vehicle-details-second-row-right-card {
     margin-bottom: 0px;
+
+    .field-type-name {
+      min-width: 12rem;
+    }
+    .field-date-name {
+      width: 10rem;
+    }
   }
 }
 

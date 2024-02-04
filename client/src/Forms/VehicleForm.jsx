@@ -9,6 +9,7 @@ import { Calendar } from 'primereact/calendar';
 import { Dropdown } from 'primereact/dropdown';
 import { useEffect } from 'react';
 import { Dialog } from 'primereact/dialog';
+import { FileUpload } from 'primereact/fileupload';
 import moment from 'moment';
 import "../styles/vehicleForm.css"
 
@@ -16,6 +17,8 @@ export default function VehicleForm(props) {
   const [hospitals, setHospitals] = useState([]);
   const [vehicleAllECV, setVehicleAllECV] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [base64Data, setBase64Data] = useState(null);
+  const fileUploader = useRef(null);
 
   const defaultValues = {
     ecv: '',
@@ -95,6 +98,34 @@ export default function VehicleForm(props) {
     toast.current.show({ severity: 'error', summary: 'Vozidlo sa nepodarilo vytvoriť', detail: 'Vozidlo s daným EČV už existuje!' });
   }
 
+  const headerTemplate = (options) => {
+    const { className, chooseButton, cancelButton } = options;
+    return (
+      <div
+        className={className}
+        style={{
+          backgroundColor: "transparent",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {chooseButton}
+        {cancelButton}
+      </div>
+    );
+  };
+
+  const customBase64Uploader = async (event) => {
+    // convert file to base64 encoded 
+    const file = event.files[0];
+    const reader = new FileReader();
+    let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+    reader.readAsDataURL(blob);
+    reader.onloadend = function () {
+      setBase64Data(reader.result.substring(reader.result.indexOf(",") + 1));
+    };
+  };
+
   const onSubmit = async (data) => {
     const token = localStorage.getItem("hospit-user");
     let ecvExists = vehicleAllECV.find(ecv => ecv.ECV === data.ecv);
@@ -111,7 +142,8 @@ export default function VehicleForm(props) {
           ecv: data.ecv,
           id_nemocnice: data.hospital.ID_NEMOCNICE,
           typ_vozidla: data.vehicleType,
-          stk: data.stk.toLocaleString("en-GB").replace(",", "")
+          stk: data.stk.toLocaleString("en-GB").replace(",", ""),
+          obrazok: base64Data
         }),
       };
 
@@ -167,7 +199,7 @@ export default function VehicleForm(props) {
         onHide={() => onHideNewVehicle()}
       >
         <div className="card flex justify-content-center vehicle-form">
-          <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
+          <form onSubmit={handleSubmit(onSubmit)} className="p-fluid vehicle-form">
           
             <div className="field first">
               <span className="p-float-label">
@@ -178,7 +210,8 @@ export default function VehicleForm(props) {
                 render={({ field, fieldState }) => (
                   <InputText 
                     id={field.name} 
-                    value={field.value}
+                    {...field}
+                    //value={field}
                     disabled={props != null && props.edit ? true : false}
                     className={classNames({ 'p-invalid': fieldState.invalid })} />
                 )} />
@@ -195,7 +228,7 @@ export default function VehicleForm(props) {
                   render={({ field }) => (
                   <Dropdown 
                     id={field.name} 
-                    value={field.value}
+                    {...field}
                     onChange={(e) => field.onChange(e.value)} 
                     options={hospitals} 
                     optionLabel="NAZOV" />
@@ -229,7 +262,8 @@ export default function VehicleForm(props) {
                   render={({ field }) => (
                     <Calendar 
                       id={field.name} 
-                      value={field.value}
+                      {...field}
+                      //value={field.value}
                       onChange={(e) => field.onChange(e.value)} 
                       maxDate={today}
                       dateFormat="dd/mm/yy" 
@@ -240,6 +274,23 @@ export default function VehicleForm(props) {
               </span>
               {getFormErrorMessage('stk')}
             </div>
+            <FileUpload
+                  ref={fileUploader}
+                  mode="advanced"
+                  accept="image/*"
+                  customUpload
+                  chooseLabel="Vložiť"
+                  cancelLabel="Zrušiť"
+                  headerTemplate={headerTemplate}
+                  maxFileSize={5000000000}
+                  onSelect={customBase64Uploader}
+                  uploadHandler={customBase64Uploader}
+                  emptyTemplate={
+                    <p className="vehicle-form-image">
+                      Vložte obrázok vozidla.
+                    </p>
+                  }
+                />
             <div className="vehicle-form-submit-button">
               <Button label={props && props.edit ? "Upraviť vozidlo" : "Vytvoriť vozidlo"} type="Submit"/>
             </div>

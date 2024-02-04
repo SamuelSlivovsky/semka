@@ -12,11 +12,20 @@
   margin-bottom: 1.5rem;
 }
 
-.vehicle-form-submit-button {
+.vehicle-form {
+  .p-fileupload-advanced {
+    .p-fileupload-content {
+      padding-left: 10px;
+    }
+    margin-bottom: 20px;
+  }
+  
+  .vehicle-form-submit-button {
   display: flex;
   justify-content: center;
 
   .p-button {
     width: 15rem;
   }
+}
 }

@@ -25,6 +25,32 @@ module.exports = {
     });
   },
 
+  getVehiclesECVPlanHist: (req, res) => {
+    const vehicles = require('../models/vehicle');
+    
+    (async () => {
+        ret_val = await vehicles.getVehiclesECVPlanHist(req.params.vehicle_ecv);
+        res.status(200).json(ret_val);
+      })()
+      .catch((err) => {
+        console.error(err);
+        es.status(403).send(err);
+    });
+  },
+
+  getVehiclesECVPlan: (req, res) => {
+    const vehicles = require('../models/vehicle');
+    
+    (async () => {
+        ret_val = await vehicles.getVehiclesECVPlan(req.params.vehicle_ecv);
+        res.status(200).json(ret_val);
+      })()
+      .catch((err) => {
+        console.error(err);
+        es.status(403).send(err);
+    });
+  },
+
   insertVehicle: (req, res) => {
     const veh = require("../models/vehicle");
     (async () => {

@@ -335,7 +335,7 @@ function App() {
     );
   };
 
-  /*const renderAdminRoutes = () => {
+  const renderAdminRoutes = () => {
     return (
       <>
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
@@ -344,7 +344,7 @@ function App() {
           <Route path="/adminPanel" element={<AdminPanel/>}></Route>
       </>
     );
-  };*/
+  };
 
   const renderPatientRoutes = () => {
     return (
@@ -401,8 +401,7 @@ function App() {
         {typeof userData !== "undefined" &&
         userData !== null &&
         userData.UserInfo.role === 0 ? (
-          sidebarButtonsRescuer
-          //sidebarButtonsAdmin
+          sidebarButtonsAdmin
         ) : userData !== null && userData.UserInfo.role === 2 ? (
           sidebarButtonsDoctor
         ) : userData !== null && userData.UserInfo.role === 3 ? (
@@ -410,7 +409,8 @@ function App() {
             {sidebarButtonsDoctor} {sidebarButtonsChief}
           </>
         ) : userData !== null && userData.UserInfo.role === 4 ? (
-          sidebarButtonsPatient
+          //sidebarButtonsPatient
+          sidebarButtonsRescuer
         ) : (
           ""
         )}
@@ -450,10 +450,9 @@ function App() {
           {typeof userData !== "undefined" &&
           userData !== null &&
           userData.UserInfo.role === 0 ? (
-            renderRescuerRoutes()
-              /*<>
+              <>
                   {renderChiefRoutes()} {renderDoctorRoutes()} {renderAdminRoutes()}
-              </>*/
+              </>
           ) : typeof userData !== "undefined" &&
             userData !== null &&
             userData.UserInfo.role === 2 ? (
@@ -467,7 +466,8 @@ function App() {
           ) : typeof userData !== "undefined" &&
             userData !== null &&
             userData.UserInfo.role === 4 ? (
-            renderPatientRoutes()
+            //renderPatientRoutes()
+            renderRescuerRoutes()
           ) : (
             ""
           )}
