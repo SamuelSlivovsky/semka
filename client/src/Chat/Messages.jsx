@@ -9,7 +9,7 @@ import { Dialog } from "primereact/dialog";
 import AddUserForm from "../Forms/AddUserForm.jsx";
 
 const Messages = (props) => {
-  const messagesEndRef = useRef(null);
+  const messagesEndRef = useRef([]);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [image, setImage] = useState(null);
@@ -17,10 +17,7 @@ const Messages = (props) => {
   const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
   const [show, setShow] = useState(false);
   const [typers, setTypers] = useState([]);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  };
+  const [isScrolledDown, setIsScrolledDown] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -34,6 +31,7 @@ const Messages = (props) => {
     fetch(`/chat/spravy/${props.group}`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
+        messagesEndRef.current = messagesEndRef.current.slice(0, data.length);
         setMessages(
           data.map((item) => {
             return {
@@ -43,6 +41,9 @@ const Messages = (props) => {
               type: "text",
               fullName: item.MENO + " " + item.PRIEZVISKO,
               unformatedDate: new Date(item.UNFORMATED_DATE),
+              unreadId: item.unreadId,
+              unreadUserId: item.unreadUserId,
+              messageId: item.ID_SPRAVY,
             };
           })
         );
@@ -50,7 +51,16 @@ const Messages = (props) => {
   }, [props.group]);
 
   useEffect(() => {
-    scrollToBottom();
+    if (messagesEndRef.current) {
+      const unreadIndex = messages.findIndex(
+        (message) =>
+          message.unreadId &&
+          message.unreadUserId == userDataHelper.UserInfo.userid
+      );
+      if (unreadIndex >= 0)
+        messagesEndRef.current[unreadIndex]?.scrollIntoView();
+      else messagesEndRef.current[messages.length - 1]?.scrollIntoView();
+    }
   }, [messages]);
 
   useEffect(() => {
@@ -103,8 +113,33 @@ const Messages = (props) => {
         });
       }
     });
+
+    const container = document.getElementById("chat-messages");
+    const handleScroll = () => {
+      const scrolledDown =
+        container.scrollTop + container.clientHeight >= container.scrollHeight;
+      if (scrolledDown) {
+        const token = localStorage.getItem("hospit-user");
+        const requestOptions = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            authorization: "Bearer " + token,
+          },
+          body: JSON.stringify({
+            userid: userDataHelper.UserInfo.userid,
+            id_skupiny: props.group,
+          }),
+        };
+        fetch("/chat/updateRead", requestOptions);
+      }
+    };
+
+    if (container) container.addEventListener("scroll", handleScroll);
+
     return () => {
       socketService.disconnect();
+      if (container) container.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
@@ -187,16 +222,34 @@ const Messages = (props) => {
     fetch("/chat/insertUser", requestOptions).then(() => setShow(false));
   };
 
+  const headerTemplate = (options) => {
+    const { className, chooseButton, cancelButton } = options;
+    return (
+      <div
+        className={className}
+        style={{
+          backgroundColor: "transparent",
+          display: "flex",
+          alignItems: "center",
+        }}
+      >
+        {chooseButton}
+        {cancelButton}
+      </div>
+    );
+  };
+
   return (
     <div style={{ width: "100%" }}>
       <div>
-        <div className="chat-messages">
+        <div className="chat-messages" id="chat-messages">
           {messages.map((message, index) => {
             const prevMessage = messages[index - 1];
             return (
               <div
-                ref={messagesEndRef}
-                key={index}
+                ref={(el) => (messagesEndRef.current[index] = el)}
+                key={message.messageId}
+                unredkey={message.unreadId}
                 className={`message-container  ${message.sender} `}
               >
                 {isCurrentUser(message.sender) ? (
@@ -285,8 +338,15 @@ const Messages = (props) => {
                     <div style={{ display: "flex", width: "100%" }}>
                       <div
                         className={`avatar`}
-                        style={{ backgroundColor: "#3498db" }}
-                      ></div>
+                        style={{
+                          backgroundColor: "#3498db",
+                          display: "flex",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        K
+                      </div>
                       <div
                         className={`message ${
                           isCurrentUser(message.sender) ? "current-user" : ""
@@ -341,7 +401,7 @@ const Messages = (props) => {
               onKeyDown={(e) => {
                 if (e.code === "Enter") sendMessage();
               }}
-              placeholder="Type a message..."
+              placeholder="Napíš správu..."
               value={newMessage}
               onChange={handleInputChange}
             />
@@ -349,23 +409,24 @@ const Messages = (props) => {
           <FileUpload
             customUpload
             accept="image/*"
+            chooseLabel="Vložiť"
+            cancelLabel="Zrušiť"
+            headerTemplate={headerTemplate}
             maxFileSize={1000000}
             onSelect={handleImageChange}
             style={{ marginBottom: "10px" }}
-            emptyTemplate={
-              <p className="m-0">Drag and drop files to here to upload.</p>
-            }
+            emptyTemplate={<p className="m-0">Potiahni súbory tu.</p>}
           />
           <div style={{ display: "flex", gap: "10px" }}>
             <Button
               onClick={sendMessage}
               style={{ width: "100px" }}
-              label="Send"
+              label="Odoslať"
             ></Button>
             <Button
               onClick={addUser}
-              style={{ width: "100px" }}
-              label="Add"
+              style={{ width: "fit-content" }}
+              label="Pridať použivateľa"
               icon="pi pi-plus"
             ></Button>
           </div>
