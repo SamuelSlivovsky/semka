@@ -61,7 +61,7 @@ const Messages = (props) => {
         messagesEndRef.current[unreadIndex]?.scrollIntoView();
       else messagesEndRef.current[messages.length - 1]?.scrollIntoView();
     }
-  }, [messages]);
+  }, [messages]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     socketService.connect();
@@ -141,7 +141,7 @@ const Messages = (props) => {
       socketService.disconnect();
       if (container) container.removeEventListener("scroll", handleScroll);
     };
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sendMessage = () => {
     if (image) {
