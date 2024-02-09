@@ -100,7 +100,11 @@ async function getGroups(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT * from chat_skupina join user_chat using(id_skupiny) where userid =:id`,
+      `SELECT chat_skupina.nazov, chat_skupina.id_skupiny as id_skupiny, count(us.id_spravy) as pocet from chat_skupina join user_chat u on(u.id_skupiny = chat_skupina.id_skupiny) 
+      left join chat_sprava cs on (cs.id_skupiny = u.id_skupiny)
+      left join user_sprava us on (cs.id_spravy = us.id_spravy and u.userid = us.userid)
+      where u.userid =:id
+      group by chat_skupina.id_skupiny, nazov`,
       { id }
     );
 

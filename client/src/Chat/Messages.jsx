@@ -17,7 +17,6 @@ const Messages = (props) => {
   const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
   const [show, setShow] = useState(false);
   const [typers, setTypers] = useState([]);
-  const [isScrolledDown, setIsScrolledDown] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -132,6 +131,13 @@ const Messages = (props) => {
           }),
         };
         fetch("/chat/updateRead", requestOptions);
+
+        props.setGroups(
+          props.groups.map((item) => {
+            if (item.ID_SKUPINY == props.group) return { ...item, pocet: 0 };
+            else return item;
+          })
+        );
       }
     };
 

@@ -33,16 +33,47 @@ const Chat = () => {
                   justifyContent: "center",
                   alignItems: "center",
                   fontSize: "20px",
+                  position: "relative",
                 }}
                 onClick={() => setGroup(item.ID_SKUPINY)}
               >
                 <p>{item.NAZOV[0]}</p>
+                {item.POCET > 0 ? (
+                  <div
+                    style={{
+                      position: "absolute",
+                      top: "-4px",
+                      left: "25px",
+                      display: "inline-block",
+                      padding: "0 4px",
+                      minWidth: "8px",
+                      maxWidth: "18px",
+                      height: "16px",
+                      borderRadius: "22px",
+                      textAlign: "center",
+                      fontSize: "12px",
+                      fontWeight: "400",
+                      lineHeight: "16px",
+                      backgroundColor: "#c00",
+                      color: "#fff",
+                      zIndex: 9999,
+                    }}
+                  >
+                    {item.POCET}
+                  </div>
+                ) : (
+                  ""
+                )}
               </div>
             );
           })
         );
       });
   }, []);
+
+  useEffect(() => {
+    console.log(groups);
+  }, [groups]);
 
   return (
     <div className="chat-container">
@@ -57,7 +88,11 @@ const Chat = () => {
       >
         {groups}
       </div>
-      {group ? <Messages group={group} /> : "Vyber skupinu"}
+      {group ? (
+        <Messages group={group} setGroups={setGroups} groups={groups} />
+      ) : (
+        "Vyber skupinu"
+      )}
     </div>
   );
 };
