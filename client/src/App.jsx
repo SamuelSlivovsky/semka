@@ -20,6 +20,7 @@ import Storage from "./Views/Storage";
 import PharmacyStorage from "./Views/PharmacyStorage";
 import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
 import TabPharmacists from "./Views/Tables/TabPharmacists";
+import TabPrescriptions from "./Views/Tables/TabPrescriptions";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
@@ -397,6 +398,7 @@ function App() {
           <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
           <Route path="/pharmacy_managers" element={<TabPharmacyManagers></TabPharmacyManagers>}></Route>
           <Route path="/pharmacists" element={<TabPharmacists></TabPharmacists>}></Route>
+          <Route path="/prescriptions" element={<TabPrescriptions></TabPrescriptions>}></Route>
       </>
     );
   };
