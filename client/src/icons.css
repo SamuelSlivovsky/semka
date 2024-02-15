@@ -200,3 +200,13 @@
   height: 44px;
   width: 44px;
 }
+.medicaments-icon {
+  content: url('./images/medicaments_black.png');
+  height: 44px;
+  width: 44px;
+}
+.medical-aids-icon {
+  content: url('./images/medical_aids_black.png');
+  height: 44px;
+  width: 44px;
+}

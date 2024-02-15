@@ -13,6 +13,8 @@ import pharmacyStorageIcon from "../images/pharmacy_storage.png";
 import pharmacyManagerIcon from "../images/pharmacist_manager.png";
 import pharmacistIcon from "../images/pharmacist.png";
 import prescriptionsIcon from "../images/prescriptions.png";
+import medicamentsIcon from '../images/medicaments.png';
+import medicalAidsIcon from '../images/medical_aids.png';
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
@@ -176,6 +178,20 @@ function Home() {
       path="/patients"
       icon={patientIcon}
       key="2"
+    ></HomeCard>,
+    <HomeCard
+      title="Zoznam liekov"
+      isCalendar={false}
+      path="/medicaments"
+      icon={medicamentsIcon}
+      key="18"
+    ></HomeCard>,     
+    <HomeCard
+      title="Zoznam zdravotníckych pomôcok"
+      isCalendar={false}
+      path="/medicalAids"
+      icon={medicalAidsIcon}
+      key="19"
     ></HomeCard>,
     <HomeCard
     title="Sklad"

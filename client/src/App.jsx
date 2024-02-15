@@ -18,7 +18,10 @@ import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
 import PharmacyStorage from "./Views/PharmacyStorage";
+import TabMedicaments from "./Views/Tables/TabMedicaments";
+import TabMedicalAids from "./Views/Tables/TabMedicalAids";
 import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
+import PharmacyManagerCard from "./Profile/PharmacyManagerCard";
 import TabPharmacists from "./Views/Tables/TabPharmacists";
 import TabPrescriptions from "./Views/Tables/TabPrescriptions";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
@@ -280,11 +283,25 @@ function App() {
       icon="patient-icon"
   />,
     <SidebarButton
-    key="10"
-    visibleLeft={visibleLeft}
-    path="/sklad"
-    label="Sklad"
-    icon="storage-icon"
+      key="18"
+      visibleLeft={visibleLeft}
+      path="/medicaments"
+      label="Zoznam liekov"
+      icon="medicaments-icon"
+  />, 
+    <SidebarButton
+      key="19"
+      visibleLeft={visibleLeft}
+      path="/medicalAids"
+      label="Zoznam zdravotníckych pomôcok"
+      icon="medical-aids-icon"
+  />, 
+    <SidebarButton
+      key="10"
+      visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
   />,  
     <SidebarButton
       key="14"
@@ -394,11 +411,14 @@ function App() {
     return (
       <>
           <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
+          <Route path="/medicaments" element={<TabMedicaments></TabMedicaments>}></Route>  
+          <Route path="/medicalAids" element={<TabMedicalAids></TabMedicalAids>}></Route>  
           <Route path="/sklad" element={<Storage />}></Route>
           <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
           <Route path="/pharmacy_managers" element={<TabPharmacyManagers></TabPharmacyManagers>}></Route>
+          <Route path="/pharmacy_manager" element={<PharmacyManagerCard></PharmacyManagerCard>}></Route>
           <Route path="/pharmacists" element={<TabPharmacists></TabPharmacists>}></Route>
-          <Route path="/prescriptions" element={<TabPrescriptions></TabPrescriptions>}></Route>
+          <Route path="/prescriptions" element={<TabPrescriptions></TabPrescriptions>}></Route>  
       </>
     );
   };

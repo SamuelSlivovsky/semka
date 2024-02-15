@@ -17,4 +17,6 @@ router.get(
     controller.getLekarnici
 );
 
+router.get("/info/:id", verify.verifyRoles(0, 10), controller.getManazerLekarneInfo);
+
 module.exports = router;

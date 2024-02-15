@@ -19,4 +19,11 @@ module.exports = {
             res.status(200).json(lekarnici);
         })();
     },
+    getManazerLekarneInfo: (req, res) => {
+        const manazerLekarne = require("../models/manazer_lekarne");
+        (async () => {
+            info = await manazerLekarne.getLegetManazerLekarneInfokarInfo(req.params.id);
+            res.status(200).json(info);
+        })();
+    },
 };
