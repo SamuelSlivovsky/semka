@@ -10,6 +10,18 @@ module.exports = {
     });
   },
 
+  getNextSpravy: (req, res) => {
+    console.log(req.params);
+    const chat = require("../models/chat");
+    (async () => {
+      ret_val = await chat.getNextSpravy(req.params.id, req.params.id_spravy);
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+
   getUnread: (req, res) => {
     const chat = require("../models/chat");
     (async () => {

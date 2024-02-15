@@ -17,6 +17,8 @@ const Messages = (props) => {
   const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
   const [show, setShow] = useState(false);
   const [typers, setTypers] = useState([]);
+  const [allowScroll, setAllowScroll] = useState(true);
+  const [nextScrollLength, setNextScrollLength] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -50,7 +52,7 @@ const Messages = (props) => {
   }, [props.group]);
 
   useEffect(() => {
-    if (messagesEndRef.current) {
+    if (messagesEndRef.current && allowScroll) {
       const unreadIndex = messages.findIndex(
         (message) =>
           message.unreadId &&
@@ -59,6 +61,8 @@ const Messages = (props) => {
       if (unreadIndex >= 0)
         messagesEndRef.current[unreadIndex]?.scrollIntoView();
       else messagesEndRef.current[messages.length - 1]?.scrollIntoView();
+    } else if (messagesEndRef.current && !allowScroll && nextScrollLength > 0) {
+      messagesEndRef.current[nextScrollLength - 1]?.scrollIntoView();
     }
   }, [messages]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -150,6 +154,7 @@ const Messages = (props) => {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sendMessage = () => {
+    setAllowScroll(true);
     if (image) {
       socketService.emit("sendImage", image, {
         userId: userDataHelper.UserInfo.userid,
@@ -245,10 +250,58 @@ const Messages = (props) => {
     );
   };
 
+  const handleTopScroll = async (e) => {
+    const container = e.target;
+    const scrolledToTop = container.scrollTop === 0;
+
+    if (scrolledToTop) await fetchPreviousMessages();
+  };
+
+  const fetchPreviousMessages = async () => {
+    setAllowScroll(false);
+    const token = localStorage.getItem("hospit-user");
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
+    };
+
+    fetch(
+      `/chat/nextSpravy/${props.group}/${messages[0].messageId}`,
+      requestOptions
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setNextScrollLength(data.length);
+        data = data.map((item) => {
+          return {
+            content: item.SPRAVA,
+            date: item.DATUM,
+            sender: Number(item.USERID),
+            type: "text",
+            fullName: item.MENO + " " + item.PRIEZVISKO,
+            unformatedDate: new Date(item.UNFORMATED_DATE),
+            unreadId: item.unreadId,
+            unreadUserId: item.unreadUserId,
+            messageId: item.ID_SPRAVY,
+          };
+        });
+        data = [...data, ...messages];
+        messagesEndRef.current = messagesEndRef.current.slice(0, data.length);
+        setMessages(data);
+      });
+  };
+
   return (
     <div style={{ width: "100%" }}>
       <div>
-        <div className="chat-messages" id="chat-messages">
+        <div
+          className="chat-messages"
+          id="chat-messages"
+          onScroll={(e) => handleTopScroll(e)}
+        >
           {messages.map((message, index) => {
             const prevMessage = messages[index - 1];
             return (
