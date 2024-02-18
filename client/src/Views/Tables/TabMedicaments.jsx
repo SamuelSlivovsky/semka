@@ -22,7 +22,7 @@ export default function TabMedicaments() {
         const token = localStorage.getItem("hospit-user");
         const userDataHelper = GetUserData(token);
         const headers = {authorization: "Bearer " + token};
-        fetch(`/medicaments/zoznamLiekov/${userDataHelper.UserInfo.userid}`, {
+        fetch(`/pharmacyManagers/zoznamLiekov/${userDataHelper.UserInfo.userid}`, {
             headers,
         })
             .then((response) => {

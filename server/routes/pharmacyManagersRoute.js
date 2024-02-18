@@ -17,6 +17,20 @@ router.get(
     controller.getLekarnici
 );
 
+router.get(
+    "/zoznamLiekov/:id",
+    verify.verifyRoles(0, 10),
+    verify.checkForCorrectId(),
+    controller.getZoznamLiekov
+);
+
+router.get(
+    "/zoznamZdravotnickychPomocok/:id",
+    verify.verifyRoles(0, 10),
+    verify.checkForCorrectId(),
+    controller.getZoznamZdravotnickychPomocok
+);
+
 router.get("/info/:id", verify.verifyRoles(0, 10), controller.getManazerLekarneInfo);
 
 module.exports = router;

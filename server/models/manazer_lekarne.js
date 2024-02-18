@@ -55,8 +55,34 @@ async function getManazeriLekarni() {
     }
   }
 
+  async function getZoznamLiekov() {
+    try {
+      let conn = await database.getConnection();
+      const result = await conn.execute(
+        `select * from liek`,
+      );
+      return result.rows;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  async function getZoznamZdravotnickychPomocok() {
+    try {
+      let conn = await database.getConnection();
+      const result = await conn.execute(
+        `select * from zdravotna_pomocka`,
+      );
+      return result.rows;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   module.exports = {
     getManazeriLekarni,
     getLekarnici,
     getManazerLekarneInfo,
+    getZoznamLiekov,
+    getZoznamZdravotnickychPomocok,
   };
