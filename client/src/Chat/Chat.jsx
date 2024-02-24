@@ -71,10 +71,6 @@ const Chat = () => {
       });
   }, []);
 
-  useEffect(() => {
-    console.log(groups);
-  }, [groups]);
-
   return (
     <div className="chat-container">
       <div

@@ -2,7 +2,7 @@ module.exports = {
   getSpravy: (req, res) => {
     const chat = require("../models/chat");
     (async () => {
-      ret_val = await chat.getSpravy(req.params.id);
+      ret_val = await chat.getSpravy(req.params.id_skupiny, req.params.userid);
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);
@@ -78,5 +78,19 @@ module.exports = {
       console.error(err);
       res.status(403).send(err);
     });
+  },
+
+  getObrazok: (req, res) => {
+    const chat = require("../models/chat");
+    (async () => {
+      ret_val = await chat.getObrazok(req.params.id);
+      if (typeof ret_val !== "undefined") {
+        res.status(200).write(ret_val, "binary");
+        res.end(null, "binary");
+      } else {
+        res.status(200).write("");
+        res.end(null, "binary");
+      }
+    })();
   },
 };

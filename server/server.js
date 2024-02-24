@@ -55,22 +55,21 @@ app.use("/chat", chatRoute);
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
   socket.on("sendMessage", (message, params) => {
-
-    
     io.emit("newMessage", {
       content: message,
+      image: params.image,
       sender: params.userId,
       type: "text",
     });
   });
 
-  socket.on("sendImage", (image, params) => {
-    io.emit("newMessage", {
-      content: image,
-      sender: params.userId,
-      type: "image",
-    });
-  });
+  // socket.on("sendImage", (image, params) => {
+  //   io.emit("newMessage", {
+  //     content: image,
+  //     sender: params.userId,
+  //     type: "image",
+  //   });
+  // });
 
   socket.on("disconnect", () => {});
   socket.on("typing", (params) => {

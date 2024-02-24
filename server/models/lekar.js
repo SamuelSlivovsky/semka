@@ -47,12 +47,23 @@ async function getPacienti(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT o.meno, p.rod_cislo, o.priezvisko, o.psc,p.id_pacienta
-      FROM pacient p
-      JOIN os_udaje o on(p.rod_cislo = o.rod_cislo)
-      JOIN nemocnica using (id_nemocnice)
-      JOIN zamestnanci using (id_nemocnice)
-      WHERE cislo_zam = :pid_lekara`,
+      `SELECT id_pacienta, meno, rod_cislo, priezvisko, psc,
+      CASE WHEN id_hosp IS NULL THEN 0 ELSE 1 END AS je_hospit
+FROM (
+   SELECT p.id_pacienta, o.meno, p.rod_cislo, o.priezvisko, o.psc, h.id_hosp, h.dat_do,
+          ROW_NUMBER() OVER (PARTITION BY p.id_pacienta ORDER BY h.dat_do DESC NULLS FIRST) AS rn_hosp
+   FROM pacient p
+   LEFT JOIN zdravotna_karta zk ON zk.id_pacienta = p.id_pacienta
+   LEFT JOIN zdravotny_zaz z ON z.id_karty = zk.id_karty AND TRUNC(z.datum) <= TRUNC(SYSDATE)
+   LEFT JOIN hospitalizacia h ON h.id_zaznamu = z.id_zaznamu
+   JOIN os_udaje o ON p.rod_cislo = o.rod_cislo
+   JOIN nemocnica USING (id_nemocnice)
+   JOIN zamestnanci USING (id_nemocnice)
+   WHERE zamestnanci.cislo_zam = :pid_lekara
+) sub
+WHERE rn_hosp = 1
+ORDER BY id_pacienta
+`,
       { pid_lekara }
     );
     return result.rows;

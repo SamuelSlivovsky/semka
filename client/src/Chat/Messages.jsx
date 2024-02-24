@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { InputText } from "primereact/inputtext";
 import { FileUpload } from "primereact/fileupload";
 import { Button } from "primereact/button";
+import { ProgressSpinner } from "primereact/progressspinner";
 import socketService from "../service/socketService.js";
 import GetUserData from "../Auth/GetUserData.jsx";
 import "../styles/chat.css";
@@ -15,43 +16,84 @@ const Messages = (props) => {
   const [image, setImage] = useState(null);
   const [mySocketId, setMySocketId] = useState("");
   const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
+  const [loading, setLoading] = useState(true);
+  const [showButton, setShowButton] = useState(false);
   const [show, setShow] = useState(false);
   const [typers, setTypers] = useState([]);
   const [allowScroll, setAllowScroll] = useState(true);
   const [nextScrollLength, setNextScrollLength] = useState(0);
+  const [base64Data, setBase64Data] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("hospit-user");
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + token,
-      },
-    };
-    fetch(`/chat/spravy/${props.group}`, requestOptions)
-      .then((response) => response.json())
-      .then((data) => {
-        messagesEndRef.current = messagesEndRef.current.slice(0, data.length);
-        setMessages(
-          data.map((item) => {
-            return {
+    setLoading(true);
+    const fetchData = async () => {
+      setAllowScroll(true);
+      const token = localStorage.getItem("hospit-user");
+      const requestOptions = {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: "Bearer " + token,
+        },
+      };
+
+      try {
+        const response = await fetch(
+          `/chat/spravy/${props.group}/${userDataHelper.UserInfo.userid}`,
+          requestOptions
+        );
+        const data = await response.json();
+
+        const updatedMessages = [];
+        await Promise.all(
+          data.map(async (item) => {
+            const message = {
               content: item.SPRAVA,
               date: item.DATUM,
               sender: Number(item.USERID),
               type: "text",
               fullName: item.MENO + " " + item.PRIEZVISKO,
-              unformatedDate: new Date(item.UNFORMATED_DATE),
+              unformatedDate: new Date(item.UNFORMATTED_DATE),
               unreadId: item.unreadId,
               unreadUserId: item.unreadUserId,
               messageId: item.ID_SPRAVY,
             };
+
+            if (item.HAS_OBRAZOK == 1) {
+              try {
+                const imageResponse = await fetch(
+                  `/chat/obrazok/${item.ID_SPRAVY}`,
+                  requestOptions
+                );
+                const blob = await imageResponse.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                message.image = imageUrl;
+              } catch (error) {
+                console.error("Error fetching image:", error);
+              }
+            }
+
+            updatedMessages.push(message);
           })
         );
-      });
+        messagesEndRef.current = messagesEndRef.current.slice(0, data.length);
+        setMessages(
+          updatedMessages.sort(
+            (a, b) => new Date(a.unformatedDate) - new Date(b.unformatedDate)
+          )
+        );
+        setLoading(false);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, [props.group]);
 
   useEffect(() => {
+    const container = document.getElementById("chat-messages");
     if (messagesEndRef.current && allowScroll) {
       const unreadIndex = messages.findIndex(
         (message) =>
@@ -60,7 +102,9 @@ const Messages = (props) => {
       );
       if (unreadIndex >= 0)
         messagesEndRef.current[unreadIndex]?.scrollIntoView();
-      else messagesEndRef.current[messages.length - 1]?.scrollIntoView();
+      else {
+        container.scrollTop = container.scrollHeight;
+      }
     } else if (messagesEndRef.current && !allowScroll && nextScrollLength > 0) {
       messagesEndRef.current[nextScrollLength - 1]?.scrollIntoView();
     }
@@ -93,10 +137,6 @@ const Messages = (props) => {
         };
         fetch("/chat/updateRead", requestOptions);
       }
-    });
-
-    socketService.on("newImage", (imageMessage) => {
-      setMessages((prevMessages) => [...prevMessages, imageMessage]);
     });
 
     socketService.on("isTyping", (data) => {
@@ -155,23 +195,22 @@ const Messages = (props) => {
 
   const sendMessage = () => {
     setAllowScroll(true);
-    if (image) {
-      socketService.emit("sendImage", image, {
+    socketService.emit(
+      "sendMessage",
+      newMessage == "" && image ? " " : newMessage,
+      {
         userId: userDataHelper.UserInfo.userid,
-      });
-      setImage(null);
-    } else if (newMessage.trim() !== "") {
-      socketService.emit("sendMessage", newMessage, {
-        userId: userDataHelper.UserInfo.userid,
-      });
+        image: image,
+      }
+    );
 
-      insertMessage(newMessage);
-    }
-
+    insertMessage(newMessage == "" && image ? " " : newMessage);
+    setImage(null);
     setNewMessage("");
   };
 
   const insertMessage = async (message) => {
+    console.log("first");
     const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",
@@ -184,6 +223,7 @@ const Messages = (props) => {
         id_skupiny: props.group,
         sprava: message,
         datum: new Date().toLocaleString("en-GB").replace(",", ""),
+        priloha: base64Data,
       }),
     };
     await fetch("/chat/add", requestOptions);
@@ -206,6 +246,7 @@ const Messages = (props) => {
       };
       reader.readAsDataURL(file);
     }
+    customBase64Uploader(e);
   };
 
   const openImageInNewTab = (imageUrl) => {
@@ -253,12 +294,19 @@ const Messages = (props) => {
   const handleTopScroll = async (e) => {
     const container = e.target;
     const scrolledToTop = container.scrollTop === 0;
+    if (container.scrollTopMax - container.scrollTop > 300 && !showButton)
+      setShowButton(true);
+    else if (container.scrollTopMax == container.scrollTop)
+      setShowButton(false);
 
-    if (scrolledToTop) await fetchPreviousMessages();
+    if (scrolledToTop && allowScroll && messages.length > 0)
+      await fetchPreviousMessages();
+    else if (!scrolledToTop) setAllowScroll(true);
   };
 
   const fetchPreviousMessages = async () => {
     setAllowScroll(false);
+    setLoading(true);
     const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "GET",
@@ -269,7 +317,7 @@ const Messages = (props) => {
     };
 
     fetch(
-      `/chat/nextSpravy/${props.group}/${messages[0].messageId}`,
+      `/chat/nextSpravy/${props.group}/${messages[0]?.messageId}`,
       requestOptions
     )
       .then((response) => response.json())
@@ -291,143 +339,215 @@ const Messages = (props) => {
         data = [...data, ...messages];
         messagesEndRef.current = messagesEndRef.current.slice(0, data.length);
         setMessages(data);
+        setLoading(false);
       });
+  };
+
+  const customBase64Uploader = async (event) => {
+    // convert file to base64 encoded
+    const file = event.files[0];
+    const reader = new FileReader();
+    let blob = await fetch(file.objectURL).then((r) => r.blob()); //blob:url
+    reader.readAsDataURL(blob);
+    reader.onloadend = function () {
+      setBase64Data(reader.result.substring(reader.result.indexOf(",") + 1));
+    };
   };
 
   return (
     <div style={{ width: "100%" }}>
-      <div>
+      <div style={{ position: "relative" }}>
+        {showButton ? (
+          <Button
+            label="Scroll down"
+            icon="pi pi-chevron-down"
+            iconPos="right"
+            style={{
+              position: "absolute",
+              bottom: 350,
+              zIndex: 999,
+              left: 290,
+            }}
+            onClick={() => {
+              messagesEndRef.current[messages.length - 1]?.scrollIntoView({
+                behavior: "smooth",
+              });
+            }}
+          />
+        ) : (
+          ""
+        )}
         <div
           className="chat-messages"
+          style={{ position: "relative" }}
           id="chat-messages"
           onScroll={(e) => handleTopScroll(e)}
         >
-          {messages.map((message, index) => {
-            const prevMessage = messages[index - 1];
-            return (
-              <div
-                ref={(el) => (messagesEndRef.current[index] = el)}
-                key={message.messageId}
-                unredkey={message.unreadId}
-                className={`message-container  ${message.sender} `}
-              >
-                {isCurrentUser(message.sender) ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      width: "100%",
-                      flexDirection: "column",
-                      rowGap: "8px",
-                    }}
-                  >
-                    {index === 0 ||
-                    (message.new &&
-                      (message.unformatedDate - prevMessage.unformatedDate) /
-                        (1000 * 60) >
-                        5) ||
-                    (index > 0 && prevMessage.sender !== message.sender) ||
-                    (index > 0 &&
-                      prevMessage.sender === message.sender &&
-                      (message.unformatedDate - prevMessage.unformatedDate) /
-                        (1000 * 60) >
-                        5) ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "10px",
-                          fontSize: "12px",
-                          marginLeft: "auto",
-                          marginRight: "16px",
-                        }}
-                      >
-                        {message.new ? "Teraz" : message.date}
-                      </div>
-                    ) : (
-                      ""
-                    )}
+          {loading ? (
+            <div
+              style={{
+                width: "100%",
+                height: "600px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ProgressSpinner />
+            </div>
+          ) : (
+            messages.map((message, index) => {
+              const prevMessage = messages[index - 1];
+              return (
+                <div
+                  ref={(el) => (messagesEndRef.current[index] = el)}
+                  key={message.messageId}
+                  unredkey={message.unreadId}
+                  className={`message-container  ${message.sender} `}
+                >
+                  {isCurrentUser(message.sender) ? (
                     <div
-                      className={`message ${
-                        isCurrentUser(message.sender) ? "current-user" : ""
-                      }`}
+                      style={{
+                        display: "flex",
+                        width: "100%",
+                        flexDirection: "column",
+                        rowGap: "8px",
+                      }}
                     >
-                      {message.type === "image" ? (
-                        <img
-                          src={message.content}
-                          alt="sent"
-                          onClick={() => openImageInNewTab(message.content)}
-                          className="image-preview"
-                        />
+                      {index === 0 ||
+                      (message.new &&
+                        (message.unformatedDate - prevMessage.unformatedDate) /
+                          (1000 * 60) >
+                          5) ||
+                      (index > 0 && prevMessage.sender !== message.sender) ||
+                      (index > 0 &&
+                        prevMessage.sender === message.sender &&
+                        (message.unformatedDate - prevMessage.unformatedDate) /
+                          (1000 * 60) >
+                          5) ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            fontSize: "12px",
+                            marginLeft: "auto",
+                            marginRight: "16px",
+                          }}
+                        >
+                          {message.new ? "Teraz" : message.date}
+                        </div>
                       ) : (
-                        <span style={{ marginLeft: "auto" }}>
-                          {message.content}
-                        </span>
-                      )}{" "}
-                    </div>
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      width: "100%",
-                      flexDirection: "column",
-                      rowGap: "8px",
-                    }}
-                  >
-                    {index === 0 ||
-                    (index > 0 && prevMessage.sender !== message.sender) ||
-                    (index > 0 &&
-                      prevMessage.sender === message.sender &&
-                      (message.unformatedDate - prevMessage.unformatedDate) /
-                        (1000 * 60) >
-                        5) ? (
-                      <div
-                        style={{
-                          display: "flex",
-                          gap: "10px",
-                          fontSize: "0.875rem",
-                          alignItems: "center",
-                        }}
-                      >
-                        <b>{message.fullName}</b>
-                        <span style={{ fontSize: "12px" }}>{message.date}</span>
-                      </div>
-                    ) : (
-                      ""
-                    )}
-                    <div style={{ display: "flex", width: "100%" }}>
-                      <div
-                        className={`avatar`}
-                        style={{
-                          backgroundColor: "#3498db",
-                          display: "flex",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        K
-                      </div>
+                        ""
+                      )}
                       <div
                         className={`message ${
                           isCurrentUser(message.sender) ? "current-user" : ""
                         }`}
                       >
-                        {message.type === "image" ? (
-                          <img
-                            src={message.content}
-                            alt="sent"
-                            onClick={() => openImageInNewTab(message.content)}
-                            className="image-preview"
-                          />
-                        ) : (
-                          message.content
-                        )}{" "}
+                        <span
+                          style={{
+                            marginLeft: "auto",
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "10px",
+                          }}
+                        >
+                          {message.content}
+                          {message.image ? (
+                            <img
+                              height={"60px"}
+                              width={"auto"}
+                              loading="eager"
+                              src={message.image}
+                              alt="sent"
+                              onClick={() => openImageInNewTab(message.image)}
+                              className="image-preview"
+                            />
+                          ) : (
+                            ""
+                          )}
+                        </span>
                       </div>
                     </div>
-                  </div>
-                )}
-              </div>
-            );
-          })}
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        width: "100%",
+                        flexDirection: "column",
+                        rowGap: "8px",
+                      }}
+                    >
+                      {index === 0 ||
+                      (index > 0 && prevMessage.sender !== message.sender) ||
+                      (index > 0 &&
+                        prevMessage.sender === message.sender &&
+                        (message.unformatedDate - prevMessage.unformatedDate) /
+                          (1000 * 60) >
+                          5) ? (
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "10px",
+                            fontSize: "0.875rem",
+                            alignItems: "center",
+                          }}
+                        >
+                          <b>{message.fullName}</b>
+                          <span style={{ fontSize: "12px" }}>
+                            {message.date}
+                          </span>
+                        </div>
+                      ) : (
+                        ""
+                      )}
+                      <div style={{ display: "flex", width: "100%" }}>
+                        <div
+                          className={`avatar`}
+                          style={{
+                            backgroundColor: "#3498db",
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                          }}
+                        >
+                          K
+                        </div>
+                        <div
+                          className={`message ${
+                            isCurrentUser(message.sender) ? "current-user" : ""
+                          }`}
+                        >
+                          <span
+                            style={{
+                              display: "flex",
+                              flexDirection: "column",
+                              gap: "10px",
+                            }}
+                          >
+                            {message.content}{" "}
+                            {message.image ? (
+                              <img
+                                height={"60px"}
+                                width={"auto"}
+                                loading="eager"
+                                src={message.image}
+                                alt="sent"
+                                onClick={() => openImageInNewTab(message.image)}
+                                className="image-preview"
+                              />
+                            ) : (
+                              ""
+                            )}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
           {typers
             .filter((item) => !item.isEmpty)
             .map((item) => {
@@ -471,8 +591,9 @@ const Messages = (props) => {
             chooseLabel="Vložiť"
             cancelLabel="Zrušiť"
             headerTemplate={headerTemplate}
-            maxFileSize={1000000}
+            maxFileSize={3000000}
             onSelect={handleImageChange}
+            uploadHandler={customBase64Uploader}
             style={{ marginBottom: "10px" }}
             emptyTemplate={<p className="m-0">Potiahni súbory tu.</p>}
           />
