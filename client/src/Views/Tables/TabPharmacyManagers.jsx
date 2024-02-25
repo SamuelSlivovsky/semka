@@ -49,13 +49,12 @@ export default function TabPharmacyManagers() {
 
     const onSubmit = () => {
         setShowDialog(false);
-        navigate("/patient", {state: selectedRow.ID_PACIENTA});
+        navigate("/pharmacy_manager", {state: selectedRow.CISLO_ZAM});
     };
 
     const handleClick = (value) => {
-        navigate("/patient", {state: value.ID_PACIENTA});
-        // setShowDialog(true);
-        // setSelectedRow(value);
+        setShowDialog(true);
+        setSelectedRow(value);
     };
 
     const renderDialogFooter = () => {

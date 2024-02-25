@@ -10,12 +10,12 @@ router.get(
 router.post("/add", verify.verifyRoles(0, 2, 3, 10), controller.insertDrug);
 router.post(
   "/updateQuantity",
-  verify.verifyRoles(0, 2, 3, 10),
+  verify.verifyRoles(0, 2, 3),
   controller.updateQuantity
 );
 router.post(
   "/deleteSarza",
-  verify.verifyRoles(0, 2, 3, 10),
+  verify.verifyRoles(0, 2, 3),
   controller.deleteSarza
 );
 

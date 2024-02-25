@@ -24,7 +24,15 @@ module.exports = {
     getManazerLekarneInfo: (req, res) => {
         const manazerLekarne = require("../models/manazer_lekarne");
         (async () => {
-            info = await manazerLekarne.getLegetManazerLekarneInfokarInfo(req.params.id);
+            info = await manazerLekarne.getManazerLekarneInfo(req.params.id);
+            res.status(200).json(info);
+        })();
+    },
+
+    getLekarniciInfo: (req, res) => {
+        const lekarnik = require("../models/manazer_lekarne");
+        (async () => {
+            info = await lekarnik.getLekarniciInfo(req.params.id);
             res.status(200).json(info);
         })();
     },

@@ -31,6 +31,8 @@ router.get(
     controller.getZoznamZdravotnickychPomocok
 );
 
-router.get("/info/:id", verify.verifyRoles(0, 10), controller.getManazerLekarneInfo);
+router.get("/manazerLekarneInfo/:id", verify.verifyRoles(0, 10), controller.getManazerLekarneInfo);
+
+router.get("/lekarnikInfo/:id", verify.verifyRoles(0, 10), controller.getLekarniciInfo);
 
 module.exports = router;

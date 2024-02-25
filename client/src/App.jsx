@@ -23,6 +23,7 @@ import TabMedicalAids from "./Views/Tables/TabMedicalAids";
 import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
 import PharmacyManagerCard from "./Profile/PharmacyManagerCard";
 import TabPharmacists from "./Views/Tables/TabPharmacists";
+import PharmacistCard from "./Profile/PharmacistCard";
 import TabPrescriptions from "./Views/Tables/TabPrescriptions";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
@@ -418,6 +419,7 @@ function App() {
           <Route path="/pharmacy_managers" element={<TabPharmacyManagers></TabPharmacyManagers>}></Route>
           <Route path="/pharmacy_manager" element={<PharmacyManagerCard></PharmacyManagerCard>}></Route>
           <Route path="/pharmacists" element={<TabPharmacists></TabPharmacists>}></Route>
+          <Route path="/pharmacist" element={<PharmacistCard></PharmacistCard>}></Route>
           <Route path="/prescriptions" element={<TabPrescriptions></TabPrescriptions>}></Route>  
       </>
     );

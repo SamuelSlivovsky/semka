@@ -39,7 +39,6 @@ export default function TabPharmacists() {
             })
             .then((data) => {
                 setLekarnici(data);
-                console.log(data);
             });
     }, []);
 
@@ -50,13 +49,12 @@ export default function TabPharmacists() {
 
     const onSubmit = () => {
         setShowDialog(false);
-        navigate("/patient", {state: selectedRow.ID_PACIENTA});
+        navigate("/pharmacist", {state: selectedRow.CISLO_ZAM});
     };
 
     const handleClick = (value) => {
-        navigate("/patient", {state: value.ID_PACIENTA});
-        // setShowDialog(true);
-        // setSelectedRow(value);
+        setShowDialog(true);
+        setSelectedRow(value);
     };
 
     const renderDialogFooter = () => {

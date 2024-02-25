@@ -55,6 +55,26 @@ async function getManazeriLekarni() {
     }
   }
 
+  async function getLekarniciInfo(id) {
+    try {
+      let conn = await database.getConnection();
+      const info = await conn.execute(
+        `select os_udaje.rod_cislo, meno, priezvisko,trunc(months_between(sysdate, to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) 
+        || '.' || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek, to_char(to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) || '.' 
+        || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,
+        PSC, mesto.nazov as nazov_obce from zamestnanci
+                    join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
+                    join mesto using(PSC) 
+                      where zamestnanci.cislo_zam = :id`,
+        [id]
+      );
+  
+      return info.rows;
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
   async function getZoznamLiekov() {
     try {
       let conn = await database.getConnection();
@@ -83,6 +103,7 @@ async function getManazeriLekarni() {
     getManazeriLekarni,
     getLekarnici,
     getManazerLekarneInfo,
+    getLekarniciInfo,
     getZoznamLiekov,
     getZoznamZdravotnickychPomocok,
   };
