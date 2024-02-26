@@ -315,7 +315,7 @@ function App() {
       key="15"
       visibleLeft={visibleLeft}
       path="/pharmacy_managers"
-      label="Manažéri lekární"
+      label="Manažéri lekární na Slovensku"
       icon="pharmacy-manager-icon"
   />,  
     <SidebarButton

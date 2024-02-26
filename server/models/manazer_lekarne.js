@@ -10,7 +10,7 @@ async function getManazeriLekarni() {
         join os_udaje using (rod_cislo)
         join lekaren on (zamestnanci.id_lekarne = lekaren.id_lekarne)
         join mesto on (mesto.PSC = lekaren.PSC)
-        where id_typ = 10`,
+        where zamestnanci.id_typ = 10`,
       );
       return result.rows;
     } catch (err) {

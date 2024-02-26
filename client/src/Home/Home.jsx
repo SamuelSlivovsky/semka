@@ -208,7 +208,7 @@ function Home() {
     key="14"
   ></HomeCard>,
   <HomeCard
-    title="Manažéri lekární"
+    title="Manažéri lekární na Slovensku"
     isCalendar={false}
     path="/pharmacy_managers"
     icon={pharmacyManagerIcon}
