@@ -48,6 +48,17 @@ module.exports = {
         })();
     },
 
+    getDetailLieku: (req, res) => {
+        const detailLieku = require("../models/manazer_lekarne");
+        (async () => {
+            detailyLiekov = await detailLieku.getDetailLieku(req.params.id);
+            // if (req.role === 0) {
+            //     manazeriLekarni = hashPacienti(manazeriLekarni);
+            // }
+            res.status(200).json(detailyLiekov);
+        })();
+    },
+
         getZoznamZdravotnickychPomocok: (req, res) => {
         const pomocka = require("../models/manazer_lekarne");
         (async () => {
@@ -56,6 +67,17 @@ module.exports = {
             //     manazeriLekarni = hashPacienti(manazeriLekarni);
             // }
             res.status(200).json(zoznamZdravotnickychPomocok);
+        })();
+    },
+
+    getDetailZdravotnickejPomocky: (req, res) => {
+        const detailZdravotnickejPomocky = require("../models/manazer_lekarne");
+        (async () => {
+            detailyZdravotnickychPomocok= await detailZdravotnickejPomocky.getDetailZdravotnickejPomocky(req.params.id);
+            // if (req.role === 0) {
+            //     manazeriLekarni = hashPacienti(manazeriLekarni);
+            // }
+            res.status(200).json(detailyZdravotnickychPomocok);
         })();
     },
 };

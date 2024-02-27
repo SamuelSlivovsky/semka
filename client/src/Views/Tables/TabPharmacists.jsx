@@ -17,6 +17,7 @@ export default function TabPharmacists() {
     const toast = useRef(null);
     const [lekarnici, setLekarnici] = useState([]);
     const navigate = useNavigate();
+    const [nazovLekarne, setNazovLekarne] = useState([]);
 
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
@@ -39,6 +40,9 @@ export default function TabPharmacists() {
             })
             .then((data) => {
                 setLekarnici(data);
+                if (data.length > 0) {
+                    setNazovLekarne(data[0].LEKAREN_NAZOV)
+                }
             });
     }, []);
 
@@ -80,7 +84,6 @@ export default function TabPharmacists() {
         return (
             <div className="flex justify-content-between">
                 <div className="table-header">
-                    <div className="mr-4"><h2>Lekárnici</h2></div>
                     <span className="p-input-icon-left">
             <i className="pi pi-search"/>
             <InputText
@@ -89,6 +92,7 @@ export default function TabPharmacists() {
                 placeholder="Keyword Search"
             />
           </span>
+          <div className="ml-4"><h2>Zoznam lekárnikov pracujúcich v lekárni: </h2><h3>{nazovLekarne}</h3></div>
                 </div>
             </div>
         );
@@ -125,14 +129,14 @@ export default function TabPharmacists() {
                 operator: FilterOperator.AND,
                 constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}],
             },
-            MESTO_NAZOV: {
-                operator: FilterOperator.AND,
-                constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-            },
-            LEKAREN_NAZOV: {
-                operator: FilterOperator.AND,
-                constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-            },
+            // MESTO_NAZOV: {
+            //     operator: FilterOperator.AND,
+            //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
+            // },
+            // LEKAREN_NAZOV: {
+            //     operator: FilterOperator.AND,
+            //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
+            // },
         });
         setGlobalFilterValue("");
     };
@@ -161,8 +165,8 @@ export default function TabPharmacists() {
                     <Column field="MENO" header={"Meno"} filter></Column>
                     <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
                     <Column field="CISLO_ZAM" header={"ID zamestnanca"} filter></Column>
-                    <Column field="LEKAREN_NAZOV" header={"Názov lekárne"} filter></Column>
-                    <Column field="MESTO_NAZOV" header={"Mesto"} filter></Column>
+                    {/* <Column field="LEKAREN_NAZOV" header={"Názov lekárne"} filter></Column> */}
+                    {/* <Column field="MESTO_NAZOV" header={"Mesto"} filter></Column> */}
                 </DataTable>
             </div>
             <Dialog

@@ -80,7 +80,6 @@ export default function TabPharmacyManagers() {
         return (
             <div className="flex justify-content-between">
                 <div className="table-header">
-                    <div className="mr-4"><h2>Manažéri lekární</h2></div>
                     <span className="p-input-icon-left">
             <i className="pi pi-search"/>
             <InputText
@@ -89,6 +88,7 @@ export default function TabPharmacyManagers() {
                 placeholder="Keyword Search"
             />
           </span>
+          <div className="ml-4"><h2>Manažéri lekární na Slovensku</h2></div>
                 </div>
             </div>
         );

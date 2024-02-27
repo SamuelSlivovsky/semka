@@ -19,7 +19,9 @@ import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
 import PharmacyStorage from "./Views/PharmacyStorage";
 import TabMedicaments from "./Views/Tables/TabMedicaments";
+import MedicamentCard from "./Details/MedicamentCard";
 import TabMedicalAids from "./Views/Tables/TabMedicalAids";
+import MedicalAidCard from "./Details/MedicalAidCard";
 import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
 import PharmacyManagerCard from "./Profile/PharmacyManagerCard";
 import TabPharmacists from "./Views/Tables/TabPharmacists";
@@ -36,6 +38,7 @@ import User from "./Views/User";
 import HospitalRoom from "./HospitalRoom/HospitalRoom";
 import TabMeetings from "./Views/Tables/TabMeetings";
 import socketService from "./service/socketService";
+
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -413,7 +416,9 @@ function App() {
       <>
           <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
           <Route path="/medicaments" element={<TabMedicaments></TabMedicaments>}></Route>  
+          <Route path="/medicament_detail" element={<MedicamentCard></MedicamentCard>}></Route>
           <Route path="/medicalAids" element={<TabMedicalAids></TabMedicalAids>}></Route>  
+          <Route path="/medicalAid_detail" element={<MedicalAidCard></MedicalAidCard>}></Route>
           <Route path="/sklad" element={<Storage />}></Route>
           <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
           <Route path="/pharmacy_managers" element={<TabPharmacyManagers></TabPharmacyManagers>}></Route>

@@ -39,7 +39,6 @@ export default function TabMedicaments() {
             })
             .then((data) => {
                 setZoznamLiekov(data);
-                console.log(data);
             });
     }, []);
 
@@ -50,13 +49,12 @@ export default function TabMedicaments() {
 
     const onSubmit = () => {
         setShowDialog(false);
-        navigate("/patient", {state: selectedRow.ID_PACIENTA});
+        navigate("/medicament_detail", {state: selectedRow.ID_LIEK});
     };
 
     const handleClick = (value) => {
-        navigate("/patient", {state: value.ID_PACIENTA});
-        // setShowDialog(true);
-        // setSelectedRow(value);
+        setShowDialog(true);
+        setSelectedRow(value);
     };
 
     const renderDialogFooter = () => {
@@ -82,7 +80,6 @@ export default function TabMedicaments() {
         return (
             <div className="flex justify-content-between">
                 <div className="table-header">
-                    <div className="mr-4"><h2>Zoznam liekov</h2></div>
                     <span className="p-input-icon-left">
             <i className="pi pi-search"/>
             <InputText
@@ -91,6 +88,7 @@ export default function TabMedicaments() {
                 placeholder="Keyword Search"
             />
           </span>
+          <div className="ml-4"><h2>Číselník všetkých liekov</h2></div>
                 </div>
             </div>
         );
@@ -119,22 +117,22 @@ export default function TabMedicaments() {
                 operator: FilterOperator.AND,
                 constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
             },
-            TYP: {
-                operator: FilterOperator.AND,
-                constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-            },
-            DAVKOVANIE: {
-                operator: FilterOperator.AND,
-                constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}],
-            },
+            // TYP: {
+            //     operator: FilterOperator.AND,
+            //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
+            // },
+            // DAVKOVANIE: {
+            //     operator: FilterOperator.AND,
+            //     constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}],
+            // },
             ATC: {
                 operator: FilterOperator.AND,
                 constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
             },
-            MNOZSTVO: {
-                operator: FilterOperator.AND,
-                constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-            },
+            // MNOZSTVO: {
+            //     operator: FilterOperator.AND,
+            //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
+            // },
         });
         setGlobalFilterValue("");
     };
@@ -161,16 +159,16 @@ export default function TabMedicaments() {
                 >
                     <Column field="ID_LIEK" header={"Id lieku"} filter></Column>
                     <Column field="NAZOV" header={"Názov lieku"} filter></Column>
-                    <Column field="TYP" header={"Typ lieku"} filter></Column>
-                    <Column field="DAVKOVANIE" header={"Dávkovanie"} filter></Column>
+                    {/* <Column field="TYP" header={"Typ lieku"} filter></Column> */}
+                    {/* <Column field="DAVKOVANIE" header={"Dávkovanie"} filter></Column> */}
                     <Column field="ATC" header={"ATC"} filter></Column>
-                    <Column field="MNOZSTVO" header={"Množstvo"} filter></Column>
+                    {/* <Column field="MNOZSTVO" header={"Množstvo"} filter></Column> */}
                 </DataTable>
             </div>
             <Dialog
                 header={
                     selectedRow != null
-                        ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+                        ? selectedRow.NAZOV
                         : ""
                 }
                 visible={showDialog}

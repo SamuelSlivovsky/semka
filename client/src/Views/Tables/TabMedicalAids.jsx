@@ -39,7 +39,6 @@ export default function TabMedicaments() {
             })
             .then((data) => {
                 setZoznamZdravotnickychPomocok(data);
-                console.log(data);
             });
     }, []);
 
@@ -50,13 +49,12 @@ export default function TabMedicaments() {
 
     const onSubmit = () => {
         setShowDialog(false);
-        navigate("/zdravotnickaPomocka", {state: selectedRow.ID_ZDR_POMOCKY});
+        navigate("/medicalAid_detail", {state: selectedRow.ID_ZDR_POMOCKY});
     };
 
     const handleClick = (value) => {
-        navigate("/zdravotnickaPomocka", {state: value.ID_ZDR_POMOCKY});
-        // setShowDialog(true);
-        // setSelectedRow(value);
+        setShowDialog(true);
+        setSelectedRow(value);
     };
 
     const renderDialogFooter = () => {
@@ -82,7 +80,6 @@ export default function TabMedicaments() {
         return (
             <div className="flex justify-content-between">
                 <div className="table-header">
-                    <div className="mr-4"><h2>Zoznam zdravotníckych pomôcok</h2></div>
                     <span className="p-input-icon-left">
             <i className="pi pi-search"/>
             <InputText
@@ -91,6 +88,7 @@ export default function TabMedicaments() {
                 placeholder="Keyword Search"
             />
           </span>
+          <div className="ml-4"><h2>Číselník všetkých zdravotníckych pomôcok</h2></div>
                 </div>
             </div>
         );
@@ -119,10 +117,10 @@ export default function TabMedicaments() {
                 operator: FilterOperator.AND,
                 constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
             },
-            DOPLNOK_NAZVU: {
-                operator: FilterOperator.AND,
-                constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-            },
+            // DOPLNOK_NAZVU: {
+            //     operator: FilterOperator.AND,
+            //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
+            // },
             TYP: {
                 operator: FilterOperator.AND,
                 constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}],
@@ -153,14 +151,14 @@ export default function TabMedicaments() {
                 >
                     <Column field="ID_ZDR_POMOCKY" header={"Id zdravotníckej pomôcky"} filter></Column>
                     <Column field="NAZOV" header={"Názov zdravotníckej pomôcky"} filter></Column>
-                    <Column field="DOPLNOK_NAZVU" header={"Doplnok k názvu"} filter></Column>
+                    {/* <Column field="DOPLNOK_NAZVU" header={"Doplnok k názvu"} filter></Column> */}
                     <Column field="TYP" header={"Typ zdravotníckej pomôcky"} filter></Column>
                 </DataTable>
             </div>
             <Dialog
                 header={
                     selectedRow != null
-                        ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+                        ? selectedRow.NAZOV
                         : ""
                 }
                 visible={showDialog}
