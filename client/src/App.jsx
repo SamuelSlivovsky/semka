@@ -18,6 +18,8 @@ import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
 import PharmacyStorage from "./Views/PharmacyStorage";
+import PharmacyStorageMedicaments from './Views/PharmacyStorageMedicaments';
+import PharmacyStorageMedicalAids from './Views/PharmacyStorageMedicalAids';
 import TabMedicaments from "./Views/Tables/TabMedicaments";
 import MedicamentCard from "./Details/MedicamentCard";
 import TabMedicalAids from "./Views/Tables/TabMedicalAids";
@@ -421,6 +423,8 @@ function App() {
           <Route path="/medicalAid_detail" element={<MedicalAidCard></MedicalAidCard>}></Route>
           <Route path="/sklad" element={<Storage />}></Route>
           <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
+          <Route path="/lekarensky_sklad_lieky" element={<PharmacyStorageMedicaments />}></Route>
+          <Route path="/lekarensky_sklad_zdravotnickePomocky" element={<PharmacyStorageMedicalAids />}></Route>
           <Route path="/pharmacy_managers" element={<TabPharmacyManagers></TabPharmacyManagers>}></Route>
           <Route path="/pharmacy_manager" element={<PharmacyManagerCard></PharmacyManagerCard>}></Route>
           <Route path="/pharmacists" element={<TabPharmacists></TabPharmacists>}></Route>

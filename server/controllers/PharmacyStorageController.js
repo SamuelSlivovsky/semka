@@ -1,17 +1,17 @@
 module.exports = {
-    getDrugsOfDeparment: (req, res) => {
+    getMedicaments: (req, res) => {
       const pharmacyStorage = require("../models/lekarensky_sklad");
       (async () => {
         console.log(req.params);
-        ret_val = await pharmacyStorage.getDrugsOfDepartment(req.params.id);
+        ret_val = await pharmacyStorage.getMedicaments(req.params.id);
         res.status(200).json(ret_val);
       })();
     },
   
-    insertDrug: (req, res) => {
+    insertMedicament: (req, res) => {
       const pharmacyStorage = require("../models/lekarensky_sklad");
       (async () => {
-        ret_val = await pharmacyStorage.insertDrug(req.body);
+        ret_val = await pharmacyStorage.insertMedicament(req.body);
         res.status(200);
       })().catch((err) => {
         console.log("Error Kontroler");
@@ -20,10 +20,10 @@ module.exports = {
       });
     },
   
-    updateQuantity: (req, res) => {
+    updateQuantityOfMedicaments: (req, res) => {
       const pharmacyStorage = require("../models/lekarensky_sklad");
       (async () => {
-        ret_val = await pharmacyStorage.updateQuantity(req.body);
+        ret_val = await pharmacyStorage.updateQuantityOfMedicaments(req.body);
         res.status(200);
       })().catch((err) => {
         console.error(err);
@@ -31,10 +31,10 @@ module.exports = {
       });
     },
   
-    deleteSarza: (req, res) => {
+    deleteMedicament: (req, res) => {
       const pharmacyStorage = require("../models/lekarensky_sklad");
       (async () => {
-        ret_val = await pharmacyStorage.deleteSarza(req.body);
+        ret_val = await pharmacyStorage.deleteMedicament(req.body);
         res.status(200);
       })().catch((err) => {
         console.error(err);

@@ -1,28 +1,20 @@
 const database = require("../database/Database");
 
-async function getDrugsOfDepartment(cis_zam) {
+async function getMedicaments(cis_zam) {
   try {
     let conn = await database.getConnection();
-    const id_oddelenia = await conn.execute(
+    const result = await conn.execute(
       `SELECT id_oddelenia from zamestnanci where cislo_zam = :cis_zam`,
       { cis_zam }
     );
-    const id_odd = id_oddelenia.rows[0].ID_ODDELENIA;
 
-    const result = await conn.execute(
-      `SELECT tl.id_liek, l.nazov, to_char(tl.datum_trvanlivosti,'DD.MM.YYYY') DAT_EXPIRACIE , tl.pocet 
-      FROM trvanlivost_lieku tl join sklad sk on (sk.id_sklad = tl.id_sklad)
-                    join liek l on (l.id_liek = tl.id_liek)
-                    where sk.id_oddelenia = :id_odd`,
-      { id_odd }
-    );
     return result.rows;
   } catch (err) {
     throw new Error("Database error: " + err);
   }
 }
 
-async function insertDrug(body) {
+async function insertMedicament(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
@@ -43,7 +35,7 @@ async function insertDrug(body) {
   }
 }
 
-async function updateQuantity(body) {
+async function updateQuantityOfMedicaments(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
@@ -62,7 +54,7 @@ async function updateQuantity(body) {
   }
 }
 
-async function deleteSarza(body) {
+async function deleteMedicament(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
@@ -81,8 +73,8 @@ async function deleteSarza(body) {
 }
 
 module.exports = {
-  getDrugsOfDepartment,
-  insertDrug,
-  updateQuantity,
-  deleteSarza,
+  getMedicaments,
+  insertMedicament,
+  updateQuantityOfMedicaments,
+  deleteMedicament,
 };
