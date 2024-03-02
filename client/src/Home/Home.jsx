@@ -9,6 +9,9 @@ import plusIcon from "../images/plus.png";
 import statIcon from "../images/statistics.png";
 import HomeCard from "./HomeCard";
 import storageIcon from "../images/drugs.png";
+import warehouseIcon from "../images/warehouse.png";
+import moveIcon from "../images/warehouse-move.png";
+import orderIcon from "../images/order.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
@@ -139,10 +142,34 @@ function Home() {
       title="Karta pacienta"
       isCalendar={false}
       path="/patient"
-      icon={patientIcon}
+      icon={storageIcon}
       key="2"
     ></HomeCard>,
   ];
+
+  const warehouseCards = [
+      <HomeCard
+          title="Sklad"
+          isCalendar={false}
+          path="/sklad"
+          icon={warehouseIcon}
+          key="9"
+      ></HomeCard>,
+    <HomeCard
+        title="Objednávky"
+        isCalendar={false}
+        path="/objednavky"
+        icon={orderIcon}
+        key="10"
+    ></HomeCard>,
+    <HomeCard
+        title="Presuny"
+        isCalendar={false}
+        path="/presuny"
+        icon={moveIcon}
+        key="11"
+    ></HomeCard>,
+  ]
 
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
@@ -155,6 +182,7 @@ function Home() {
           </>
         );
       else if (userData.UserInfo.role === 4) return patientCards;
+      else if (userData.UserInfo.role === 5) return warehouseCards;
     }
   };
 

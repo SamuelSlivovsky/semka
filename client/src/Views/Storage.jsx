@@ -16,6 +16,7 @@ import "../App.css";
 export default function Storage() {
   let emptyProduct = {
     ID_LIEK: null,
+    ID_ODDELENIA: null,
     NAZOV: null,
     POCET: null,
     DAT_EXPIRACIE: null,
@@ -39,10 +40,10 @@ export default function Storage() {
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`sklad/all/${userDataHelper.UserInfo.userid}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setProducts(data);
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          setProducts(data);
+        });
     initFilter();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -67,11 +68,11 @@ export default function Storage() {
       const token = localStorage.getItem("hospit-user");
       const headers = { authorization: "Bearer " + token };
       fetch(`lieky/all`, { headers })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          setDrugs(data);
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            setDrugs(data);
+          });
     }
 
     setProduct(emptyProduct);
@@ -116,14 +117,14 @@ export default function Storage() {
         id_oddelenia: 216,
         nazov_lieku: product.NAZOV,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
-          ",",
-          ""
+            ",",
+            ""
         ),
         pocet: product.POCET,
       }),
     };
     const response = await fetch("/sklad/add", requestOptions).catch((err) =>
-      console.log(err)
+        console.log(err)
     );
   }
 
@@ -159,18 +160,18 @@ export default function Storage() {
       });
       if (!sarzaExists && checkPocet) {
         if (
-          product.NAZOV &&
-          product.DAT_EXPIRACIE &&
-          product.POCET &&
-          product.ID_LIEK
+            product.NAZOV &&
+            product.DAT_EXPIRACIE &&
+            product.POCET &&
+            product.ID_LIEK
         ) {
           insertData();
           _product.DAT_EXPIRACIE =
-            product.DAT_EXPIRACIE.getDate() +
-            "." +
-            (product.DAT_EXPIRACIE.getMonth() + 1) +
-            "." +
-            product.DAT_EXPIRACIE.getFullYear();
+              product.DAT_EXPIRACIE.getDate() +
+              "." +
+              (product.DAT_EXPIRACIE.getMonth() + 1) +
+              "." +
+              product.DAT_EXPIRACIE.getFullYear();
           _products.push(_product);
           toast.current.show({
             severity: "success",
@@ -292,8 +293,8 @@ export default function Storage() {
         id_liek: product.ID_LIEK,
         pocet: product.POCET,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
-          ",",
-          ""
+            ",",
+            ""
         ),
       }),
     };
@@ -318,267 +319,272 @@ export default function Storage() {
 
   const leftToolbarTemplate = () => {
     return (
-      <React.Fragment>
-        <Button
-          label="New"
-          icon="pi pi-plus"
-          className="p-button-success mr-2"
-          onClick={openNew}
-        />
-        <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-danger"
-          onClick={confirmDeleteSelected}
-          disabled={!selectedProducts || !selectedProducts.length}
-        />
-      </React.Fragment>
+        <React.Fragment>
+          <Button
+              label="New"
+              icon="pi pi-plus"
+              className="p-button-success mr-2"
+              onClick={openNew}
+          />
+          <Button
+              label="Delete"
+              icon="pi pi-trash"
+              className="p-button-danger"
+              onClick={confirmDeleteSelected}
+              disabled={!selectedProducts || !selectedProducts.length}
+          />
+        </React.Fragment>
     );
   };
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <React.Fragment>
-        <Button
-          icon="pi pi-pencil"
-          className="p-button-rounded p-button-success mr-2"
-          onClick={() => editProduct(rowData)}
-        />
-        <Button
-          icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
-          onClick={() => confirmDeleteProduct(rowData)}
-        />
-      </React.Fragment>
+        <React.Fragment>
+          <Button
+              icon="pi pi-pencil"
+              className="p-button-rounded p-button-success mr-2"
+              onClick={() => editProduct(rowData)}
+          />
+          <Button
+              icon="pi pi-trash"
+              className="p-button-rounded p-button-warning"
+              onClick={() => confirmDeleteProduct(rowData)}
+          />
+        </React.Fragment>
     );
   };
 
   const header = (
-    <div className="table-header">
-      <h5 className="mx-0 my-1">Lieky</h5>
-      <span className="p-input-icon-left">
+      <div className="table-header">
+        <h5 className="mx-0 my-1">Lieky</h5>
+        <span className="p-input-icon-left">
         <i className="pi pi-search" />
         <InputText
-          type="search"
-          value={globalFilter}
-          onInput={(e) => {
-            onGlobalFilterChange(e);
-          }}
-          placeholder="Search..."
+            type="search"
+            value={globalFilter}
+            onInput={(e) => {
+              onGlobalFilterChange(e);
+            }}
+            placeholder="Search..."
         />
       </span>
-    </div>
+      </div>
   );
   const productDialogFooter = (
-    <React.Fragment>
-      <Button
-        label="Cancel"
-        icon="pi pi-times"
-        className="p-button-text"
-        onClick={hideDialog}
-      />
-      <Button
-        label="Save"
-        icon="pi pi-check"
-        className="p-button-text"
-        onClick={saveProduct}
-      />
-    </React.Fragment>
+      <React.Fragment>
+        <Button
+            label="Cancel"
+            icon="pi pi-times"
+            className="p-button-text"
+            onClick={hideDialog}
+        />
+        <Button
+            label="Save"
+            icon="pi pi-check"
+            className="p-button-text"
+            onClick={saveProduct}
+        />
+      </React.Fragment>
   );
   const deleteProductDialogFooter = (
-    <React.Fragment>
-      <Button
-        label="No"
-        icon="pi pi-times"
-        className="p-button-text"
-        onClick={hideDeleteProductDialog}
-      />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        className="p-button-text"
-        onClick={deleteProduct}
-      />
-    </React.Fragment>
+      <React.Fragment>
+        <Button
+            label="No"
+            icon="pi pi-times"
+            className="p-button-text"
+            onClick={hideDeleteProductDialog}
+        />
+        <Button
+            label="Yes"
+            icon="pi pi-check"
+            className="p-button-text"
+            onClick={deleteProduct}
+        />
+      </React.Fragment>
   );
   const deleteProductsDialogFooter = (
-    <React.Fragment>
-      <Button
-        label="No"
-        icon="pi pi-times"
-        className="p-button-text"
-        onClick={hideDeleteProductsDialog}
-      />
-      <Button
-        label="Yes"
-        icon="pi pi-check"
-        className="p-button-text"
-        onClick={deleteSelectedProducts}
-      />
-    </React.Fragment>
+      <React.Fragment>
+        <Button
+            label="No"
+            icon="pi pi-times"
+            className="p-button-text"
+            onClick={hideDeleteProductsDialog}
+        />
+        <Button
+            label="Yes"
+            icon="pi pi-check"
+            className="p-button-text"
+            onClick={deleteSelectedProducts}
+        />
+      </React.Fragment>
   );
 
   return (
-    <div className="storage-table">
-      <Toast ref={toast} />
+      <div className="storage-table">
+        <Toast ref={toast} />
 
-      <div className="card">
-        <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
+        <div className="card">
+          <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
-        <DataTable
-          value={products}
-          selection={selectedProducts}
-          onSelectionChange={(e) => setSelectedProducts(e.value)}
-          dataKey="ID_LIEK"
-          globalFilter={globalFilter}
-          globalFilterFields={["ID_LIEK", "NAZOV", "POCET", "DAT_EXPIRACIE"]}
-          filters={filter}
-          header={header}
-          responsiveLayout="scroll"
+          <DataTable
+              value={products}
+              selection={selectedProducts}
+              onSelectionChange={(e) => setSelectedProducts(e.value)}
+              dataKey="ID_LIEK"
+              globalFilter={globalFilter}
+              globalFilterFields={["ID_LIEK","ID_ODDELENIA", "NAZOV", "POCET", "DAT_EXPIRACIE"]}
+              filters={filter}
+              header={header}
+              responsiveLayout="scroll"
+          >
+            <Column
+                selectionMode="multiple"
+                headerStyle={{ width: "3rem" }}
+            ></Column>
+            <Column
+                field="ID_LIEK"
+                header="Id lieku"
+                style={{ minWidth: "12rem" }}
+            ></Column>
+            <Column
+                field="ID_ODDELENIA"
+                header="Id oddelenia"
+                style={{ minWidth: "16rem" }}
+            ></Column>
+            <Column
+                field="NAZOV"
+                header="Názov lieku"
+                style={{ minWidth: "16rem" }}
+            ></Column>
+            <Column
+                field="POCET"
+                header="Počet liekov"
+                style={{ minWidth: "10rem" }}
+            ></Column>
+            <Column
+                field="DAT_EXPIRACIE"
+                header="Dátum expirácie"
+                style={{ minWidth: "10rem" }}
+            ></Column>
+            <Column
+                body={actionBodyTemplate}
+                style={{ minWidth: "8rem" }}
+            ></Column>
+          </DataTable>
+        </div>
+
+        <Dialog
+            visible={addProductDialog}
+            style={{ width: "500px" }}
+            header="Pridať liek"
+            modal
+            className="p-fluid"
+            footer={productDialogFooter}
+            onHide={hideDialog}
         >
-          <Column
-            selectionMode="multiple"
-            headerStyle={{ width: "3rem" }}
-          ></Column>
-          <Column
-            field="ID_LIEK"
-            header="Id lieku"
-            style={{ minWidth: "12rem" }}
-          ></Column>
-          <Column
-            field="NAZOV"
-            header="Názov lieku"
-            style={{ minWidth: "16rem" }}
-          ></Column>
-          <Column
-            field="POCET"
-            header="Počet liekov"
-            style={{ minWidth: "10rem" }}
-          ></Column>
-          <Column
-            field="DAT_EXPIRACIE"
-            header="Dátum expirácie"
-            style={{ minWidth: "10rem" }}
-          ></Column>
-          <Column
-            body={actionBodyTemplate}
-            style={{ minWidth: "8rem" }}
-          ></Column>
-        </DataTable>
-      </div>
+          <div className="formgrid grid">
+            <div className="field col">
+              <Dropdown
+                  value={selectedDrug}
+                  options={drugs}
+                  onChange={(e) => setSelectedDrugFromDropdown(e)}
+                  optionLabel="NAZOV"
+                  filter
+                  showClear
+                  filterBy="NAZOV"
+                  filterMatchMode="startsWith"
+                  placeholder="Vybrať liek"
+                  resetFilterOnHide
+                  required
+              />
+            </div>
+          </div>
+          <div className="formgrid grid">
+            <div className="field col">
+              <label htmlFor="POCET">Počet</label>
+              <InputNumber
+                  id="POCET"
+                  value={product.POCET}
+                  onValueChange={(e) => onInputNumberChange(e, "POCET")}
+                  integeronly
+              />
+            </div>
+          </div>
+          <div className="formgird grid">
+            <div className="field col">
+              <label htmlFor="DAT_EXPIRACIE">Dátum expirácie</label>
+              <Calendar
+                  value={product.DAT_EXPIRACIE}
+                  inline
+                  dateFormat="dd.mm.yy"
+                  onChange={(e) =>
+                      setProduct({ ...product, DAT_EXPIRACIE: e.value })
+                  }
+              ></Calendar>
+            </div>
+          </div>
+        </Dialog>
 
-      <Dialog
-        visible={addProductDialog}
-        style={{ width: "500px" }}
-        header="Pridať liek"
-        modal
-        className="p-fluid"
-        footer={productDialogFooter}
-        onHide={hideDialog}
-      >
-        <div className="formgrid grid">
-          <div className="field col">
-            <Dropdown
-              value={selectedDrug}
-              options={drugs}
-              onChange={(e) => setSelectedDrugFromDropdown(e)}
-              optionLabel="NAZOV"
-              filter
-              showClear
-              filterBy="NAZOV"
-              filterMatchMode="startsWith"
-              placeholder="Vybrať liek"
-              resetFilterOnHide
-              required
-            />
+        <Dialog
+            visible={changeProductDialog}
+            style={{ width: "500px" }}
+            header={product.NAZOV}
+            modal
+            className="p-fluid"
+            footer={productDialogFooter}
+            onHide={hideDialog}
+        >
+          <div className="formgrid grid">
+            <div className="field col">
+              <label htmlFor="POCET">Počet</label>
+              <InputNumber
+                  id="POCET"
+                  value={product.POCET}
+                  onValueChange={(e) => onInputNumberChange(e, "POCET")}
+                  integeronly
+                  required
+              />
+            </div>
           </div>
-        </div>
-        <div className="formgrid grid">
-          <div className="field col">
-            <label htmlFor="POCET">Počet</label>
-            <InputNumber
-              id="POCET"
-              value={product.POCET}
-              onValueChange={(e) => onInputNumberChange(e, "POCET")}
-              integeronly
-            />
-          </div>
-        </div>
-        <div className="formgird grid">
-          <div className="field col">
-            <label htmlFor="DAT_EXPIRACIE">Dátum expirácie</label>
-            <Calendar
-              value={product.DAT_EXPIRACIE}
-              inline
-              dateFormat="dd.mm.yy"
-              onChange={(e) =>
-                setProduct({ ...product, DAT_EXPIRACIE: e.value })
-              }
-            ></Calendar>
-          </div>
-        </div>
-      </Dialog>
+        </Dialog>
 
-      <Dialog
-        visible={changeProductDialog}
-        style={{ width: "500px" }}
-        header={product.NAZOV}
-        modal
-        className="p-fluid"
-        footer={productDialogFooter}
-        onHide={hideDialog}
-      >
-        <div className="formgrid grid">
-          <div className="field col">
-            <label htmlFor="POCET">Počet</label>
-            <InputNumber
-              id="POCET"
-              value={product.POCET}
-              onValueChange={(e) => onInputNumberChange(e, "POCET")}
-              integeronly
-              required
+        <Dialog
+            visible={deleteProductDialog}
+            style={{ width: "450px" }}
+            header="Confirm"
+            modal
+            footer={deleteProductDialogFooter}
+            onHide={hideDeleteProductDialog}
+        >
+          <div className="confirmation-content">
+            <i
+                className="pi pi-exclamation-triangle mr-3"
+                style={{ fontSize: "2rem" }}
             />
-          </div>
-        </div>
-      </Dialog>
-
-      <Dialog
-        visible={deleteProductDialog}
-        style={{ width: "450px" }}
-        header="Confirm"
-        modal
-        footer={deleteProductDialogFooter}
-        onHide={hideDeleteProductDialog}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
-          />
-          {product && (
-            <span>
+            {product && (
+                <span>
               Naozaj chcete odstrániť liek <b>{product.NAZOV}</b>?
             </span>
-          )}
-        </div>
-      </Dialog>
+            )}
+          </div>
+        </Dialog>
 
-      <Dialog
-        visible={deleteProductsDialog}
-        style={{ width: "450px" }}
-        header="Confirm"
-        modal
-        footer={deleteProductsDialogFooter}
-        onHide={hideDeleteProductsDialog}
-      >
-        <div className="confirmation-content">
-          <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
-          />
-          {product && <span>Naozaj chcete odstrániť zvolené lieky?</span>}
-        </div>
-      </Dialog>
-    </div>
+        <Dialog
+            visible={deleteProductsDialog}
+            style={{ width: "450px" }}
+            header="Confirm"
+            modal
+            footer={deleteProductsDialogFooter}
+            onHide={hideDeleteProductsDialog}
+        >
+          <div className="confirmation-content">
+            <i
+                className="pi pi-exclamation-triangle mr-3"
+                style={{ fontSize: "2rem" }}
+            />
+            {product && <span>Naozaj chcete odstrániť zvolené lieky?</span>}
+          </div>
+        </Dialog>
+      </div>
   );
 }
