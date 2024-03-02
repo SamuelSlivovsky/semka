@@ -12,6 +12,7 @@ import "../icons.css";
 import DiseaseForm from "../Forms/DiseaseForm";
 import DisablesForm from "../Forms/DisablesForm";
 import VacForm from "../Forms/VacForm";
+import { Tag } from "primereact/tag";
 
 export default function ProfileCard(props) {
   const [profile, setProfile] = useState("");
@@ -350,7 +351,20 @@ export default function ProfileCard(props) {
         <Card
           className="col-5 shadow-4 "
           style={{ width: "50rem", height: "40rem" }}
-          title={profile.MENO + " " + profile.PRIEZVISKO}
+          title={
+            <div style={{ display: "flex", gap: "10px" }}>
+              {profile.MENO + " " + profile.PRIEZVISKO}{" "}
+              {profile.CUDZINEC == 1 ? (
+                <Tag
+                  style={{ fontSize: "16px" }}
+                  severity={"info"}
+                  value={"Cudzinec"}
+                />
+              ) : (
+                ""
+              )}
+            </div>
+          }
         >
           <div className="flex ">
             <div className="col-6 text-center m-0">

@@ -8,12 +8,12 @@ import { classNames } from "primereact/utils";
 import { AutoComplete } from "primereact/autocomplete";
 import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
 export default function PatientForm() {
   const [showMessage, setShowMessage] = useState(false);
   const [cities, setCities] = useState([]);
   const [filteredPsc, setFilteredPsc] = useState(null);
-  const [isForeign, setIsForeign] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -35,7 +35,7 @@ export default function PatientForm() {
     if (!data.priezvisko) {
       errors.priezvisko = "Priezvisko je povinné";
     }
-    if (!data.rod_cislo) {
+    if (!data.cudzinec && !data.rod_cislo) {
       errors.rod_cislo = "Rodné číslo je povinné";
     }
     if (!data.psc) {
@@ -44,6 +44,7 @@ export default function PatientForm() {
     if (!data.dat_od) {
       errors.dat_od = "Dátum zápisu je povinný";
     }
+    console.log(errors);
     return errors;
   };
 
@@ -66,10 +67,15 @@ export default function PatientForm() {
         ulica: data.ulica,
         dat_od: data.dat_od.toLocaleString("en-GB").replace(",", ""),
         dat_narodenia: data.dat_narodenia
-          .toLocaleString("en-GB")
-          .replace(",", ""),
-        cudzinec: data.cudzinec ? 1 : 0,
-        dat_do: null,
+          ? data.dat_narodenia.toLocaleString("en-GB").replace(",", "")
+          : "",
+        cudzinec: data.cudzinec,
+        dat_do:
+          data.dat_do != null && data.dat_do != ""
+            ? data.dat_do.toLocaleString("en-GB").replace(",", "")
+            : null,
+        pohlavie: data.pohlavie,
+        typ_krvi: data.typ_krvi,
       }),
     };
     await fetch("/add/pacient", requestOptionsPatient).then(() =>
@@ -146,6 +152,8 @@ export default function PatientForm() {
             telefon: "",
             cudzinec: false,
             dat_narodenia: null,
+            pohlavie: "M",
+            typ_krvi: "0-",
           }}
           validate={validate}
           render={({ handleSubmit, form, values }) => (
@@ -237,31 +245,69 @@ export default function PatientForm() {
                   )}
                 />
               ) : (
-                <Field
-                  name="dat_narodenia"
-                  render={({ input, meta }) => (
-                    <div className="field col-12">
-                      <label
-                        htmlFor="dat_narodenia"
-                        className={classNames({
-                          "p-error": isFormFieldValid(meta),
-                        })}
-                      >
-                        Dátum narodenia*
-                      </label>
-                      <Calendar
-                        id="dat_narodenia"
-                        {...input}
-                        className={classNames({
-                          "p-invalid": isFormFieldValid(meta),
-                        })}
-                      />
+                <>
+                  <Field
+                    name="pohlavie"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label htmlFor="dat_narodenia">Pohlavie*</label>
+                        <Dropdown
+                          id="pohlavie"
+                          {...input}
+                          options={["M", "Ž"]}
+                        />
+                      </div>
+                    )}
+                  />
+                  <Field
+                    name="dat_narodenia"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label
+                          htmlFor="dat_narodenia"
+                          className={classNames({
+                            "p-error": isFormFieldValid(meta),
+                          })}
+                        >
+                          Dátum narodenia*
+                        </label>
+                        <Calendar
+                          id="dat_narodenia"
+                          {...input}
+                          className={classNames({
+                            "p-invalid": isFormFieldValid(meta),
+                          })}
+                        />
 
-                      {getFormErrorMessage(meta)}
-                    </div>
-                  )}
-                />
-              )}
+                        {getFormErrorMessage(meta)}
+                      </div>
+                    )}
+                  />
+                </>
+              )}{" "}
+              <Field
+                name="typ_krvi"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label htmlFor="dat_narodenia">Krvná skupina*</label>
+                    <Dropdown
+                      id="pohlavie"
+                      {...input}
+                      filter
+                      options={[
+                        "0-",
+                        "0+",
+                        "B-",
+                        "B+",
+                        "A-",
+                        "A+",
+                        "AB-",
+                        "AB+",
+                      ]}
+                    />
+                  </div>
+                )}
+              />
               <Field
                 name="psc"
                 render={({ input, meta }) => (
@@ -337,7 +383,6 @@ export default function PatientForm() {
                   </div>
                 )}
               />
-
               <div
                 className="field col-12 "
                 style={{ justifyContent: "center", display: "grid" }}

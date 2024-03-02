@@ -6,6 +6,7 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
+import { Tag } from "primereact/tag";
 import GetUserData from "../../Auth/GetUserData";
 
 export default function TabPatients() {
@@ -41,8 +42,6 @@ export default function TabPatients() {
 
   const handleClick = (value) => {
     navigate("/patient", { state: value.ID_PACIENTA });
-    // setShowDialog(true);
-    // setSelectedRow(value);
   };
 
   const renderDialogFooter = () => {
@@ -146,6 +145,16 @@ export default function TabPatients() {
     return Math.round(diffInMs / (1000 * 60 * 60 * 24) / 365);
   };
 
+  const statusBodyTemplate = (rowData) => {
+    return (
+      <Tag
+        style={{ width: "110px" }}
+        severity={rowData.JE_HOSPIT ? "success" : "info"}
+        value={rowData.JE_HOSPIT == 1 ? "Hospitalizovaný" : "Iné"}
+      />
+    );
+  };
+
   const header = renderHeader();
   return (
     <div>
@@ -166,23 +175,9 @@ export default function TabPatients() {
           <Column field="MENO" header={"Meno"} filter></Column>
           <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
           <Column field="PSC" header={"PSČ"} filter></Column>
+          <Column body={statusBodyTemplate} header={"Status"}></Column>
         </DataTable>
       </div>
-      <Dialog
-        header={
-          selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
-            : ""
-        }
-        visible={showDialog}
-        style={{ width: "50vw" }}
-        footer={renderDialogFooter()}
-        onHide={() => onHide()}
-      >
-        <p>{getPohlavie()}</p>
-        <p>{getVek() + " rokov"}</p>
-        <p>{selectedRow != null ? "PSČ " + selectedRow.PSC : ""}</p>
-      </Dialog>
     </div>
   );
 }
