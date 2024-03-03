@@ -89,7 +89,7 @@ export default function Orders() {
     }, []);
 
     //Async function for inserting new data into DB
-    //@TODO add ID_SKLAD somehow
+    //@TODO add ID_SKLAD
     async function insertData() {
         const token = localStorage.getItem("hospit-user");
 
