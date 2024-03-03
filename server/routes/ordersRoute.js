@@ -19,4 +19,10 @@ router.get(
 
 router.post("/add", verify.verifyRoles(0, 2, 3, 5), controller.insertOrder);
 
+router.post(
+    "/deleteOrder",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.deleteOrder
+);
+
 module.exports = router;

@@ -40,11 +40,11 @@ export default function Orders() {
     //Defined constants
     const [products, setProducts] = useState(null);
     const [selectedDrug, setSelectedDrug] = useState(null);
-    const [order, setOrder] = useState(null);
-    const [product, setProduct] = useState(emptyOrders);
+    const [order, setOrder] = useState(emptyOrders);
     const [drugs, setDrugs] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [addOrderDialog, setAddOrderDialog] = useState(false);
+    const [deleteProductDialog, setDeleteProductDialog] = useState(false);
     const [changeProductDialog, setChangeProductDialog] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
@@ -110,6 +110,22 @@ export default function Orders() {
 
     }
 
+    //Async function for removing order
+    async function deleteOrder(_order) {
+        const token = localStorage.getItem("hospit-user");
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                id_obj: _order.ID_OBJEDNAVKY
+            }),
+        };
+        const response = await fetch("/objednavky/deleteOrder", requestOptions);
+    }
+
     //Function that will be called after clicking on one of the rows
     const handleClick = (value) => {
         setShowDialog(true);
@@ -171,7 +187,7 @@ export default function Orders() {
     const addOrder = () => {
         //Checking if there are any values below 0
         let _orders = [...products];
-        let _order = { ... product};
+        let _order = { ... order};
 
         let checkPocet = true;
         if(selectedMedications.some((medication) => medication.quantity <= 0)) {
@@ -187,12 +203,11 @@ export default function Orders() {
         //Checking if all medicines are unique
         let unique = true;
 
-        //@TODO check this
-
-        /*if(addOrderDialog) {
-            const selectedDrugs = selectedMedications.map((medication) => medication.selectedDrug);
+        if(addOrderDialog) {
+            const selectedDrugs = selectedMedications.map((medication) => medication.selectedDrug.NAZOV);
             const uniqueDrugs = new Set(selectedDrugs);
-            if(selectedDrugs.length === uniqueDrugs.size) {
+
+            if (selectedDrugs.length !== uniqueDrugs.size) {
                 toast.current.show({
                     severity: "error",
                     summary: "Error",
@@ -201,7 +216,7 @@ export default function Orders() {
                 });
                 unique = false;
             }
-        }*/
+        }
 
         //Add whole list and create new order
         if(unique && checkPocet && selectedMedications.length > 0) {
@@ -213,16 +228,21 @@ export default function Orders() {
 
             insertData();
 
-            /*const lastOrder = _orders[_orders.length - 1];
+            const lastOrder = _orders[_orders.length - 1];
             _order.ID_OBJEDNAVKY = lastOrder ? lastOrder.ID_OBJEDNAVKY + 1 : 1;
             _order.ID_SKLAD = skladId;
             _order.ZOZNAM_LIEKOV = formattedString;
-            _order.DATUM_OBJEDNAVKY = _order.DATUM_OBJEDNAVKY.getDate() + "." + product.DAT_EXPIRACIE.getMonth() +
-                "." + product.DAT_EXPIRACIE.getFullYear();
+
+            var currentDate = new Date();
+            var day = currentDate.getDate();
+            var month = currentDate.getMonth() + 1;
+            var year = currentDate.getFullYear();
+
+            _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
             _orders.push(_order);
 
             console.log(_order);
-            console.log(_orders);*/
+            console.log(_orders);
 
             toast.current.show({
                 severity: "success",
@@ -232,12 +252,32 @@ export default function Orders() {
             });
 
             setSelectedDrug(null);
-            setSelectedMedications(null);
+            setSelectedMedications([]);
             setAddOrderDialog(false);
+            setProducts(_orders);
+            setOrder(emptyOrders);
         }
-        //@TODO zostane prazdna stranka, dunno why, check it
         hideDialog();
     }
+
+    const deleteProduct = () => {
+        let _orders = products.filter((val) => val.ID_OBJEDNAVKY !== order.ID_OBJEDNAVKY);
+        deleteOrder(order);
+        setProducts(_orders);
+        setDeleteProductDialog(false);
+        setOrder(emptyOrders);
+        toast.current.show({
+            severity: "success",
+            summary: "Successful",
+            detail: "Objednávka bola odstránená",
+            life: 3000,
+        });
+    };
+
+    const confirmDeleteProduct = (product) => {
+        setOrder(product);
+        setDeleteProductDialog(true);
+    };
 
     /*
     ******************************************************************************************************************
@@ -257,6 +297,10 @@ export default function Orders() {
         setSelectedDrug(null);
         setAddOrderDialog(false);
         setChangeProductDialog(false);
+    };
+
+    const hideDeleteProductDialog = () => {
+        setDeleteProductDialog(false);
     };
 
 
@@ -294,6 +338,35 @@ const leftToolbarTemplate = () => {
                 icon="pi pi-check"
                 className="p-button-text"
                 onClick={addOrder}
+            />
+        </React.Fragment>
+    );
+
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button
+                    icon="pi pi-trash"
+                    className="p-button-rounded p-button-warning"
+                    onClick={() => confirmDeleteProduct(rowData)}
+                />
+            </React.Fragment>
+        );
+    };
+
+    const deleteProductDialogFooter = (
+        <React.Fragment>
+            <Button
+                label="No"
+                icon="pi pi-times"
+                className="p-button-text"
+                onClick={hideDeleteProductDialog}
+            />
+            <Button
+                label="Yes"
+                icon="pi pi-check"
+                className="p-button-text"
+                onClick={deleteProduct}
             />
         </React.Fragment>
     );
@@ -345,7 +418,7 @@ return (
                 style={{ minWidth: "10rem" }}
             ></Column>
             <Column
-                body={NaN} //actionBodyTemplate
+                body={actionBodyTemplate}
                 style={{ minWidth: "8rem" }}
             ></Column>
         </DataTable>
@@ -414,14 +487,9 @@ return (
         </TabView>
 
         <Dialog
-            header={selectedRow != null
-                ? selectedRow.ID_OBJEDNAVKY != null
-                    ? selectedRow.ID_OBJEDNAVKY
-                    : selectedRow.type
-                : ""}
             visible={showDialog && dialog}
             style={{ width: "50vw" }}
-            footer={productDialogFooter}
+            footer={NaN} //productDialogFooter
             onHide={() => onHide()}
         >
             {loading ? (
@@ -492,6 +560,27 @@ return (
             ))}
             <div style={{display: "flex", justifyContent: "center", paddingTop: "20px"}}>
                 <Button style={{width: "50%"}} label="Pridať do zoznamu" onClick={addMedication} />
+            </div>
+        </Dialog>
+
+        <Dialog
+            visible={deleteProductDialog}
+            style={{ width: "450px" }}
+            header="Confirm"
+            modal
+            footer={deleteProductDialogFooter}
+            onHide={hideDeleteProductDialog}
+        >
+            <div className="confirmation-content">
+                <i
+                    className="pi pi-exclamation-triangle mr-3"
+                    style={{ fontSize: "2rem" }}
+                />
+                {order && (
+                    <span>
+              Naozaj chcete odstrániť objednávku s ID: <b>{order.ID_OBJEDNAVKY}</b> ?
+            </span>
+                )}
             </div>
         </Dialog>
 

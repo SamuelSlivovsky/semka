@@ -29,7 +29,6 @@ async function getListOrders(id) {
 }
 
 async function insertOrder(body) {
-    //@TODO zmenit
     try {
         let conn = await database.getConnection();
         const sqlStatement = `BEGIN
@@ -48,8 +47,26 @@ async function insertOrder(body) {
     }
 }
 
+async function deleteObjednavka(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `begin
+                delete_order_warehouse(:id_obj);
+            end;`;
+        console.log(body);
+        let result = await conn.execute(sqlStatement, {
+            id_obj: body.id_obj
+        });
+
+        console.log("Rows inserted " + result.rowsAffected);
+    } catch (err) {
+        throw new Error("Database error: " + err);
+    }
+}
+
 module.exports = {
     getAllOrders,
     getListOrders,
-    insertOrder
+    insertOrder,
+    deleteObjednavka
 };

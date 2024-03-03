@@ -26,5 +26,16 @@ module.exports = {
             console.error(err);
             res.status(500).send(err);
         });
+    },
+
+    deleteOrder: (req, res) => {
+        const order = require("../models/orders");
+        (async () => {
+            ret_val = await order.deleteObjednavka(req.body);
+            res.status(200);
+        })().catch((err) => {
+            console.error(err);
+            res.status(500).send(err);
+        });
     }
 };
