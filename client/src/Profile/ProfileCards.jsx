@@ -371,10 +371,13 @@ export default function ProfileCard(props) {
               <h4>Rok narodenia</h4>
               <div>{profile.DATUM_NARODENIA}</div>
             </div>
-
             <div className="col-6 text-center m-0">
-              <h4>Mobil</h4>
-              <div>{profile.TEL}</div>
+              <h4>Dátum úmrtia</h4>
+              <div>
+                {profile.DATUM_UMRTIA
+                  ? new Date(profile.DATUM_UMRTIA).toLocaleDateString("fr-CH")
+                  : ""}
+              </div>
             </div>
           </div>
 
@@ -384,8 +387,8 @@ export default function ProfileCard(props) {
               <div>{profile.VEK}</div>
             </div>
             <div className="col-6 text-center m-0">
-              <h4>Email</h4>
-              <div>{profile.MAIL}</div>
+              <h4>Mobil</h4>
+              <div>{profile.TEL}</div>
             </div>
           </div>
 
@@ -417,7 +420,11 @@ export default function ProfileCard(props) {
                       gap: "20px",
                     }}
                   >
-                    Áno{" "}
+                    {patientZTPTypes.find(
+                      (item) => item.DAT_DO === "Súčasnosť"
+                    ) !== null
+                      ? "Áno"
+                      : "Nie "}
                     <Button
                       label="Zoznam"
                       onClick={() => setShowDisables(true)}

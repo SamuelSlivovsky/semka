@@ -182,6 +182,7 @@ async function getInfo(id) {
         ELSE
             to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY')
     END AS datum_narodenia,
+    datum_umrtia,
     typ_krvi,
     PSC,
     mesto.nazov AS nazov_obce,
