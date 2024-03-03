@@ -47,4 +47,10 @@ router.get(
   controller.getKonzilia
 );
 
+router.post(
+  "/konzilia/update",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.updateKonzilium
+);
+
 module.exports = router;

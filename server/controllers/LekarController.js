@@ -68,4 +68,12 @@ module.exports = {
       res.status(200).json(info);
     })();
   },
+
+  updateKonzilium: (req, res) => {
+    const konzilium = require("../models/konzilium");
+    (async () => {
+      info = await konzilium.updateKonzilium(req.body);
+      res.status(200);
+    })();
+  },
 };
