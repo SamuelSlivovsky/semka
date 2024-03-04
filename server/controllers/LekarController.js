@@ -16,7 +16,7 @@ module.exports = {
   getLekari: (req, res) => {
     const lekar = require("../models/lekar");
     (async () => {
-      lekari = await lekar.getLekari(req.params.id);
+      const lekari = await lekar.getLekari(req.params.id);
       res.status(200).json(lekari);
     })();
   },
@@ -65,6 +65,14 @@ module.exports = {
     const konzilium = require("../models/konzilium");
     (async () => {
       info = await konzilium.getKonzilia(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
+  getZaznamy: (req, res) => {
+    const zaznam = require("../models/zdravotny_zaznam");
+    (async () => {
+      info = await zaznam.getZaznamy(req.params.id);
       res.status(200).json(info);
     })();
   },

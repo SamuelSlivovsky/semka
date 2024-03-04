@@ -175,7 +175,12 @@ export default function TabPatients() {
           <Column field="MENO" header={"Meno"} filter></Column>
           <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
           <Column field="PSC" header={"PSČ"} filter></Column>
-          <Column body={statusBodyTemplate} header={"Status"}></Column>
+          <Column
+            body={statusBodyTemplate}
+            header={"Status"}
+            field="JE_HOSPIT"
+            sortable
+          ></Column>
         </DataTable>
       </div>
     </div>

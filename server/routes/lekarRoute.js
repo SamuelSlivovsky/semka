@@ -53,4 +53,10 @@ router.post(
   controller.updateKonzilium
 );
 
+router.get(
+  "/zaznamy/:id",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getZaznamy
+);
+
 module.exports = router;

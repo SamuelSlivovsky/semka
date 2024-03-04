@@ -38,7 +38,44 @@ async function updateKonzilium(body) {
   }
 }
 
+async function insertKonzilium(body) {
+  try {
+    let conn = await database.getConnection();
+    await conn.execute(
+      `begin konzilium_insert(:popis, :sprava, :id_zaznamu,:datum); end;`,
+      {
+        popis: body.popis,
+        sprava: body.sprava,
+        id_zaznamu: body.id_zaznamu,
+        datum: body.datum,
+      }
+    );
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function insertKonziliumUser(body) {
+  try {
+    let conn = await database.getConnection();
+    body.lekari.forEach((element) => {
+      console.log(element);
+      conn.execute(
+        `begin zam_konzilium_insert(:cislo_zam, :id_zaznamu); end;`,
+        {
+          cislo_zam: element,
+          id_zaznamu: body.id_zaznamu,
+        }
+      );
+    });
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 module.exports = {
   getKonzilia,
   updateKonzilium,
+  insertKonzilium,
+  insertKonziliumUser,
 };

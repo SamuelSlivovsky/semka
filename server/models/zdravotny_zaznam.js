@@ -123,6 +123,25 @@ async function insertVysetrenie(body) {
   }
 }
 
+async function getZaznamy(id) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `select id_zaznamu, PACIENT.rod_cislo || ', ' || ZDRAVOTNY_ZAZ.nazov as nazov, ID_NEMOCNICE from zdravotny_zaz
+    join zdravotna_karta using (id_karty)
+    join pacient using (id_pacienta)
+    join nemocnica using (id_nemocnice)
+    join zamestnanci using (id_nemocnice)
+    where cislo_zam = :id`;
+
+    const result = await conn.execute(sqlStatement, {
+      id,
+    });
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function updateZaznam(body) {
   console.log(body);
   try {
@@ -147,4 +166,5 @@ module.exports = {
   getPopisZaznamu,
   getPriloha,
   updateZaznam,
+  getZaznamy,
 };
