@@ -210,7 +210,6 @@ const Messages = (props) => {
   };
 
   const insertMessage = async (message) => {
-    console.log("first");
     const token = localStorage.getItem("hospit-user");
     const requestOptions = {
       method: "POST",

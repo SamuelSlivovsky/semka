@@ -5,34 +5,36 @@ async function getSpravy(id_skupiny, userid) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT 
-      distinct cs.id_spravy, 
-      meno, 
-      priezvisko, 
-      cs.id_skupiny, 
-      cs.userid, 
-      cs.sprava, 
-      CASE WHEN cs.obrazok IS NOT NULL THEN 1 ELSE 0 END AS has_obrazok,
-      TO_CHAR(cs.datum, 'DD.MM.YYYY HH24:MI:SS') AS datum,
-      cs.datum AS unformatted_date, 
-      us.id_spravy AS "unreadId", 
-      us.userid AS "unreadUserId" 
-  FROM 
-      (SELECT * FROM chat_sprava WHERE id_skupiny = :id_skupiny ORDER BY datum DESC FETCH FIRST 50 ROWS ONLY) cs
-  JOIN 
-      user_chat uc ON cs.userid = uc.userid AND cs.id_skupiny = uc.id_skupiny
-  LEFT JOIN 
-      user_sprava us ON (us.id_spravy = cs.id_spravy AND us.userid = :userid)
-  JOIN 
-      user_tab ut ON uc.userid = ut.userid
-  JOIN 
-      zamestnanci z ON z.cislo_zam = uc.userid
-  JOIN 
-      os_udaje USING (rod_cislo)
-  ORDER BY 
-      cs.datum ASC
+      `SELECT
+    DISTINCT cs.id_spravy,
+    meno,
+    priezvisko,
+    cs.id_skupiny,
+    cs.userid,
+    cs.sprava,
+    CASE WHEN cs.obrazok IS NOT NULL AND DBMS_LOB.GETLENGTH(cs.obrazok) > 1 THEN 1 ELSE 0 END AS has_obrazok,
+    TO_CHAR(cs.datum, 'DD.MM.YYYY HH24:MI:SS') AS datum,
+    cs.datum AS unformatted_date,
+    us.id_spravy AS "unreadId",
+    us.userid AS "unreadUserId"
+FROM
+    (SELECT * FROM chat_sprava WHERE id_skupiny = :id_skupiny ORDER BY datum DESC FETCH FIRST 50 ROWS ONLY) cs
+JOIN
+    user_chat uc ON (cs.id_skupiny = uc.id_skupiny and uc.USERID = :userid)
+LEFT JOIN
+    user_sprava us ON (us.id_spravy = cs.id_spravy AND us.userid = :userid)
+JOIN
+    user_tab ut ON uc.userid = ut.userid
+JOIN
+    zamestnanci z ON z.cislo_zam = uc.userid
+JOIN
+    os_udaje USING (rod_cislo)
+WHERE
+(uc.HISTORIA = 1 OR uc.ADMIN = 1 OR cs.datum > uc.DATUM_PRIDANIA)
+ORDER BY
+    cs.datum ASC
   `,
-      { id_skupiny, userid }
+      { id_skupiny, userid, userid }
     );
 
     const messages = result.rows.map((row) => {
@@ -144,7 +146,7 @@ async function insertSprava(body) {
         id_skupiny: body.id_skupiny,
         sprava: body.sprava,
         datum: body.datum,
-        priloha: buffer !== null ? buffer : body.priloha,
+        priloha: "EMPTY_BLOB()",
       },
       { autoCommit: true }
     );

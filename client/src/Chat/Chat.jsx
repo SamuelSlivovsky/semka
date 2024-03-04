@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import "../styles/chat.css";
+import { ProgressSpinner } from "primereact/progressspinner";
 import Messages from "./Messages.jsx";
 import GetUserData from "../Auth/GetUserData.jsx";
+import "../styles/chat.css";
 const Chat = () => {
+  const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState(null);
   const [groups, setGroups] = useState([]);
   const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
@@ -68,6 +70,7 @@ const Chat = () => {
             );
           })
         );
+        setLoading(false);
       });
   }, []);
 
@@ -82,7 +85,7 @@ const Chat = () => {
           alignItems: "center",
         }}
       >
-        {groups}
+        {loading ? <ProgressSpinner /> : groups}
       </div>
       {group ? (
         <Messages group={group} setGroups={setGroups} groups={groups} />
