@@ -61,7 +61,6 @@ export default function TableMedic(props) {
 
   const getRecordDetails = () => {
     let popis;
-    console.log(cellData);
     cellData.map((data) => {
       if (data.id === selectedRow.id) {
         data.LEKAR === data.ODDELENIE
@@ -228,26 +227,61 @@ export default function TableMedic(props) {
             <ProgressSpinner />
           </div>
         ) : selectedRow !== null ? (
-          <div style={{ maxWidth: "100%", overflowWrap: "break-word" }}>
+          <div
+            style={{
+              maxWidth: "100%",
+              overflowWrap: "break-word",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <PDFDownloadLink
+              style={{
+                height: "40px",
+                backgroundColor: "red",
+                width: "120px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "5px",
+                textDecoration: "none",
+                marginBottom: "10px",
+                backgroundColor: "#14B8A6",
+              }}
               document={
                 <Pdf
                   eventType={eventType}
                   data={selectedRow}
                   doctor={userData}
+                  desc={popis}
+                  name={nazov}
                 />
               }
               fileName={`${selectedRow.PRIEZVISKO}${selectedRow.type}.pdf`}
             >
               {({ blob, url, loading, error }) =>
-                loading ? "Loading document..." : "Download now!"
+                loading ? (
+                  "Načítavam"
+                ) : (
+                  <span
+                    style={{
+                      fontWeight: "bold",
+                      color: "white",
+                      display: "flex",
+                      gap: "10px",
+                    }}
+                  >
+                    {" "}
+                    <i
+                      className="pi pi-file-pdf"
+                      style={{ fontSize: "20px" }}
+                    ></i>
+                    Stiahnuť
+                  </span>
+                )
               }
             </PDFDownloadLink>
-            <img
-              src={imgUrl}
-              alt=""
-              style={{ maxWidth: 400, maxHeight: 400 }}
-            />
+            <img src={imgUrl} alt="" width={"400"} height={"auto"} />
 
             {selectedRow.type != null ? getRecordDetails() : ""}
             <h2>{nazov} </h2>

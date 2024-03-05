@@ -186,7 +186,8 @@ async function getHospitalizacie(id) {
                   join miestnost on (lozko.id_miestnost = miestnost.id_miestnosti)
                   join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
                   join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
-                    where zamestnanci.cislo_zam = :id`,
+                    where zamestnanci.cislo_zam = :id
+                    order by hospitalizacia.dat_do desc`,
       [id]
     );
 

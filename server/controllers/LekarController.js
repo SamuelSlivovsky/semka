@@ -77,6 +77,22 @@ module.exports = {
     })();
   },
 
+  getMiestnosti: (req, res) => {
+    const miestnost = require("../models/miestnost");
+    (async () => {
+      info = await miestnost.getMiestnosti(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
+  getNeobsadeneLozka: (req, res) => {
+    const lozko = require("../models/lozko");
+    (async () => {
+      info = await lozko.getNeobsadeneLozka(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
   updateKonzilium: (req, res) => {
     const konzilium = require("../models/konzilium");
     (async () => {

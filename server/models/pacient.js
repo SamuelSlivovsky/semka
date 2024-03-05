@@ -456,6 +456,20 @@ async function insertPacient(body) {
   }
 }
 
+async function updateTimeOfDeath(body) {
+  try {
+    let conn = await database.getConnection();
+    await conn.execute(
+      `update pacient set datum_umrtia = to_date(to_char(to_timestamp(:datum_umrtia,'DD/MM/YYYY HH24:MI:SS'),
+      'DD/MM/YYYY HH24:MI:SS')) where id_pacienta = :id_pacienta`,
+      { datum_umrtia: body.datum_umrtia, id_pacienta: body.id_pacienta },
+      { autoCommit: true }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getPacienti,
   getNajviacChoriPocet,
@@ -475,4 +489,5 @@ module.exports = {
   insertPacient,
   getIdPacienta,
   getOckovania,
+  updateTimeOfDeath,
 };

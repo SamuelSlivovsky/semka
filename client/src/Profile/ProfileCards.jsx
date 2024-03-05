@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { useLocation } from "react-router";
@@ -13,8 +13,11 @@ import DiseaseForm from "../Forms/DiseaseForm";
 import DisablesForm from "../Forms/DisablesForm";
 import VacForm from "../Forms/VacForm";
 import { Tag } from "primereact/tag";
+import { Calendar } from "primereact/calendar";
+import { Toast } from "primereact/toast";
 
 export default function ProfileCard(props) {
+  const toast = useRef(null);
   const [profile, setProfile] = useState("");
   const [show, setShow] = useState(false);
   const location = useLocation();
@@ -27,6 +30,7 @@ export default function ProfileCard(props) {
   const [patientDiseases, setPatientDiseases] = useState("");
   const [patientZTPTypes, setPatientZTPTypes] = useState([]);
   const [patientVac, setPatientVac] = useState([]);
+  const [allowUpdateTimeOfDeath, setAllowUpdateTimeOfDeath] = useState(false);
   const token = localStorage.getItem("hospit-user");
   const headers = { authorization: "Bearer " + token };
 
@@ -345,8 +349,37 @@ export default function ProfileCard(props) {
     }
   };
 
+  const updateTimeOfDeath = (e) => {
+    if (e.value <= new Date()) {
+      setProfile({ ...profile, DATUM_UMRTIA: e.value });
+      const token = localStorage.getItem("hospit-user");
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          datum_umrtia: e.value.toLocaleString("en-GB").replace(",", ""),
+          id_pacienta:
+            typeof props.patientId !== "undefined" && props.patientId !== null
+              ? props.patientId
+              : location.state,
+        }),
+      };
+      fetch("/patient/update/umrtie", requestOptions);
+    } else {
+      toast.current.show({
+        severity: "error",
+        summary: "Dátum úmrtia nemôže byť v budúcnosti",
+        life: 3000,
+      });
+    }
+  };
+
   return (
     <div>
+      <Toast ref={toast} />
       <div className="flex col-12 ">
         <Card
           className="col-5 shadow-4 "
@@ -374,9 +407,58 @@ export default function ProfileCard(props) {
             <div className="col-6 text-center m-0">
               <h4>Dátum úmrtia</h4>
               <div>
-                {profile.DATUM_UMRTIA
-                  ? new Date(profile.DATUM_UMRTIA).toLocaleDateString("fr-CH")
-                  : ""}
+                {profile.DATUM_UMRTIA ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {" "}
+                    <Calendar
+                      style={{ width: "170px" }}
+                      showTime
+                      value={new Date(profile.DATUM_UMRTIA)}
+                      onChange={(e) => {
+                        updateTimeOfDeath(e);
+                      }}
+                      disabled={!allowUpdateTimeOfDeath}
+                    />
+                    <Button
+                      label="Uprav"
+                      onClick={() => setAllowUpdateTimeOfDeath(true)}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Calendar
+                      value={
+                        profile.DATUM_UMRTIA
+                          ? new Date(profile.DATUM_UMRTIA)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        updateTimeOfDeath(e);
+                      }}
+                      style={{
+                        width: "170px",
+                        display: allowUpdateTimeOfDeath ? "" : "none",
+                      }}
+                      showTime
+                    />
+                    <Button
+                      label="Pridaj"
+                      onClick={() => setAllowUpdateTimeOfDeath(true)}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </div>

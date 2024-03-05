@@ -50,7 +50,7 @@ async function insertHospitalizacia(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        hospitalizacia_insert(:rod_cislo, :id_lekara, :datum, :datum_do, :priloha, :nazov, :popis );
+        hospitalizacia_insert(:rod_cislo, :id_lekara, :datum, :datum_do, :priloha, :nazov, :popis, :id_lozka );
         END;`;
 
     let buffer = Buffer.from([0x00]);
@@ -66,6 +66,7 @@ async function insertHospitalizacia(body) {
       id_lekara: body.id_lekara,
       datum_do: body.datum_do,
       nazov: body.nazov,
+      id_lozka: body.id_lozka,
     });
   } catch (err) {
     throw new Error("Database error: " + err);

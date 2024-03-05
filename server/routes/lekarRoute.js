@@ -59,4 +59,16 @@ router.get(
   controller.getZaznamy
 );
 
+router.get(
+  "/miestnosti/:id",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getMiestnosti
+);
+
+router.get(
+  "/neobsadeneLozka/:id",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getNeobsadeneLozka
+);
+
 module.exports = router;

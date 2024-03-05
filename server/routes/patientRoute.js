@@ -22,5 +22,10 @@ router.get(
   verify.verifyRoles(1, 2, 3),
   controller.getOckovania
 );
+router.post(
+  "/update/umrtie",
+  verify.verifyRoles(1, 2, 3),
+  controller.updateTimeOfDeath
+);
 
 module.exports = router;

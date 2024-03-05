@@ -71,4 +71,15 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+
+  updateTimeOfDeath: (req, res) => {
+    const pacient = require("../models/pacient");
+    (async () => {
+      ret_val = await pacient.updateTimeOfDeath(req.body);
+      res.status(200);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
 };
