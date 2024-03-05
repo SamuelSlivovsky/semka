@@ -10,11 +10,12 @@ import statIcon from "../images/statistics.png";
 import HomeCard from "./HomeCard";
 import storageIcon from "../images/drugs.png";
 import pharmacyStorageIcon from "../images/pharmacy_storage.png";
+import aboutMeIcon from "../images/about_me.png";
 import pharmacyManagerIcon from "../images/pharmacist_manager.png";
 import pharmacistIcon from "../images/pharmacist.png";
 import prescriptionsIcon from "../images/prescriptions.png";
-import medicamentsIcon from '../images/medicaments.png';
-import medicalAidsIcon from '../images/medical_aids.png';
+import medicamentsIcon from "../images/medicaments.png";
+import medicalAidsIcon from "../images/medical_aids.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
@@ -125,32 +126,32 @@ function Home() {
       key="9"
     ></HomeCard>,
     <HomeCard
-        title="Pacienti"
-        isCalendar={false}
-        path="/patients"
-        icon={patientIcon}
-        key="2"
+      title="Pacienti"
+      isCalendar={false}
+      path="/patients"
+      icon={patientIcon}
+      key="2"
     ></HomeCard>,
     <HomeCard
-        title="Vyšetrenia"
-        isCalendar={false}
-        path="/examinations"
-        icon={examinationIcon}
-        key="4"
+      title="Vyšetrenia"
+      isCalendar={false}
+      path="/examinations"
+      icon={examinationIcon}
+      key="4"
     ></HomeCard>,
     <HomeCard
-        title="Hospitalizácie"
-        isCalendar={false}
-        path="/hospitalizations"
-        icon={hospitalizationIcon}
-        key="5"
+      title="Hospitalizácie"
+      isCalendar={false}
+      path="/hospitalizations"
+      icon={hospitalizationIcon}
+      key="5"
     ></HomeCard>,
     <HomeCard
-        title="Operácie"
-        isCalendar={false}
-        path="/operations"
-        icon={operationIcon}
-        key="6"
+      title="Operácie"
+      isCalendar={false}
+      path="/operations"
+      icon={operationIcon}
+      key="6"
     ></HomeCard>,
   ];
 
@@ -173,61 +174,61 @@ function Home() {
 
   const pharmacyManagerCards = [
     <HomeCard
-      title="Pacienti"
+      title="Informácie o mne"
       isCalendar={false}
-      path="/patients"
-      icon={patientIcon}
-      key="2"
+      path="/about_me"
+      icon={aboutMeIcon}
+      key="20"
     ></HomeCard>,
     <HomeCard
-      title="Zoznam liekov"
+      title="Číselník liekov"
       isCalendar={false}
       path="/medicaments"
       icon={medicamentsIcon}
       key="18"
-    ></HomeCard>,     
+    ></HomeCard>,
     <HomeCard
-      title="Zoznam zdravotníckych pomôcok"
+      title="Číselník zdravotníckych pomôcok"
       isCalendar={false}
-      path="/medicalAids"
+      path="/medical_aids"
       icon={medicalAidsIcon}
       key="19"
     ></HomeCard>,
     <HomeCard
-    title="Sklad"
-    isCalendar={false}
-    path="/sklad"
-    icon={storageIcon}
-    key="9"
-  ></HomeCard>,
-  <HomeCard
-    title="Lekárenský sklad"
-    isCalendar={false}
-    path="/lekarensky_sklad"
-    icon={pharmacyStorageIcon}
-    key="14"
-  ></HomeCard>,
-  <HomeCard
-    title="Manažéri lekární na Slovensku"
-    isCalendar={false}
-    path="/pharmacy_managers"
-    icon={pharmacyManagerIcon}
-    key="15"
-  ></HomeCard>,
-  <HomeCard
-    title="Lekárnici"
-    isCalendar={false}
-    path="/pharmacists"
-    icon={pharmacistIcon}
-    key="16"
-  ></HomeCard>,     
-  <HomeCard
-    title="Recepty"
-    isCalendar={false}
-    path="/prescriptions"
-    icon={prescriptionsIcon}
-    key="17"
-  ></HomeCard>,   
+      title="Sklad"
+      isCalendar={false}
+      path="/sklad"
+      icon={storageIcon}
+      key="9"
+    ></HomeCard>,
+    <HomeCard
+      title="Lekárenský sklad"
+      isCalendar={false}
+      path="/lekarensky_sklad"
+      icon={pharmacyStorageIcon}
+      key="14"
+    ></HomeCard>,
+    <HomeCard
+      title="Manažéri lekární na Slovensku"
+      isCalendar={false}
+      path="/pharmacy_managers"
+      icon={pharmacyManagerIcon}
+      key="15"
+    ></HomeCard>,
+    <HomeCard
+      title="Lekárnici"
+      isCalendar={false}
+      path="/pharmacists"
+      icon={pharmacistIcon}
+      key="16"
+    ></HomeCard>,
+    <HomeCard
+      title="Recepty"
+      isCalendar={false}
+      path="/prescriptions"
+      icon={prescriptionsIcon}
+      key="17"
+    ></HomeCard>,
   ];
 
   const renderHomeCards = () => {

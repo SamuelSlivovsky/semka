@@ -1,12 +1,12 @@
-import React, {useState, useEffect} from "react";
+import React, { useState, useEffect } from "react";
 import EventCalendar from "./Calendar/Calendar";
 import Home from "./Home/Home";
-import {Button} from "primereact/button";
-import {Routes, Route} from "react-router-dom";
+import { Button } from "primereact/button";
+import { Routes, Route } from "react-router-dom";
 import TabPatients from "./Views/Tables/TabPatients";
 import Patient from "./Views/Patient";
-import {Register} from "./Auth/Register";
-import {Login} from "./Auth/Login";
+import { Register } from "./Auth/Register";
+import { Login } from "./Auth/Login";
 import Statistics from "./Views/Statistics";
 import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
@@ -18,21 +18,23 @@ import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
 import PharmacyStorage from "./Views/PharmacyStorage";
-import PharmacyStorageMedicaments from './Views/PharmacyStorageMedicaments';
-import PharmacyStorageMedicalAids from './Views/PharmacyStorageMedicalAids';
+import PharmacyStorageMedicaments from "./Views/PharmacyStorageMedicaments";
+import PharmacyStorageMedicalAids from "./Views/PharmacyStorageMedicalAids";
 import TabMedicaments from "./Views/Tables/TabMedicaments";
 import MedicamentCard from "./Details/MedicamentCard";
 import TabMedicalAids from "./Views/Tables/TabMedicalAids";
 import MedicalAidCard from "./Details/MedicalAidCard";
 import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
-import PharmacyManagerCard from "./Profile/PharmacyManagerCard";
 import TabPharmacists from "./Views/Tables/TabPharmacists";
+import PharmacyManagerCard from "./Profile/PharmacyManagerCard";
 import PharmacistCard from "./Profile/PharmacistCard";
+import AboutMeCard from "./Profile/AboutMeCard";
 import TabPrescriptions from "./Views/Tables/TabPrescriptions";
+import PrecsriptionCard from "./Details/PrescriptionCard";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
-import {useNavigate, useLocation} from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import AdminPanel from "./Views/AdminPanel";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
@@ -100,86 +102,87 @@ function App() {
     };
   }, [location.pathname]);
 
-    const sidebarButtonsAdmin = [
-        <SidebarButton
-            key="1"
-            visibleLeft={visibleLeft}
-            path="/"
-            label="Domov"
-            icon="home-icon"
-        />,
-        <SidebarButton
-            key="3"
-            visibleLeft={visibleLeft}
-            path="/patients"
-            label="Pacienti"
-            icon="patient-icon"
-        />,
-        <SidebarButton
-            key="8"
-            visibleLeft={visibleLeft}
-            path="/statistics"
-            label="Štatistiky"
-            icon="stat-icon"
-        />,
-        <SidebarButton
-            key="10"
-            visibleLeft={visibleLeft}
-            path="/sklad"
-            label="Sklad"
-            icon="storage-icon"
-        />,
-        <SidebarButton
-            key="13"
-            visibleLeft={visibleLeft}
-            path="/adminPanel"
-            label="Admin Panel"
-            icon="database-icon"
-        />, <SidebarButton
-            key="5"
-            visibleLeft={visibleLeft}
-            path="/examinations"
-            label="Vyšetrenia"
-            icon="examination-icon"
-        />,
-        <SidebarButton
-            key="6"
-            visibleLeft={visibleLeft}
-            path="/hospitalizations"
-            icon="hospit-icon"
-            label="Hospitalizácie"
-        />,
-        <SidebarButton
-            key="7"
-            visibleLeft={visibleLeft}
-            path="/operations"
-            label="Operácie"
-            icon="operation-icon"
-        />,
-    ];
+  const sidebarButtonsAdmin = [
+    <SidebarButton
+      key="1"
+      visibleLeft={visibleLeft}
+      path="/"
+      label="Domov"
+      icon="home-icon"
+    />,
+    <SidebarButton
+      key="3"
+      visibleLeft={visibleLeft}
+      path="/patients"
+      label="Pacienti"
+      icon="patient-icon"
+    />,
+    <SidebarButton
+      key="8"
+      visibleLeft={visibleLeft}
+      path="/statistics"
+      label="Štatistiky"
+      icon="stat-icon"
+    />,
+    <SidebarButton
+      key="10"
+      visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
+    />,
+    <SidebarButton
+      key="13"
+      visibleLeft={visibleLeft}
+      path="/adminPanel"
+      label="Admin Panel"
+      icon="database-icon"
+    />,
+    <SidebarButton
+      key="5"
+      visibleLeft={visibleLeft}
+      path="/examinations"
+      label="Vyšetrenia"
+      icon="examination-icon"
+    />,
+    <SidebarButton
+      key="6"
+      visibleLeft={visibleLeft}
+      path="/hospitalizations"
+      icon="hospit-icon"
+      label="Hospitalizácie"
+    />,
+    <SidebarButton
+      key="7"
+      visibleLeft={visibleLeft}
+      path="/operations"
+      label="Operácie"
+      icon="operation-icon"
+    />,
+  ];
 
-    const sidebarButtonsDoctor = [
-        <SidebarButton
-            key="1"
-            visibleLeft={visibleLeft}
-            path="/"
-            label="Domov"
-            icon="home-icon"
-        />,
-        <SidebarButton
-            key="2"
-            visibleLeft={visibleLeft}
-            path="/calendar"
-            label="Kalendár"
-            icon="calendar-icon"
-        />,
-        <SidebarButton
-            key="3"
-            visibleLeft={visibleLeft}
-            path="/patients"
-            label="Pacienti"
-            icon="patient-icon"
-        />,
+  const sidebarButtonsDoctor = [
+    <SidebarButton
+      key="1"
+      visibleLeft={visibleLeft}
+      path="/"
+      label="Domov"
+      icon="home-icon"
+    />,
+    <SidebarButton
+      key="2"
+      visibleLeft={visibleLeft}
+      path="/calendar"
+      label="Kalendár"
+      icon="calendar-icon"
+    />,
+    <SidebarButton
+      key="3"
+      visibleLeft={visibleLeft}
+      path="/patients"
+      label="Pacienti"
+      icon="patient-icon"
+    />,
 
     <SidebarButton
       key="5"
@@ -239,15 +242,15 @@ function App() {
     />,
   ];
 
-    const sidebarButtonsChief = [
-        <SidebarButton
-            key="4"
-            visibleLeft={visibleLeft}
-            path="/doctors"
-            label="Lekári"
-            icon="doctor-icon"
-        />,
-    ];
+  const sidebarButtonsChief = [
+    <SidebarButton
+      key="4"
+      visibleLeft={visibleLeft}
+      path="/doctors"
+      label="Lekári"
+      icon="doctor-icon"
+    />,
+  ];
 
   const sidebarButtonsPatient = [
     <SidebarButton
@@ -282,61 +285,61 @@ function App() {
       icon="home-icon"
     />,
     <SidebarButton
-      key="3"
+      key="20"
       visibleLeft={visibleLeft}
-      path="/patients"
-      label="Pacienti"
-      icon="patient-icon"
-  />,
+      path="/about_me"
+      label="Informácie o mne"
+      icon="aboutMe-icon"
+    />,
     <SidebarButton
       key="18"
       visibleLeft={visibleLeft}
       path="/medicaments"
-      label="Zoznam liekov"
+      label="Číselník liekov"
       icon="medicaments-icon"
-  />, 
+    />,
     <SidebarButton
       key="19"
       visibleLeft={visibleLeft}
-      path="/medicalAids"
-      label="Zoznam zdravotníckych pomôcok"
+      path="/medical_aids"
+      label="Číselník zdravotníckych pomôcok"
       icon="medical-aids-icon"
-  />, 
+    />,
     <SidebarButton
       key="10"
       visibleLeft={visibleLeft}
       path="/sklad"
       label="Sklad"
       icon="storage-icon"
-  />,  
+    />,
     <SidebarButton
       key="14"
       visibleLeft={visibleLeft}
       path="/lekarensky_sklad"
       label="Lekárenský sklad"
       icon="pharmacy-storage-icon"
-  />,  
+    />,
     <SidebarButton
       key="15"
       visibleLeft={visibleLeft}
       path="/pharmacy_managers"
       label="Manažéri lekární na Slovensku"
       icon="pharmacy-manager-icon"
-  />,  
+    />,
     <SidebarButton
       key="16"
       visibleLeft={visibleLeft}
       path="/pharmacists"
       label="Lekárnici"
       icon="pharmacist-icon"
-  />,  
+    />,
     <SidebarButton
       key="17"
       visibleLeft={visibleLeft}
       path="/prescriptions"
       label="Recepty"
       icon="prescriptions-icon"
-  />, 
+    />,
   ];
 
   const renderDoctorRoutes = () => {
@@ -391,7 +394,7 @@ function App() {
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
         <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
-          <Route path="/adminPanel" element={<AdminPanel/>}></Route>
+        <Route path="/adminPanel" element={<AdminPanel />}></Route>
       </>
     );
   };
@@ -416,20 +419,57 @@ function App() {
   const renderPharmacyManagerRoutes = () => {
     return (
       <>
-          <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
-          <Route path="/medicaments" element={<TabMedicaments></TabMedicaments>}></Route>  
-          <Route path="/medicament_detail" element={<MedicamentCard></MedicamentCard>}></Route>
-          <Route path="/medicalAids" element={<TabMedicalAids></TabMedicalAids>}></Route>  
-          <Route path="/medicalAid_detail" element={<MedicalAidCard></MedicalAidCard>}></Route>
-          <Route path="/sklad" element={<Storage />}></Route>
-          <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
-          <Route path="/lekarensky_sklad_lieky" element={<PharmacyStorageMedicaments />}></Route>
-          <Route path="/lekarensky_sklad_zdravotnickePomocky" element={<PharmacyStorageMedicalAids />}></Route>
-          <Route path="/pharmacy_managers" element={<TabPharmacyManagers></TabPharmacyManagers>}></Route>
-          <Route path="/pharmacy_manager" element={<PharmacyManagerCard></PharmacyManagerCard>}></Route>
-          <Route path="/pharmacists" element={<TabPharmacists></TabPharmacists>}></Route>
-          <Route path="/pharmacist" element={<PharmacistCard></PharmacistCard>}></Route>
-          <Route path="/prescriptions" element={<TabPrescriptions></TabPrescriptions>}></Route>  
+        <Route path="/about_me" element={<AboutMeCard></AboutMeCard>}></Route>
+        <Route
+          path="/medicaments"
+          element={<TabMedicaments></TabMedicaments>}
+        ></Route>
+        <Route
+          path="/medicament_detail"
+          element={<MedicamentCard></MedicamentCard>}
+        ></Route>
+        <Route
+          path="/medical_aids"
+          element={<TabMedicalAids></TabMedicalAids>}
+        ></Route>
+        <Route
+          path="/medicalAid_detail"
+          element={<MedicalAidCard></MedicalAidCard>}
+        ></Route>
+        <Route path="/sklad" element={<Storage />}></Route>
+        <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
+        <Route
+          path="/lekarensky_sklad_lieky"
+          element={<PharmacyStorageMedicaments />}
+        ></Route>
+        <Route
+          path="/lekarensky_sklad_zdravotnickePomocky"
+          element={<PharmacyStorageMedicalAids />}
+        ></Route>
+        <Route
+          path="/pharmacy_managers"
+          element={<TabPharmacyManagers></TabPharmacyManagers>}
+        ></Route>
+        <Route
+          path="/pharmacy_manager"
+          element={<PharmacyManagerCard></PharmacyManagerCard>}
+        ></Route>
+        <Route
+          path="/pharmacists"
+          element={<TabPharmacists></TabPharmacists>}
+        ></Route>
+        <Route
+          path="/pharmacist"
+          element={<PharmacistCard></PharmacistCard>}
+        ></Route>
+        <Route
+          path="/prescriptions"
+          element={<TabPrescriptions></TabPrescriptions>}
+        ></Route>
+        <Route
+          path="/prescription_detail"
+          element={<PrecsriptionCard></PrecsriptionCard>}
+        ></Route>
       </>
     );
   };
@@ -463,7 +503,7 @@ function App() {
         ) : userData !== null && userData.UserInfo.role === 4 ? (
           sidebarButtonsPatient
         ) : userData !== null && userData.UserInfo.role === 10 ? (
-          sidebarButtonsPharmacyManager  
+          sidebarButtonsPharmacyManager
         ) : (
           ""
         )}
@@ -503,9 +543,9 @@ function App() {
           {typeof userData !== "undefined" &&
           userData !== null &&
           userData.UserInfo.role === 0 ? (
-              <>
-                  {renderChiefRoutes()} {renderDoctorRoutes()} {renderAdminRoutes()}
-              </>
+            <>
+              {renderChiefRoutes()} {renderDoctorRoutes()} {renderAdminRoutes()}
+            </>
           ) : typeof userData !== "undefined" &&
             userData !== null &&
             userData.UserInfo.role === 2 ? (

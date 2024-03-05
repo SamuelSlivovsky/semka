@@ -181,32 +181,37 @@
 }
 
 .pharmacy-storage-icon {
-  content: url('./images/pharmacy_storage_black.png');
+  content: url("./images/pharmacy_storage_black.png");
   height: 44px;
   width: 44px;
 }
 .pharmacy-manager-icon {
-  content: url('./images/pharmacist_manager_black.png');
+  content: url("./images/pharmacist_manager_black.png");
   height: 44px;
   width: 44px;
 }
 .pharmacist-icon {
-  content: url('./images/pharmacist_black.png');
+  content: url("./images/pharmacist_black.png");
   height: 44px;
   width: 44px;
 }
 .prescriptions-icon {
-  content: url('./images/prescriptions_black.png');
+  content: url("./images/prescriptions_black.png");
   height: 44px;
   width: 44px;
 }
 .medicaments-icon {
-  content: url('./images/medicaments_black.png');
+  content: url("./images/medicaments_black.png");
   height: 44px;
   width: 44px;
 }
 .medical-aids-icon {
-  content: url('./images/medical_aids_black.png');
+  content: url("./images/medical_aids_black.png");
+  height: 44px;
+  width: 44px;
+}
+.aboutMe-icon {
+  content: url("./images/about_me_black.png");
   height: 44px;
   width: 44px;
 }

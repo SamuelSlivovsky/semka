@@ -21,7 +21,7 @@ async function getLekarnici(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select zl.cislo_zam, zl.rod_cislo, ol.meno, ol.priezvisko, zl.id_typ, zl.id_lekarne, ll.nazov as "LEKAREN_NAZOV", ml.nazov as "MESTO_NAZOV"
+      `select distinct zl.cislo_zam, zl.rod_cislo, ol.meno, ol.priezvisko, zl.id_typ, zl.id_lekarne, ll.nazov as "LEKAREN_NAZOV", ml.nazov as "MESTO_NAZOV"
         from zamestnanci zl
         join os_udaje ol on (ol.rod_cislo = zl.rod_cislo)
         join lekaren ll on (zl.id_lekarne = ll.id_lekarne)
@@ -74,6 +74,29 @@ async function getLekarniciInfo(id) {
   }
 }
 
+async function getPouzivatelInfo(id) {
+  try {
+    let conn = await database.getConnection();
+    const info = await conn.execute(
+      `select os_udaje.meno, os_udaje.priezvisko, os_udaje.rod_cislo, os_udaje.ulica, os_udaje.PSC, mesto.nazov as "NAZOV_MESTA", okres.nazov_okresu,
+      kraj.nazov_kraja, zamestnanci.cislo_zam, zamestnanci.id_typ, to_char(zamestnanci.dat_od, 'DD.MM.YYYY HH24:MI:SS') AS "DAT_OD", typ_zam.nazov as "NAZOV_ROLE", lekaren.nazov as "NAZOV_LEKARNE"
+      from zamestnanci
+      join os_udaje on (os_udaje.rod_cislo = zamestnanci.rod_cislo)
+      join mesto on (mesto.PSC = os_udaje.PSC)
+      join okres on (okres.id_okresu = mesto.id_okresu)
+      join kraj on (kraj.id_kraja = okres.id_kraja)
+      join typ_zam on (typ_zam.id_typ = zamestnanci.id_typ)
+      join lekaren on (lekaren.id_lekarne = zamestnanci.id_lekarne)
+      where zamestnanci.cislo_zam = :id`,
+      [id]
+    );
+
+    return info.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getZoznamLiekov() {
   try {
     let conn = await database.getConnection();
@@ -88,7 +111,7 @@ async function getDetailLieku(id) {
   try {
     let conn = await database.getConnection();
     const detail = await conn.execute(
-      `select typ, davkovanie, mnozstvo from liek where id_liek = :id`,
+      `select nazov, typ, davkovanie, mnozstvo from liek where id_liek = :id`,
       [id]
     );
 
@@ -112,7 +135,7 @@ async function getDetailZdravotnickejPomocky(id) {
   try {
     let conn = await database.getConnection();
     const detail = await conn.execute(
-      `select doplnok_nazvu from zdravotna_pomocka where id_zdr_pomocky = :id`,
+      `select nazov, doplnok_nazvu from zdravotna_pomocka where id_zdr_pomocky = :id`,
       [id]
     );
 
@@ -127,6 +150,7 @@ module.exports = {
   getLekarnici,
   getManazerLekarneInfo,
   getLekarniciInfo,
+  getPouzivatelInfo,
   getZoznamLiekov,
   getDetailLieku,
   getZoznamZdravotnickychPomocok,

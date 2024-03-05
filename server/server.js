@@ -18,6 +18,7 @@ const patientRoute = require("./routes/patientRoute");
 const receptRoute = require("./routes/receptRoute");
 const storageRoute = require("./routes/storageRoute");
 const pharmacyStorageRoute = require("./routes/pharmacyStorageRoute");
+const pharmacyPrescriptionsRoute = require("./routes/PharmacyPrescriptionsRoute");
 const drugsRoute = require("./routes/drugsRoute");
 const medRecordsRoute = require("./routes/medRecordsRoute");
 const addRoute = require("./routes/addRoute");
@@ -44,6 +45,7 @@ app.use("/sklad", storageRoute);
 app.use("/lekarenskySklad", pharmacyStorageRoute);
 app.use("/lekar", lekarRoute);
 app.use("/pharmacyManagers", pharmacyManagersRoute);
+app.use("/pharmacyPrescriptions", pharmacyPrescriptionsRoute);
 app.use("/selects", selectsRoute);
 app.use("/calendar", calendarRoute);
 app.use("/patient", patientRoute);
@@ -59,8 +61,6 @@ app.use("/chat", chatRoute);
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
   socket.on("sendMessage", (message, params) => {
-
-    
     io.emit("newMessage", {
       content: message,
       sender: params.userId,

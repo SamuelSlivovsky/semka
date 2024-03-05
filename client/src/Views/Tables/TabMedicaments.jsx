@@ -90,7 +90,7 @@ export default function TabMedicaments() {
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
-              placeholder="Keyword Search"
+              placeholder="Vyhľadať"
             />
           </span>
           <div className="ml-4">

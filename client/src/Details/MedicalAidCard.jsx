@@ -40,7 +40,7 @@ export default function MedicalAidCard(props) {
             <Card
               className="col-5 shadow-4 text-center"
               style={{ width: "40rem", height: "40rem" }}
-              title={detail.NAZOV}
+              title=<h3>{detail.NAZOV}</h3>
             >
               {renderDetail("Doplnok k zdravotníckej pomôcke: ", detail.DOPLNOK_NAZVU)}
 

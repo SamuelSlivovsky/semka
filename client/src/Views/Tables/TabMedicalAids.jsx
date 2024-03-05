@@ -9,7 +9,7 @@ import { useNavigate } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 
-export default function TabMedicaments() {
+export default function TabMedicalAids() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -94,7 +94,7 @@ export default function TabMedicaments() {
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
-              placeholder="Keyword Search"
+              placeholder="Vyhľadať"
             />
           </span>
           <div className="ml-4">

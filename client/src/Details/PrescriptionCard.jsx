@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { useLocation } from "react-router";
 
-export default function MedicamentCard(props) {
+export default function PrescriptionCard(props) {
   const [detail, setDetail] = useState("");
   const location = useLocation();
 
@@ -10,9 +10,10 @@ export default function MedicamentCard(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     fetch(
-      `pharmacyManagers/detailLieku/${
-        typeof props.medicamentId !== "undefined" && props.medicamentId !== null
-          ? props.medicamentId
+      `pharmacyPrescriptions/detailReceptu/${
+        typeof props.prescriptionId !== "undefined" &&
+        props.prescriptionId !== null
+          ? props.prescriptionId
           : location.state
       }`,
       { headers }
@@ -39,12 +40,25 @@ export default function MedicamentCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "40rem", height: "40rem" }}
-          title=<h3>{detail.NAZOV}</h3>
+          style={{ width: "70rem", height: "40rem" }}
+          title=<h3>ID receptu: {detail.ID_RECEPTU}</h3>
         >
-          {renderDetail("Typ lieku: ", detail.TYP)}
-          {renderDetail("Dávkovanie lieku: ", detail.DAVKOVANIE)}
-          {renderDetail("Množstvo: ", detail.MNOZSTVO)}
+          {renderDetail("Dátum zapisu: ", detail.DATUM_ZAPISU)}
+          {renderDetail("Liek na recept: ", detail.NAZOV_LIEKU)}
+          {renderDetail("Poznámka: ", detail.POZNAMKA)}
+          {renderDetail(
+            "Recept vydal: ",
+            detail.TYP_ZAMESTNANCA +
+              ": " +
+              detail.MENO_LEKARA +
+              " " +
+              detail.PRIEZVISKO_LEKARA
+          )}
+          {renderDetail("Opakujúci recept: ", detail.OPAKUJUCI)}
+          {renderDetail(
+            "Dátum prevzatia (toto musim vediet editovat): ",
+            detail.DATUM_PREVZATIA
+          )}
         </Card>
       </div>
       <div className="col-12 flex"></div>
