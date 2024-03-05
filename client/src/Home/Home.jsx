@@ -16,6 +16,7 @@ import pharmacistIcon from "../images/pharmacist.png";
 import prescriptionsIcon from "../images/prescriptions.png";
 import medicamentsIcon from "../images/medicaments.png";
 import medicalAidsIcon from "../images/medical_aids.png";
+import reservationsIcon from "../images/reservations.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
@@ -228,6 +229,13 @@ function Home() {
       path="/prescriptions"
       icon={prescriptionsIcon}
       key="17"
+    ></HomeCard>,
+    <HomeCard
+      title="Rezervácie"
+      isCalendar={false}
+      path="/reservations"
+      icon={reservationsIcon}
+      key="21"
     ></HomeCard>,
   ];
 

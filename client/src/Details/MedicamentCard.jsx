@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
-import { useLocation } from "react-router";
+import { Button } from "primereact/button";
+import { useNavigate, useLocation } from "react-router";
 
 export default function MedicamentCard(props) {
   const [detail, setDetail] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -22,6 +24,23 @@ export default function MedicamentCard(props) {
         setDetail(...data);
       });
   }, []); //
+
+  const redirect = () => {
+    navigate("/medicaments");
+  };
+
+  const renderCardFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Späť"
+          icon="pi pi-replay"
+          style={{ marginTop: 150 }}
+          onClick={() => redirect()}
+        />
+      </div>
+    );
+  };
 
   const renderDetail = (label, value) => (
     <div className="flex w-100">
@@ -45,6 +64,7 @@ export default function MedicamentCard(props) {
           {renderDetail("Typ lieku: ", detail.TYP)}
           {renderDetail("Dávkovanie lieku: ", detail.DAVKOVANIE)}
           {renderDetail("Množstvo: ", detail.MNOZSTVO)}
+          {renderCardFooter()}
         </Card>
       </div>
       <div className="col-12 flex"></div>

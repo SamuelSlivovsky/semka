@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 export default function PharmacyManagerCard(props) {
   const [profile, setProfile] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     fetch(
       `pharmacyManagers/manazerLekarneInfo/${
-        typeof props.pharmacyManagerId !== "undefined" && props.pharmacyManagerId !== null
+        typeof props.pharmacyManagerId !== "undefined" &&
+        props.pharmacyManagerId !== null
           ? props.pharmacyManagerId
           : location.state
       }`,
@@ -24,13 +26,30 @@ export default function PharmacyManagerCard(props) {
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const redirect = () => {
+    navigate("/pharmacy_managers");
+  };
+
+  const renderCardFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Späť"
+          icon="pi pi-replay"
+          style={{ marginTop: 20 }}
+          onClick={() => redirect()}
+        />
+      </div>
+    );
+  };
+
   const renderDetail = (label, value) => (
     <div className="flex w-100">
       <div className="col-6 m-0">
         <h3 className="ml-10">{label}</h3>
       </div>
       <div className="col-6 m-0">
-        <h4 style={{color: "gray"}}>{value}</h4>
+        <h4 style={{ color: "gray" }}>{value}</h4>
       </div>
     </div>
   );
@@ -47,11 +66,14 @@ export default function PharmacyManagerCard(props) {
           {renderDetail("Rodné číslo: ", profile.ROD_CISLO)}
           {renderDetail("Rok narodenia: ", profile.DATUM_NARODENIA)}
           {renderDetail("Vek: ", profile.VEK)}
-          {renderDetail("Adresa bydliska: ", profile.NAZOV_OBCE + " " + profile.PSC)}
-
+          {renderDetail(
+            "Adresa bydliska: ",
+            profile.NAZOV_OBCE + " " + profile.PSC
+          )}
           <div className="mt-5 text-center">
             <Button label="Poslať správu" icon="pi pi-send" />
           </div>
+          {renderCardFooter()}
         </Card>
       </div>
       <div className="col-12 flex"></div>

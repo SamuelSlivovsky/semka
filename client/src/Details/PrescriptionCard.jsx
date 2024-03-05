@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
-import { useLocation } from "react-router";
+import { useNavigate, useLocation } from "react-router";
+import { Button } from "primereact/button";
 
 export default function PrescriptionCard(props) {
   const [detail, setDetail] = useState("");
   const location = useLocation();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -24,6 +26,23 @@ export default function PrescriptionCard(props) {
       });
   }, []); //
 
+  const redirect = () => {
+    navigate("/prescriptions");
+  };
+
+  const renderCardFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Späť"
+          icon="pi pi-replay"
+          style={{ marginTop: 30 }}
+          onClick={() => redirect()}
+        />
+      </div>
+    );
+  };
+
   const renderDetail = (label, value) => (
     <div className="flex w-100">
       <div className="col-6 m-0">
@@ -40,7 +59,7 @@ export default function PrescriptionCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "70rem", height: "40rem" }}
+          style={{ width: "70rem", height: "45rem" }}
           title=<h3>ID receptu: {detail.ID_RECEPTU}</h3>
         >
           {renderDetail("Dátum zapisu: ", detail.DATUM_ZAPISU)}
@@ -59,6 +78,7 @@ export default function PrescriptionCard(props) {
             "Dátum prevzatia (toto musim vediet editovat): ",
             detail.DATUM_PREVZATIA
           )}
+          {renderCardFooter()}
         </Card>
       </div>
       <div className="col-12 flex"></div>

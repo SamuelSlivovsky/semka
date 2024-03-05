@@ -31,6 +31,7 @@ import PharmacistCard from "./Profile/PharmacistCard";
 import AboutMeCard from "./Profile/AboutMeCard";
 import TabPrescriptions from "./Views/Tables/TabPrescriptions";
 import PrecsriptionCard from "./Details/PrescriptionCard";
+import TabReservations from "./Views/Tables/TabResevations";
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
@@ -340,6 +341,13 @@ function App() {
       label="Recepty"
       icon="prescriptions-icon"
     />,
+    <SidebarButton
+      key="21"
+      visibleLeft={visibleLeft}
+      path="/reservations"
+      label="Rezervácie"
+      icon="reservations-icon"
+    />,
   ];
 
   const renderDoctorRoutes = () => {
@@ -469,6 +477,10 @@ function App() {
         <Route
           path="/prescription_detail"
           element={<PrecsriptionCard></PrecsriptionCard>}
+        ></Route>
+        <Route
+          path="/reservations"
+          element={<TabReservations></TabReservations>}
         ></Route>
       </>
     );
