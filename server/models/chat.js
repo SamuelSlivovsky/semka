@@ -6,33 +6,33 @@ async function getSpravy(id_skupiny, userid) {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `SELECT
-    DISTINCT cs.id_spravy,
-    meno,
-    priezvisko,
-    cs.id_skupiny,
-    cs.userid,
-    cs.sprava,
-    CASE WHEN cs.obrazok IS NOT NULL AND DBMS_LOB.GETLENGTH(cs.obrazok) > 1 THEN 1 ELSE 0 END AS has_obrazok,
-    TO_CHAR(cs.datum, 'DD.MM.YYYY HH24:MI:SS') AS datum,
-    cs.datum AS unformatted_date,
-    us.id_spravy AS "unreadId",
-    us.userid AS "unreadUserId"
-FROM
-    (SELECT * FROM chat_sprava WHERE id_skupiny = :id_skupiny ORDER BY datum DESC FETCH FIRST 50 ROWS ONLY) cs
-JOIN
-    user_chat uc ON (cs.id_skupiny = uc.id_skupiny and uc.USERID = :userid)
-LEFT JOIN
-    user_sprava us ON (us.id_spravy = cs.id_spravy AND us.userid = :userid)
-JOIN
-    user_tab ut ON uc.userid = ut.userid
-JOIN
-    zamestnanci z ON z.cislo_zam = uc.userid
-JOIN
-    os_udaje USING (rod_cislo)
-WHERE
-(uc.HISTORIA = 1 OR uc.ADMIN = 1 OR cs.datum > uc.DATUM_PRIDANIA)
-ORDER BY
-    cs.datum ASC
+      DISTINCT cs.id_spravy,
+      meno,
+      priezvisko,
+      cs.id_skupiny,
+      cs.userid,
+      cs.sprava,
+      CASE WHEN cs.obrazok IS NOT NULL AND DBMS_LOB.GETLENGTH(cs.obrazok) > 1 THEN 1 ELSE 0 END AS has_obrazok,
+      TO_CHAR(cs.datum, 'DD.MM.YYYY HH24:MI:SS') AS datum,
+      cs.datum AS unformatted_date,
+      us.id_spravy AS "unreadId",
+      us.userid AS "unreadUserId"
+  FROM
+      (SELECT * FROM chat_sprava WHERE id_skupiny = :id_skupiny ORDER BY datum DESC FETCH FIRST 50 ROWS ONLY) cs
+  JOIN
+      user_chat uc ON (cs.id_skupiny = uc.id_skupiny and uc.USERID = :userid)
+  LEFT JOIN
+      user_sprava us ON (us.id_spravy = cs.id_spravy AND us.userid = :userid)
+  JOIN
+      user_tab ut ON cs.userid = ut.userid
+  JOIN
+      zamestnanci z ON z.cislo_zam = cs.userid
+  JOIN
+      os_udaje USING (rod_cislo)
+  WHERE
+  (uc.HISTORIA = 1 OR uc.ADMIN = 1 OR cs.datum > uc.DATUM_PRIDANIA)
+  ORDER BY
+      cs.datum ASC
   `,
       { id_skupiny, userid, userid }
     );
@@ -73,38 +73,45 @@ async function getObrazok(id) {
   }
 }
 
-async function getNextSpravy(id, id_spravy) {
+async function getNextSpravy(body) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT 
+      `   SELECT 
       meno, 
       priezvisko, 
       cs.id_spravy, 
       cs.userid, 
       cs.id_skupiny, 
       cs.sprava, 
-      cs.obrazok,
+        CASE WHEN cs.obrazok IS NOT NULL AND DBMS_LOB.GETLENGTH(cs.obrazok) > 1 THEN 1 ELSE 0 END AS has_obrazok,
       TO_CHAR(cs.datum, 'DD.MM.YYYY HH24:MI:SS') AS datum,
       cs.datum AS unformatted_date, 
       us.id_spravy AS "unreadId", 
       us.userid AS "unreadUserId" 
   FROM 
-      (SELECT * FROM chat_sprava WHERE id_skupiny = :id AND id_spravy < :id_spravy ORDER BY datum DESC FETCH FIRST 50 ROWS ONLY) cs
-  JOIN 
-      user_chat uc ON cs.userid = uc.userid AND cs.id_skupiny = uc.id_skupiny
-  LEFT JOIN 
-      user_sprava us ON us.id_spravy = cs.id_spravy
+      (SELECT * FROM chat_sprava WHERE id_skupiny = :id_skupiny AND id_spravy < :id_spravy ORDER BY datum DESC FETCH FIRST 50 ROWS ONLY) cs
+ JOIN
+    user_chat uc ON (cs.id_skupiny = uc.id_skupiny and uc.USERID = :userid)
+LEFT JOIN
+    user_sprava us ON (us.id_spravy = cs.id_spravy AND us.userid = :userid)
   JOIN 
       user_tab ut ON uc.userid = ut.userid
   JOIN 
-      zamestnanci z ON z.cislo_zam = uc.userid
+      zamestnanci z ON z.cislo_zam = cs.userid
   JOIN 
       os_udaje USING (rod_cislo)
+      WHERE
+(uc.HISTORIA = 1 OR uc.ADMIN = 1 OR cs.datum > uc.DATUM_PRIDANIA)
   ORDER BY 
       cs.datum ASC
   `,
-      { id, id_spravy }
+      {
+        id_skupiny: body.id_skupiny,
+        id_spravy: body.id_spravy,
+        userid: body.userid,
+        userid: body.userid,
+      }
     );
 
     return result.rows;
@@ -119,6 +126,20 @@ async function getUnread(id) {
     const result = await conn.execute(
       `SELECT count(userid) as pocet from user_sprava where userid =:id and precital = 'N'`,
       { id }
+    );
+
+    return result.rows[0];
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function isAdmin(id, id_skupiny) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `SELECT admin from user_chat where userid =:id AND id_skupiny =:id_skupiny`,
+      { id, id_skupiny }
     );
 
     return result.rows[0];
@@ -211,6 +232,41 @@ async function getGroups(id) {
   }
 }
 
+async function getOtherUsers(id_skupiny, id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select uc.userid, os.meno || ' ' || os.priezvisko as "meno", uc.historia from user_chat uc join zamestnanci z on (z.cislo_zam = uc.userid) 
+      join os_udaje os on (z.rod_cislo = os.rod_cislo)
+      where id_skupiny = :id_skupiny AND userid <> :id`,
+      { id_skupiny, id }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function updateHistory(body) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `update user_chat set historia= :historia where userid =:userid AND id_skupiny =:id_skupiny`,
+      {
+        historia: body.historia,
+        userid: body.userid,
+        id_skupiny: body.id_skupiny,
+      },
+      { autoCommit: true }
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 module.exports = {
   getSpravy,
   insertSprava,
@@ -220,4 +276,7 @@ module.exports = {
   getNextSpravy,
   getGroups,
   getObrazok,
+  isAdmin,
+  getOtherUsers,
+  updateHistory,
 };

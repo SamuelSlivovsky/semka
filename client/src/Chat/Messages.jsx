@@ -8,6 +8,7 @@ import GetUserData from "../Auth/GetUserData.jsx";
 import "../styles/chat.css";
 import { Dialog } from "primereact/dialog";
 import AddUserForm from "../Forms/AddUserForm.jsx";
+import ChatSettings from "./ChatSettings.jsx";
 
 const Messages = (props) => {
   const messagesEndRef = useRef([]);
@@ -23,6 +24,8 @@ const Messages = (props) => {
   const [allowScroll, setAllowScroll] = useState(true);
   const [nextScrollLength, setNextScrollLength] = useState(0);
   const [base64Data, setBase64Data] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [settingsShow, setSettingsShow] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -39,7 +42,7 @@ const Messages = (props) => {
 
       try {
         const response = await fetch(
-          `/chat/spravy/${props.group}/${userDataHelper.UserInfo.userid}`,
+          `/chat/spravy/${props.group.ID_SKUPINY}/${userDataHelper.UserInfo.userid}`,
           requestOptions
         );
         const data = await response.json();
@@ -90,7 +93,26 @@ const Messages = (props) => {
     };
 
     fetchData();
+    checkIfAdmin();
   }, [props.group]);
+
+  const checkIfAdmin = () => {
+    const token = localStorage.getItem("hospit-user");
+    const requestOptions = {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + token,
+      },
+    };
+
+    fetch(
+      `/chat/jeAdmin/${userDataHelper.UserInfo.userid}/${props.group.ID_SKUPINY}`,
+      requestOptions
+    )
+      .then((res) => res.json())
+      .then((data) => setIsAdmin(data.ADMIN == 1));
+  };
 
   useEffect(() => {
     const container = document.getElementById("chat-messages");
@@ -132,7 +154,7 @@ const Messages = (props) => {
           },
           body: JSON.stringify({
             userid: userDataHelper.UserInfo.userid,
-            id_skupiny: props.group,
+            id_skupiny: props.group.ID_SKUPINY,
           }),
         };
         fetch("/chat/updateRead", requestOptions);
@@ -171,14 +193,15 @@ const Messages = (props) => {
           },
           body: JSON.stringify({
             userid: userDataHelper.UserInfo.userid,
-            id_skupiny: props.group,
+            id_skupiny: props.group.ID_SKUPINY,
           }),
         };
         fetch("/chat/updateRead", requestOptions);
 
         props.setGroups(
           props.groups.map((item) => {
-            if (item.ID_SKUPINY == props.group) return { ...item, pocet: 0 };
+            if (item.ID_SKUPINY == props.group.ID_SKUPINY)
+              return { ...item, pocet: 0 };
             else return item;
           })
         );
@@ -219,7 +242,7 @@ const Messages = (props) => {
       },
       body: JSON.stringify({
         userid: userDataHelper.UserInfo.userid,
-        id_skupiny: props.group,
+        id_skupiny: props.group.ID_SKUPINY,
         sprava: message,
         datum: new Date().toLocaleString("en-GB").replace(",", ""),
         priloha: base64Data,
@@ -268,7 +291,10 @@ const Messages = (props) => {
         "Content-Type": "application/json",
         authorization: "Bearer " + token,
       },
-      body: JSON.stringify({ userid: user.CISLO_ZAM, id_skupiny: props.group }),
+      body: JSON.stringify({
+        userid: user.CISLO_ZAM,
+        id_skupiny: props.group.ID_SKUPINY,
+      }),
     };
     fetch("/chat/insertUser", requestOptions).then(() => setShow(false));
   };
@@ -308,17 +334,19 @@ const Messages = (props) => {
     setLoading(true);
     const token = localStorage.getItem("hospit-user");
     const requestOptions = {
-      method: "GET",
+      method: "POST",
       headers: {
         "Content-Type": "application/json",
         authorization: "Bearer " + token,
       },
+      body: JSON.stringify({
+        id_skupiny: props.group.ID_SKUPINY,
+        id_spravy: messages[0]?.messageId,
+        userid: userDataHelper.UserInfo.userid,
+      }),
     };
 
-    fetch(
-      `/chat/nextSpravy/${props.group}/${messages[0]?.messageId}`,
-      requestOptions
-    )
+    fetch(`/chat/nextSpravy`, requestOptions)
       .then((response) => response.json())
       .then((data) => {
         setNextScrollLength(data.length);
@@ -355,6 +383,31 @@ const Messages = (props) => {
 
   return (
     <div style={{ width: "100%" }}>
+      <div
+        style={{
+          height: "40px",
+          width: "100%",
+          backgroundColor: "rgb(174, 253, 243)",
+          display: "flex",
+          alignItems: "center",
+          fontSize: "20px",
+          fontWeight: "bold",
+          paddingLeft: "10px",
+        }}
+      >
+        {props.group.NAZOV}
+        <Button
+          icon="pi pi-cog"
+          style={{
+            display: isAdmin ? "" : "none",
+            width: "30px",
+            height: "30px",
+            marginLeft: "auto",
+            marginRight: "10px",
+          }}
+          onClick={() => setSettingsShow(true)}
+        />
+      </div>
       <div style={{ position: "relative" }}>
         {showButton ? (
           <Button
@@ -618,6 +671,17 @@ const Messages = (props) => {
       >
         {" "}
         <AddUserForm onClick={addChatUser} />
+      </Dialog>
+      <Dialog
+        visible={settingsShow}
+        onHide={() => setSettingsShow(false)}
+        style={{ minWidth: "50%" }}
+      >
+        <h1>Nastavenia</h1>
+        <ChatSettings
+          groupId={props.group.ID_SKUPINY}
+          userid={userDataHelper.UserInfo.userid}
+        />
       </Dialog>
     </div>
   );

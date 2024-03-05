@@ -37,7 +37,7 @@ const Chat = () => {
                   fontSize: "20px",
                   position: "relative",
                 }}
-                onClick={() => setGroup(item.ID_SKUPINY)}
+                onClick={() => setGroup(item)}
               >
                 <p>{item.NAZOV[0]}</p>
                 {item.POCET > 0 ? (
