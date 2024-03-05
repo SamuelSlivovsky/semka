@@ -4,23 +4,30 @@ import GetUserData from "../../Auth/GetUserData";
 
 export default function TabHospitalizations() {
   const [hospitalizacie, setHospitalizacie] = useState([]);
-
+  const [loading, setLoading] = useState(false);
   useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setLoading(true);
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
-    fetch(`/lekar/hospitalizacie/${userDataHelper.UserInfo.userid}`, {
+    await fetch(`/lekar/hospitalizacie/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
       .then((response) => response.json())
       .then((data) => {
         setHospitalizacie(data);
+        setLoading(false);
       });
-  }, []);
+  };
 
   const data = {
     tableName: "Hospitalizácie",
     cellData: hospitalizacie,
+    fetchData: () => fetchData(),
     titles: [
       { field: "ROD_CISLO", header: "Rodné číslo" },
       { field: "MENO", header: "Meno" },
@@ -30,6 +37,7 @@ export default function TabHospitalizations() {
     allowFilters: true,
     dialog: true,
     eventType: "Hospitalizácia",
+    tableLoading: loading,
   };
 
   return <div>{data && <TableMedicalRecords {...data} />}</div>;

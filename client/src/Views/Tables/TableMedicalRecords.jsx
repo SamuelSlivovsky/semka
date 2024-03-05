@@ -9,6 +9,8 @@ import { Calendar } from "primereact/calendar";
 import { PDFDownloadLink } from "@react-pdf/renderer";
 import { Pdf } from "../../Forms/Pdf";
 import GetUserData from "../../Auth/GetUserData";
+import { InputTextarea } from "primereact/inputtextarea";
+import { Button } from "primereact/button";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -17,16 +19,21 @@ export default function TableMedic(props) {
   const [selectedRow, setSelectedRow] = useState(null);
   const [imgUrl, setImgUrl] = useState("");
   const [loading, setLoading] = useState(false);
+  const [leaveMessage, setLeaveMessage] = useState("");
+  const [canAdd, setCanAdd] = useState(false);
+  const [endDate, setEndDate] = useState(new Date());
   const userData = GetUserData(localStorage.getItem("hospit-user"));
   const {
     tableName,
     cellData,
+    fetchData,
     titles,
     allowFilters,
     dialog,
     tableScrollHeight,
     editor,
     eventType,
+    tableLoading,
   } = props;
   const [popis, setPopis] = useState(null);
   const [nazov, setNazov] = useState(null);
@@ -37,6 +44,10 @@ export default function TableMedic(props) {
     setPopis(null);
     setNazov(null);
     setSelectedRow(null);
+    setCanAdd(false);
+    setLeaveMessage("");
+    setEndDate(new Date());
+    fetchData();
   };
 
   const handleClick = (value) => {
@@ -45,6 +56,7 @@ export default function TableMedic(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
+    setEndDate(value.DAT_DO ? new Date(value.DAT_DO) : new Date());
     fetch(`/zaznamy/priloha/${value.id_zaz}`, { headers })
       .then((res) => res.blob())
       .then((result) => {
@@ -166,12 +178,35 @@ export default function TableMedic(props) {
     return new Date(formattedDateString);
   };
 
+  const endHospitalization = async () => {
+    setSelectedRow({
+      ...selectedRow,
+      DAT_DO: endDate,
+      PREPUSTACIA_SPRAVA: leaveMessage,
+    });
+    setCanAdd(false);
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + localStorage.getItem("hospit-user"),
+      },
+      body: JSON.stringify({
+        dat_do: endDate.toLocaleString("en-GB").replace(",", ""),
+        sprava: leaveMessage,
+        id_hosp: selectedRow.ID_HOSP,
+      }),
+    };
+    await fetch("/hospitalizacia/ukoncit", requestOptions);
+  };
+
   const header = allowFilters ? renderHeader() : "";
   return (
     <div>
       <div className="card">
         <DataTable
           editMode={editor ? "row" : ""}
+          loading={tableLoading}
           value={cellData}
           scrollable
           selectionMode="single"
@@ -287,6 +322,60 @@ export default function TableMedic(props) {
             <h2>{nazov} </h2>
             <h5>{"Dátum: " + selectedRow.DATUM} </h5>
             <div>{popis}</div>
+            {selectedRow.type == "HOS" ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginTop: "10px",
+                }}
+              >
+                {canAdd ? (
+                  ""
+                ) : (
+                  <Button
+                    label={
+                      selectedRow.DAT_DO == null
+                        ? "Ukončiť hospitalizáciu?"
+                        : "Zmeniť dátum ukončenia?"
+                    }
+                    icon="pi pi-plus"
+                    onClick={() => setCanAdd(true)}
+                  />
+                )}
+                {canAdd ? (
+                  <div
+                    style={{
+                      width: "100%",
+                      marginTop: "10px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                    }}
+                  >
+                    <InputTextarea
+                      style={{ width: "100%" }}
+                      rows={5}
+                      value={leaveMessage}
+                      onChange={(e) => setLeaveMessage(e.target.value)}
+                    />
+                    <Calendar
+                      showTime
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.value)}
+                    />
+                    <Button
+                      label="Pridaj"
+                      onClick={() => endHospitalization()}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+            ) : (
+              ""
+            )}
           </div>
         ) : (
           ""

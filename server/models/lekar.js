@@ -176,7 +176,8 @@ async function getHospitalizacie(id) {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
       `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
-      as "start",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
+      as "start",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum,
+      hospitalizacia.dat_do, hospitalizacia.id_hosp, hospitalizacia.prepustacia_sprava
        from hospitalizacia
         join zdravotny_zaz using(id_zaznamu)
           join zdravotna_karta using(id_karty)
