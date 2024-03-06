@@ -61,4 +61,10 @@ router.get(
   controller.getDetailZdravotnickejPomocky
 );
 
+router.get(
+  "/reportInfo/:id",
+  verify.verifyRoles(0, 10),
+  controller.getReportInfo
+);
+
 module.exports = router;

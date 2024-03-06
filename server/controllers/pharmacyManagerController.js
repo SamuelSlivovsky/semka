@@ -92,4 +92,12 @@ module.exports = {
       res.status(200).json(detailyZdravotnickychPomocok);
     })();
   },
+
+  getReportInfo: (req, res) => {
+    const report = require("../models/manazer_lekarne");
+    (async () => {
+      info = await report.getReportInfo(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
 };

@@ -160,6 +160,31 @@ async function getDetailZdravotnickejPomocky(id) {
   }
 }
 
+async function getReportInfo(id) {
+  try {
+    let conn = await database.getConnection();
+    const info = await conn.execute(
+      `select distinct count(distinct zl.cislo_zam) as "POCET_ZAMESNTNACOV", 
+      count(distinct tzp.datum_trvanlivosti) as "POCET_ZDR_POMOCOK_V_LEK_SKLADE", 
+      count(distinct tl.datum_trvanlivosti) as "POCET_LIEKOV_V_LEK_SKLADE",
+      l.nazov as "NAZOV_LEKARNE"
+      from zamestnanci zm
+      left join lekaren l on (l.id_lekarne = zm.id_lekarne)
+      left join zamestnanci zl on (zl.id_lekarne = l.id_lekarne)
+      left join lekarensky_sklad ls on (ls.id_lekarne = l.id_lekarne)
+      left join trvanlivost_zdr_pomocky tzp on (tzp.id_lekarensky_sklad = ls.id_lekarensky_sklad)
+      left join trvanlivost_lieku tl on (tl.id_lekarensky_sklad = ls.id_lekarensky_sklad)
+      where zl.id_typ = 9 and zm.id_typ = 10 and zm.cislo_zam = :id
+      group by zm.cislo_zam, l.nazov`,
+      [id]
+    );
+
+    return info.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getManazeriLekarni,
   getLekarnici,
@@ -170,4 +195,5 @@ module.exports = {
   getDetailLieku,
   getZoznamZdravotnickychPomocok,
   getDetailZdravotnickejPomocky,
+  getReportInfo,
 };

@@ -30,7 +30,7 @@ import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
 import TabPharmacists from "./Views/Tables/TabPharmacists";
 import PharmacyManagerCard from "./Profile/PharmacyManagerCard";
 import PharmacistCard from "./Profile/PharmacistCard";
-import AboutMeCard from "./Profile/AboutMeCard";
+import PharmacyManagersDashboard from "./Views/PharmacyManagersDashboard";
 import TabPrescriptions from "./Views/Tables/TabPrescriptions";
 import PrecsriptionCard from "./Details/PrescriptionCard";
 import TabReservations from "./Views/Tables/TabResevations";
@@ -429,7 +429,10 @@ function App() {
   const renderPharmacyManagerRoutes = () => {
     return (
       <>
-        <Route path="/about_me" element={<AboutMeCard></AboutMeCard>}></Route>
+        <Route
+          path="/about_me"
+          element={<PharmacyManagersDashboard></PharmacyManagersDashboard>}
+        ></Route>
         <Route
           path="/medicaments"
           element={<TabMedicaments></TabMedicaments>}
