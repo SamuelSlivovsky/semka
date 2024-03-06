@@ -41,6 +41,7 @@ export default function ProfileCard(props) {
     titles: [
       { field: "DATUM", header: "Dátum" },
       { field: "TYP", header: "Typ záznamu" },
+      { field: "DAT_DO", header: "Dátum do" },
     ],
     allowFilters: false,
     dialog: true,

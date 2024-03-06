@@ -364,8 +364,15 @@ async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
-      `select id_zaznamu as "id_zaz", to_char(datum, 'DD.MM.YYYY') DATUM, get_typ_zdrav_zaznamu(id_zaznamu) as typ   
+      `select id_zaznamu as "id_zaz", to_char(datum, 'DD.MM.YYYY') DATUM,prepustacia_sprava, 
+       case when id_hosp is not null then 
+       nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY HH24:MI:SS'),'Neukončená') 
+       else null end
+       as dat_do,
+       hospitalizacia.dat_do as unformated_dat_do , get_typ_zdrav_zaznamu(id_zaznamu) as typ,
+       id_hosp
           from zdravotny_zaz 
+          left join hospitalizacia using (id_zaznamu)   
           join zdravotna_karta using(id_karty)
             where id_pacienta = :pid_pacienta
                   order by zdravotny_zaz.datum desc`,

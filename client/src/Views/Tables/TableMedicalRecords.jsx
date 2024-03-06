@@ -47,7 +47,7 @@ export default function TableMedic(props) {
     setCanAdd(false);
     setLeaveMessage("");
     setEndDate(new Date());
-    fetchData();
+    if (fetchData) fetchData();
   };
 
   const handleClick = (value) => {
@@ -229,7 +229,9 @@ export default function TableMedic(props) {
               header={title.header}
               filter
               editor={
-                title.field === "DAT_DO" ? (options) => dateEditor(options) : ""
+                editor && title.field === "DAT_DO"
+                  ? (options) => dateEditor(options)
+                  : ""
               }
             ></Column>
           ))}
@@ -317,12 +319,12 @@ export default function TableMedic(props) {
               }
             </PDFDownloadLink>
             <img src={imgUrl} alt="" width={"400"} height={"auto"} />
-
             {selectedRow.type != null ? getRecordDetails() : ""}
             <h2>{nazov} </h2>
             <h5>{"Dátum: " + selectedRow.DATUM} </h5>
             <div>{popis}</div>
-            {selectedRow.type == "HOS" ? (
+            {selectedRow.type == "HOS" ||
+            selectedRow.TYP == "Hospitalizácia" ? (
               <div
                 style={{
                   display: "flex",
