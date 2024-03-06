@@ -48,7 +48,7 @@ export default function PharmacyStorageMedicaments() {
       .then((data) => {
         setLiekyLekarenskySklad(data);
         if (data.length > 0) {
-          setNazovLekarne(data[0].LEKAREN_NAZOV);
+          setNazovLekarne(data[0].NAZOV_LEKARNE);
         }
       });
   }, []);

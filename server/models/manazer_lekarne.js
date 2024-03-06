@@ -9,7 +9,8 @@ async function getManazeriLekarni() {
         join os_udaje using (rod_cislo)
         join lekaren on (zamestnanci.id_lekarne = lekaren.id_lekarne)
         join mesto on (mesto.PSC = lekaren.PSC)
-        where zamestnanci.id_typ = 10`
+        where zamestnanci.id_typ = 10
+        order by meno, priezvisko`
     );
     return result.rows;
   } catch (err) {
@@ -27,7 +28,8 @@ async function getLekarnici(id) {
         join lekaren ll on (zl.id_lekarne = ll.id_lekarne)
         join mesto ml on (ml.PSC = ll.PSC)
         join zamestnanci zml on (zml.id_lekarne = zl.id_lekarne)
-        where zl.id_typ = 9 and zml.cislo_zam = :id`,
+        where zl.id_typ = 9 and zml.cislo_zam = :id
+        order by meno, priezvisko`,
       [id]
     );
     return result.rows;
@@ -100,7 +102,13 @@ async function getPouzivatelInfo(id) {
 async function getZoznamLiekov() {
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`select * from liek`);
+    const result =
+      await conn.execute(`select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,
+      ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka
+    from ucinne_latky_liekov ull
+    join liek l on (l.id_liek = ull.id_liek)
+    join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
+    order by NAZOV_LIEKU`);
     return result.rows;
   } catch (err) {
     console.log(err);
@@ -111,7 +119,12 @@ async function getDetailLieku(id) {
   try {
     let conn = await database.getConnection();
     const detail = await conn.execute(
-      `select nazov, typ, davkovanie, mnozstvo from liek where id_liek = :id`,
+      `select l.nazov as "NAZOV_LIEKU", l.typ, l.davkovanie, l.mnozstvo,
+      ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka
+    from ucinne_latky_liekov ull
+    join liek l on (l.id_liek = ull.id_liek)
+    join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
+    where l.id_liek = :id`,
       [id]
     );
 
@@ -124,7 +137,9 @@ async function getDetailLieku(id) {
 async function getZoznamZdravotnickychPomocok() {
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`select * from zdravotna_pomocka`);
+    const result = await conn.execute(
+      `select * from zdravotna_pomocka order by nazov`
+    );
     return result.rows;
   } catch (err) {
     console.log(err);

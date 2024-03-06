@@ -9,24 +9,23 @@ import { useNavigate } from "react-router";
 import GetUserData from "../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 
-export default function PharmacyStorageMedicalAids() {
+export default function PharmacySearchMedicaments() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
-  const [zdrPomockyLekarenskySklad, setZdrPomockyLekarenskySklad] = useState(
+  const [searchLiekyLekarenskySklad, setSearchLiekyLekarenskySklad] = useState(
     []
   );
   const navigate = useNavigate();
-  const [nazovLekarne, setNazovLekarne] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(
-      `/lekarenskySklad/lekarenskySkladZdrPomocky/${userDataHelper.UserInfo.userid}`,
+      `/lekarenskySklad/lekarenskySkladVyhladavnieLieciva/${userDataHelper.UserInfo.userid}`,
       {
         headers,
       }
@@ -48,11 +47,7 @@ export default function PharmacyStorageMedicalAids() {
         }
       })
       .then((data) => {
-        setZdrPomockyLekarenskySklad(data);
-        console.log(data);
-        if (data.length >= 0) {
-          setNazovLekarne(data[0].NAZOV_LEKARNE);
-        }
+        setSearchLiekyLekarenskySklad(data);
       });
   }, []);
 
@@ -66,10 +61,10 @@ export default function PharmacyStorageMedicalAids() {
   //   navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
   // };
 
-  // const handleClick = (value) => {
-  //   setShowDialog(true);
-  //   setSelectedRow(value);
-  // };
+  const handleClick = (value) => {
+    setShowDialog(true);
+    setSelectedRow(value);
+  };
 
   // const renderDialogFooter = () => {
   //   return (
@@ -103,8 +98,7 @@ export default function PharmacyStorageMedicalAids() {
             />
           </span>
           <div className="ml-4">
-            <h2>Zdravotnícke pomôcky dostupné na sklade v lekárni: </h2>
-            <h3>{nazovLekarne}</h3>
+            <h2>Vyhľadávanie lekárne, ktorá má liečivo skladom</h2>
           </div>
         </div>
       </div>
@@ -126,7 +120,11 @@ export default function PharmacyStorageMedicalAids() {
   const initFilters = () => {
     setFilters({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      NAZOV_ZDR_POMOCKY: {
+      NAZOV_LEKARNE: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      NAZOV_LIEKU: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
@@ -148,28 +146,30 @@ export default function PharmacyStorageMedicalAids() {
       <Toast ref={toast} position="top-center" />
       <div className="card">
         <DataTable
-          value={zdrPomockyLekarenskySklad}
+          value={searchLiekyLekarenskySklad}
           responsiveLayout="scroll"
           selectionMode="single"
           paginator
           rows={15}
           selection={selectedRow}
-          // onSelectionChange={(e) => handleClick(e.value)}
+          onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}
           filterDisplay="menu"
           globalFilterFields={[
-            "NAZOV_ZDR_POMOCKY",
+            "NAZOV_LEKARNE",
+            "NAZOV_LIEKU",
             "DATUM_TRVANLIVOSTI",
             "POCET",
           ]}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
           <Column
-            field="NAZOV_ZDR_POMOCKY"
-            header={"Názov zdravotníckej pomôcky"}
+            field="NAZOV_LEKARNE"
+            header={"Názov lekárne"}
             filter
           ></Column>
+          <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
           <Column
             field="DATUM_TRVANLIVOSTI"
             header={"Dátum expirácie"}

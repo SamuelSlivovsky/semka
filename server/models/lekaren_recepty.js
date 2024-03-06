@@ -13,7 +13,8 @@ async function getZoznamReceptov() {
     join typ_zam on (typ_zam.id_typ = zamestnanci.id_typ)
     join os_udaje oupac on (oupac.rod_cislo = pacient.rod_cislo)
     join os_udaje ouzam on (ouzam.rod_cislo = zamestnanci.rod_cislo)
-    join liek on (liek.id_liek = recept.id_liek)`);
+    join liek on (liek.id_liek = recept.id_liek)
+    order by ID_RECEPTU`);
     return result.rows;
   } catch (err) {
     console.log(err);

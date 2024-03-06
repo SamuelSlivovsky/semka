@@ -120,26 +120,18 @@ export default function TabMedicaments() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
-      NAZOV: {
+      NAZOV_LIEKU: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      // TYP: {
-      //     operator: FilterOperator.AND,
-      //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-      // },
-      // DAVKOVANIE: {
-      //     operator: FilterOperator.AND,
-      //     constraints: [{value: null, matchMode: FilterMatchMode.EQUALS}],
-      // },
       ATC: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      // MNOZSTVO: {
-      //     operator: FilterOperator.AND,
-      //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-      // },
+      NAZOV_UCINNEJ_LATKY: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
     });
     setGlobalFilterValue("");
   };
@@ -162,24 +154,24 @@ export default function TabMedicaments() {
           filterDisplay="menu"
           globalFilterFields={[
             "ID_LIEK",
-            "NAZOV",
-            "TYP",
-            "DAVKOVANIE",
+            "NAZOV_LIEKU",
             "ATC",
-            "MNOZSTVO",
+            "NAZOV_UCINNEJ_LATKY",
           ]}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
           <Column field="ID_LIEK" header={"Id lieku"} filter></Column>
-          <Column field="NAZOV" header={"Názov lieku"} filter></Column>
-          {/* <Column field="TYP" header={"Typ lieku"} filter></Column> */}
-          {/* <Column field="DAVKOVANIE" header={"Dávkovanie"} filter></Column> */}
+          <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
           <Column field="ATC" header={"ATC"} filter></Column>
-          {/* <Column field="MNOZSTVO" header={"Množstvo"} filter></Column> */}
+          <Column
+            field="NAZOV_UCINNEJ_LATKY"
+            header={"Účinná látka"}
+            filter
+          ></Column>
         </DataTable>
       </div>
       <Dialog
-        header={selectedRow != null ? selectedRow.NAZOV : ""}
+        header={selectedRow != null ? selectedRow.NAZOV_LIEKU : ""}
         visible={showDialog}
         style={{ width: "50vw" }}
         footer={renderDialogFooter()}

@@ -19,7 +19,9 @@ import TabOperations from "./Views/Tables/TabOperations";
 import Storage from "./Views/Storage";
 import PharmacyStorage from "./Views/PharmacyStorage";
 import PharmacyStorageMedicaments from "./Views/PharmacyStorageMedicaments";
+import PharmacySearchMedicaments from "./Views/PharmacySearchMedicaments";
 import PharmacyStorageMedicalAids from "./Views/PharmacyStorageMedicalAids";
+import PharmacSearchMedicalAids from "./Views/PharmacSearchMedicalAids";
 import TabMedicaments from "./Views/Tables/TabMedicaments";
 import MedicamentCard from "./Details/MedicamentCard";
 import TabMedicalAids from "./Views/Tables/TabMedicalAids";
@@ -453,6 +455,14 @@ function App() {
         <Route
           path="/lekarensky_sklad_zdravotnickePomocky"
           element={<PharmacyStorageMedicalAids />}
+        ></Route>
+        <Route
+          path="/lekarensky_sklad_vyhladavanieLiecivaPodlaLekarni"
+          element={<PharmacySearchMedicaments />}
+        ></Route>
+        <Route
+          path="/lekarensky_sklad_vyhladavanieZdrPomockyPodlaLekarni"
+          element={<PharmacSearchMedicalAids />}
         ></Route>
         <Route
           path="/pharmacy_managers"

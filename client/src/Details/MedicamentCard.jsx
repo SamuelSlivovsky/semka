@@ -35,7 +35,7 @@ export default function MedicamentCard(props) {
         <Button
           label="Späť"
           icon="pi pi-replay"
-          style={{ marginTop: 150 }}
+          style={{ marginTop: 50 }}
           onClick={() => redirect()}
         />
       </div>
@@ -58,12 +58,17 @@ export default function MedicamentCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "40rem", height: "40rem" }}
-          title=<h3>{detail.NAZOV}</h3>
+          style={{ width: "45rem", height: "45rem" }}
+          title=<h3>{detail.NAZOV_LIEKU}</h3>
         >
           {renderDetail("Typ lieku: ", detail.TYP)}
           {renderDetail("Dávkovanie lieku: ", detail.DAVKOVANIE)}
           {renderDetail("Množstvo: ", detail.MNOZSTVO)}
+          {renderDetail(
+            "Účinná látka: ",
+            detail.ID_UCINNA_LATKA + ": " + detail.NAZOV_UCINNEJ_LATKY
+          )}
+          {renderDetail("Účinná látka (latinsky): ", detail.LATINSKY_NAZOV)}
           {renderCardFooter()}
         </Card>
       </div>

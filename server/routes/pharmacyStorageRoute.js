@@ -17,4 +17,18 @@ router.get(
   controller.getZdrPomockyLekarenskySklad
 );
 
+router.get(
+  "/lekarenskySkladVyhladavnieLieciva/:id",
+  verify.verifyRoles(0, 10),
+  verify.checkForCorrectId(),
+  controller.getSearchLiecivoLekarenskySklad
+);
+
+router.get(
+  "/lekarenskySkladVyhladavnieZdrPomocky/:id",
+  verify.verifyRoles(0, 10),
+  verify.checkForCorrectId(),
+  controller.getSearchZdrPomockaLekarenskySklad
+);
+
 module.exports = router;
