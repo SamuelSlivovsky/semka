@@ -24,6 +24,7 @@ const equipmentRoute = require("./routes/equipmentRoute");
 const updateRoute = require("./routes/updateRoute");
 const chatRoute = require("./routes/chatRoute");
 const ordersRoute = require("./routes/ordersRoute");
+const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
 
 const server = http.createServer(app); // Create an HTTP server using your Express app
 const io = socketIo(server); // Initialize Socket.io with the HTTP server
@@ -53,6 +54,7 @@ app.use("/vybavenie", equipmentRoute);
 app.use("/update", updateRoute);
 app.use("/chat", chatRoute);
 app.use("/objednavky", ordersRoute);
+app.use("/presuny", warehouseTransfersRoute);
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);

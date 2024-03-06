@@ -11,11 +11,8 @@ import { Dialog } from "primereact/dialog";
 import { Toast } from "primereact/toast";
 import GetUserData from "../Auth/GetUserData";
 import {ProgressSpinner} from "primereact/progressspinner";
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { xonokai } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import {Dropdown} from "primereact/dropdown";
 import {InputNumber} from "primereact/inputnumber";
-import {Calendar} from "primereact/calendar";
 
 export default function Orders() {
 
@@ -50,25 +47,7 @@ export default function Orders() {
     const [selectedRow, setSelectedRow] = useState(null);
     const [xmlContent, setXmlContent] = useState("");
     const toast = useRef(null);
-
-
-
-    // Define state variables
-    //const [medications, setMedications] = useState([]);
     const [selectedMedications, setSelectedMedications] = useState([]);
-
-    // Function to add selected medication to the list
-    const addMedication = () => {
-        setSelectedMedications([...selectedMedications, { medication: "", quantity: 0 }]);
-    };
-
-    // Function to remove medication from the list
-    const removeMedication = (index) => {
-        const updatedMedications = [...selectedMedications];
-        updatedMedications.splice(index, 1);
-        setSelectedMedications(updatedMedications);
-    };
-
 
     /*
     ----------------------------------------------------------------------------------------
@@ -279,6 +258,18 @@ export default function Orders() {
         setDeleteProductDialog(true);
     };
 
+    // Function to add selected medication to the list
+    const addMedication = () => {
+        setSelectedMedications([...selectedMedications, { medication: "", quantity: 0 }]);
+    };
+
+    // Function to remove medication from the list
+    const removeMedication = (index) => {
+        const updatedMedications = [...selectedMedications];
+        updatedMedications.splice(index, 1);
+        setSelectedMedications(updatedMedications);
+    };
+
     /*
     ******************************************************************************************************************
                                                     Hide functions
@@ -422,69 +413,6 @@ return (
                 style={{ minWidth: "8rem" }}
             ></Column>
         </DataTable>
-
-
-
-
-
-
-
-
-
-        <TabView>
-            //Tab for pending orders
-            <TabPanel header="Čakajúce objednávky">
-
-            </TabPanel>
-            //Tab for finished orders
-            <TabPanel header="Vybavené objednávky">
-                <DataTable
-                    value={NaN} //products
-                    selection={NaN} //selectedProducts
-                    onSelectionChange={NaN} //(e) => setSelectedProducts(e.value)
-                    dataKey="ID_LIEK"
-                    globalFilter={NaN} //globalFilter
-                    globalFilterFields={["ID_LIEK","ID_ODDELENIA", "NAZOV", "POCET", "DAT_EXPIRACIE"]}
-                    filters={NaN} //filter
-                    header={NaN} //header
-                    responsiveLayout="scroll"
-                >
-                    <Column
-                        selectionMode="multiple"
-                        headerStyle={{ width: "3rem" }}
-                    ></Column>
-                    <Column
-                        field="ID_PRESUN"
-                        header="Id presunu"
-                        style={{ minWidth: "8rem" }}
-                    ></Column>
-                    <Column
-                        field="ID_SKLAD_OBJ"
-                        header="Id objednávajúceho skladu"
-                        style={{ minWidth: "16rem" }}
-                    ></Column>
-                    <Column
-                        field="ID_SKLAD_PRIJ"
-                        header="Id prijímajúceho skladu"
-                        style={{ minWidth: "14rem" }}
-                    ></Column>
-                    <Column
-                        field="DATUM_PRESUNU"
-                        header="Dátum presunu"
-                        style={{ minWidth: "10rem" }}
-                    ></Column>
-                    <Column
-                        field="STATUS"
-                        header="Status presunu"
-                        style={{ minWidth: "10rem" }}
-                    ></Column>
-                    <Column
-                        body={NaN} //actionBodyTemplate
-                        style={{ minWidth: "8rem" }}
-                    ></Column>
-                </DataTable>
-            </TabPanel>
-        </TabView>
 
         <Dialog
             visible={showDialog && dialog}

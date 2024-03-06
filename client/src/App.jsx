@@ -19,6 +19,7 @@ import TabOperations from "./Views/Tables/TabOperations";
 
 import Storage from "./Views/Storage";
 import Orders from "./Views/Orders";
+import WarehouseTransfers from "./Views/WarehouseTransfers";
 
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
@@ -261,7 +262,7 @@ function App() {
       <SidebarButton
           key="15"
           visibleLeft={visibleLeft}
-          path="/presun"
+          path="/presuny"
           label="Presuny"
           icon="warehouse-move-icon"
       />,
@@ -345,7 +346,7 @@ function App() {
           <>
               <Route path="/sklad" element={<Storage />}></Route>
               <Route path="/objednavky" element={<Orders />}></Route>
-              <Route path="/presuny" element={<Storage />}></Route>
+              <Route path="/presuny" element={<WarehouseTransfers />}></Route>
           </>
       )
   };

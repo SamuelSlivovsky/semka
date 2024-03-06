@@ -1,26 +1,24 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/ordersController");
+const controller = require("../controllers/warehouseTransfersController");
 const verify = require("../middleware/verifyUser");
 
 router.get(
-    "/all",
+    "/allFin",
     verify.verifyRoles(0, 2, 3, 5),
-    controller.getAllOrders
+    controller.getFinishedTransfers
+);
+
+router.get(
+    "/allWait",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getWaitingTransfers
 );
 
 router.get(
     "/list/:id",
     verify.verifyRoles(0, 2, 3, 5),
-    controller.getListOrders
-);
-
-router.post("/add", verify.verifyRoles(0, 2, 3, 5), controller.insertOrder);
-
-router.post(
-    "/deleteOrder",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.deleteOrder
+    controller.getListTransfers
 );
 
 module.exports = router;

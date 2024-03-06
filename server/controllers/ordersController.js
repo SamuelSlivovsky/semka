@@ -1,15 +1,12 @@
 const order = require("../models/orders");
-const sklad = require("../models/sklad");
 module.exports = {
     getAllOrders: (req, res) => {
-        const order = require("../models/orders");
         (async () => {
             ret_val = await order.getAllOrders();
             res.status(200).json(ret_val);
         })();
     },
     getListOrders: (req, res) => {
-        const order = require("../models/orders");
         (async () => {
             ret_val = await order.getListOrders(req.params.id);
             res.status(200).json(ret_val);
@@ -17,7 +14,6 @@ module.exports = {
     },
 
     insertOrder: (req, res) => {
-        const order = require("../models/orders");
         (async () => {
             ret_val = await order.insertOrder(req.body);
             res.status(200);
@@ -29,7 +25,6 @@ module.exports = {
     },
 
     deleteOrder: (req, res) => {
-        const order = require("../models/orders");
         (async () => {
             ret_val = await order.deleteObjednavka(req.body);
             res.status(200);
