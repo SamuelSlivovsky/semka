@@ -21,4 +21,18 @@ module.exports = {
         })();
     },
 
+    getWarehouses: (req, res) => {
+        (async () => {
+            ret_val = await transfers.getWarehouses();
+            res.status(200).json(ret_val);
+        })();
+    },
+
+    getHospitalMedication: (req, res) => {
+        (async () => {
+            ret_val = await transfers.getHospitalMedication(req.params.id);
+            res.status(200).json(ret_val);
+        })();
+    },
+
 };

@@ -1,3 +1,6 @@
+//@TODO add automatic transfer for expiring medications + when they are expired or there is large amount in main warehouse
+//@TODO add new tab
+
 import {TabPanel, TabView} from "primereact/tabview";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
@@ -8,6 +11,8 @@ import {Button} from "primereact/button";
 import GetUserData from "../Auth/GetUserData";
 import {ProgressSpinner} from "primereact/progressspinner";
 import {Dialog} from "primereact/dialog";
+import {Dropdown} from "primereact/dropdown";
+import "../styles/warehouses.css";
 
 export default function WarehouseTransfers() {
     let emptyTransfer = {
@@ -23,19 +28,38 @@ export default function WarehouseTransfers() {
         dialog: true
     };
 
+    let emptyHospital = {
+        NAZOV: null,
+        ID_NEMOCNICE: null
+    };
+
     //Constants
     const toast = useRef(null);
-    const [newTransfer, setNewTransfer] = useState(emptyTransfer);
+    const [inputValues, setInputValues] = useState({});
+    const [hospitalSearchOption, setHospitalSearchOption] = useState(false);
+    const [medicineSearchOption, setMedicineSearchOption] = useState(false);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [selectedHospital, setSelectedHospital] = useState(emptyHospital);
+    const [showNewTransfer, setShowNewTransfer] = useState(false);
     const [waitingTransfers, setWaitingTransfers] = useState(null);
     const [finishedTransfers, setFinishedTransfers] = useState(null);
+    const [hospitals, setHospitals] = useState([]);
+    const [medications, setMedications] = useState(null);
+    const [hospitalMedications, setHospitalMedication] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
+    const [showHospitalMedications, setShowHospitalMedications] = useState(false);
+    const [showHospitalSelection, setShowHospitalSelection] = useState(false);
     const [xmlContent, setXmlContent] = useState("");
+
+    const dropdownOptions = [
+        { value: 'hospital', label: 'Vyhľadať podľa nemocnice' },
+        { value: 'medicine', label: 'Vyhľadať podľa liekov' }
+    ];
 
 
     useEffect(() => {
-        //@TODO function for getting data to both tableviews, need 2 fetches
         const token = localStorage.getItem("hospit-user");
         const userDataHelper = GetUserData(token);
         const headers = { authorization: "Bearer " + token };
@@ -61,6 +85,7 @@ export default function WarehouseTransfers() {
     ----------------------------------------------------------------------------------------
     */
 
+    //Function for openning list of medication that are in JSON format
     const handleClick = (value) => {
         setShowDialog(true);
         setLoading(true);
@@ -102,6 +127,97 @@ export default function WarehouseTransfers() {
 
     };
 
+    //Function for just openning Dialog menu
+    const openNewTransfer = () => {
+        setShowNewTransfer(true);
+    }
+
+    //Function for getting all hospitals from DB into Dropdown
+    const getHospitalsList = () => {
+        const token = localStorage.getItem("hospit-user");
+        const headers = { authorization: "Bearer " + token };
+        fetch(`/presuny/getWarehouses`, { headers })
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setHospitals(data);
+            });
+    }
+
+    //Function for searching all medications that are in table medicine
+    //@TODO select needs to be checked, there is some error in searching by hospital
+    const getMedicationList = () => {
+        const token = localStorage.getItem("hospit-user");
+        const headers = {authorization: "Bearer " + token};
+        /*fetch(`presuny/hospitalMedications/${selectedHospital}`, {headers})
+            .then((response) => response.json())
+            .then((data) => {
+                setHospitalMedication(data);
+            });*/
+    }
+
+    const createHospitalTransfer = () => {
+        setShowHospitalMedications(false);
+    }
+
+    //Function for searching medication in selected hospital
+    const searchHospitalMedicine = () => {
+        const token = localStorage.getItem("hospit-user");
+        const headers = {authorization: "Bearer " + token};
+        fetch(`presuny/hospitalMedications/${selectedHospital.ID_NEMOCNICE}`, {headers})
+            .then((response) => response.json())
+            .then((data) => {
+                console.log(data);
+                setHospitalMedication(data);
+            });
+        //@TODO change visibality of previoud DIALOG and show new table for this with all medications
+    }
+
+    //Function for updating
+    const handleDropdownChange = (event) => {
+        const selectedValue = event.target.value;
+        setSelectedOption(selectedValue);
+        if (selectedValue === 'hospital') {
+            setHospitalSearchOption(true);
+            setMedicineSearchOption(false);
+            if(hospitals.length <= null) {
+                getHospitalsList();
+            }
+        } else if (selectedValue === 'medicine') {
+            setMedicineSearchOption(true);
+            setHospitalSearchOption(false);
+            if(medications == null) {
+                getMedicationList();
+            }
+        }
+    };
+
+    //Search function for searching medication
+    const searchMedication = () => {
+        //If user selected hospital then search by selected hospital
+        if(selectedOption === 'hospital') {
+            if(selectedHospital !== null) {
+                searchHospitalMedicine();
+                setShowHospitalMedications(true);
+                hideDialog();
+            } else {
+                //@TODO Add alert in here
+            }
+        } else {
+            //@TODO add check if array is atleast of size 1, if not alert
+        }
+    }
+
+    //Function for checking number in Požadovaný počet, there should be only numbers and not greater then Počet
+    const handleInputChange = (event, rowData) => {
+        const { value } = event.target;
+        const { ID_LIEK, POCET } = rowData;
+        const numericValue = Math.min(parseInt(value.replace(/\D/g, ''), 10), POCET);
+        setInputValues(prevState => ({
+            ...prevState,
+            [ID_LIEK]: numericValue
+        }));
+    };
 
     //@TODO needs to be changed to suit this site
     //New/Delete toolbar function
@@ -109,22 +225,38 @@ export default function WarehouseTransfers() {
         return (
             <React.Fragment>
                 <Button
-                    label="New"
+                    label="Hľadať lieky"
                     icon="pi pi-plus"
                     className="p-button-success mr-2"
-                    onClick={NaN} //openNew
+                    onClick={openNewTransfer}
                 />
                 <Button
-                    label="Delete"
-                    icon="pi pi-trash"
-                    className="p-button-danger"
-                    onClick={NaN} /*confirmDeleteSelected*/
-                    disabled={NaN} /*!selectedProducts || !selectedProducts.length*/
+                    visible={showHospitalMedications}
+                    label="Vytvoriť presun"
+                    icon="pi pi-check-square"
+                    className="p-button-success mr-2"
+                    onClick={createHospitalTransfer}
                 />
             </React.Fragment>
         );
     };
 
+    const productDialogFooter = (
+        <React.Fragment>
+            <Button
+                label="Cancel"
+                icon="pi pi-times"
+                className="p-button-text"
+                onClick={NaN} //hideDialog
+            />
+            <Button
+                label="Save"
+                icon="pi pi-check-square"
+                className="p-button-text"
+                onClick={NaN} //addOrder
+            />
+        </React.Fragment>
+    );
 
     /*
     ******************************************************************************************************************
@@ -139,11 +271,63 @@ export default function WarehouseTransfers() {
         setSelectedRow(null);
     };
 
+    //New order hide
+    const hideDialog = () => {
+        setShowNewTransfer(false);
+        setShowHospitalSelection(false);
+    };
+
     return (
         <div>
             <Toast ref={toast} />
 
             <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
+
+            {showHospitalMedications ? <div>
+                <DataTable
+                    value={hospitalMedications}
+                    dataKey="ID_LIEK"
+                    paginator={true}
+                    paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                    currentPageReportTemplate="Zobrazuje sa {first} - {last} z celkových {totalRecords} záznamov"
+                    rowsPerPageOptions={[10, 15, 20]}
+                >
+                    <Column
+                        field="ID_LIEK"
+                        header="Id lieku"
+                        style={{ minWidth: "8rem" }}
+                    ></Column>
+                    <Column
+                        field="NAZOV"
+                        header="Názov lieku"
+                        style={{ minWidth: "16rem" }}
+                    ></Column>
+                    <Column
+                        field="DATUM_TRVANLIVOSTI"
+                        header="Dátum trvanlivosti"
+                        style={{ minWidth: "12rem" }}
+                    ></Column>
+                    <Column
+                        field="POCET"
+                        header="Voľný počet na sklade"
+                        style={{ minWidth: "12rem" }}
+                    ></Column>
+                    <Column
+                        field="Input"
+                        header="Požadovaný počet"
+                        style={{ minWidth: "10rem" }}
+                        body={(rowData) => (
+                            <input
+                                type="text"
+                                defaultValue={inputValues[rowData.ID_LIEK] || '0'}
+                                onChange={(e) => handleInputChange(e, rowData)}
+                                pattern="[0-9]*"
+                                inputMode="numeric"
+                            />
+                        )}
+                    ></Column>
+                </DataTable>
+            </div> : null}
 
             <TabView>
                 //Tab for pending orders
@@ -263,6 +447,38 @@ export default function WarehouseTransfers() {
                 ) : (
                     ""
                 )}
+            </Dialog>
+
+            <Dialog
+                visible={showNewTransfer}
+                style={{ width: "500px"}}
+                header="Pridať objednávku"
+                modal
+                className="p-fluid"
+                //footer={productDialogFooter}
+                onHide={hideDialog}
+            >
+                <Dropdown
+                    value={selectedOption}
+                    options={dropdownOptions}
+                    onChange={handleDropdownChange}
+                />
+                {hospitalSearchOption ? <div>
+                    <h2>Vyberte si nemocnicu</h2>
+                    <Dropdown
+                        value={selectedHospital}
+                        options={hospitals.map(hospital => ({ value: hospital, label: hospital.NAZOV }))}
+                        onChange={(selectedOption) => {
+                            setSelectedHospital(selectedOption.value);
+                        }}/>
+                </div> : null}
+
+                {medicineSearchOption ? <div>
+                    <h2>Vyberte si nemocnicu</h2>
+                </div> : null}
+                {hospitalSearchOption || medicineSearchOption ? <div className={"submit-button"}>
+                    <Button style={{width: "50%"}} label="Vyhľadať" onClick={searchMedication} />
+                </div> : null}
             </Dialog>
 
         </div>

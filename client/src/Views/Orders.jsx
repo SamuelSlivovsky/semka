@@ -1,4 +1,5 @@
-//@TODO do this page for Orders
+//@TODO add ordering on critical stock in warehouse for all medications that are in hospital
+//@TODO also add ordering when medicine will expire in X days
 
 //Imports
 import React, { useState, useEffect, useRef } from "react";
@@ -305,13 +306,6 @@ const leftToolbarTemplate = () => {
                 className="p-button-success mr-2"
                 onClick={openNew}
             />
-            <Button
-                label="Delete"
-                icon="pi pi-trash"
-                className="p-button-danger"
-                onClick={NaN} /*confirmDeleteSelected*/
-                disabled={NaN} /*!selectedProducts || !selectedProducts.length*/
-            />
         </React.Fragment>
     );
 };
@@ -486,7 +480,7 @@ return (
                     </div>
                 </div>
             ))}
-            <div style={{display: "flex", justifyContent: "center", paddingTop: "20px"}}>
+            <div className={"submit-button"}>
                 <Button style={{width: "50%"}} label="Pridať do zoznamu" onClick={addMedication} />
             </div>
         </Dialog>
