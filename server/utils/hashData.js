@@ -1,4 +1,3 @@
-//TODO Doplnit funkcie zamienania udajov
 const fs = require("fs");
 
 //TODO pridat podmienku aby rok bralo z original Rod_Cisla a okolo neho +-5 rokov
@@ -28,7 +27,7 @@ function generujRodneCislo(pohlavie) {
     // Spojenie všetkých častí do rodného čísla
     const rodneCislo = `${rok}${formatovanyMesiac}${formatovanyDen}/${kontrolnyKod}`;
 
-    //TODO pridat kontrolu duplicity rodnehoCisla a zistit zlozitost
+    //TODO pridat kontrolu duplicity rodnehoCisla a zistit zlozitost analyza hashovania dat kolko trvaju a aky maju dopad
     return rodneCislo;
 }
 
@@ -102,7 +101,6 @@ function hashPacienti(pacienti) {
     return hashovaniPacienti;
 }
 
-//TODO analyza hashovania dat kolko trvaju a aky maju dopad
 function hashMedical(data) {
     const menaMuzy = nacitajDataZoSuboru("../server/utils/menaMuzy.txt");
     const menaZeny = nacitajDataZoSuboru("../server/utils/menaZeny.txt");
