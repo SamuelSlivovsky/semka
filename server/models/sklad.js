@@ -12,9 +12,7 @@ async function getDrugsOfDepartment(cis_zam) {
     const result = await conn.execute(
       `SELECT tl.id_liek, l.nazov, to_char(tl.datum_trvanlivosti,'DD.MM.YYYY') DAT_EXPIRACIE , tl.pocet 
       FROM trvanlivost_lieku tl join sklad sk on (sk.id_sklad = tl.id_sklad)
-                    join liek l on (l.id_liek = tl.id_liek)
-                    where sk.id_oddelenia = :id_odd`,
-      { id_odd }
+                    join liek l on (l.id_liek = tl.id_liek)`,
     );
     return result.rows;
   } catch (err) {

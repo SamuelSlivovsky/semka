@@ -16,7 +16,11 @@ import "../node_modules/primeflex/primeflex.css";
 import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
+
 import Storage from "./Views/Storage";
+import Orders from "./Views/Orders";
+import WarehouseTransfers from "./Views/WarehouseTransfers";
+
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
@@ -253,6 +257,37 @@ function App() {
         />,
     ];
 
+  const sidebarWarehouseManager = [
+      <SidebarButton
+          key="1"
+          visibleLeft={visibleLeft}
+          path="/"
+          label="Domov"
+          icon="home-icon"
+      />,
+      <SidebarButton
+          key="10"
+          visibleLeft={visibleLeft}
+          path="/sklad"
+          label="Sklad"
+          icon="storage-icon"
+      />,
+      <SidebarButton
+          key="14"
+          visibleLeft={visibleLeft}
+          path="/objednavky"
+          label="Objednavky"
+          icon="order-icon"
+      />,
+      <SidebarButton
+          key="15"
+          visibleLeft={visibleLeft}
+          path="/presuny"
+          label="Presuny"
+          icon="warehouse-move-icon"
+      />,
+  ]
+
   const renderDoctorRoutes = () => {
     return (
       <>
@@ -327,6 +362,16 @@ function App() {
         );
     };
 
+  const renderWarehouseManagerRoutes = () => {
+      return (
+          <>
+              <Route path="/sklad" element={<Storage />}></Route>
+              <Route path="/objednavky" element={<Orders />}></Route>
+              <Route path="/presuny" element={<WarehouseTransfers />}></Route>
+          </>
+      )
+  };
+
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
@@ -355,6 +400,8 @@ function App() {
           </>
         ) : userData !== null && userData.UserInfo.role === 4 ? (
           sidebarButtonsPatient
+        ) : userData !== null && userData.UserInfo.role === 5 ? (
+            sidebarWarehouseManager
         ) : (
           ""
         )}
@@ -411,6 +458,12 @@ function App() {
             userData !== null &&
             userData.UserInfo.role === 4 ? (
             renderPatientRoutes()
+          ) : typeof userData !== "undefined" &&
+          userData !== null &&
+          userData.UserInfo.role === 5 ? (
+              <>
+                  {renderWarehouseManagerRoutes()} {renderChiefRoutes()}
+              </>
           ) : (
             ""
           )}
