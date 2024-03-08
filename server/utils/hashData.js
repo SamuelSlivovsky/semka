@@ -1,23 +1,38 @@
 const fs = require("fs");
+const {hash} = require("bcrypt");
 
 //TODO pridat podmienku aby rok bralo z original Rod_Cisla a okolo neho +-5 rokov
-function generujRodneCislo(pohlavie) {
-    let rok = Math.floor(Math.random() * (1999 - 1954 + 1)) + 1954;
-    rok = rok % 100;
+function generujRodneCislo(pohlavie, rodnecislo) {
+
+    let rokRodneCislo = parseInt(rodnecislo.substring(0, 2));
+    // Ak je rodné číslo staršie ako 54, znamená to, že ide o rodné číslo z 20. storočia, inak z 19. storočia
+    rokRodneCislo = rokRodneCislo < 54 ? 2000 + rokRodneCislo : 1900 + rokRodneCislo;
+    // Generovanie náhodného roku narodenia
+    let rok = Math.floor(Math.random() * 11) - 5 + rokRodneCislo;
+    // prekonvertovanie roku na posledne dve cislice
+    rok = rok.toString().substring(2, 4);
     const mesiac = Math.floor(Math.random() * 12) + 1;
     const den = Math.floor(Math.random() * 28) + 1;
-
-    // Kód pohlavia (muž: 0-1, žena: 5-6) z tretiej číslice
+    // Kód pohlavia (muž: 0-1, žena: 5-6) z tretiej číslice pre cudzinca 2-3 muz 7-8 zena
     let formatovanyMesiac;
-    if (pohlavie === "muz") {
-        formatovanyMesiac = mesiac < 10 ? "0" + mesiac : mesiac;
-    } else {
-        formatovanyMesiac = 50 + mesiac;
+    // Ak ide o muža, mesiac sa neupravuje, inak sa k nemu pridá 50 pre cudincov u muzov pridavam 20 a 30 a u zien 70 a 80
+    switch (pohlavie) {
+        case "muz":
+            formatovanyMesiac = mesiac < 10 ? "0" + mesiac : mesiac;
+            break;
+        case "zena":
+            formatovanyMesiac = 50 + mesiac;
+            break;
+        case "muzCudzinec":
+            formatovanyMesiac = 20 + mesiac;
+            break;
+        case "zenaCudzinec":
+            formatovanyMesiac = 70 + mesiac;
+            break;
     }
 
     // Pridanie nuly pred číslice menšie ako 10
     const formatovanyDen = den < 10 ? "0" + den : den;
-    rok = rok < 10 ? "0" + rok : rok;
 
     // Generovanie kontrolného kódu (4-miestne číslo)
     const kontrolnyKod = Math.floor(Math.random() * 10000)
@@ -26,24 +41,33 @@ function generujRodneCislo(pohlavie) {
 
     // Spojenie všetkých častí do rodného čísla
     const rodneCislo = `${rok}${formatovanyMesiac}${formatovanyDen}/${kontrolnyKod}`;
+    //duplicita rodneho cisla
 
-    //TODO pridat kontrolu duplicity rodnehoCisla a zistit zlozitost analyza hashovania dat kolko trvaju a aky maju dopad
     return rodneCislo;
 }
 
-//TODO Pridat choroby hash
+//TODO zistit zlozitost analyza hashovania dat kolko trvaju a aky maju dopad
 //Zamysliet sa nad moznostou nahradenia a zasifrovania aby nebolo mozne spojit napriklad vzacne ochorenia s osobou
-//Ale toto vedie k tomu ze musim identifikovat skrite vazby
+//Ale toto vedie k tomu ze musim identifikovat skrite vazby medzi chorobami a pacientami
 
 function zistiPohlavie(rodneCislo) {
-    //TODO pridat podmeniku aby kontrolovalo rodne cislo cudzinca muz 2-3 zena 7-8
     const pohlavieKod = parseInt(rodneCislo.charAt(2));
-    // Ak je pohlavie kód párne číslo, ide o ženu, inak o muža
-    return pohlavieKod === 0 || pohlavieKod === 1
-        ? "muz"
-        : pohlavieKod === 5 || pohlavieKod === 6
-            ? "zena"
-            : null;
+    // Kód pohlavia (muž: 0-1, žena: 5-6) z tretiej číslice pre cudzinca 2-3 muzCudzinec 7-8 zenaCudzinec
+    switch (pohlavieKod) {
+        case 0:
+        case 1:
+            return "muz";
+        case 5:
+        case 6:
+            return "zena";
+        case 2:
+        case 3:
+            return "muzCudzinec";
+        case 7:
+        case 8:
+            return "zenaCudzinec";
+    }
+
 }
 
 function nacitajDataZoSuboru(nazovSuboru) {
@@ -79,6 +103,8 @@ function hashPacienti(pacienti) {
         let noveMeno;
         let indexPriezviska;
         let novepriezvisko;
+        let rodneCislo;
+        let zoznamRodnychCisel = [];
         if (pohlavie === "muz") {
             indexMena = Math.floor(Math.random() * menaMuzy.length);
             indexPriezviska = Math.floor(Math.random() * priezviskoMuzy.length);
@@ -90,11 +116,16 @@ function hashPacienti(pacienti) {
             noveMeno = menaZeny[indexMena];
             novepriezvisko = priezviskoZeny[indexPriezviska];
         }
-
+        //generovanie rodneho cisla + kontrola duplicity
+        rodneCislo = generujRodneCislo(pohlavie, pacient.ROD_CISLO);
+        zoznamRodnychCisel.push(rodneCislo);
+        while (zoznamRodnychCisel.includes(rodneCislo)) {
+            rodneCislo = generujRodneCislo(pohlavie, pacient.ROD_CISLO);
+        }
         return {
             ...pacient,
             MENO: noveMeno,
-            ROD_CISLO: generujRodneCislo(pohlavie),
+            ROD_CISLO: rodneCislo,
             PRIEZVISKO: novepriezvisko,
         };
     });
@@ -111,7 +142,7 @@ function hashMedical(data) {
         "../server/utils/priezviskoZeny.txt"
     );
     if (menaMuzy.length === 0 || menaZeny === 0) {
-        // console.error("Nepodarilo sa načítať mená zo súboru.");
+        console.error("Nepodarilo sa načítať mená zo súboru.");
         return data;
     }
     // Zmena mien v medicinskych zaznamoch
@@ -142,11 +173,32 @@ function hashMedical(data) {
         };
     });
     return hashovaneData;
+}
 
+//Hash dat zdravotnej karty + nahodny pocet dat
+function hashZdravotnaKarta(data) {
+    if (data.length === 0) {
+        console.error("Nepodarilo sa načítať recepty.");
+        return data;
+    }
+    //Nahodny pocet dat
+    let randomPocetDat = Math.floor(Math.random() * 10);
+    const orezaneData = data.slice(0, randomPocetDat);
+    const hashovaneData = orezaneData.map((singlerow) => {
+        let novyRecept;
+        let indexReceptu = Math.floor(Math.random() * orezaneData.length);
+        novyRecept = orezaneData[indexReceptu];
 
+        return {
+            ...singlerow,
+            RECEPT: novyRecept,
+        };
+    });
+    return hashovaneData;
 }
 
 module.exports = {
+    hashZdravotnaKarta,
     hashPacienti,
-    hashMedical
+    hashMedical,
 };
