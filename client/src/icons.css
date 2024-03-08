@@ -117,7 +117,7 @@
 }
 
 .storage-icon {
-  content: url("./images/drugs-black.png");
+  content: url("./images/warehouse.png");
   height: 44px;
   width: 44px;
 }
@@ -218,6 +218,18 @@
 
 .reservations-icon {
   content: url("./images/reservations_black.png");
+  height: 44px;
+  width: 44px;
+}
+
+.warehouse-move-icon {
+  content: url("./images/warehouse-move.png");
+  height: 44px;
+  width: 44px;
+}
+
+.order-icon {
+  content: url("./images/order.png");
   height: 44px;
   width: 44px;
 }

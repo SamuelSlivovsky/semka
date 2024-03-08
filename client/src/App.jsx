@@ -16,7 +16,11 @@ import "../node_modules/primeflex/primeflex.css";
 import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
+
 import Storage from "./Views/Storage";
+import Orders from "./Views/Orders";
+import WarehouseTransfers from "./Views/WarehouseTransfers";
+
 import PharmacyStorage from "./Views/PharmacyStorage";
 import PharmacyStorageMedicaments from "./Views/PharmacyStorageMedicaments";
 import PharmacySearchMedicaments from "./Views/PharmacySearchMedicaments";
@@ -279,6 +283,37 @@ function App() {
     />,
   ];
 
+  const sidebarWarehouseManager = [
+      <SidebarButton
+          key="1"
+          visibleLeft={visibleLeft}
+          path="/"
+          label="Domov"
+          icon="home-icon"
+      />,
+      <SidebarButton
+          key="10"
+          visibleLeft={visibleLeft}
+          path="/sklad"
+          label="Sklad"
+          icon="storage-icon"
+      />,
+      <SidebarButton
+          key="14"
+          visibleLeft={visibleLeft}
+          path="/objednavky"
+          label="Objednavky"
+          icon="order-icon"
+      />,
+      <SidebarButton
+          key="15"
+          visibleLeft={visibleLeft}
+          path="/presuny"
+          label="Presuny"
+          icon="warehouse-move-icon"
+      />,
+  ]
+
   const sidebarButtonsPharmacyManager = [
     <SidebarButton
       key="1"
@@ -409,21 +444,31 @@ function App() {
     );
   };
 
-  const renderPatientRoutes = () => {
-    return (
-      <>
-        <Route
-          path="/calendar"
-          element={<EventCalendar userData={userData}></EventCalendar>}
-        ></Route>
-        <Route
-          path="/patient"
-          element={
-            <Patient userData={userData} patientId={patientId}></Patient>
-          }
-        ></Route>
-      </>
-    );
+    const renderPatientRoutes = () => {
+        return (
+            <>
+                <Route
+                    path="/calendar"
+                    element={<EventCalendar userData={userData}></EventCalendar>}
+                ></Route>
+                <Route
+                    path="/patient"
+                    element={
+                        <Patient userData={userData} patientId={patientId}></Patient>
+                    }
+                ></Route>
+            </>
+        );
+    };
+
+  const renderWarehouseManagerRoutes = () => {
+      return (
+          <>
+              <Route path="/sklad" element={<Storage />}></Route>
+              <Route path="/objednavky" element={<Orders />}></Route>
+              <Route path="/presuny" element={<WarehouseTransfers />}></Route>
+          </>
+      )
   };
 
   const renderPharmacyManagerRoutes = () => {
@@ -527,6 +572,8 @@ function App() {
           </>
         ) : userData !== null && userData.UserInfo.role === 4 ? (
           sidebarButtonsPatient
+        ) : userData !== null && userData.UserInfo.role === 5 ? (
+            sidebarWarehouseManager
         ) : userData !== null && userData.UserInfo.role === 10 ? (
           sidebarButtonsPharmacyManager
         ) : (
@@ -581,6 +628,12 @@ function App() {
             </>
           ) : userData && userData.UserInfo.role === 4 ? (
             renderPatientRoutes()
+          ) : typeof userData !== "undefined" &&
+          userData !== null &&
+          userData.UserInfo.role === 5 ? (
+              <>
+                  {renderWarehouseManagerRoutes()} {renderChiefRoutes()}
+              </>
           ) : userData && userData.UserInfo.role === 10 ? (
             renderPharmacyManagerRoutes()
           ) : (
