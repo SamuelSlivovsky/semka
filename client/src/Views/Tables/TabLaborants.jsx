@@ -10,26 +10,24 @@ import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
 
-export default function TabPrescriptions() {
+export default function TabLaborants() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
-  const [zoznamReceptov, setZoznamReceptov] = useState([]);
+  const [laboranti, setLaboranti] = useState([]);
   const navigate = useNavigate();
+  const [nazovLekarne, setNazovLekarne] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
-    fetch(
-      `/pharmacyPrescriptions/zoznamReceptov/${userDataHelper.UserInfo.userid}`,
-      {
-        headers,
-      }
-    )
+    fetch(`/pharmacyManagers/laboranti/${userDataHelper.UserInfo.userid}`, {
+      headers,
+    })
       .then((response) => {
         // Kontrola ci response je ok (status:200)
         if (response.ok) {
@@ -47,8 +45,12 @@ export default function TabPrescriptions() {
         }
       })
       .then((data) => {
-        setZoznamReceptov(data);
+        setLaboranti(data);
         console.log(data);
+        if (data.length > 0) {
+          setNazovLekarne(data[0].LEKAREN_NAZOV);
+          console.log(data);
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -62,7 +64,7 @@ export default function TabPrescriptions() {
 
   const onSubmit = () => {
     setShowDialog(false);
-    navigate("/prescription_detail", { state: selectedRow.ID_RECEPTU });
+    navigate("/laborant", { state: selectedRow.CISLO_ZAM });
   };
 
   const handleClick = (value) => {
@@ -102,7 +104,8 @@ export default function TabPrescriptions() {
             />
           </span>
           <div className="ml-4">
-            <h2>Predpísané recepty</h2>
+            <h2>Zoznam laborantov pracujúcich v lekárni: </h2>
+            <h3>{nazovLekarne}</h3>
           </div>
         </div>
       </div>
@@ -124,19 +127,19 @@ export default function TabPrescriptions() {
   const initFilters = () => {
     setFilters({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      ID_RECEPTU: {
+      ROD_CISLO: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
-      ROD_CISLO: {
+      MENO: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      MENO_PACIENTA: {
+      PRIEZVISKO: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      PRIEZVISKO_PACIENTA: {
+      CISLO_ZAM: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
@@ -170,7 +173,7 @@ export default function TabPrescriptions() {
           </div>
         ) : (
           <DataTable
-            value={zoznamReceptov}
+            value={laboranti}
             responsiveLayout="scroll"
             selectionMode="single"
             paginator
@@ -181,36 +184,24 @@ export default function TabPrescriptions() {
             filters={filters}
             filterDisplay="menu"
             globalFilterFields={[
-              "ID_RECEPTU",
               "ROD_CISLO",
-              "MENO_PACIENTA",
-              "PRIEZVISKO_PACIENTA",
+              "MENO",
+              "PRIEZVISKO",
+              "CISLO_ZAM",
             ]}
             emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
           >
-            <Column field="ID_RECEPTU" header={"Id receptu"} filter></Column>
-            <Column
-              field="ROD_CISLO"
-              header={"Rodné číslo pacienta"}
-              filter
-            ></Column>
-            <Column
-              field="MENO_PACIENTA"
-              header={"Meno pacienta"}
-              filter
-            ></Column>
-            <Column
-              field="PRIEZVISKO_PACIENTA"
-              header={"Priezvisko pacienta"}
-              filter
-            ></Column>
+            <Column field="ROD_CISLO" header={"Rodné číslo"} filter></Column>
+            <Column field="MENO" header={"Meno"} filter></Column>
+            <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
+            <Column field="CISLO_ZAM" header={"ID zamestnanca"} filter></Column>
           </DataTable>
         )}
       </div>
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO_PACIENTA + " " + selectedRow.PRIEZVISKO_PACIENTA
+            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
             : ""
         }
         visible={showDialog}

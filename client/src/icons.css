@@ -216,6 +216,12 @@
   width: 44px;
 }
 
+.pharmacy-employee-icon {
+  content: url("./images/emloyee_black.png");
+  height: 44px;
+  width: 44px;
+}
+
 .reservations-icon {
   content: url("./images/reservations_black.png");
   height: 44px;

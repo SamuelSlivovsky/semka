@@ -58,14 +58,20 @@ export default function PharmacyReportCard(props) {
           style={{ width: "40rem", height: "50rem" }}
           title={info.NAZOV_LEKARNE}
         >
-          {renderDetail("Počet zamestnancov: ", info.POCET_ZAMESNTNACOV)}
+          {renderDetail(
+            "Celkový počet zamestnancov: ",
+            info.CELKOVY_POCET_ZAMESTNANCOV
+          )}
+          {renderDetail("Počet manažérov: ", info.POCET_MANAZEROV)}
+          {renderDetail("Počet lekárnikov: ", info.POCET_LEKARNIKOV)}
+          {renderDetail("Počet laborantov: ", info.POCET_LABORANTOV)}
           {renderDetail(
             "Počet liekov v lekárenskom sklade: ",
-            info.POCET_LIEKOV_V_LEK_SKLADE
+            info.POCET_LIEKOV
           )}
           {renderDetail(
             "Počet zdravotníckych pomôcok v lekárenskom sklade: ",
-            info.POCET_ZDR_POMOCOK_V_LEK_SKLADE
+            info.POCET_ZDR_POMOCOK
           )}
           {/* {renderCardFooter()} */}
         </Card>

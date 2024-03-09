@@ -15,7 +15,7 @@ import orderIcon from "../images/order.png";
 import pharmacyStorageIcon from "../images/pharmacy_storage.png";
 import aboutMeIcon from "../images/about_me.png";
 import pharmacyManagerIcon from "../images/pharmacist_manager.png";
-import pharmacistIcon from "../images/pharmacist.png";
+import pharmacyEmployeeIcon from "../images/emloyee.png";
 import prescriptionsIcon from "../images/prescriptions.png";
 import medicamentsIcon from "../images/medicaments.png";
 import medicalAidsIcon from "../images/medical_aids.png";
@@ -177,28 +177,28 @@ function Home() {
   ];
 
   const warehouseCards = [
-      <HomeCard
-          title="Sklad"
-          isCalendar={false}
-          path="/sklad"
-          icon={warehouseIcon}
-          key="9"
-      ></HomeCard>,
     <HomeCard
-        title="Objednávky"
-        isCalendar={false}
-        path="/objednavky"
-        icon={orderIcon}
-        key="10"
+      title="Sklad"
+      isCalendar={false}
+      path="/sklad"
+      icon={warehouseIcon}
+      key="9"
     ></HomeCard>,
     <HomeCard
-        title="Presuny"
-        isCalendar={false}
-        path="/presuny"
-        icon={moveIcon}
-        key="11"
+      title="Objednávky"
+      isCalendar={false}
+      path="/objednavky"
+      icon={orderIcon}
+      key="10"
     ></HomeCard>,
-  ]
+    <HomeCard
+      title="Presuny"
+      isCalendar={false}
+      path="/presuny"
+      icon={moveIcon}
+      key="11"
+    ></HomeCard>,
+  ];
 
   const pharmacyManagerCards = [
     <HomeCard
@@ -223,20 +223,6 @@ function Home() {
       key="19"
     ></HomeCard>,
     <HomeCard
-      title="Sklad"
-      isCalendar={false}
-      path="/sklad"
-      icon={storageIcon}
-      key="9"
-    ></HomeCard>,
-    <HomeCard
-      title="Lekárenský sklad"
-      isCalendar={false}
-      path="/lekarensky_sklad"
-      icon={pharmacyStorageIcon}
-      key="14"
-    ></HomeCard>,
-    <HomeCard
       title="Manažéri lekární na Slovensku"
       isCalendar={false}
       path="/pharmacy_managers"
@@ -244,11 +230,25 @@ function Home() {
       key="15"
     ></HomeCard>,
     <HomeCard
-      title="Lekárnici"
+      title="Zamestnanci lekárne"
       isCalendar={false}
-      path="/pharmacists"
-      icon={pharmacistIcon}
-      key="16"
+      path="/pharmacy_employees"
+      icon={pharmacyEmployeeIcon}
+      key="22"
+    ></HomeCard>,
+    <HomeCard
+      title="Presuny"
+      isCalendar={false}
+      path="/presuny"
+      icon={moveIcon}
+      key="11"
+    ></HomeCard>,
+    <HomeCard
+      title="Lekárenský sklad"
+      isCalendar={false}
+      path="/lekarensky_sklad"
+      icon={pharmacyStorageIcon}
+      key="14"
     ></HomeCard>,
     <HomeCard
       title="Recepty"

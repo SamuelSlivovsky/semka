@@ -8,6 +8,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function TabMedicaments() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -15,6 +16,7 @@ export default function TabMedicaments() {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
+  const [loading, setLoading] = useState(true);
   const [zoznamLiekov, setZoznamLiekov] = useState([]);
   const navigate = useNavigate();
 
@@ -44,6 +46,9 @@ export default function TabMedicaments() {
       .then((data) => {
         setZoznamLiekov(data);
         console.log(data);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -141,34 +146,55 @@ export default function TabMedicaments() {
     <div>
       <Toast ref={toast} position="top-center" />
       <div className="card">
-        <DataTable
-          value={zoznamLiekov}
-          responsiveLayout="scroll"
-          selectionMode="single"
-          paginator
-          rows={15}
-          selection={selectedRow}
-          onSelectionChange={(e) => handleClick(e.value)}
-          header={header}
-          filters={filters}
-          filterDisplay="menu"
-          globalFilterFields={[
-            "ID_LIEK",
-            "NAZOV_LIEKU",
-            "ATC",
-            "NAZOV_UCINNEJ_LATKY",
-          ]}
-          emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
-        >
-          <Column field="ID_LIEK" header={"Id lieku"} filter></Column>
-          <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
-          <Column field="ATC" header={"ATC"} filter></Column>
-          <Column
-            field="NAZOV_UCINNEJ_LATKY"
-            header={"Účinná látka"}
-            filter
-          ></Column>
-        </DataTable>
+        {loading ? (
+          <div
+            className="p-d-flex p-jc-center p-ai-center"
+            style={{ height: "300px" }}
+          >
+            <ProgressSpinner
+              className="p-d-flex p-jc-center p-ai-center"
+              style={{
+                height: "100vh",
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(255, 255, 255, 0.8)",
+              }}
+              strokeWidth="4"
+            />
+          </div>
+        ) : (
+          <DataTable
+            value={zoznamLiekov}
+            responsiveLayout="scroll"
+            selectionMode="single"
+            paginator
+            rows={15}
+            selection={selectedRow}
+            onSelectionChange={(e) => handleClick(e.value)}
+            header={header}
+            filters={filters}
+            filterDisplay="menu"
+            globalFilterFields={[
+              "ID_LIEK",
+              "NAZOV_LIEKU",
+              "ATC",
+              "NAZOV_UCINNEJ_LATKY",
+            ]}
+            emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+          >
+            <Column field="ID_LIEK" header={"Id lieku"} filter></Column>
+            <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
+            <Column field="ATC" header={"ATC"} filter></Column>
+            <Column
+              field="NAZOV_UCINNEJ_LATKY"
+              header={"Účinná látka"}
+              filter
+            ></Column>
+          </DataTable>
+        )}
       </div>
       <Dialog
         header={selectedRow != null ? selectedRow.NAZOV_LIEKU : ""}

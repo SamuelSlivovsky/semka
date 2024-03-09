@@ -18,6 +18,13 @@ router.get(
 );
 
 router.get(
+  "/laboranti/:id",
+  verify.verifyRoles(0, 10),
+  verify.checkForCorrectId(),
+  controller.getLaboranti
+);
+
+router.get(
   "/zoznamLiekov/:id",
   verify.verifyRoles(0, 10),
   verify.checkForCorrectId(),
@@ -41,6 +48,12 @@ router.get(
   "/lekarnikInfo/:id",
   verify.verifyRoles(0, 10),
   controller.getLekarniciInfo
+);
+
+router.get(
+  "/laborantInfo/:id",
+  verify.verifyRoles(0, 10),
+  controller.getLaborantiInfo
 );
 
 router.get(

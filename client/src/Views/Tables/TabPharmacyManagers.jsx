@@ -8,6 +8,7 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 export default function TabPharmacyManagers() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -15,6 +16,7 @@ export default function TabPharmacyManagers() {
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
+  const [loading, setLoading] = useState(true);
   const [manazeriLekarni, setManazeriLekarni] = useState([]);
   const navigate = useNavigate();
 
@@ -46,6 +48,9 @@ export default function TabPharmacyManagers() {
       })
       .then((data) => {
         setManazeriLekarni(data);
+      })
+      .finally(() => {
+        setLoading(false);
       });
   }, []);
 
@@ -151,38 +156,59 @@ export default function TabPharmacyManagers() {
     <div>
       <Toast ref={toast} position="top-center" />
       <div className="card">
-        <DataTable
-          value={manazeriLekarni}
-          responsiveLayout="scroll"
-          selectionMode="single"
-          paginator
-          rows={15}
-          selection={selectedRow}
-          onSelectionChange={(e) => handleClick(e.value)}
-          header={header}
-          filters={filters}
-          filterDisplay="menu"
-          globalFilterFields={[
-            "ROD_CISLO",
-            "MENO",
-            "PRIEZVISKO",
-            "CISLO_ZAM",
-            "LEKAREN_NAZOV",
-            "MESTO_NAZOV",
-          ]}
-          emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
-        >
-          <Column field="ROD_CISLO" header={"Rodné číslo"} filter></Column>
-          <Column field="MENO" header={"Meno"} filter></Column>
-          <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
-          <Column field="CISLO_ZAM" header={"ID zamestnanca"} filter></Column>
-          <Column
-            field="LEKAREN_NAZOV"
-            header={"Názov lekárne"}
-            filter
-          ></Column>
-          <Column field="MESTO_NAZOV" header={"Mesto"} filter></Column>
-        </DataTable>
+        {loading ? (
+          <div
+            className="p-d-flex p-jc-center p-ai-center"
+            style={{ height: "300px" }}
+          >
+            <ProgressSpinner
+              className="p-d-flex p-jc-center p-ai-center"
+              style={{
+                height: "100vh",
+                position: "fixed",
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: "rgba(255, 255, 255, 0.8)",
+              }}
+              strokeWidth="4"
+            />
+          </div>
+        ) : (
+          <DataTable
+            value={manazeriLekarni}
+            responsiveLayout="scroll"
+            selectionMode="single"
+            paginator
+            rows={15}
+            selection={selectedRow}
+            onSelectionChange={(e) => handleClick(e.value)}
+            header={header}
+            filters={filters}
+            filterDisplay="menu"
+            globalFilterFields={[
+              "ROD_CISLO",
+              "MENO",
+              "PRIEZVISKO",
+              "CISLO_ZAM",
+              "LEKAREN_NAZOV",
+              "MESTO_NAZOV",
+            ]}
+            emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+          >
+            <Column field="ROD_CISLO" header={"Rodné číslo"} filter></Column>
+            <Column field="MENO" header={"Meno"} filter></Column>
+            <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
+            <Column field="CISLO_ZAM" header={"ID zamestnanca"} filter></Column>
+            <Column
+              field="LEKAREN_NAZOV"
+              header={"Názov lekárne"}
+              filter
+            ></Column>
+            <Column field="MESTO_NAZOV" header={"Mesto"} filter></Column>
+          </DataTable>
+        )}
       </div>
       <Dialog
         header={

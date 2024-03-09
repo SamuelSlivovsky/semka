@@ -21,6 +21,17 @@ module.exports = {
     })();
   },
 
+  getLaboranti: (req, res) => {
+    const laborant = require("../models/manazer_lekarne");
+    (async () => {
+      laboranti = await laborant.getLaboranti(req.params.id);
+      // if (req.role === 0) {
+      //     lekarnici = hashPacienti(manazeriLekarni);
+      // }
+      res.status(200).json(laboranti);
+    })();
+  },
+
   getManazerLekarneInfo: (req, res) => {
     const manazerLekarne = require("../models/manazer_lekarne");
     (async () => {
@@ -33,6 +44,14 @@ module.exports = {
     const lekarnik = require("../models/manazer_lekarne");
     (async () => {
       info = await lekarnik.getLekarniciInfo(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
+  getLaborantiInfo: (req, res) => {
+    const laborant = require("../models/manazer_lekarne");
+    (async () => {
+      info = await laborant.getLaborantiInfo(req.params.id);
       res.status(200).json(info);
     })();
   },
