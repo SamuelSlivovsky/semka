@@ -12,6 +12,8 @@ import "../styles/auth.css";
 import {redirect} from "react-router-dom";
 import {Toast} from 'primereact/toast';
 import {InputNumber} from "primereact/inputnumber";
+import GetUserData from "./GetUserData";
+import user from "../Views/User";
 
 
 export const Register = () => {
@@ -20,6 +22,7 @@ export const Register = () => {
     const navigate = useNavigate();
     const toast = useRef(null);
     const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
     const defaultValues = {
         rc: "", email: "", password: "", role: "",
     };
@@ -31,7 +34,7 @@ export const Register = () => {
     const onSubmit = (data) => {
         setFormData(data);
         let body;
-        if (token) {
+        if (token && userDataHelper.UserInfo.role === 0) {
             body = JSON.stringify({
                 userid: data.rc, pwd: data.password, role: data.role,
             })
@@ -49,7 +52,7 @@ export const Register = () => {
         fetch("/auth/register", requestOptions)
             .then((response) => response.json())
             .then((res) => {
-                if(token){
+                if(token && userDataHelper.UserInfo.role === 0){
                     if (res.message !== undefined) {
                         toast.current.show({severity: 'error', summary: res.message, life: 999999999});
                     } else {
@@ -117,7 +120,7 @@ export const Register = () => {
                         required: "Rodné číslo je povinné"
                     }}
                     render={({field, fieldState}) => {
-                        if (token) {
+                        if (token && userDataHelper.UserInfo.role === 0) {
                             return (<InputText
                                 id={field.name}
                                 {...field}
@@ -141,7 +144,7 @@ export const Register = () => {
                     }}
                 />
                   {(() => {
-                      if (token) {
+                      if (token && userDataHelper.UserInfo.role === 0) {
                           return (<label htmlFor="rc" className={classNames({"p-error": errors.rc})}>ID
                               zamestnanca*</label>);
 
@@ -184,7 +187,7 @@ export const Register = () => {
                         {getFormErrorMessage("email")}
                     </div>
                     {(() => {
-                        if (token) {
+                        if (token && userDataHelper.UserInfo.role === 0) {
                             let zoznamRoly = ["Lekár", "Sestra","Primár","Záchranár","Skladník","Upratovačka","Sanitár", "Laborant", "Lekárnik", "Manažér Lekárne"];
                             let roleOptions = zoznamRoly.map((role, index) => ({label: role, value: index + 1}));
                             return (<div className="field">
@@ -243,7 +246,7 @@ export const Register = () => {
               </span>
                         {getFormErrorMessage("password")}
                         {(() => {
-                            if (token) {
+                            if (token && userDataHelper.UserInfo.role === 0) {
                                 return null
                             } else {
                                 return <a href="login">Máte už vytvorený účet?</a>

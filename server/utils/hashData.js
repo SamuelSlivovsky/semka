@@ -1,7 +1,6 @@
 const fs = require("fs");
 const {hash} = require("bcrypt");
 
-//TODO pridat podmienku aby rok bralo z original Rod_Cisla a okolo neho +-5 rokov
 function generujRodneCislo(pohlavie, rodnecislo) {
 
     let rokRodneCislo = parseInt(rodnecislo.substring(0, 2));
@@ -41,8 +40,6 @@ function generujRodneCislo(pohlavie, rodnecislo) {
 
     // Spojenie všetkých častí do rodného čísla
     const rodneCislo = `${rok}${formatovanyMesiac}${formatovanyDen}/${kontrolnyKod}`;
-    //duplicita rodneho cisla
-
     return rodneCislo;
 }
 
@@ -70,7 +67,40 @@ function zistiPohlavie(rodneCislo) {
 
 }
 
+
+function calculateAgeAndBirthDate(rod_cislo) {
+    let thirdDigit = parseInt(rod_cislo.substring(2, 3));
+    let year, month, day, birthDate, age;
+
+    if (thirdDigit === 2 || thirdDigit === 3) {
+        year = '19' + rod_cislo.substring(0, 2);
+        month = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 20)).slice(-2);
+        day = rod_cislo.substring(4, 6);
+    } else if (thirdDigit === 7 || thirdDigit === 8) {
+        year = '19' + rod_cislo.substring(0, 2);
+        month = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 70)).slice(-2);
+        day = rod_cislo.substring(4, 6);
+    } else {
+        year = '19' + rod_cislo.substring(0, 2);
+        month = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 50)).slice(-2);
+        day = rod_cislo.substring(4, 6);
+    }
+
+    birthDate = new Date(year, month - 1, day);
+    let currentDate = new Date();
+    age = currentDate.getFullYear() - birthDate.getFullYear();
+    let m = currentDate.getMonth() - birthDate.getMonth();
+    if (m < 0 || (m === 0 && currentDate.getDate() < birthDate.getDate())) {
+        age--;
+    }
+
+    birthDate = birthDate.toLocaleDateString();
+
+    return { age, birthDate };
+}
+
 function nacitajDataZoSuboru(nazovSuboru) {
+    //Moznost prepojenia s API v buducnosti
     try {
         const obsahSuboru = fs.readFileSync(`${nazovSuboru}`, "utf-8");
         //Oddelovac v subore medzi menami
@@ -105,7 +135,7 @@ function hashPacienti(pacienti) {
         let novepriezvisko;
         let rodneCislo;
         let zoznamRodnychCisel = [];
-        if (pohlavie === "muz") {
+        if (pohlavie.includes("muz")) {
             indexMena = Math.floor(Math.random() * menaMuzy.length);
             indexPriezviska = Math.floor(Math.random() * priezviskoMuzy.length);
             noveMeno = menaMuzy[indexMena];
@@ -122,11 +152,16 @@ function hashPacienti(pacienti) {
         while (zoznamRodnychCisel.includes(rodneCislo)) {
             rodneCislo = generujRodneCislo(pohlavie, pacient.ROD_CISLO);
         }
+
+        const podrobnosti = calculateAgeAndBirthDate(rodneCislo);
+
         return {
             ...pacient,
             MENO: noveMeno,
             ROD_CISLO: rodneCislo,
             PRIEZVISKO: novepriezvisko,
+            VEK: podrobnosti.age,
+            DATUM_NARODENIA: podrobnosti.birthDate
         };
     });
     return hashovaniPacienti;

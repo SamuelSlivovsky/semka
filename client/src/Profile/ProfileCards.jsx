@@ -163,6 +163,7 @@ export default function ProfileCard(props) {
       .then((response) => response.json())
       .then((data) => {
         setProfile(...data);
+        console.log(data);
       });
   };
 

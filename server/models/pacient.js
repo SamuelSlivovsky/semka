@@ -157,16 +157,47 @@ async function getInfo(id) {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
-            `select distinct id_pacienta, meno, priezvisko, rod_cislo,
-      trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek,
-      to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,
-      typ_krvi, PSC, mesto.nazov as nazov_obce, poistovna.nazov as nazov_poistovne 
-       from os_udaje join pacient using(rod_cislo)
-        join zdravotna_karta using(id_pacienta)
-        join mesto using(PSC) 
-        join poistenie using(id_pacienta)
-        join poistovna using(ICO)
-          where id_pacienta = :id`,
+            `select distinct id_pacienta,meno,priezvisko,rod_cislo,
+                case WHEN substr(rod_cislo,3,1) = 2 OR substr(rod_cislo,3,1) = 3 OR substr(rod_cislo,3,1) = 7 OR substr(rod_cislo,3,1) = 8
+                then 1
+                else 0
+                end as cudzinec,
+    CASE
+        WHEN substr(rod_cislo,3,1) = 2 OR substr(rod_cislo,3,1) = 3 THEN
+            trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),20) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+        WHEN substr(rod_cislo,3,1) = 7 OR substr(rod_cislo,3,1) = 8 THEN
+            trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),70) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+        ELSE
+            trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+    END AS vek,
+    CASE
+        WHEN substr(rod_cislo,3,1) = 2 OR substr(rod_cislo,3,1) = 3 THEN
+            to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),20) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY')
+        WHEN substr(rod_cislo,3,1) = 7 OR substr(rod_cislo,3,1) = 8 THEN
+            to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),70) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY')
+        ELSE
+            to_char(to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY')
+    END AS datum_narodenia,
+    datum_umrtia,
+    typ_krvi,
+    PSC,
+    mesto.nazov AS nazov_obce,
+    poistovna.nazov AS nazov_poistovne
+FROM
+    os_udaje
+JOIN
+    pacient USING(rod_cislo)
+LEFT JOIN
+    zdravotna_karta USING(id_pacienta)
+JOIN
+
+    mesto USING(PSC)
+LEFT JOIN
+    poistenie USING(id_pacienta)
+LEFT JOIN
+    poistovna USING(ICO)
+WHERE
+    id_pacienta = :id`,
             [id]
         );
 
