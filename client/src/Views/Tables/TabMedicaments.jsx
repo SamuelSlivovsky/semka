@@ -137,6 +137,10 @@ export default function TabMedicaments() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
+      NA_PREDPIS: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
     });
     setGlobalFilterValue("");
   };
@@ -182,6 +186,7 @@ export default function TabMedicaments() {
               "NAZOV_LIEKU",
               "ATC",
               "NAZOV_UCINNEJ_LATKY",
+              "NA_PREDPIS",
             ]}
             emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
           >
@@ -191,6 +196,14 @@ export default function TabMedicaments() {
             <Column
               field="NAZOV_UCINNEJ_LATKY"
               header={"Účinná látka"}
+              filter
+            ></Column>
+            <Column
+              field="NA_PREDPIS"
+              header={"Výdaj"}
+              body={(rowData) =>
+                rowData.NA_PREDPIS === "A" ? "Na predpis" : "Voľnopredajný"
+              }
               filter
             ></Column>
           </DataTable>
