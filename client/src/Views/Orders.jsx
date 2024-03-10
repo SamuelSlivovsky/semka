@@ -17,6 +17,7 @@ import {InputNumber} from "primereact/inputnumber";
 
 export default function Orders() {
 
+
     //------------------------------------------------------------------------------------------------
     let skladId = 30;
     //------------------------------------------------------------------------------------------------
@@ -129,9 +130,6 @@ export default function Orders() {
                     // If ZOZNAM_LIEKOV is a string, parse it as JSON
                     if (jsonData && jsonData[0] && jsonData[0].ZOZNAM_LIEKOV) {
                         const zoznamLiekovArray = JSON.parse(jsonData[0].ZOZNAM_LIEKOV);
-
-                        // Now zoznamLiekovArray should be an array of objects
-                        //console.log('Parsed ZOZNAM_LIEKOV:', zoznamLiekovArray);
 
                         setLoading(false);
                         setXmlContent(zoznamLiekovArray);

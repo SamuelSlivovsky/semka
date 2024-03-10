@@ -16,7 +16,7 @@ async function getWaitingTransfers() {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
-            `select * from PRESUN_LIEKOV where STATUS like 'Neprijata'`,
+            `select * from PRESUN_LIEKOV where STATUS like 'Neprijata' order by ID_PRESUN`,
         );
         return result.rows;
     } catch (err) {
@@ -71,10 +71,30 @@ async function getHospitalMedication(id) {
     }
 }
 
+async function getNewTransferParams(id) {
+    try {
+        let conn = await database.getConnection();
+
+        const id_sklad = await conn.execute(
+            `select ID_SKLAD from sklad where ID_NEMOCNICE = :id and ID_ODDELENIA is null`,
+            { id }
+        );
+
+        const sqlStatement = `select ID_PRESUN, ID_SKLAD_OBJ, ID_SKLAD_PRIJ from PRESUN_LIEKOV where ID_SKLAD_PRIJ = :id_pres`;
+        let result = await conn.execute(sqlStatement, {
+            id_pres: id_sklad.rows[0].ID_SKLAD
+        });
+        return result.rows;
+    } catch (err) {
+        throw new Error("Database error: " + err);
+    }
+
+}
+
 async function createHospTransfer(body) {
     try {
         let conn = await database.getConnection();
-        const sqlStatement = `begin
+        let sqlStatement = `begin
                     insert_hospital_transfer(:zoz_liek, :id_nem_pos, :usr_id);
                 end;`;
         console.log(body);
@@ -84,7 +104,26 @@ async function createHospTransfer(body) {
             usr_id: body.user_id
         });
 
+        const id_zam = body.user_id;
         console.log("Rows inserted " + result.rowsAffected);
+        const id_sklad = await conn.execute(
+            `select ID_SKLAD from ZAMESTNANCI join NEMOCNICA on ZAMESTNANCI.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                join SKLAD on NEMOCNICA.ID_NEMOCNICE = SKLAD.ID_NEMOCNICE
+    where CISLO_ZAM = :id and SKLAD.ID_ODDELENIA is null`,
+            { id: id_zam }
+        );
+
+        sqlStatement = `SELECT ID_PRESUN, ID_SKLAD_OBJ, ID_SKLAD_PRIJ
+                            FROM PRESUN_LIEKOV
+                            WHERE ID_PRESUN = (
+                                SELECT MAX(ID_PRESUN)
+                                FROM PRESUN_LIEKOV
+                                WHERE ID_SKLAD_OBJ = :id_pres
+                            )`;
+        let finalResult = await conn.execute(sqlStatement, {
+            id_pres: id_sklad.rows[0].ID_SKLAD
+        });
+        return finalResult.rows;
     } catch (err) {
         console.log("Error Model");
         console.log(err);
@@ -97,5 +136,5 @@ module.exports = {
     getListTransfers,
     getWarehouses,
     getHospitalMedication,
-    createHospTransfer
+    createHospTransfer,
 };

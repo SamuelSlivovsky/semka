@@ -41,8 +41,10 @@ export default function WarehouseTransfers() {
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedHospital, setSelectedHospital] = useState(emptyHospital);
     const [showNewTransfer, setShowNewTransfer] = useState(false);
+    const [newTransferData, setNewTransferData] = useState(null);
     const [waitingTransfers, setWaitingTransfers] = useState(null);
     const [finishedTransfers, setFinishedTransfers] = useState(null);
+    const [selectedData, setSelectedData]= useState(null);
     const [hospitals, setHospitals] = useState([]);
     const [medications, setMedications] = useState(null);
     const [hospitalMedications, setHospitalMedication] = useState(null);
@@ -156,8 +158,10 @@ export default function WarehouseTransfers() {
             });*/
     }
 
+    //@TODO finish this function, it shoud already return rows
     async function createHospitalTransfer() {
-        setShowHospitalMedications(false);
+        const _transfer = [...waitingTransfers];
+        const _tr = {...emptyTransfer};
 
         const nonEmptyRows = hospitalMedications.filter(row => {
             return inputValues[row.ID_LIEK] !== undefined;
@@ -168,8 +172,6 @@ export default function WarehouseTransfers() {
             NAZOV: row.NAZOV,
             requestedAmount: inputValues[row.ID_LIEK]
         }));
-
-        console.log(selectedData);
 
         const transformedData = selectedData.map(row => ({
             id: row.ID_LIEK,
@@ -194,9 +196,40 @@ export default function WarehouseTransfers() {
                 user_id: userDataHelper.UserInfo.userid
             }),
         };
-        const response = await fetch(`presuny/createHospTransfer`, requestOptions).catch((err) =>
-            console.log(err)
-        );
+        if(nonEmptyRows.length > 0) {
+            fetch(`presuny/createHospTransfer`, requestOptions)
+                .then((response) => response.json())
+                .then((data) => {
+                    console.log(data);
+
+                    let currentDate = new Date();
+                    let day = currentDate.getDate();
+                    let month = currentDate.getMonth() + 1;
+                    let year = currentDate.getFullYear();
+
+                    _tr.DATUM_PRESUNU = day + "." + month + "." + year;
+                    _tr.STATUS = "Neprijata";
+                    _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
+                    _tr.ID_PRESUN = newTransferData.ID_PRESUN;
+                    _tr.ID_SKLAD_OBJ = newTransferData.ID_SKLAD_OBJ;
+                    _tr.ID_SKLAD_PRIJ = newTransferData.ID_SKLAD_PRIJ;
+
+                    _transfer.push(_tr);
+
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Successful",
+                        detail: "Presun bol vytvorený",
+                        life: 3000,
+                    });
+
+                    setShowHospitalMedications(false);
+                    setWaitingTransfers(_transfer);
+                    setNewTransferData(null);
+                });
+        } else {
+
+        }
 
     }
 
@@ -258,6 +291,76 @@ export default function WarehouseTransfers() {
         }));
     };
 
+    async function newTransferCheck() {
+        const _transfer = [...waitingTransfers];
+        const _tr = {...emptyTransfer};
+
+        const nonEmptyRows = hospitalMedications.filter(row => {
+            return inputValues[row.ID_LIEK] !== undefined;
+        });
+
+        const selectedData = nonEmptyRows.map(row => ({
+            ID_LIEK: row.ID_LIEK,
+            NAZOV: row.NAZOV,
+            requestedAmount: inputValues[row.ID_LIEK]
+        }));
+
+        const transformedData = selectedData.map(row => ({
+            id: row.ID_LIEK,
+            name: row.NAZOV,
+            amount: row.requestedAmount
+        }));
+
+        console.log(selectedData);
+
+        if(nonEmptyRows.length > 0) {
+            let formattedString = JSON.stringify(transformedData);
+            const token = localStorage.getItem("hospit-user");
+            const headers = { authorization: "Bearer " + token };
+
+            await createHospitalTransfer();
+
+            /*fetch(`/presuny/getNewTransferParams/${selectedHospital.ID_NEMOCNICE}`, { headers })
+                .then((response) => response.json())
+                .then((data) => {
+                    setNewTransferData(data);
+
+                    let currentDate = new Date();
+                    let day = currentDate.getDate();
+                    let month = currentDate.getMonth() + 1;
+                    let year = currentDate.getFullYear();
+
+                    _tr.DATUM_PRESUNU = day + "." + month + "." + year;
+                    _tr.STATUS = "Neprijata";
+                    _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
+                    _tr.ID_PRESUN = newTransferData.ID_PRESUN;
+                    _tr.ID_SKLAD_OBJ = newTransferData.ID_SKLAD_OBJ;
+                    _tr.ID_SKLAD_PRIJ = newTransferData.ID_SKLAD_PRIJ;
+
+                    _transfer.push(_tr);
+
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Successful",
+                        detail: "Presun bol vytvorený",
+                        life: 3000,
+                    });
+
+                    setShowHospitalMedications(false);
+                    setWaitingTransfers(_transfer);
+                    setNewTransferData(null);
+                });*/
+
+        } else {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Musíte vyplniť požadovaný počet aspoň pre jeden liek",
+                life: 3000,
+            });
+        }
+    }
+
     //@TODO needs to be changed to suit this site
     //New/Delete toolbar function
     const leftToolbarTemplate = () => {
@@ -274,7 +377,7 @@ export default function WarehouseTransfers() {
                     label="Vytvoriť presun"
                     icon="pi pi-check-square"
                     className="p-button-success mr-2"
-                    onClick={createHospitalTransfer}
+                    onClick={newTransferCheck}
                 />
             </React.Fragment>
         );
