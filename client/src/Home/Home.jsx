@@ -16,7 +16,7 @@ import pharmacyStorageIcon from "../images/pharmacy_storage.png";
 import aboutMeIcon from "../images/about_me.png";
 import pharmacyManagerIcon from "../images/pharmacist_manager.png";
 import pharmacyEmployeeIcon from "../images/emloyee.png";
-import prescriptionsIcon from "../images/prescriptions.png";
+import dispensingMedicinesIcon from "../images/dispense_medicaments.png";
 import medicamentsIcon from "../images/medicaments.png";
 import medicalAidsIcon from "../images/medical_aids.png";
 import reservationsIcon from "../images/reservations.png";
@@ -251,11 +251,11 @@ function Home() {
       key="14"
     ></HomeCard>,
     <HomeCard
-      title="Recepty"
+      title="Výdaj"
       isCalendar={false}
-      path="/prescriptions"
-      icon={prescriptionsIcon}
-      key="17"
+      path="/dispensing_medicines"
+      icon={dispensingMedicinesIcon}
+      key="23"
     ></HomeCard>,
     <HomeCard
       title="Rezervácie"

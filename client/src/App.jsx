@@ -41,6 +41,8 @@ import TabPrescriptions from "./Views/Tables/TabPrescriptions";
 import PrecsriptionCard from "./Details/PrescriptionCard";
 import TabReservations from "./Views/Tables/TabResevations";
 import PharmacyEmployees from "./Views/PharmacyEmployees";
+import PharmacyDispensing from "./Views/PharmacyDispensing";
+import TabFreeSaleMedicaments from "./Views/Tables/TabFreeSaleMedicaments";
 
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
@@ -376,11 +378,11 @@ function App() {
       icon="pharmacy-storage-icon"
     />,
     <SidebarButton
-      key="17"
+      key="23"
       visibleLeft={visibleLeft}
-      path="/prescriptions"
-      label="Recepty"
-      icon="prescriptions-icon"
+      path="/dispensing_medicines"
+      label="Výdaj"
+      icon="dispensing-medicines-icon"
     />,
     <SidebarButton
       key="21"
@@ -541,12 +543,20 @@ function App() {
         ></Route>
         <Route path="/laborant" element={<LaborantCard></LaborantCard>}></Route>
         <Route
+          path="/dispensing_medicines"
+          element={<PharmacyDispensing></PharmacyDispensing>}
+        ></Route>
+        <Route
           path="/prescriptions"
           element={<TabPrescriptions></TabPrescriptions>}
         ></Route>
         <Route
           path="/prescription_detail"
           element={<PrecsriptionCard></PrecsriptionCard>}
+        ></Route>
+        <Route
+          path="/free_sale_medicaments"
+          element={<TabFreeSaleMedicaments></TabFreeSaleMedicaments>}
         ></Route>
         <Route
           path="/reservations"
