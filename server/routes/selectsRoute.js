@@ -159,7 +159,7 @@ router.get(
   controller.getPomerMuziZeny
 );
 router.get(
-  "/pocetPacientiPodlaVeku/",
+  "/pocetPacientiPodlaVeku/:cislo_zam",
   verify.verifyRoles(1, 2, 3),
   controller.getPocetPacientiPodlaVeku
 );

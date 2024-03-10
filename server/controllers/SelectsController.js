@@ -270,7 +270,7 @@ module.exports = {
     const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
-      ret_val = await pacient.getPocetPacientiPodlaVeku();
+      ret_val = await pacient.getPocetPacientiPodlaVeku(req.params.cislo_zam);
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);

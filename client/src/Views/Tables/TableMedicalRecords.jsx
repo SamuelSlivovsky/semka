@@ -56,7 +56,13 @@ export default function TableMedic(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
-    setEndDate(value.DAT_DO ? new Date(value.DAT_DO) : new Date());
+    setEndDate(
+      value.UNFORMATED_DAT_DO
+        ? new Date(value.UNFORMATED_DAT_DO)
+        : value.DAT_DO
+        ? new Date(value.DAT_DO)
+        : new Date()
+    );
     fetch(`/zaznamy/priloha/${value.id_zaz}`, { headers })
       .then((res) => res.blob())
       .then((result) => {

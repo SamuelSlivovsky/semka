@@ -10,9 +10,12 @@ import reportWebVitals from "./reportWebVitals";
 import { BrowserRouter as Router } from "react-router-dom";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
+const value = {
+  locale: "sk",
+};
 root.render(
   <Router>
-    <PrimeReactProvider>
+    <PrimeReactProvider value={value}>
       <App />
     </PrimeReactProvider>
   </Router>

@@ -38,6 +38,7 @@ export default function ProfileCard(props) {
     tableName: "Zdravotné záznamy",
     route: "/pacient",
     cellData: patientMedicalRecords,
+    fetchData: () => fetchMedRecords(),
     titles: [
       { field: "DATUM", header: "Dátum" },
       { field: "TYP", header: "Typ záznamu" },

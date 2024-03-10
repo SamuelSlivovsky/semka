@@ -137,14 +137,34 @@ async function getPacientiChorobaP13() {
   }
 }
 
-async function getPocetPacientiPodlaVeku() {
+async function getPocetPacientiPodlaVeku(cislo_zam) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select count(*) as pocet, trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek
-            from pacient join os_udaje using(rod_cislo)
-             group by trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),50) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-              order by 2`
+      `select count(distinct p.id_pacienta) as pocet,   CASE
+      WHEN substr(p.rod_cislo,3,1) = 2 OR substr(p.rod_cislo,3,1) = 3 THEN
+          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),20) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+      WHEN substr(p.rod_cislo,3,1) = 7 OR substr(p.rod_cislo,3,1) = 8 THEN
+          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),70) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+      ELSE
+          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),50) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+  END AS vek
+            from oddelenie o  
+             join zamestnanci z on (z.id_oddelenia = o.id_oddelenia)
+              join nemocnica n on (n.id_nemocnice = o.id_nemocnice)
+               join pacient p on (p.id_nemocnice = n.id_nemocnice)
+             join os_udaje os on(p.rod_cislo = os.rod_cislo)
+             where o.id_oddelenia = (select id_oddelenia from zamestnanci where cislo_zam =:cislo_zam)
+             group by  CASE
+      WHEN substr(p.rod_cislo,3,1) = 2 OR substr(p.rod_cislo,3,1) = 3 THEN
+          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),20) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+      WHEN substr(p.rod_cislo,3,1) = 7 OR substr(p.rod_cislo,3,1) = 8 THEN
+          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),70) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+      ELSE
+          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),50) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+  END 
+              order by 2`,
+      [cislo_zam]
     );
 
     return result.rows;

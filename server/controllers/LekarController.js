@@ -100,4 +100,12 @@ module.exports = {
       res.status(200);
     })();
   },
+
+  getOddeleniePrimara: (req, res) => {
+    const lekar = require("../models/lekar");
+    (async () => {
+      info = await lekar.getOddeleniePrimara(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
 };

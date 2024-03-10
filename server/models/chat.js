@@ -167,7 +167,7 @@ async function insertSprava(body) {
         id_skupiny: body.id_skupiny,
         sprava: body.sprava,
         datum: body.datum,
-        priloha: "EMPTY_BLOB()",
+        priloha: buffer,
       },
       { autoCommit: true }
     );

@@ -29,8 +29,9 @@ async function getLekari(pid_lekara) {
     );
     let id_odd = id_oddelenia.rows[0].ID_ODDELENIA;
     const result = await conn.execute(
-      `SELECT meno, priezvisko, oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, zamestnanci.cislo_zam 
+      `SELECT typ_zam.nazov as profesia, meno, priezvisko, oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, zamestnanci.cislo_zam 
           from zamestnanci
+                    join typ_zam using (id_typ)
                     join os_udaje using(rod_cislo)
                     join nemocnica using(id_nemocnice)
                     left join oddelenie on(zamestnanci.id_oddelenia = oddelenie.id_oddelenia)
@@ -82,9 +83,8 @@ async function getPriemernyVek() {
                 (select extract(year from sysdate) - extract(year from datum_narodenia) as vek
                 from (select to_date(substr(rod_cislo, 5, 2) || '.' || (case when substr(rod_cislo, 3, 1) = '5' then '0' when substr(rod_cislo, 3, 1) = '6' then '1' end) 
                 || substr(rod_cislo, 4, 1) ||  '.19' || substr(rod_cislo, 1, 2), 'DD.MM.YYYY') as datum_narodenia
-                from os_udaje join zamestnanec using(rod_cislo)
-                join lekar using(id_zamestnanca)))) /
-                (select count(distinct id_zamestnanca) from lekar) as priemerny_vek
+                from os_udaje join zamestnanci using(rod_cislo)))) /
+                (select count(distinct cislo_zam) from zamestnanci) as priemerny_vek
              from dual`
     );
     return result.rows;
@@ -151,13 +151,14 @@ async function getVysetrenia(id) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(zdravotny_zaz.datum, 'HH24:MI:SS') as "start", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') datum,
+      `select rod_cislo, meno, priezvisko, to_char(vysetrenie.datum,'YYYY-MM-DD') || 'T' || to_char(vysetrenie.datum, 'HH24:MI:SS') as "start", to_char(vysetrenie.datum,'DD.MM.YYYY') datum,
       id_zaznamu as "id_zaz" from vysetrenie
         join zdravotny_zaz using(id_zaznamu)
             join zdravotna_karta using(id_karty)
                  join pacient using(id_pacienta)
                   join os_udaje using(rod_cislo) 
-                   where cislo_zam = :id`,
+                   where cislo_zam = :id
+                   order by vysetrenie.datum desc`,
       [id]
     );
 
@@ -175,9 +176,9 @@ async function getHospitalizacie(id) {
   try {
     let conn = await database.getConnection();
     const hospitalizacie = await conn.execute(
-      `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
-      as "start",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum,
-      hospitalizacia.dat_do, hospitalizacia.id_hosp, hospitalizacia.prepustacia_sprava
+      `select os_udaje.rod_cislo, meno, priezvisko, to_char(hospitalizacia.dat_od,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
+      as "start",id_zaznamu as "id_zaz", to_char(hospitalizacia.dat_od,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum,
+      hospitalizacia.dat_do, hospitalizacia.id_hosp, hospitalizacia.prepustacia_sprava, hospitalizacia.dat_od
        from hospitalizacia
         join zdravotny_zaz using(id_zaznamu)
           join zdravotna_karta using(id_karty)
@@ -188,7 +189,7 @@ async function getHospitalizacie(id) {
                   join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
                   join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
                     where zamestnanci.cislo_zam = :id
-                    order by hospitalizacia.dat_do desc`,
+                    order by hospitalizacia.dat_do desc, hospitalizacia.dat_od desc`,
       [id]
     );
 
@@ -260,6 +261,22 @@ async function getKonzilia(id) {
   }
 }
 
+async function getOddeleniePrimara(id) {
+  try {
+    let conn = await database.getConnection();
+    const info = await conn.execute(
+      `select o.id_oddelenia, o.typ_oddelenia as NAZOV from oddelenie o
+      join zamestnanci z on (z.id_oddelenia = o.id_oddelenia)
+      where cislo_zam =:id`,
+      { id }
+    );
+
+    return info.rows[0];
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getLekari,
   getPacienti,
@@ -271,4 +288,5 @@ module.exports = {
   getLekarInfo,
   getNemocnicaOddelenia,
   getZoznamLekarov,
+  getOddeleniePrimara,
 };

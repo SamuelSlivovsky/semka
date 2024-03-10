@@ -7,6 +7,7 @@ import HospitForm from "../Forms/HospitForm";
 import OperationForm from "../Forms/OperationForm";
 import ExaminationForm from "../Forms/ExaminationForm";
 import MeetingForm from "../Forms/MeetingForm";
+import RequestForm from "../Forms/Request/RequestForm";
 export default function Add() {
   const toast = useRef(null);
   const [eventTypeButton, setEventTypeButton] = useState(1);
@@ -17,6 +18,7 @@ export default function Add() {
     { name: "Recept", code: "RECEPT", value: 4 },
     { name: "Pacient", code: "PAT", value: 5 },
     { name: "Konzílium", code: "MET", value: 6 },
+    { name: "Žiadanka", code: "REQ", value: 7 },
   ];
 
   return (
@@ -43,8 +45,10 @@ export default function Add() {
         <RecipeForm />
       ) : eventTypeButton === 5 ? (
         <PatientForm />
-      ) : (
+      ) : eventTypeButton === 6 ? (
         <MeetingForm />
+      ) : (
+        <RequestForm />
       )}
     </div>
   );

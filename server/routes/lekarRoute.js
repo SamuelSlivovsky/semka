@@ -71,4 +71,10 @@ router.get(
   controller.getNeobsadeneLozka
 );
 
+router.get(
+  "/oddeleniePrimara/:id",
+  verify.verifyRoles(0, 3),
+  controller.getOddeleniePrimara
+);
+
 module.exports = router;

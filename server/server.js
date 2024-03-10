@@ -65,14 +65,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  // socket.on("sendImage", (image, params) => {
-  //   io.emit("newMessage", {
-  //     content: image,
-  //     sender: params.userId,
-  //     type: "image",
-  //   });
-  // });
-
   socket.on("disconnect", () => {});
   socket.on("typing", (params) => {
     io.emit("isTyping", {

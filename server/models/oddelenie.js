@@ -163,9 +163,10 @@ async function getPocetHospitalizaciiOddelenia(cislo_zam, rok) {
     const result = await conn.execute(
       `select count(id_hosp) as poc_hospitalizacii from hospitalizacia h
       join lozko l on (l.id_lozka = h.id_lozka)
-      join oddelenie o on (o.id_oddelenia = l.id_oddelenia)
+      join miestnost m on (m.id_miestnosti = l.id_miestnost)
+      join oddelenie o on (o.id_oddelenia = m.id_oddelenia)
       join zamestnanci z on (z.id_oddelenia = o.id_oddelenia)
-      where l.id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
+      where m.id_oddelenia = z.id_oddelenia AND z.cislo_zam = :cislo_zam
       and to_char(h.dat_od,'YYYY') = :rok`,
       [cislo_zam, rok]
     );

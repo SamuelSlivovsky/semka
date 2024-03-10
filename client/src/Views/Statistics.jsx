@@ -1,40 +1,54 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Chart } from "primereact/chart";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { ProgressBar } from "primereact/progressbar";
 import { Calendar } from "primereact/calendar";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
+import { addLocale } from "primereact/api";
+import { Checkbox } from "primereact/checkbox";
 import GetUserData from "../Auth/GetUserData.jsx";
+import sk from "../locales/sk.json";
 
 import "../styles/stat.css";
 export default function Statistics() {
   const toast = useRef(null);
   const [render, setRender] = useState(false);
   const [muziZeny, setMuziZeny] = useState(null);
-  const [valuesInTable, setValuesInTable] = useState([]);
-  const [columns, setColumns] = useState(null);
+  const [wholeYearCheck, setWholeYearCheck] = useState(false);
   const [pocetZam, setPocetZam] = useState(null);
   const [pocetPac, setPocetPac] = useState(null);
   const [pocetOpe, setPocetOpe] = useState(null);
   const [pocetHosp, setPocetHosp] = useState(null);
   const [pocetVys, setPocetVys] = useState(null);
   const [krv, setKrv] = useState(null);
-  const [year, setYear] = useState("");
+  const [date, setDate] = useState("");
   const [pacientiVek, setPacientiVek] = useState(null);
   const [pacientiVekOptions, setPacientiVekOptions] = useState(null);
-  const [sumaVyplat, setSumaVyplat] = useState(null);
-  const [sumaVyplatOptions, setSumaVyplatOptions] = useState(null);
+  const [department, setDepartment] = useState(null);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    const userId = GetUserData(token).UserInfo.userid;
+    const headers = { authorization: "Bearer " + token };
+    fetch(`/lekar/oddeleniePrimara/${userId}`, { headers })
+      .then((res) => res.json())
+      .then((result) => {
+        setDepartment(result);
+      });
+    addLocale("sk", sk);
+  }, []);
 
   const handleSubmit = () => {
     const token = localStorage.getItem("hospit-user");
     const userId = GetUserData(token).UserInfo.userid;
     const headers = { authorization: "Bearer " + token };
-    if (year !== null) {
+    if (date !== null) {
       setRender(true);
       setLoading(true);
+      const dateParam = wholeYearCheck
+        ? date.getFullYear()
+        : `${date.getFullYear()}&${date.getMonth()}`;
       fetch(`/selects/pomerMuziZeny/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
@@ -85,11 +99,7 @@ export default function Statistics() {
           });
         });
 
-      fetch(`/selects/priemernyVek`, { headers })
-        .then((res) => res.json())
-        .then((result) => {});
-
-      fetch(`/selects/pocetZamOddelenia/${userId}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetZamOddelenia/${userId}/${dateParam}`, {
         headers,
       })
         .then((res) => res.json())
@@ -97,7 +107,7 @@ export default function Statistics() {
           setPocetZam(result[0].POCET_ZAMESTNANCOV);
         });
 
-      fetch(`/selects/pocetOperOddelenia/${userId}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetOperOddelenia/${userId}/${dateParam}`, {
         headers,
       })
         .then((res) => res.json())
@@ -105,7 +115,7 @@ export default function Statistics() {
           setPocetOpe(result[0].POC_OPERACII);
         });
 
-      fetch(`/selects/pocetHospitOddelenia/${userId}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetHospitOddelenia/${userId}/${dateParam}`, {
         headers,
       })
         .then((res) => res.json())
@@ -113,7 +123,7 @@ export default function Statistics() {
           setPocetHosp(result[0].POC_HOSPITALIZACII);
         });
 
-      fetch(`/selects/pocetVyseOddelenia/${userId}/${year.getFullYear()}`, {
+      fetch(`/selects/pocetVyseOddelenia/${userId}/${dateParam}`, {
         headers,
       })
         .then((res) => res.json())
@@ -126,81 +136,7 @@ export default function Statistics() {
         .then((result) => {
           setPocetPac(result[0].POCET_PACIENTOV);
         });
-      /*fetch(
-        `/selects/topZamestnanciVyplatyOddelenie/${id}/${year.getFullYear()}`,
-        { headers }
-      )
-        .then((res) => res.json())
-        .then((result) => {
-          setValuesInTable(result);
-          loadColumnsHeaders(result);
-        });
-
-      fetch(`/selects/sumaVyplatRoka/${id}/${year.getFullYear()}`, { headers })
-        .then((res) => res.json())
-        .then((result) => {
-          setSumaVyplat({
-            labels: [
-              'Január',
-              'Február',
-              'Marec',
-              'Apríl',
-              'Máj',
-              'Jún',
-              'Júl',
-              'August',
-              'September',
-              'Október',
-              'November',
-              'December',
-            ],
-            datasets: [
-              {
-                label: 'Súčet výplat',
-                backgroundColor: '#42A5F5',
-                data: [
-                  result[0].JANUAR,
-                  result[0].FEBRUAR,
-                  result[0].MAREC,
-                  result[0].APRIL,
-                  result[0].MAJ,
-                  result[0].JUN,
-                  result[0].JUL,
-                  result[0].AUGUST,
-                  result[0].SEPTEMBER,
-                  result[0].OKTOBER,
-                  result[0].NOVEMBER,
-                  result[0].DECEMBER,
-                ],
-              },
-            ],
-          });
-          setSumaVyplatOptions({
-            plugins: {
-              legend: {
-                labels: {
-                  color: '#495057',
-                },
-              },
-            },
-            scales: {
-              y: {
-                title: {
-                  display: true,
-                  text: 'Suma v €',
-                },
-              },
-              x: {
-                title: {
-                  display: true,
-                  text: 'Mesiac',
-                },
-              },
-            },
-          });
-        });
-*/
-      fetch(`/selects/pocetPacientiPodlaVeku`, { headers })
+      fetch(`/selects/pocetPacientiPodlaVeku/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPacientiVek({
@@ -246,53 +182,62 @@ export default function Statistics() {
     }
   };
 
-  const loadColumnsHeaders = (data) => {
-    if (Object.keys(...data).length > 0) {
-      loadColumns(Object.keys(...data));
-    }
-  };
-
-  const loadColumns = (keys) => {
-    let array = "";
-    keys.forEach((element) => {
-      array = [
-        ...array,
-        <Column
-          field={element}
-          header={element}
-          key={element}
-          rowSpan={10}
-        ></Column>,
-      ];
-    });
-    setColumns(array);
-  };
-
   return (
-    <div>
-      <div className="grid" style={{ marginTop: "1rem" }}>
+    <div style={{ padding: "10px" }}>
+      {department != null ? (
+        <h1 style={{ textAlign: "center" }}>
+          Štatistiky pre oddelenie {department.NAZOV}
+        </h1>
+      ) : (
+        ""
+      )}
+      <div>
         <Toast ref={toast} />
-        <div className="field col-4 md:col-3">
-          <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
-            Zadajte rok
-          </label>
-          <Calendar
-            id="range"
-            value={year}
-            onChange={(e) => {
-              setYear(e.value);
+        <div style={{ display: "flex" }}>
+          <div
+            className="field col-2 md:col-1"
+            style={{
+              height: "62px",
+              display: "flex",
+              alignItems: "center",
+              marginRight: "20px",
             }}
-            view="year"
-            dateFormat="yy"
-            readOnlyInput
-          />
-        </div>
-        <div className="field col-4 md:col-3">
-          <Button
-            icon="pi pi-check"
-            label="Zadaj"
-            onClick={handleSubmit}
-          ></Button>
+          >
+            <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
+              <h2>Celý rok?</h2>
+            </label>
+            <Checkbox
+              checked={wholeYearCheck}
+              onChange={(e) => setWholeYearCheck(e.checked)}
+            />
+          </div>
+          <div
+            className="field col-4 md:col-4"
+            style={{ height: "62px", display: "flex", alignItems: "center" }}
+          >
+            <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
+              <h2>Zadajte {wholeYearCheck ? "rok" : "mesiac a rok"}</h2>
+            </label>
+            <Calendar
+              id="range"
+              value={date}
+              onChange={(e) => {
+                setDate(e.value);
+              }}
+              locale="sk"
+              view={wholeYearCheck ? "year" : "month"}
+              dateFormat={wholeYearCheck ? "yy" : "MM yy"}
+              readOnlyInput
+            />
+          </div>
+
+          <div className="field col-4 md:col-3">
+            <Button
+              icon="pi pi-check"
+              label="Zadaj"
+              onClick={handleSubmit}
+            ></Button>
+          </div>
         </div>
         {render && !loading ? (
           <>
@@ -327,22 +272,6 @@ export default function Statistics() {
                 options={pacientiVekOptions}
                 style={{ width: "35%" }}
               />
-              <Chart
-                type="bar"
-                data={sumaVyplat}
-                options={sumaVyplatOptions}
-                style={{ width: "35%" }}
-              />
-              <DataTable
-                size="small"
-                value={valuesInTable}
-                style={{ width: "25%", marginLeft: "1rem" }}
-                scrollable
-                showGridlines
-                responsiveLayout="scroll"
-              >
-                {columns}
-              </DataTable>
             </div>
             <div className="xl:col-12 justify-content-center align-content-center flex h-auto">
               <Chart
