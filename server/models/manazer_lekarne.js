@@ -141,13 +141,13 @@ async function getPouzivatelInfo(id) {
 async function getZoznamLiekov() {
   try {
     let conn = await database.getConnection();
-    const result =
-      await conn.execute(`select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,
-      ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka
-    from ucinne_latky_liekov ull
-    join liek l on (l.id_liek = ull.id_liek)
-    join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
-    order by NAZOV_LIEKU`);
+    const result = await conn.execute(
+      `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis
+      from  liek l 
+      join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
+      join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
+      order by NAZOV_LIEKU`
+    );
     return result.rows;
   } catch (err) {
     console.log(err);
@@ -158,12 +158,11 @@ async function getDetailLieku(id) {
   try {
     let conn = await database.getConnection();
     const detail = await conn.execute(
-      `select l.nazov as "NAZOV_LIEKU", l.typ, l.davkovanie, l.mnozstvo,
-      ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka
-    from ucinne_latky_liekov ull
-    join liek l on (l.id_liek = ull.id_liek)
-    join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
-    where l.id_liek = :id`,
+      `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis
+      from  liek l 
+      join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
+      join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
+      where l.id_liek = :id`,
       [id]
     );
 
