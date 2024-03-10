@@ -1,5 +1,3 @@
-//create data table using primeract and primereact components and styles for errorlogs take inspiration from TabPatients.jsx
-
 import React, {useEffect, useRef, useState} from "react";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
