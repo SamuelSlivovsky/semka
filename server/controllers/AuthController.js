@@ -12,7 +12,6 @@ const handleRegister = async (req, res) => {
             .json({message: "Username and password are required."});
     // check for duplicate usernames in the db
 
-    //TODO zmenit rolu pri registracii na rolu pacienta
     try {
         if (await userModel.userExists(userid)) {
             return res
@@ -74,21 +73,21 @@ const handleLogin = async (req, res) => {
             .status(400)
             .json({message: "User with this login does not exist"}); //Does not exist
 
-  const foundUser = await userModel.getUserByUserId(userid);
-  const match = await bcrypt.compare(pwd, foundUser.PWD);
-  if (match == true) {
-    const accessToken = jwt.sign(
-      {
-        UserInfo: {
-          userid: !isNaN(foundUser.USERID)
-            ? Number(foundUser.USERID)
-            : foundUser.USERID,
-          role: foundUser.ROLE,
-        },
-      },
-      process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: "1d" }
-    );
+    const foundUser = await userModel.getUserByUserId(userid);
+    const match = await bcrypt.compare(pwd, foundUser.PWD);
+    if (match == true) {
+        const accessToken = jwt.sign(
+            {
+                UserInfo: {
+                    userid: !isNaN(foundUser.USERID)
+                        ? Number(foundUser.USERID)
+                        : foundUser.USERID,
+                    role: foundUser.ROLE,
+                },
+            },
+            process.env.ACCESS_TOKEN_SECRET,
+            {expiresIn: "1d"}
+        );
 
         const refreshToken = jwt.sign(
             {userid: foundUser.USERID},
