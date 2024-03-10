@@ -156,8 +156,48 @@ export default function WarehouseTransfers() {
             });*/
     }
 
-    const createHospitalTransfer = () => {
+    async function createHospitalTransfer() {
         setShowHospitalMedications(false);
+
+        const nonEmptyRows = hospitalMedications.filter(row => {
+            return inputValues[row.ID_LIEK] !== undefined;
+        });
+
+        const selectedData = nonEmptyRows.map(row => ({
+            ID_LIEK: row.ID_LIEK,
+            NAZOV: row.NAZOV,
+            requestedAmount: inputValues[row.ID_LIEK]
+        }));
+
+        console.log(selectedData);
+
+        const transformedData = selectedData.map(row => ({
+            id: row.ID_LIEK,
+            name: row.NAZOV,
+            amount: row.requestedAmount
+        }));
+
+        let formattedString = JSON.stringify(transformedData);
+
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                zoznam_liekov: formattedString,
+                id_nemocnice: selectedHospital.ID_NEMOCNICE,
+                user_id: userDataHelper.UserInfo.userid
+            }),
+        };
+        const response = await fetch(`presuny/createHospTransfer`, requestOptions).catch((err) =>
+            console.log(err)
+        );
+
     }
 
     //Function for searching medication in selected hospital
@@ -170,7 +210,6 @@ export default function WarehouseTransfers() {
                 console.log(data);
                 setHospitalMedication(data);
             });
-        //@TODO change visibality of previoud DIALOG and show new table for this with all medications
     }
 
     //Function for updating
@@ -212,7 +251,7 @@ export default function WarehouseTransfers() {
     const handleInputChange = (event, rowData) => {
         const { value } = event.target;
         const { ID_LIEK, POCET } = rowData;
-        const numericValue = Math.min(parseInt(value.replace(/\D/g, ''), 10), POCET);
+        const numericValue = value === '' ? '' : Math.min(parseInt(value.replace(/\D/g, ''), 10), POCET);
         setInputValues(prevState => ({
             ...prevState,
             [ID_LIEK]: numericValue
@@ -290,7 +329,8 @@ export default function WarehouseTransfers() {
                     paginator={true}
                     paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                     currentPageReportTemplate="Zobrazuje sa {first} - {last} z celkových {totalRecords} záznamov"
-                    rowsPerPageOptions={[10, 15, 20]}
+                    rows={10}
+                    rowsPerPageOptions={[15, 20]}
                 >
                     <Column
                         field="ID_LIEK"
@@ -319,9 +359,9 @@ export default function WarehouseTransfers() {
                         body={(rowData) => (
                             <input
                                 type="text"
-                                defaultValue={inputValues[rowData.ID_LIEK] || '0'}
+                                value={inputValues[rowData.ID_LIEK] || ''}
                                 onChange={(e) => handleInputChange(e, rowData)}
-                                pattern="[0-9]*"
+                                pattern="[0-9]*" // Allow only numeric input
                                 inputMode="numeric"
                             />
                         )}
@@ -426,7 +466,7 @@ export default function WarehouseTransfers() {
 
             <Dialog
                 visible={showDialog && dialog}
-                style={{ width: "50vw" }}
+                style={{ width: "40vw" }}
                 footer={NaN} //productDialogFooter
                 onHide={() => onHide()}
             >
@@ -439,6 +479,7 @@ export default function WarehouseTransfers() {
                         <h3>Zoznam objednaných liekov</h3>
                         {xmlContent.map((item, index) => (
                             <div key={index}>
+                                <h4>ID lieku: {item.id}</h4>
                                 <p>Názov: {item.name}</p>
                                 <p>Počet: {item.amount}</p>
                             </div>

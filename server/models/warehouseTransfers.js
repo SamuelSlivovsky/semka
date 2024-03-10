@@ -54,7 +54,6 @@ async function getWarehouses() {
 async function getHospitalMedication(id) {
     try {
         let conn = await database.getConnection();
-        //@TODO change select
         const sqlStatement = `SELECT LIEK.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
            (SKLAD.CELKOVY_POCET - SKLAD.MINIMALNY_POCET) AS POCET FROM SKLAD
             JOIN LIEK ON SKLAD.ID_LIEK = LIEK.ID_LIEK
@@ -72,10 +71,31 @@ async function getHospitalMedication(id) {
     }
 }
 
+async function createHospTransfer(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `begin
+                    insert_hospital_transfer(:zoz_liek, :id_nem_pos, :usr_id);
+                end;`;
+        console.log(body);
+        let result = await conn.execute(sqlStatement, {
+            zoz_liek: body.zoznam_liekov,
+            id_nem_pos: body.id_nemocnice,
+            usr_id: body.user_id
+        });
+
+        console.log("Rows inserted " + result.rowsAffected);
+    } catch (err) {
+        console.log("Error Model");
+        console.log(err);
+    }
+}
+
 module.exports = {
     getFinishedTransfers,
     getWaitingTransfers,
     getListTransfers,
     getWarehouses,
-    getHospitalMedication
+    getHospitalMedication,
+    createHospTransfer
 };
