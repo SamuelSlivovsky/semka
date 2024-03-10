@@ -2,6 +2,7 @@ const bcrypt = require("bcrypt");
 const userModel = require("../models/user");
 var jwt = require("jsonwebtoken");
 const sklad = require("../models/sklad");
+const logy = require("../models/log_table");
 require("dotenv").config();
 
 const handleRegister = async (req, res) => {
@@ -156,22 +157,36 @@ const handleRefreshToken = async (req, res) => {
     });
 };
 
+const insertLog = async (req, res) => {
+    const logy = require("../models/log_table");
+    (async () => {
+        ret_val = await logy.insertLogFailedLogin(req.body);
+        res.status(200);
+    })().catch((err) => {
+        console.log("Error Kontroler");
+        console.error(err);
+        res.status(500).send(err);
+    });
+};
+
+const getLogs = async (req, res) => {
+    const logy = require("../models/log_table");
+    (async () => {
+        ret_val = await logy.getLogs();
+        res.status(200).json(ret_val);
+    })().catch((err) => {
+        console.log("Error Kontroler");
+        console.error(err);
+        res.status(500).send(err);
+    });
+};
+
 
 module.exports = {
     handleRegister,
     handleLogin,
     handleLogout,
     handleRefreshToken,
-    //TODO PRIDAT CONNECT NA TAB. LOGY
-    insertLog: (req, res) => {
-        const logy = require("../models/logy");
-        (async () => {
-            ret_val = await logy.insertLog(req.body);
-            res.status(200);
-        })().catch((err) => {
-            console.log("Error Kontroler");
-            console.error(err);
-            res.status(500).send(err);
-        });
-    },
+    insertLog,
+    getLogs,
 };

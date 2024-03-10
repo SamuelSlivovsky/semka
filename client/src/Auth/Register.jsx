@@ -4,6 +4,7 @@ import {InputText} from "primereact/inputtext";
 import {Button} from "primereact/button";
 import {Password} from "primereact/password";
 import {Dialog} from "primereact/dialog";
+import {Dropdown} from "primereact/dropdown";
 import {classNames} from "primereact/utils";
 import {InputMask} from "primereact/inputmask";
 import {useNavigate} from "react-router";
@@ -48,15 +49,24 @@ export const Register = () => {
         fetch("/auth/register", requestOptions)
             .then((response) => response.json())
             .then((res) => {
-                if (res.message !== undefined) {
-                    navigate("/logout");
-                    navigate("/register")
-                    toast.current.show({severity: 'error', summary: res.message, life: 999999999});
+                if(token){
+                    if (res.message !== undefined) {
+                        toast.current.show({severity: 'error', summary: res.message, life: 999999999});
+                    } else {
+                        toast.current.show({severity: 'success', summary: "Registrácia prebehla úspešne", life: 999999999});
+                    }
                 } else {
-                    localStorage.setItem("hospit-user", res.accessToken);
-                    navigate("/");
-                    window.location.reload();
+                    if (res.message !== undefined) {
+                        navigate("/logout");
+                        navigate("/register")
+                        toast.current.show({severity: 'error', summary: res.message, life: 999999999});
+                    } else {
+                        localStorage.setItem("hospit-user", res.accessToken);
+                        navigate("/");
+                        window.location.reload();
+                    }
                 }
+
             });
         reset();
     };
@@ -175,26 +185,26 @@ export const Register = () => {
                     </div>
                     {(() => {
                         if (token) {
+                            let zoznamRoly = ["Lekár", "Sestra","Primár","Záchranár","Skladník","Upratovačka","Sanitár", "Laborant", "Lekárnik", "Manažér Lekárne"];
+                            let roleOptions = zoznamRoly.map((role, index) => ({label: role, value: index + 1}));
                             return (<div className="field">
                                 <span className="p-float-label">
-                                    <Controller
-                                        name="role"
-                                        control={control}
-                                        rules={{
-                                            required: "Zadaj rolu", pattern: {
-                                                value: /^\d+$/,
-                                                message: "Rola môže obsahovať iba číslice.",
-                                            }
-                                        }}
-                                        render={({field, fieldState}) => (
-                                            <InputText
-                                                id={field.name}
-                                                {...field}
-                                                className={classNames({
-                                                    "p-invalid": fieldState.invalid,
-                                                })}
-                                            />)}
-                                    />
+                                   <Controller
+                                       name="role"
+                                       control={control}
+                                       rules={{required: "Zadaj rolu"}}
+                                       render={({field, fieldState}) => (
+                                           <Dropdown
+                                               id={field.name}
+                                               {...field}
+                                               options={roleOptions}
+                                               onChange={(e) => {
+                                                   field.onChange(e.value);
+                                               }}
+                                               className={classNames({"p-invalid": fieldState.invalid})}
+                                           />
+                                       )}
+                                   />
                                     <label
                                         htmlFor="role"
                                         className={classNames({"p-error": errors.role})}>Rola*

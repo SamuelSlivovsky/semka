@@ -11,6 +11,7 @@ const verifyJWT = require("./middleware/verifyJWT");
 const credentials = require("./middleware/credentials");
 // ROUTES
 const lekarRoute = require("./routes/lekarRoute");
+const logRoute = require("./routes/logRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
 const patientRoute = require("./routes/patientRoute");
@@ -37,9 +38,9 @@ app.use(
 );
 
 app.use(cookieParser()); // Middleware for cookies
-
 app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
+app.use("/logs", logRoute);
 app.use("/sklad", storageRoute);
 app.use("/lekar", lekarRoute);
 app.use("/selects", selectsRoute);

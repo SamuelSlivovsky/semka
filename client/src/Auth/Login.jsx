@@ -48,7 +48,29 @@ export const Login = () => {
             .then((response) => response.json())
             .then((res) => {
                 if (res.message !== undefined) {
-                    fetch("")
+                    const requestLogOptions = {
+                        method: "POST",
+                        headers: {"Content-Type": "application/json"},
+                        body: JSON.stringify({
+                            userid: data.userid,
+                            pwd: data.password,
+                            ip: logDetails,
+                            status: "failed login",
+                        }),
+                    };
+                    fetch("/auth/logData", requestLogOptions)
+                        .then((response) => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then((res) => {
+                            console.log(res);
+                        })
+                        .catch((error) => {
+                            console.log('There was a problem with the fetch operation: ' + error.message);
+                        });
                     navigate("/logout");
                     navigate("/login")
                     toast.current.show({severity: 'error', summary: res.message, life: 999999999});
