@@ -232,11 +232,17 @@ export default function PrescriptionCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "70rem", height: "45rem" }}
+          style={{ width: "70rem", height: "55rem" }}
           title=<h3>ID receptu: {detail.ID_RECEPTU}</h3>
         >
           {renderDetail("Dátum zapisu: ", detail.DATUM_ZAPISU)}
           {renderDetail("Liek na recept: ", detail.NAZOV_LIEKU)}
+          {renderDetail(
+            "Aktuálny počet  " + detail.NAZOV_LIEKU + " na sklade: ",
+            detail.DOSTUPNY_POCET_NA_SKLADE === null
+              ? "Momentálne nedostupné"
+              : detail.DOSTUPNY_POCET_NA_SKLADE
+          )}
           {renderDetail("Poznámka: ", detail.POZNAMKA)}
           {renderDetail(
             "Recept vydal: ",
