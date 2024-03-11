@@ -185,13 +185,51 @@ export default function PrescriptionCard(props) {
     navigate("/prescriptions");
   };
 
+  const formatDate = (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const handleEditDate = () => {
-    toast.current.show({
-      severity: "success",
-      summary: "Úspech",
-      detail: "Liek na recept bol úspešne vydaný!",
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json",
+    };
+
+    const formattedDate = formatDate(selectedDate);
+
+    fetch(`pharmacyPrescriptions/updateDatumZapisu`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        id_receptu: detail.ID_RECEPTU,
+        datum_prevzatia: formattedDate,
+      }),
+    }).then((res) => {
+      console.log("blbosit 1");
+      if (res.ok) {
+        toast.current.show({
+          severity: "success",
+          summary: "Úspech",
+          detail: "Dátum prevzatia bol úspešne aktualizovaný!",
+        });
+        console.log("blbost");
+        setShowEditDialog(false);
+        redirect();
+      } else {
+        // Handle error response
+        const errorData = res.json();
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: "Nastala chyba pri aktualizácii dátumu prevzatia.",
+        });
+        throw new Error(errorData.message || "Error updating date");
+      }
     });
-    //sendNotificationToPatient(); // Implement this function
   };
 
   const renderCardFooter = () => {
@@ -287,7 +325,6 @@ export default function PrescriptionCard(props) {
           dateFormat="yy-mm-dd"
         />
       </Dialog>
-      {/* Toast component for notifications */}
       <Toast ref={toast} />
     </div>
   );

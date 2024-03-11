@@ -23,4 +23,10 @@ router.get(
   controller.getDetailReceptu
 );
 
+router.post(
+  "/updateDatumZapisu",
+  verify.verifyRoles(0, 10),
+  controller.updateDatumZapisu
+);
+
 module.exports = router;

@@ -70,8 +70,31 @@ async function getDetailReceptu(id) {
   }
 }
 
+async function updateDatumZapisu(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `UPDATE recept SET datum_prevzatia = to_date(:datum_prevzatia, 'YYYY-MM-DD')
+    where id_receptu = :id_receptu`;
+    console.log(body);
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        datum_prevzatia: body.datum_prevzatia,
+        id_receptu: body.id_receptu,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getZoznamAktualnychReceptov,
   getZoznamVydanychReceptov,
   getDetailReceptu,
+  updateDatumZapisu,
 };
