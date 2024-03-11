@@ -63,10 +63,10 @@ export default function PharmacyStorageMedicaments() {
   //   navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
   // };
 
-  const handleClick = (value) => {
-    setShowDialog(true);
-    setSelectedRow(value);
-  };
+  // const handleClick = (value) => {
+  //   setShowDialog(true);
+  //   setSelectedRow(value);
+  // };
 
   // const renderDialogFooter = () => {
   //   return (
@@ -151,7 +151,7 @@ export default function PharmacyStorageMedicaments() {
           paginator
           rows={15}
           selection={selectedRow}
-          onSelectionChange={(e) => handleClick(e.value)}
+          // onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}
           filterDisplay="menu"

@@ -4,7 +4,7 @@ async function getLiekyLekarenskySklad(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT l.nazov as "NAZOV_LIEKU", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE", tl.id_lekarensky_sklad, tl.datum_trvanlivosti, tl.pocet
+      `select DISTINCT l.nazov as "NAZOV_LIEKU", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE", tl.id_lekarensky_sklad, to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET"
       from liek l
       join trvanlivost_lieku tl on (tl.id_liek = l.id_liek)
       join lekarensky_sklad ls on (ls.id_lekarensky_sklad = tl.id_lekarensky_sklad)
@@ -80,5 +80,5 @@ module.exports = {
   getLiekyLekarenskySklad,
   getZdrPomockyLekarenskySklad,
   getSearchLiecivoLekarenskySklad,
-  getSearchZdrPomockaLekarenskySklad
+  getSearchZdrPomockaLekarenskySklad,
 };
