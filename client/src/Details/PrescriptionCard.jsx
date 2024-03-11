@@ -218,7 +218,7 @@ export default function PrescriptionCard(props) {
         setShowEditDialog(false);
         setTimeout(() => {
           redirect();
-        }, 1000);
+        }, 2000);
       } else {
         // Handle error response
         const errorData = res.json();
