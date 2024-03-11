@@ -4,10 +4,17 @@ const controller = require("../controllers/PharmacyPrescriptionsController");
 const verify = require("../middleware/verifyUser");
 
 router.get(
-  "/zoznamReceptov/:id",
+  "/zoznamAktualnychReceptov/:id",
   verify.verifyRoles(0, 10),
   verify.checkForCorrectId(),
-  controller.getZoznamReceptov
+  controller.getZoznamAktualnychReceptov
+);
+
+router.get(
+  "/zoznamVydanychReceptov/:id",
+  verify.verifyRoles(0, 10),
+  verify.checkForCorrectId(),
+  controller.getZoznamVydanychReceptov
 );
 
 router.get(

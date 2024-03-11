@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { TabView, TabPanel } from "primereact/tabview";
 
 export default function TabPrescriptions() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -17,44 +18,48 @@ export default function TabPrescriptions() {
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
-  const [zoznamReceptov, setZoznamReceptov] = useState([]);
+  const [aktualneRecepty, setAktualneRecepty] = useState([]);
+  const [vydaneRecepty, setVydaneRecepty] = useState([]);
   const navigate = useNavigate();
-  // Add a new state to track whether rodne cislo is entered
   const [rodneCisloEntered, setRodneCisloEntered] = useState(false);
 
   useEffect(() => {
-    const token = localStorage.getItem("hospit-user");
-    const userDataHelper = GetUserData(token);
-    const headers = { authorization: "Bearer " + token };
-    fetch(
-      `/pharmacyPrescriptions/zoznamReceptov/${userDataHelper.UserInfo.userid}`,
-      {
-        headers,
-      }
-    )
-      .then((response) => {
-        // Kontrola ci response je ok (status:200)
-        if (response.ok) {
-          return response.json();
-        } else if (response.status === 401) {
-          // Token expiroval redirect na logout
-          toast.current.show({
-            severity: "error",
-            summary: "Session timeout redirecting to login page",
-            life: 999999999,
-          });
-          setTimeout(() => {
-            navigate("/logout");
-          }, 3000);
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+        const headers = { authorization: "Bearer " + token };
+
+        const [aktualneResponse, vydaneResponse] = await Promise.all([
+          fetch(
+            `/pharmacyPrescriptions/zoznamAktualnychReceptov/${userDataHelper.UserInfo.userid}`,
+            { headers }
+          ),
+          fetch(
+            `/pharmacyPrescriptions/zoznamVydanychReceptov/${userDataHelper.UserInfo.userid}`,
+            { headers }
+          ),
+        ]);
+
+        if (!aktualneResponse.ok || !vydaneResponse.ok) {
+          // Handle error (show toast or redirect)
+          return;
         }
-      })
-      .then((data) => {
-        setZoznamReceptov(data);
-        console.log(data);
-      })
-      .finally(() => {
+
+        const aktualneData = await aktualneResponse.json();
+        const vydaneData = await vydaneResponse.json();
+
+        setAktualneRecepty(aktualneData);
+        console.log(aktualneData);
+        setVydaneRecepty(vydaneData);
+      } catch (error) {
+        // Handle error
+      } finally {
         setLoading(false);
-      });
+      }
+    };
+
+    fetchData();
   }, []);
 
   const onHide = () => {
@@ -91,36 +96,22 @@ export default function TabPrescriptions() {
     );
   };
 
-  // const renderHeader = () => {
-  //   return (
-  //     <div className="flex justify-content-between">
-  //       <div className="table-header">
-  //         <span className="p-input-icon-left">
-  //           <i className="pi pi-search" />
-  //           <InputText
-  //             value={globalFilterValue}
-  //             onChange={onGlobalFilterChange}
-  //             placeholder="Vyhľadať"
-  //           />
-  //         </span>
-  //         <div className="ml-4">
-  //           <h2>Predpísané recepty</h2>
-  //         </div>
-  //       </div>
-  //     </div>
-  //   );
-  // };
-
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
-    let _filters = { ...filters };
-    _filters["global"].value = value;
+    const trimmedValue = value.trim();
 
-    // Set the flag if rodne cislo is entered
-    setRodneCisloEntered(value.trim() !== "");
+    if (trimmedValue.length >= 6) {
+      let _filters = { ...filters };
+      _filters["global"].value = trimmedValue;
 
-    setFilters(_filters);
-    setGlobalFilterValue(value);
+      setRodneCisloEntered(true);
+      setFilters(_filters);
+      setGlobalFilterValue(trimmedValue);
+    } else {
+      // Ak je zadaných menej ako šesť čísel, nezobrazujte dáta
+      setRodneCisloEntered(false);
+      setGlobalFilterValue(value);
+    }
   };
 
   useEffect(() => {
@@ -150,7 +141,6 @@ export default function TabPrescriptions() {
     setGlobalFilterValue("");
   };
 
-  // const header = renderHeader();
   return (
     <div>
       <Toast ref={toast} position="top-center" />
@@ -176,77 +166,155 @@ export default function TabPrescriptions() {
           </div>
         ) : (
           <div>
-            <div className="flex justify-content-between">
-              <div className="table-header ml-5">
-                <span className="p-input-icon-left">
-                  <i className="pi pi-search" />
-                  <InputText
-                    value={globalFilterValue}
-                    onChange={onGlobalFilterChange}
-                    placeholder="Vyhľadať"
-                  />
-                </span>
-                <div className="ml-4">
-                  <h2>Predpísané recepty</h2>
+            <TabView>
+              <TabPanel header="Predpísané recepty">
+                <div className="flex justify-content-between">
+                  <div className="table-header ml-5">
+                    <span className="p-input-icon-left">
+                      <i className="pi pi-search" />
+                      <InputText
+                        value={globalFilterValue}
+                        onChange={onGlobalFilterChange}
+                        placeholder="Vyhľadať"
+                      />
+                    </span>
+                    <div className="ml-4">
+                      <h2>Predpísané recepty</h2>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
 
-            {rodneCisloEntered ? (
-              <DataTable
-                value={zoznamReceptov}
-                responsiveLayout="scroll"
-                selectionMode="single"
-                paginator
-                rows={15}
-                selection={selectedRow}
-                onSelectionChange={(e) => handleClick(e.value)}
-                // header={header}
-                filters={filters}
-                filterDisplay="menu"
-                globalFilterFields={[
-                  "ID_RECEPTU",
-                  "ROD_CISLO",
-                  "MENO_PACIENTA",
-                  "PRIEZVISKO_PACIENTA",
-                ]}
-                emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
-              >
-                <Column
-                  field="ID_RECEPTU"
-                  header={"Id receptu"}
-                  filter
-                ></Column>
-                <Column
-                  field="ROD_CISLO"
-                  header={"Rodné číslo pacienta"}
-                  filter
-                ></Column>
-                <Column
-                  field="MENO_PACIENTA"
-                  header={"Meno pacienta"}
-                  filter
-                ></Column>
-                <Column
-                  field="PRIEZVISKO_PACIENTA"
-                  header={"Priezvisko pacienta"}
-                  filter
-                ></Column>
-              </DataTable>
-            ) : (
-              <div
-                style={{
-                  textAlign: "center",
-                  fontSize: "25px",
-                  marginTop: "50vh",
-                  transform: "translateY(-50%)",
-                }}
-              >
-                <p>
-                  Zadajte rodné číslo pacienta pre zobrazenie liekov na predpis!
-                </p>
-              </div>
-            )}
+                {rodneCisloEntered ? (
+                  <DataTable
+                    value={aktualneRecepty}
+                    responsiveLayout="scroll"
+                    selectionMode="single"
+                    paginator
+                    rows={15}
+                    selection={selectedRow}
+                    onSelectionChange={(e) => handleClick(e.value)}
+                    filters={filters}
+                    filterDisplay="menu"
+                    globalFilterFields={[
+                      "ID_RECEPTU",
+                      "ROD_CISLO",
+                      "MENO_PACIENTA",
+                      "PRIEZVISKO_PACIENTA",
+                    ]}
+                    emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+                  >
+                    <Column
+                      field="ID_RECEPTU"
+                      header={"Id receptu"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="ROD_CISLO"
+                      header={"Rodné číslo pacienta"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="MENO_PACIENTA"
+                      header={"Meno pacienta"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="PRIEZVISKO_PACIENTA"
+                      header={"Priezvisko pacienta"}
+                      filter
+                    ></Column>
+                  </DataTable>
+                ) : (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      fontSize: "25px",
+                      marginTop: "35vh",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <p>
+                      Zadajte rodné číslo pacienta pre zobrazenie liekov na
+                      predpis!
+                    </p>
+                  </div>
+                )}
+              </TabPanel>
+
+              <TabPanel header="Vydané recepty">
+                <div className="flex justify-content-between">
+                  <div className="table-header ml-5">
+                    <span className="p-input-icon-left">
+                      <i className="pi pi-search" />
+                      <InputText
+                        value={globalFilterValue}
+                        onChange={onGlobalFilterChange}
+                        placeholder="Vyhľadať"
+                      />
+                    </span>
+                    <div className="ml-4">
+                      <h2>Vydané recepty</h2>
+                    </div>
+                  </div>
+                </div>
+
+                {rodneCisloEntered ? (
+                  <DataTable
+                    value={vydaneRecepty}
+                    responsiveLayout="scroll"
+                    selectionMode="single"
+                    paginator
+                    rows={15}
+                    selection={selectedRow}
+                    onSelectionChange={(e) => handleClick(e.value)}
+                    filters={filters}
+                    filterDisplay="menu"
+                    globalFilterFields={[
+                      "ID_RECEPTU",
+                      "ROD_CISLO",
+                      "MENO_PACIENTA",
+                      "PRIEZVISKO_PACIENTA",
+                    ]}
+                    emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+                  >
+                    <Column
+                      field="ID_RECEPTU"
+                      header={"Id receptu"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="ROD_CISLO"
+                      header={"Rodné číslo pacienta"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="MENO_PACIENTA"
+                      header={"Meno pacienta"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="PRIEZVISKO_PACIENTA"
+                      header={"Priezvisko pacienta"}
+                      filter
+                    ></Column>
+                  </DataTable>
+                ) : (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      fontSize: "25px",
+                      marginTop: "35vh",
+                      transform: "translateY(-50%)",
+                    }}
+                  >
+                    <p>
+                      Zadajte rodné číslo pacienta pre zobrazenie vydaných
+                      receptov!
+                    </p>
+                  </div>
+                )}
+              </TabPanel>
+            </TabView>
           </div>
         )}
       </div>
