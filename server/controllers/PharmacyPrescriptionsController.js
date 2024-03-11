@@ -31,7 +31,7 @@ module.exports = {
     const recept = require("../models/lekaren_recepty");
     (async () => {
       ret_val = await recept.updateDatumZapisu(req.body);
-      res.status(200);
+      res.status(200).json("success");
     })().catch((err) => {
       console.error(err);
       res.status(403).send(err);

@@ -198,7 +198,7 @@ export default function PrescriptionCard(props) {
       Authorization: "Bearer " + token,
       "Content-Type": "application/json",
     };
-
+    console.log("first");
     const formattedDate = formatDate(selectedDate);
 
     fetch(`pharmacyPrescriptions/updateDatumZapisu`, {
@@ -209,16 +209,16 @@ export default function PrescriptionCard(props) {
         datum_prevzatia: formattedDate,
       }),
     }).then((res) => {
-      console.log("blbosit 1");
       if (res.ok) {
         toast.current.show({
           severity: "success",
           summary: "Úspech",
           detail: "Dátum prevzatia bol úspešne aktualizovaný!",
         });
-        console.log("blbost");
         setShowEditDialog(false);
-        redirect();
+        setTimeout(() => {
+          redirect();
+        }, 1000);
       } else {
         // Handle error response
         const errorData = res.json();
@@ -313,7 +313,7 @@ export default function PrescriptionCard(props) {
             <Button
               label="Potvrdiť"
               icon="pi pi-check"
-              onClick={handleEditDate}
+              onClick={() => handleEditDate()}
             />
           </div>
         }
