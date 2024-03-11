@@ -19,6 +19,8 @@ export default function TabPrescriptions() {
   const [loading, setLoading] = useState(true);
   const [zoznamReceptov, setZoznamReceptov] = useState([]);
   const navigate = useNavigate();
+  // Add a new state to track whether rodne cislo is entered
+  const [rodneCisloEntered, setRodneCisloEntered] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -89,30 +91,34 @@ export default function TabPrescriptions() {
     );
   };
 
-  const renderHeader = () => {
-    return (
-      <div className="flex justify-content-between">
-        <div className="table-header">
-          <span className="p-input-icon-left">
-            <i className="pi pi-search" />
-            <InputText
-              value={globalFilterValue}
-              onChange={onGlobalFilterChange}
-              placeholder="Vyhľadať"
-            />
-          </span>
-          <div className="ml-4">
-            <h2>Predpísané recepty</h2>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // const renderHeader = () => {
+  //   return (
+  //     <div className="flex justify-content-between">
+  //       <div className="table-header">
+  //         <span className="p-input-icon-left">
+  //           <i className="pi pi-search" />
+  //           <InputText
+  //             value={globalFilterValue}
+  //             onChange={onGlobalFilterChange}
+  //             placeholder="Vyhľadať"
+  //           />
+  //         </span>
+  //         <div className="ml-4">
+  //           <h2>Predpísané recepty</h2>
+  //         </div>
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
     _filters["global"].value = value;
+
+    // Set the flag if rodne cislo is entered
+    setRodneCisloEntered(value.trim() !== "");
+
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
@@ -144,7 +150,7 @@ export default function TabPrescriptions() {
     setGlobalFilterValue("");
   };
 
-  const header = renderHeader();
+  // const header = renderHeader();
   return (
     <div>
       <Toast ref={toast} position="top-center" />
@@ -169,42 +175,79 @@ export default function TabPrescriptions() {
             />
           </div>
         ) : (
-          <DataTable
-            value={zoznamReceptov}
-            responsiveLayout="scroll"
-            selectionMode="single"
-            paginator
-            rows={15}
-            selection={selectedRow}
-            onSelectionChange={(e) => handleClick(e.value)}
-            header={header}
-            filters={filters}
-            filterDisplay="menu"
-            globalFilterFields={[
-              "ID_RECEPTU",
-              "ROD_CISLO",
-              "MENO_PACIENTA",
-              "PRIEZVISKO_PACIENTA",
-            ]}
-            emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
-          >
-            <Column field="ID_RECEPTU" header={"Id receptu"} filter></Column>
-            <Column
-              field="ROD_CISLO"
-              header={"Rodné číslo pacienta"}
-              filter
-            ></Column>
-            <Column
-              field="MENO_PACIENTA"
-              header={"Meno pacienta"}
-              filter
-            ></Column>
-            <Column
-              field="PRIEZVISKO_PACIENTA"
-              header={"Priezvisko pacienta"}
-              filter
-            ></Column>
-          </DataTable>
+          <div>
+            <div className="flex justify-content-between">
+              <div className="table-header ml-5">
+                <span className="p-input-icon-left">
+                  <i className="pi pi-search" />
+                  <InputText
+                    value={globalFilterValue}
+                    onChange={onGlobalFilterChange}
+                    placeholder="Vyhľadať"
+                  />
+                </span>
+                <div className="ml-4">
+                  <h2>Predpísané recepty</h2>
+                </div>
+              </div>
+            </div>
+
+            {rodneCisloEntered ? (
+              <DataTable
+                value={zoznamReceptov}
+                responsiveLayout="scroll"
+                selectionMode="single"
+                paginator
+                rows={15}
+                selection={selectedRow}
+                onSelectionChange={(e) => handleClick(e.value)}
+                // header={header}
+                filters={filters}
+                filterDisplay="menu"
+                globalFilterFields={[
+                  "ID_RECEPTU",
+                  "ROD_CISLO",
+                  "MENO_PACIENTA",
+                  "PRIEZVISKO_PACIENTA",
+                ]}
+                emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+              >
+                <Column
+                  field="ID_RECEPTU"
+                  header={"Id receptu"}
+                  filter
+                ></Column>
+                <Column
+                  field="ROD_CISLO"
+                  header={"Rodné číslo pacienta"}
+                  filter
+                ></Column>
+                <Column
+                  field="MENO_PACIENTA"
+                  header={"Meno pacienta"}
+                  filter
+                ></Column>
+                <Column
+                  field="PRIEZVISKO_PACIENTA"
+                  header={"Priezvisko pacienta"}
+                  filter
+                ></Column>
+              </DataTable>
+            ) : (
+              <div
+                style={{
+                  textAlign: "center",
+                  fontSize: "25px",
+                  marginTop: "50vh",
+                  transform: "translateY(-50%)",
+                }}
+              >
+                <p>
+                  Zadajte rodné číslo pacienta pre zobrazenie liekov na predpis!
+                </p>
+              </div>
+            )}
+          </div>
         )}
       </div>
       <Dialog
