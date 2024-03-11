@@ -9,6 +9,13 @@ router.get(
   verify.checkForCorrectId(),
   controller.getLekari
 );
+
+router.get(
+  "/zamestnanci/:id",
+  verify.verifyRoles(0, 3),
+  verify.checkForCorrectId(),
+  controller.getZamestnanci
+);
 router.get(
   "/operacie/:id",
   verify.verifyRoles(0, 2, 3),

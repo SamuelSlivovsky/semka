@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
@@ -12,8 +10,6 @@ import GetUserData from "../../Auth/GetUserData";
 export default function TabPatients() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
   const [pacienti, setPacienti] = useState([]);
   const navigate = useNavigate();
 
@@ -30,37 +26,8 @@ export default function TabPatients() {
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const onHide = () => {
-    setShowDialog(false);
-    setSelectedRow(null);
-  };
-
-  const onSubmit = () => {
-    setShowDialog(false);
-    navigate("/patient", { state: selectedRow.ID_PACIENTA });
-  };
-
   const handleClick = (value) => {
     navigate("/patient", { state: value.ID_PACIENTA });
-  };
-
-  const renderDialogFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Zatvoriť"
-          icon="pi pi-times"
-          className="p-button-danger"
-          onClick={() => onHide()}
-        />
-        <Button
-          label="Detail"
-          icon="pi pi-check"
-          onClick={() => onSubmit()}
-          autoFocus
-        />
-      </div>
-    );
   };
 
   const renderHeader = () => {
@@ -116,35 +83,6 @@ export default function TabPatients() {
     setGlobalFilterValue("");
   };
 
-  const getPohlavie = () => {
-    if (selectedRow !== null)
-      return selectedRow.ROD_CISLO.substring(2, 3) === "5" ||
-        selectedRow.ROD_CISLO.substring(2, 3) === "6"
-        ? "Žena"
-        : "Muž";
-  };
-  const getVek = () => {
-    if (selectedRow != null) {
-      let birthDate =
-        "19" +
-        selectedRow.ROD_CISLO.substring(0, 2) +
-        "-" +
-        (selectedRow.ROD_CISLO.substring(2, 4) % 50) +
-        "-" +
-        selectedRow.ROD_CISLO.substring(4, 6);
-
-      birthDate = new Date(birthDate);
-
-      var today = new Date();
-      return getDifferenceInDays(today, birthDate);
-    }
-  };
-
-  const getDifferenceInDays = (date1, date2) => {
-    const diffInMs = Math.abs(date2 - date1);
-    return Math.round(diffInMs / (1000 * 60 * 60 * 24) / 365);
-  };
-
   const statusBodyTemplate = (rowData) => {
     return (
       <Tag
@@ -163,7 +101,6 @@ export default function TabPatients() {
           value={pacienti}
           responsiveLayout="scroll"
           selectionMode="single"
-          selection={selectedRow}
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}

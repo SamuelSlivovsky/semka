@@ -6,6 +6,7 @@ import { ProgressBar } from "primereact/progressbar";
 import { Calendar } from "primereact/calendar";
 import { addLocale } from "primereact/api";
 import { Checkbox } from "primereact/checkbox";
+import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData.jsx";
 import sk from "../locales/sk.json";
 
@@ -20,12 +21,14 @@ export default function Statistics() {
   const [pocetOpe, setPocetOpe] = useState(null);
   const [pocetHosp, setPocetHosp] = useState(null);
   const [pocetVys, setPocetVys] = useState(null);
+  const [doctors, setDoctors] = useState([]);
   const [krv, setKrv] = useState(null);
   const [date, setDate] = useState("");
   const [pacientiVek, setPacientiVek] = useState(null);
   const [pacientiVekOptions, setPacientiVekOptions] = useState(null);
   const [department, setDepartment] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -36,6 +39,16 @@ export default function Statistics() {
       .then((result) => {
         setDepartment(result);
       });
+
+    fetch(`/lekar/lekari/${userId}`, { headers })
+      .then((res) => res.json())
+      .then((result) => {
+        result = result.map((item) => {
+          return { ...item, name: `${item.MENO} ${item.PRIEZVISKO}` };
+        });
+        setSelectedDoctor(result.find((item) => item.CISLO_ZAM == userId));
+        setDoctors(result);
+      });
     addLocale("sk", sk);
   }, []);
 
@@ -43,13 +56,13 @@ export default function Statistics() {
     const token = localStorage.getItem("hospit-user");
     const userId = GetUserData(token).UserInfo.userid;
     const headers = { authorization: "Bearer " + token };
-    if (date !== null) {
+    if (date !== null && selectedDoctor !== null) {
       setRender(true);
       setLoading(true);
       const dateParam = wholeYearCheck
         ? date.getFullYear()
         : `${date.getFullYear()}&${date.getMonth()}`;
-      fetch(`/selects/pomerMuziZeny/${userId}`, { headers })
+      fetch(`/selects/pomerMuziZeny/${selectedDoctor.CISLO_ZAM}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setMuziZeny({
@@ -65,7 +78,9 @@ export default function Statistics() {
           });
         });
 
-      fetch(`/selects/krvneSkupinyOddelenia/${userId}`, { headers })
+      fetch(`/selects/krvneSkupinyOddelenia/${selectedDoctor.CISLO_ZAM}`, {
+        headers,
+      })
         .then((res) => res.json())
         .then((result) => {
           setLoading(false);
@@ -99,44 +114,60 @@ export default function Statistics() {
           });
         });
 
-      fetch(`/selects/pocetZamOddelenia/${userId}/${dateParam}`, {
-        headers,
-      })
+      fetch(
+        `/selects/pocetZamOddelenia/${selectedDoctor.CISLO_ZAM}/${dateParam}`,
+        {
+          headers,
+        }
+      )
         .then((res) => res.json())
         .then((result) => {
           setPocetZam(result[0].POCET_ZAMESTNANCOV);
         });
 
-      fetch(`/selects/pocetOperOddelenia/${userId}/${dateParam}`, {
-        headers,
-      })
+      fetch(
+        `/selects/pocetOperOddelenia/${selectedDoctor.CISLO_ZAM}/${dateParam}`,
+        {
+          headers,
+        }
+      )
         .then((res) => res.json())
         .then((result) => {
           setPocetOpe(result[0].POC_OPERACII);
         });
 
-      fetch(`/selects/pocetHospitOddelenia/${userId}/${dateParam}`, {
-        headers,
-      })
+      fetch(
+        `/selects/pocetHospitOddelenia/${selectedDoctor.CISLO_ZAM}/${dateParam}`,
+        {
+          headers,
+        }
+      )
         .then((res) => res.json())
         .then((result) => {
           setPocetHosp(result[0].POC_HOSPITALIZACII);
         });
 
-      fetch(`/selects/pocetVyseOddelenia/${userId}/${dateParam}`, {
-        headers,
-      })
+      fetch(
+        `/selects/pocetVyseOddelenia/${selectedDoctor.CISLO_ZAM}/${dateParam}`,
+        {
+          headers,
+        }
+      )
         .then((res) => res.json())
         .then((result) => {
           setPocetVys(result[0].POC_VYS);
         });
 
-      fetch(`/selects/pocetPacOddelenia/${userId}`, { headers })
+      fetch(`/selects/pocetPacOddelenia/${selectedDoctor.CISLO_ZAM}`, {
+        headers,
+      })
         .then((res) => res.json())
         .then((result) => {
           setPocetPac(result[0].POCET_PACIENTOV);
         });
-      fetch(`/selects/pocetPacientiPodlaVeku/${userId}`, { headers })
+      fetch(`/selects/pocetPacientiPodlaVeku/${selectedDoctor.CISLO_ZAM}`, {
+        headers,
+      })
         .then((res) => res.json())
         .then((result) => {
           setPacientiVek({
@@ -224,13 +255,28 @@ export default function Statistics() {
               onChange={(e) => {
                 setDate(e.value);
               }}
+              style={{ width: "55%" }}
               locale="sk"
               view={wholeYearCheck ? "year" : "month"}
               dateFormat={wholeYearCheck ? "yy" : "MM yy"}
               readOnlyInput
             />
           </div>
-
+          <div
+            className="field col-4 md:col-3"
+            style={{ height: "62px", display: "flex", alignItems: "center" }}
+          >
+            <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
+              <h2>Vyberte lekára</h2>
+            </label>
+            <Dropdown
+              options={doctors}
+              style={{ width: "50%" }}
+              optionLabel={"name"}
+              value={selectedDoctor}
+              onChange={(e) => setSelectedDoctor(e.value)}
+            />
+          </div>
           <div className="field col-4 md:col-3">
             <Button
               icon="pi pi-check"

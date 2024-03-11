@@ -35,7 +35,7 @@ async function getLekari(pid_lekara) {
                     join os_udaje using(rod_cislo)
                     join nemocnica using(id_nemocnice)
                     left join oddelenie on(zamestnanci.id_oddelenia = oddelenie.id_oddelenia)
-              where oddelenie.id_oddelenia = :id_odd`,
+              where oddelenie.id_oddelenia = :id_odd and id_typ in (1,3)`,
       { id_odd }
     );
 

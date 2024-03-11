@@ -21,6 +21,14 @@ module.exports = {
     })();
   },
 
+  getZamestnanci: (req, res) => {
+    const zamestnanec = require("../models/zamestnanec");
+    (async () => {
+      const lekari = await zamestnanec.getZamestnanci(req.params.id);
+      res.status(200).json(lekari);
+    })();
+  },
+
   getOperacie: (req, res) => {
     const lekar = require("../models/lekar");
     (async () => {
