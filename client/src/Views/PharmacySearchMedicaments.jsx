@@ -51,39 +51,35 @@ export default function PharmacySearchMedicaments() {
       });
   }, []);
 
-  // const onHide = () => {
-  //   setShowDialog(false);
-  //   setSelectedRow(null);
-  // };
-
-  // const onSubmit = () => {
-  //   setShowDialog(false);
-  //   navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
-  // };
-
-  const handleClick = (value) => {
-    setShowDialog(true);
-    setSelectedRow(value);
+  const onHide = () => {
+    setShowDialog(false);
+    setSelectedRow(null);
   };
 
-  // const renderDialogFooter = () => {
-  //   return (
-  //     <div>
-  //       <Button
-  //         label="Zatvoriť"
-  //         icon="pi pi-times"
-  //         className="p-button-danger"
-  //         onClick={() => onHide()}
-  //       />
-  //       <Button
-  //         label="Detail"
-  //         icon="pi pi-check"
-  //         onClick={() => onSubmit()}
-  //         autoFocus
-  //       />
-  //     </div>
-  //   );
-  // };
+  const onSubmit = () => {
+    setShowDialog(false);
+    // navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
+  };
+
+  const handleClick = (value) => {
+    if (value && value.NA_PREDPIS === "N") {
+      setShowDialog(true);
+      setSelectedRow(value);
+    }
+  };
+
+  const renderDialogFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Rezervovať"
+          icon="pi pi-cart-plus"
+          onClick={() => onSubmit()}
+          autoFocus
+        />
+      </div>
+    );
+  };
 
   const renderHeader = () => {
     return (
@@ -128,6 +124,10 @@ export default function PharmacySearchMedicaments() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
+      NA_PREDPIS: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
       DATUM_TRVANLIVOSTI: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
@@ -159,6 +159,7 @@ export default function PharmacySearchMedicaments() {
           globalFilterFields={[
             "NAZOV_LEKARNE",
             "NAZOV_LIEKU",
+            "NA_PREDPIS",
             "DATUM_TRVANLIVOSTI",
             "POCET",
           ]}
@@ -171,6 +172,14 @@ export default function PharmacySearchMedicaments() {
           ></Column>
           <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
           <Column
+            field="NA_PREDPIS"
+            header={"Výdaj"}
+            body={(rowData) =>
+              rowData.NA_PREDPIS === "A" ? "Na predpis" : "Voľnopredajný"
+            }
+            filter
+          ></Column>
+          <Column
             field="DATUM_TRVANLIVOSTI"
             header={"Dátum expirácie"}
             filter
@@ -180,14 +189,21 @@ export default function PharmacySearchMedicaments() {
       </div>
       <Dialog
         header={
-          selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
-            : ""
+          selectedRow != null ? (
+            <div>
+              {selectedRow.NAZOV_LEKARNE}
+              <br />
+              <br />
+              {selectedRow.NAZOV_LIEKU}
+            </div>
+          ) : (
+            ""
+          )
         }
         visible={showDialog}
         style={{ width: "50vw" }}
-        // footer={renderDialogFooter()}
-        // onHide={() => onHide()}
+        footer={renderDialogFooter()}
+        onHide={() => onHide()}
       ></Dialog>
     </div>
   );

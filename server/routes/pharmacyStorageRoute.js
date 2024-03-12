@@ -31,4 +31,11 @@ router.get(
   controller.getSearchZdrPomockaLekarenskySklad
 );
 
+router.get(
+  "/volnyPredajLiekov/:id",
+  verify.verifyRoles(0, 10),
+  verify.checkForCorrectId(),
+  controller.getVolnyPredajLiekov
+);
+
 module.exports = router;

@@ -55,24 +55,50 @@ export default function PharmacyReportCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "40rem", height: "50rem" }}
+          style={{ width: "40rem", height: "55rem" }}
           title={info.NAZOV_LEKARNE}
         >
-          {renderDetail(
-            "Celkový počet zamestnancov: ",
-            info.CELKOVY_POCET_ZAMESTNANCOV
-          )}
+          <div
+            style={{
+              borderRadius: "30px",
+              outlineStyle: "solid",
+              outlineColor: "#14b8a6",
+            }}
+          >
+            {renderDetail(
+              "Celkový počet zamestnancov: ",
+              info.CELKOVY_POCET_ZAMESTNANCOV
+            )}
+          </div>
           {renderDetail("Počet manažérov: ", info.POCET_MANAZEROV)}
           {renderDetail("Počet lekárnikov: ", info.POCET_LEKARNIKOV)}
           {renderDetail("Počet laborantov: ", info.POCET_LABORANTOV)}
-          {renderDetail(
-            "Počet liekov v lekárenskom sklade: ",
-            info.POCET_LIEKOV
-          )}
-          {renderDetail(
-            "Počet zdravotníckych pomôcok v lekárenskom sklade: ",
-            info.POCET_ZDR_POMOCOK
-          )}
+          <div
+            style={{
+              borderRadius: "30px",
+              outlineStyle: "solid",
+              outlineColor: "#14b8a6",
+            }}
+          >
+            {renderDetail(
+              "Počet liekov v lekárenskom sklade: ",
+              info.POCET_LIEKOV
+            )}
+          </div>
+          {renderDetail("Voľnopredajné: ", info.POCET_LIEKOV_VOLNY)}
+          {renderDetail("Na predpis: ", info.POCET_LIEKOV_PREDPIS)}
+          <div
+            style={{
+              borderRadius: "30px",
+              outlineStyle: "solid",
+              outlineColor: "#14b8a6",
+            }}
+          >
+            {renderDetail(
+              "Počet zdravotníckych pomôcok v lekárenskom sklade: ",
+              info.POCET_ZDR_POMOCOK
+            )}
+          </div>
           {/* {renderCardFooter()} */}
         </Card>
       </div>

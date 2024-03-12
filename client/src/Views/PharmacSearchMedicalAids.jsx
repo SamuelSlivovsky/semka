@@ -50,40 +50,33 @@ export default function PharmacSearchMedicalAids() {
       });
   }, []);
 
-  // const onHide = () => {
-  //   setShowDialog(false);
-  //   setSelectedRow(null);
-  // };
+  const onHide = () => {
+    setShowDialog(false);
+    setSelectedRow(null);
+  };
 
-  // const onSubmit = () => {
-  //   setShowDialog(false);
-  //   navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
-  // };
+  const onSubmit = () => {
+    setShowDialog(false);
+    // navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
+  };
 
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
   };
 
-  // const renderDialogFooter = () => {
-  //   return (
-  //     <div>
-  //       <Button
-  //         label="Zatvoriť"
-  //         icon="pi pi-times"
-  //         className="p-button-danger"
-  //         onClick={() => onHide()}
-  //       />
-  //       <Button
-  //         label="Detail"
-  //         icon="pi pi-check"
-  //         onClick={() => onSubmit()}
-  //         autoFocus
-  //       />
-  //     </div>
-  //   );
-  // };
-
+  const renderDialogFooter = () => {
+    return (
+      <div>
+        <Button
+          label="Rezervovať"
+          icon="pi pi-cart-plus"
+          onClick={() => onSubmit()}
+          autoFocus
+        />
+      </div>
+    );
+  };
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -183,14 +176,21 @@ export default function PharmacSearchMedicalAids() {
       </div>
       <Dialog
         header={
-          selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
-            : ""
+          selectedRow != null ? (
+            <div>
+              {selectedRow.NAZOV_LEKARNE}
+              <br />
+              <br />
+              {selectedRow.NAZOV_ZDR_POMOCKY}
+            </div>
+          ) : (
+            ""
+          )
         }
         visible={showDialog}
         style={{ width: "50vw" }}
-        // footer={renderDialogFooter()}
-        // onHide={() => onHide()}
+        footer={renderDialogFooter()}
+        onHide={() => onHide()}
       ></Dialog>
     </div>
   );

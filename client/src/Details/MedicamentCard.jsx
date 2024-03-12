@@ -22,6 +22,7 @@ export default function MedicamentCard(props) {
       .then((response) => response.json())
       .then((data) => {
         setDetail(...data);
+        console.log(data);
       });
   }, []); //
 

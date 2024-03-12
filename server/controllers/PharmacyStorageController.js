@@ -40,4 +40,12 @@ module.exports = {
       res.status(200).json(result);
     })();
   },
+
+  getVolnyPredajLiekov: (req, res) => {
+    const volnyPredajLiekov = require("../models/lekarensky_sklad");
+    (async () => {
+      result = await volnyPredajLiekov.getVolnyPredajLiekov(req.params.id);
+      res.status(200).json(result);
+    })();
+  },
 };

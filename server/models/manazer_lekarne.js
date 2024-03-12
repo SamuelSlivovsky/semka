@@ -120,7 +120,7 @@ async function getPouzivatelInfo(id) {
     let conn = await database.getConnection();
     const info = await conn.execute(
       `select os_udaje.meno, os_udaje.priezvisko, os_udaje.rod_cislo, os_udaje.ulica, os_udaje.PSC, mesto.nazov as "NAZOV_MESTA", okres.nazov_okresu,
-      kraj.nazov_kraja, zamestnanci.cislo_zam, zamestnanci.id_typ, to_char(zamestnanci.dat_od, 'DD.MM.YYYY HH24:MI:SS') AS "DAT_OD", typ_zam.nazov as "NAZOV_ROLE", lekaren.nazov as "NAZOV_LEKARNE"
+      kraj.nazov_kraja, zamestnanci.cislo_zam, zamestnanci.id_typ, to_char(zamestnanci.dat_od, 'DD.MM.YYYY') AS "DAT_OD", typ_zam.nazov as "NAZOV_ROLE", lekaren.nazov as "NAZOV_LEKARNE"
       from zamestnanci
       join os_udaje on (os_udaje.rod_cislo = zamestnanci.rod_cislo)
       join mesto on (mesto.PSC = os_udaje.PSC)
@@ -158,7 +158,8 @@ async function getDetailLieku(id) {
   try {
     let conn = await database.getConnection();
     const detail = await conn.execute(
-      `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis
+      `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", l.typ, l.davkovanie, l.mnozstvo,
+      ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis
       from  liek l 
       join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
       join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
@@ -202,16 +203,18 @@ async function getReportInfo(id) {
   try {
     let conn = await database.getConnection();
     const info = await conn.execute(
-      `select NAZOV_LEKARNE, (POCET_MANAZEROV + POCET_LEKARNIKOV + POCET_LABORANTOV) as "CELKOVY_POCET_ZAMESTNANCOV", 
-      POCET_MANAZEROV, POCET_LEKARNIKOV, POCET_LABORANTOV, POCET_ZDR_POMOCOK, POCET_LIEKOV
+      `select distinct NAZOV_LEKARNE, (POCET_MANAZEROV + POCET_LEKARNIKOV + POCET_LABORANTOV) as "CELKOVY_POCET_ZAMESTNANCOV", 
+      POCET_MANAZEROV, POCET_LEKARNIKOV, POCET_LABORANTOV, POCET_ZDR_POMOCOK, POCET_LIEKOV, POCET_LIEKOV_VOLNY, POCET_LIEKOV_PREDPIS
       from
       (
           select l.id_lekarne, l.nazov as "NAZOV_LEKARNE",
           count(distinct manazer.cislo_zam) as "POCET_MANAZEROV",
           count(distinct lekarnik.cislo_zam) as "POCET_LEKARNIKOV",
           count(distinct laborant.cislo_zam) as "POCET_LABORANTOV",
-          count(distinct tzp.datum_trvanlivosti) as "POCET_ZDR_POMOCOK",
-          count(distinct tl.datum_trvanlivosti) as "POCET_LIEKOV"
+          count(tzp.datum_trvanlivosti) as "POCET_ZDR_POMOCOK",
+          count(tl.datum_trvanlivosti) as "POCET_LIEKOV",
+          count(volnopredajny.na_predpis) as "POCET_LIEKOV_VOLNY",
+          count(predpis.na_predpis) as "POCET_LIEKOV_PREDPIS"
           from lekaren l
           join zamestnanci manazer on (manazer.id_lekarne = l.id_lekarne)
           join zamestnanci lekarnik on (lekarnik.id_lekarne = l.id_lekarne and lekarnik.id_lekarne = manazer.id_lekarne)
@@ -219,7 +222,11 @@ async function getReportInfo(id) {
           left join lekarensky_sklad ls on (ls.id_lekarne = l.id_lekarne)
           left join trvanlivost_zdr_pomocky tzp on (tzp.id_lekarensky_sklad = ls.id_lekarensky_sklad)
           left join trvanlivost_lieku tl on (tl.id_lekarensky_sklad = ls.id_lekarensky_sklad)
-          where manazer.cislo_zam = :id and lekarnik.id_typ = 9 and laborant.id_typ = 8
+          left join trvanlivost_lieku tlv on (tlv.id_lekarensky_sklad = ls.id_lekarensky_sklad)
+          left join liek volnopredajny on (volnopredajny.id_liek = tlv.id_liek and volnopredajny.na_predpis = 'N')
+          left join trvanlivost_lieku tlp on (tlp.id_lekarensky_sklad = ls.id_lekarensky_sklad)
+          left join liek predpis on (predpis.id_liek = tlp.id_liek and predpis.na_predpis = 'A')
+          where manazer.cislo_zam = :id and lekarnik.id_typ = 9 and laborant.id_typ = 8  
           group by l.id_lekarne, l.nazov
       )`,
       [id]

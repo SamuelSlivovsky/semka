@@ -127,6 +127,10 @@ export default function PharmacyStorageMedicaments() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
+      NA_PREDPIS: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
       DATUM_TRVANLIVOSTI: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
@@ -155,10 +159,23 @@ export default function PharmacyStorageMedicaments() {
           header={header}
           filters={filters}
           filterDisplay="menu"
-          globalFilterFields={["NAZOV_LIEKU", "DATUM_TRVANLIVOSTI", "POCET"]}
+          globalFilterFields={[
+            "NAZOV_LIEKU",
+            "NA_PREDPIS",
+            "DATUM_TRVANLIVOSTI",
+            "POCET",
+          ]}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
           <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
+          <Column
+            field="NA_PREDPIS"
+            header={"Výdaj"}
+            body={(rowData) =>
+              rowData.NA_PREDPIS === "A" ? "Na predpis" : "Voľnopredajný"
+            }
+            filter
+          ></Column>
           <Column
             field="DATUM_TRVANLIVOSTI"
             header={"Dátum expirácie"}
