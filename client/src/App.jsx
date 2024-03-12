@@ -81,7 +81,6 @@ function App() {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setNotifications(data.POCET);
         });
     });
@@ -448,15 +447,11 @@ function App() {
             userData !== null &&
             userData.UserInfo.role === 2 ? (
             renderDoctorRoutes()
-          ) : typeof userData !== "undefined" &&
-            userData !== null &&
-            userData.UserInfo.role === 3 ? (
+          ) : userData && userData.UserInfo.role === 3 ? (
             <>
               {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
-          ) : typeof userData !== "undefined" &&
-            userData !== null &&
-            userData.UserInfo.role === 4 ? (
+          ) : userData && userData.UserInfo.role === 4 ? (
             renderPatientRoutes()
           ) : typeof userData !== "undefined" &&
           userData !== null &&

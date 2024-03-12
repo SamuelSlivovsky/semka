@@ -392,11 +392,18 @@ async function getReceptyAdmin() {
 }
 
 async function getZdravZaznamy(pid_pacienta) {
-    try {
-        let conn = await database.getConnection();
-        const zdravZaznamy = await conn.execute(
-            `select id_zaznamu as "id_zaz", to_char(datum, 'DD.MM.YYYY') DATUM, get_typ_zdrav_zaznamu(id_zaznamu) as typ   
+  try {
+    let conn = await database.getConnection();
+    const zdravZaznamy = await conn.execute(
+      `select id_zaznamu as "id_zaz", to_char(datum, 'DD.MM.YYYY') DATUM,prepustacia_sprava, 
+       case when id_hosp is not null then 
+       nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY HH24:MI:SS'),'Neukončená') 
+       else null end
+       as dat_do,
+       hospitalizacia.dat_do as unformated_dat_do , get_typ_zdrav_zaznamu(id_zaznamu) as typ,
+       id_hosp
           from zdravotny_zaz 
+          left join hospitalizacia using (id_zaznamu)   
           join zdravotna_karta using(id_karty)
             where id_pacienta = :pid_pacienta
                   order by zdravotny_zaz.datum desc`,
@@ -491,28 +498,60 @@ async function getTypyZTPAdmin() {
 }
 
 async function insertPacient(body) {
-    try {
-        let conn = await database.getConnection();
-        const sqlStatement = `BEGIN
-    pacient_insert(:meno, :priezvisko, :psc, :rod_cislo, :id_lekara, :ulica, :dat_od, :dat_do);
+  try {
+    let conn = await database.getConnection();
+    let sqlStatement;
+    let result;
+    if (!body.cudzinec) {
+      sqlStatement = `BEGIN
+    pacient_insert(:meno, :priezvisko, :psc, :rod_cislo, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi);
     END;`;
-
-        let result = await conn.execute(sqlStatement, {
-            rod_cislo: body.rod_cislo,
-            meno: body.meno,
-            priezvisko: body.priezvisko,
-            rod_cislo: body.rod_cislo,
-            psc: body.psc,
-            id_lekara: body.id_lekara,
-            ulica: body.ulica,
-            dat_od: body.dat_od,
-            dat_do: body.dat_do,
-        });
-
-        console.log("Rows inserted " + result.rowsAffected);
-    } catch (err) {
-        throw new Error("Database error: " + err);
+      result = await conn.execute(sqlStatement, {
+        rod_cislo: body.rod_cislo,
+        meno: body.meno,
+        priezvisko: body.priezvisko,
+        psc: body.psc,
+        id_lekara: body.id_lekara,
+        ulica: body.ulica,
+        dat_od: body.dat_od,
+        dat_do: body.dat_do,
+        typ_krvi: body.typ_krvi,
+      });
+    } else {
+      sqlStatement = `BEGIN
+    cudzinec_insert(:meno, :priezvisko, :psc, :dat_narodenia,:pohlavie, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi);
+    END;`;
+      result = await conn.execute(sqlStatement, {
+        meno: body.meno,
+        priezvisko: body.priezvisko,
+        psc: body.psc,
+        dat_narodenia: body.dat_narodenia,
+        pohlavie: body.pohlavie,
+        id_lekara: body.id_lekara,
+        ulica: body.ulica,
+        dat_od: body.dat_od,
+        dat_do: body.dat_do,
+        typ_krvi: body.typ_krvi,
+      });
     }
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function updateTimeOfDeath(body) {
+  try {
+    let conn = await database.getConnection();
+    await conn.execute(
+      `update pacient set datum_umrtia = to_date(to_char(to_timestamp(:datum_umrtia,'DD/MM/YYYY HH24:MI:SS'),
+      'DD/MM/YYYY HH24:MI:SS')) where id_pacienta = :id_pacienta`,
+      { datum_umrtia: body.datum_umrtia, id_pacienta: body.id_pacienta },
+      { autoCommit: true }
+    );
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 module.exports = {
@@ -539,4 +578,5 @@ module.exports = {
     insertPacient,
     getIdPacienta,
     getOckovania,
+  updateTimeOfDeath,
 };

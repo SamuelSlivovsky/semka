@@ -102,6 +102,30 @@ module.exports = {
     });
   },
 
+  insertKonzilium: (req, res) => {
+    const konzilium = require("../models/konzilium");
+    (async () => {
+      ret_val = await konzilium.insertKonzilium(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
+
+  insertKonziliumUser: (req, res) => {
+    const konzilium = require("../models/konzilium");
+    (async () => {
+      ret_val = await konzilium.insertKonziliumUser(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
+
   getObce: (req, res) => {
     const obec = require("../models/obec");
     (async () => {
