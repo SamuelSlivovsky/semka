@@ -29,7 +29,7 @@ export default function ErrorLogs() {
                 // Kontrola ci response je ok (status:200)
                 if (response.ok) {
                     return response.json();
-                } else if (response.status === 401) {
+                } else if (response.status === 410) {
                     // Token expiroval redirect na logout
                     toast.current.show({
                         severity: 'error',
