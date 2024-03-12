@@ -14,11 +14,26 @@ import {Toast} from 'primereact/toast';
 import {InputNumber} from "primereact/inputnumber";
 import GetUserData from "./GetUserData";
 import user from "../Views/User";
+import {Divider} from 'primereact/divider';
 
 
 export const Register = () => {
     const [showMessage, setShowMessage] = useState(false);
     const [formData, setFormData] = useState({});
+    const header = <div className="font-bold mb-3">Zadaj heslo</div>;
+    const footer = (
+        <>
+            <Divider/>
+            <p className="mt-2">Musi obsahovat</p>
+            <ul className="pl-2 ml-2 mt-0 line-height-3">
+                <li>Aspoň jedno malé písmeno</li>
+                <li>Aspoň jedno veľké písmeno</li>
+                <li>Aspoň jeden číselný údaj</li>
+                <li>Aspoň jeden špeciálny znak</li>
+                <li>Minimálne 8 znakov</li>
+            </ul>
+        </>
+    );
     const navigate = useNavigate();
     const toast = useRef(null);
     const token = localStorage.getItem("hospit-user");
@@ -52,11 +67,15 @@ export const Register = () => {
         fetch("/auth/register", requestOptions)
             .then((response) => response.json())
             .then((res) => {
-                if(token && userDataHelper.UserInfo.role === 0){
+                if (token && userDataHelper.UserInfo.role === 0) {
                     if (res.message !== undefined) {
                         toast.current.show({severity: 'error', summary: res.message, life: 999999999});
                     } else {
-                        toast.current.show({severity: 'success', summary: "Registrácia prebehla úspešne", life: 999999999});
+                        toast.current.show({
+                            severity: 'success',
+                            summary: "Registrácia prebehla úspešne",
+                            life: 999999999
+                        });
                     }
                 } else {
                     if (res.message !== undefined) {
@@ -73,7 +92,6 @@ export const Register = () => {
             });
         reset();
     };
-
     const getFormErrorMessage = (name) => {
         return (errors[name] && <small className="p-error">{errors[name].message}</small>);
     };
@@ -188,7 +206,7 @@ export const Register = () => {
                     </div>
                     {(() => {
                         if (token && userDataHelper.UserInfo.role === 0) {
-                            let zoznamRoly = ["Lekár", "Sestra","Primár","Záchranár","Skladník","Upratovačka","Sanitár", "Laborant", "Lekárnik", "Manažér Lekárne"];
+                            let zoznamRoly = ["Lekár", "Sestra", "Primár", "Záchranár", "Skladník", "Upratovačka", "Sanitár", "Laborant", "Lekárnik", "Manažér Lekárne"];
                             let roleOptions = zoznamRoly.map((role, index) => ({label: role, value: index + 1}));
                             return (<div className="field">
                                 <span className="p-float-label">
@@ -226,16 +244,29 @@ export const Register = () => {
                 <Controller
                     name="password"
                     control={control}
-                    rules={{required: "Heslo je povinné."}}
-                    render={({field, fieldState}) => (<Password
-                        id={field.name}
-                        {...field}
-                        toggleMask
-                        className={classNames({
-                            "p-invalid": fieldState.invalid,
-                        })}
-                        header={passwordHeader}
-                    />)}
+                    rules={{
+                        required: "Heslo je povinné",
+                        minLength: {
+                            value: 8,
+                            message: "Heslo musí mať aspoň 8 znakov",
+                        },
+                        pattern: {
+                            value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                            message: "Heslo musí obsahovať aspoň jedno veľké písmeno, jedno špeciálne znak a jedno číslo",
+                        },
+                    }}
+                    render={({field, fieldState}) => (
+                        <Password
+                            id={field.name}
+                            {...field}
+                            toggleMask
+                            header={header}
+                            footer={footer}
+                            className={classNames({
+                                "p-invalid": fieldState.invalid,
+                            })}
+                        />
+                    )}
                 />
                 <label
                     htmlFor="password"
@@ -249,7 +280,9 @@ export const Register = () => {
                             if (token && userDataHelper.UserInfo.role === 0) {
                                 return null
                             } else {
-                                return <a href="login">Máte už vytvorený účet?</a>
+                                return <div>
+                                    <a href="login">Máte už vytvorený účet?</a>
+                                </div>
                             }
                         })()}
                     </div>

@@ -22,7 +22,7 @@ export default function ErrorLogs() {
         const token = localStorage.getItem("hospit-user");
         const userDataHelper = GetUserData(token);
         const headers = {authorization: "Bearer " + token};
-        fetch(`/logs/getLogs`, {
+        fetch(`logs/getLogs`, {
             headers,
         })
             .then((response) => {
@@ -33,7 +33,7 @@ export default function ErrorLogs() {
                     // Token expiroval redirect na logout
                     toast.current.show({
                         severity: 'error',
-                        summary: "Session timeout redirecting to login page",
+                        summary: "Časový limit relácie vypršal presmerovanie na prihlasovaciu stránku",
                         life: 999999999
                     });
                     setTimeout(() => {

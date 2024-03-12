@@ -10,19 +10,30 @@ const handleRegister = async (req, res) => {
     if (!userid || !pwd)
         return res
             .status(400)
-            .json({message: "Username and password are required."});
-    // check for duplicate usernames in the db
+            .json({message: "Vyžaduje sa používateľské meno a heslo."});
 
+    if (pwd.length < 8){
+        return res
+            .status(400)
+            .json({message: "Heslo musí mať aspoň 8 znakov."});
+    }
+    if (!pwd.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)){
+        return res
+            .status(400)
+            .json({message: "Heslo musí obsahovať aspoň jedno veľké písmeno, jedno malé písmeno, jednu číslicu a jeden špeciálny znak."});
+    }
+
+    // check for duplicate usernames in the db
     try {
         if (await userModel.userExists(userid)) {
             return res
                 .status(409)
-                .json({message: `User with this name already exist`});
+                .json({message: `Používateľ s týmto menom už existuje`});
             // Kontrola ci uzivatel existuje v pacientoch/zamestnancoch
         } else if (await userModel.userExistsInDB(userid)) {
             return res
                 .status(409)
-                .json({message: `User does not exist in database`});
+                .json({message: `Používateľ neexistuje v databáze`});
         } else {
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
@@ -63,16 +74,34 @@ const handleRegister = async (req, res) => {
 };
 
 const handleLogin = async (req, res) => {
-    const {userid, pwd} = req.body;
-    if (!userid || !pwd)
-        return res
-            .status(400)
-            .json({message: "Username and password are required."});
 
-    if (!(await userModel.userExists(userid)))
+    if (await logy.getNumberOfWrongLogins(req.body.ip)) {
+        return res
+            .status(401)
+            .json({message: "Príliš veľa neúspešných pokusov o prihlásenie z tejto IP adresy. Skúste to prosím neskôr."});
+    }
+    const logbodyFailed = {
+        ...req.body,
+        status: "failed login",
+    }
+    const logbodyWrongParam = {
+        ...req.body,
+        status: "Wrong parameters",
+    }
+
+    const {userid, pwd} = req.body;
+    if (!userid || !pwd) {
+        insertLog(logbodyWrongParam)
         return res
             .status(400)
-            .json({message: "User with this login does not exist"}); //Does not exist
+            .json({message: "Vyžaduje sa používateľské meno a heslo."});
+    }
+    if (!(await userModel.userExists(userid))) {
+        insertLog(logbodyWrongParam)
+        return res
+            .status(400)
+            .json({message: "Používateľ s týmto prihlasovacím menom neexistuje"}); //Does not exist
+    }
 
     const foundUser = await userModel.getUserByUserId(userid);
     const match = await bcrypt.compare(pwd, foundUser.PWD);
@@ -104,7 +133,8 @@ const handleLogin = async (req, res) => {
         res.cookie("jwt", refreshToken, {httpOnly: true}); //1 day httponly cookie is not available to javascript
         res.status(200).json({accessToken}); //store in memory not in local storage
     } else {
-        res.status(409).json({message: "Username or password is invalid"});
+        insertLog(logbodyFailed)
+        res.status(409).json({message: "Používateľské meno alebo heslo je neplatné"});
     }
 };
 
@@ -157,27 +187,15 @@ const handleRefreshToken = async (req, res) => {
     });
 };
 
-const insertLog = async (req, res) => {
+const insertLog = async (body) => {
     const logy = require("../models/log_table");
     (async () => {
-        ret_val = await logy.insertLogFailedLogin(req.body);
-        res.status(200);
+        ret_val = await logy.insertLogFailedLogin(body);
+        return 200;
     })().catch((err) => {
         console.log("Error Kontroler");
         console.error(err);
-        res.status(500).send(err);
-    });
-};
-
-const getLogs = async (req, res) => {
-    const logy = require("../models/log_table");
-    (async () => {
-        ret_val = await logy.getLogs();
-        res.status(200).json(ret_val);
-    })().catch((err) => {
-        console.log("Error Kontroler");
-        console.error(err);
-        res.status(500).send(err);
+        return 500;
     });
 };
 
@@ -188,5 +206,4 @@ module.exports = {
     handleLogout,
     handleRefreshToken,
     insertLog,
-    getLogs,
 };

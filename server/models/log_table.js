@@ -1,7 +1,6 @@
 const database = require("../database/Database");
 
 
-//TODO Pridat export logov do ErrorLogy na admin panely
 async function getLogs() {
     try {
         let conn = await database.getConnection();
@@ -9,6 +8,22 @@ async function getLogs() {
             `select id_logu, to_char(datum,'DD.MM.YYYY HH:MM:SS') datum, tabulka, typ, popis, ip, riadok from log_table order by id_logu`,
         );
         return result.rows;
+    } catch (err) {
+        throw new Error("Database error: " + err);
+    }
+}
+
+async function getNumberOfWrongLogins(ip) {
+    try {
+        let conn = await database.getConnection();
+        const result = await conn.execute(
+            `select count(typ) as pocet from log_table where typ = 'failed login' and ip = :ip and datum > sysdate - 1/24`,
+            {ip}
+        );
+        if (result.rows[0].POCET >= 5){
+            return true;
+        }
+
     } catch (err) {
         throw new Error("Database error: " + err);
     }
@@ -38,4 +53,5 @@ async function insertLogFailedLogin(body) {
 module.exports = {
     insertLogFailedLogin,
     getLogs,
+    getNumberOfWrongLogins,
 };

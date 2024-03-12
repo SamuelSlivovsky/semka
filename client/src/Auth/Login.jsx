@@ -15,11 +15,11 @@ export const Login = () => {
     const navigate = useNavigate();
     const toast = useRef(null);
     const [logDetails, setLogDetails] = useState(null);
+    const oldLogDetails = null;
     const defaultValues = {
         userid: "",
         password: "",
     };
-
     const {
         control,
         formState: {errors},
@@ -42,35 +42,13 @@ export const Login = () => {
             body: JSON.stringify({
                 userid: data.userid,
                 pwd: data.password,
+                ip: logDetails,
             }),
         };
         fetch("/auth/login", requestOptions)
             .then((response) => response.json())
             .then((res) => {
                 if (res.message !== undefined) {
-                    const requestLogOptions = {
-                        method: "POST",
-                        headers: {"Content-Type": "application/json"},
-                        body: JSON.stringify({
-                            userid: data.userid,
-                            pwd: data.password,
-                            ip: logDetails,
-                            status: "failed login",
-                        }),
-                    };
-                    fetch("/auth/logData", requestLogOptions)
-                        .then((response) => {
-                            if (!response.ok) {
-                                throw new Error(`HTTP error! status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then((res) => {
-                            console.log(res);
-                        })
-                        .catch((error) => {
-                            console.log('There was a problem with the fetch operation: ' + error.message);
-                        });
                     navigate("/logout");
                     navigate("/login")
                     toast.current.show({severity: 'error', summary: res.message, life: 999999999});
