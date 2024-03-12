@@ -36,23 +36,25 @@ export default function WarehouseTransfers() {
     //Constants
     const toast = useRef(null);
     const [inputValues, setInputValues] = useState({});
+    const [transfer, setTransfer] = useState(emptyTransfer);
     const [hospitalSearchOption, setHospitalSearchOption] = useState(false);
     const [medicineSearchOption, setMedicineSearchOption] = useState(false);
+    const [drugs, setDrugs] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedHospital, setSelectedHospital] = useState(emptyHospital);
     const [showNewTransfer, setShowNewTransfer] = useState(false);
-    const [newTransferData, setNewTransferData] = useState(null);
     const [waitingTransfers, setWaitingTransfers] = useState(null);
     const [finishedTransfers, setFinishedTransfers] = useState(null);
-    const [selectedData, setSelectedData]= useState(null);
     const [hospitals, setHospitals] = useState([]);
-    const [medications, setMedications] = useState(null);
     const [hospitalMedications, setHospitalMedication] = useState(null);
+    const [medicationsByHospital, setMedicationsByHospital] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [showHospitalMedications, setShowHospitalMedications] = useState(false);
-    const [showHospitalSelection, setShowHospitalSelection] = useState(false);
+    const [showDeleteTransferDialog ,setDeleteTransferDialog] = useState(false);
+    const [showSelectedMedicationsSearch, setShowSelectedMedicationsSearch] = useState(false);
+    const [selectedMedications, setSelectedMedications] = useState([]);
     const [xmlContent, setXmlContent] = useState("");
 
     const dropdownOptions = [
@@ -63,18 +65,21 @@ export default function WarehouseTransfers() {
 
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
-        const userDataHelper = GetUserData(token);
         const headers = { authorization: "Bearer " + token };
 
         //Finished transfers
-        fetch(`presuny/allFin`, { headers })
+        fetch(`/presuny/allFin`, { headers })
             .then((response) => response.json())
             .then((data) => {
                 setFinishedTransfers(data);
             });
+    }, []);
 
+    useEffect(() => {
+        const token = localStorage.getItem("hospit-user");
+        const headers = { authorization: "Bearer " + token };
         //Waiting transfers
-        fetch(`presuny/allWait`, { headers })
+        fetch(`/presuny/allWait`, { headers })
             .then((response) => response.json())
             .then((data) => {
                 setWaitingTransfers(data);
@@ -150,40 +155,97 @@ export default function WarehouseTransfers() {
     //@TODO select needs to be checked, there is some error in searching by hospital
     const getMedicationList = () => {
         const token = localStorage.getItem("hospit-user");
-        const headers = {authorization: "Bearer " + token};
-        /*fetch(`presuny/hospitalMedications/${selectedHospital}`, {headers})
+        const headers = { authorization: "Bearer " + token };
+        fetch(`lieky/all`, { headers })
             .then((response) => response.json())
             .then((data) => {
-                setHospitalMedication(data);
-            });*/
+                console.log(data);
+                setDrugs(data);
+            });
     }
 
-    //@TODO finish this function, it shoud already return rows
+    //Function for creating new Transfer from selected hospital
     async function createHospitalTransfer() {
+        //Transfer from hospital, search option by hospital
         const _transfer = [...waitingTransfers];
         const _tr = {...emptyTransfer};
 
         const nonEmptyRows = hospitalMedications.filter(row => {
             return inputValues[row.ID_LIEK] !== undefined;
         });
+        if(showSelectedMedicationsSearch) {
+            //New transfer for each hospital or warehouse ,search option by medications
 
-        const selectedData = nonEmptyRows.map(row => ({
-            ID_LIEK: row.ID_LIEK,
-            NAZOV: row.NAZOV,
-            requestedAmount: inputValues[row.ID_LIEK]
-        }));
+        } else {
 
-        const transformedData = selectedData.map(row => ({
-            id: row.ID_LIEK,
-            name: row.NAZOV,
-            amount: row.requestedAmount
-        }));
+            const selectedData = nonEmptyRows.map(row => ({
+                ID_LIEK: row.ID_LIEK,
+                NAZOV: row.NAZOV,
+                requestedAmount: inputValues[row.ID_LIEK]
+            }));
 
-        let formattedString = JSON.stringify(transformedData);
+            const transformedData = selectedData.map(row => ({
+                id: row.ID_LIEK,
+                name: row.NAZOV,
+                amount: row.requestedAmount
+            }));
 
+            let formattedString = JSON.stringify(transformedData);
+
+            const token = localStorage.getItem("hospit-user");
+            const userDataHelper = GetUserData(token);
+
+            const requestOptions = {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    authorization: "Bearer " + token,
+                },
+                body: JSON.stringify({
+                    zoznam_liekov: formattedString,
+                    id_nemocnice: selectedHospital.ID_NEMOCNICE,
+                    user_id: userDataHelper.UserInfo.userid
+                }),
+            };
+            if(nonEmptyRows.length > 0) {
+                fetch(`presuny/createHospTransfer`, requestOptions)
+                    .then((response) => response.json())
+                    .then((data) => {
+                        console.log(data);
+
+                        _tr.STATUS = "Neprijata";
+                        _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
+                        _tr.ID_PRESUN = data[0].ID_PRESUN;
+                        _tr.ID_SKLAD_OBJ = data[0].ID_SKLAD_OBJ;
+                        _tr.ID_SKLAD_PRIJ = data[0].ID_SKLAD_PRIJ;
+
+                        _transfer.push(_tr);
+
+                        toast.current.show({
+                            severity: "success",
+                            summary: "Successful",
+                            detail: "Presun bol vytvorený",
+                            life: 3000,
+                        });
+
+                        setShowHospitalMedications(false);
+                        setWaitingTransfers(_transfer);
+                    });
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Musíte zadať požadovaný počet",
+                    life: 3000,
+                });
+            }
+        }
+
+
+    }
+
+    async function deleteTransferFromDB(_transfer) {
         const token = localStorage.getItem("hospit-user");
-        const userDataHelper = GetUserData(token);
-
         const requestOptions = {
             method: "POST",
             headers: {
@@ -191,46 +253,10 @@ export default function WarehouseTransfers() {
                 authorization: "Bearer " + token,
             },
             body: JSON.stringify({
-                zoznam_liekov: formattedString,
-                id_nemocnice: selectedHospital.ID_NEMOCNICE,
-                user_id: userDataHelper.UserInfo.userid
+                id_presun: _transfer.ID_PRESUN
             }),
         };
-        if(nonEmptyRows.length > 0) {
-            fetch(`presuny/createHospTransfer`, requestOptions)
-                .then((response) => response.json())
-                .then((data) => {
-                    console.log(data);
-
-                    let currentDate = new Date();
-                    let day = currentDate.getDate();
-                    let month = currentDate.getMonth() + 1;
-                    let year = currentDate.getFullYear();
-
-                    _tr.DATUM_PRESUNU = day + "." + month + "." + year;
-                    _tr.STATUS = "Neprijata";
-                    _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
-                    _tr.ID_PRESUN = newTransferData.ID_PRESUN;
-                    _tr.ID_SKLAD_OBJ = newTransferData.ID_SKLAD_OBJ;
-                    _tr.ID_SKLAD_PRIJ = newTransferData.ID_SKLAD_PRIJ;
-
-                    _transfer.push(_tr);
-
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Successful",
-                        detail: "Presun bol vytvorený",
-                        life: 3000,
-                    });
-
-                    setShowHospitalMedications(false);
-                    setWaitingTransfers(_transfer);
-                    setNewTransferData(null);
-                });
-        } else {
-
-        }
-
+        const response = await fetch("/presuny/deleteTransfer", requestOptions);
     }
 
     //Function for searching medication in selected hospital
@@ -243,6 +269,31 @@ export default function WarehouseTransfers() {
                 console.log(data);
                 setHospitalMedication(data);
             });
+    }
+
+    const searchSelectedMedications = (selectedDrugs) => {
+        const token = localStorage.getItem("hospit-user");
+        const headers = {authorization: "Bearer " + token};
+        let finishedFetches = 0;
+        const newDataArray = [];
+
+        console.log(selectedDrugs);
+        for (let i = 0; i < selectedDrugs.length; i++) {
+            const medication = selectedDrugs[i];
+            //console.log(`Index ${i}:`, medication);
+            fetch(`/presuny/selectedMedications/${medication.ID_LIEK}`, {headers})
+                .then((response) => response.json())
+                .then((data) => {
+                    if (data.length > 0) {
+                        newDataArray.push(...data);
+                    }
+                    finishedFetches++;
+
+                    if(finishedFetches === selectedDrugs.length) {
+                        setMedicationsByHospital(newDataArray);
+                    }
+                });
+        }
     }
 
     //Function for updating
@@ -258,7 +309,7 @@ export default function WarehouseTransfers() {
         } else if (selectedValue === 'medicine') {
             setMedicineSearchOption(true);
             setHospitalSearchOption(false);
-            if(medications == null) {
+            if(drugs == null) {
                 getMedicationList();
             }
         }
@@ -273,10 +324,39 @@ export default function WarehouseTransfers() {
                 setShowHospitalMedications(true);
                 hideDialog();
             } else {
-                //@TODO Add alert in here
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Musíte vybrať nemocnicu",
+                    life: 3000,
+                });
             }
         } else {
-            //@TODO add check if array is atleast of size 1, if not alert
+            if(selectedMedications.length > 0) {
+                const selectedDrugs = selectedMedications.map((medication) => medication.selectedDrug);
+                const uniqueDrugs = new Set(selectedDrugs);
+                if(selectedDrugs.length !== uniqueDrugs.size) {
+                    //Medications are not unique
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Lieky v zozname musia byť unikátne",
+                        life: 3000,
+                    });
+                } else {
+                    //Selected medications are unique
+                    searchSelectedMedications(selectedDrugs);
+                    setShowSelectedMedicationsSearch(true);
+                    hideDialog();
+                }
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Musíte vybrať aspoň jeden liek",
+                    life: 3000,
+                });
+            }
         }
     }
 
@@ -291,77 +371,65 @@ export default function WarehouseTransfers() {
         }));
     };
 
-    async function newTransferCheck() {
-        const _transfer = [...waitingTransfers];
-        const _tr = {...emptyTransfer};
-
-        const nonEmptyRows = hospitalMedications.filter(row => {
-            return inputValues[row.ID_LIEK] !== undefined;
-        });
-
-        const selectedData = nonEmptyRows.map(row => ({
-            ID_LIEK: row.ID_LIEK,
-            NAZOV: row.NAZOV,
-            requestedAmount: inputValues[row.ID_LIEK]
-        }));
-
-        const transformedData = selectedData.map(row => ({
-            id: row.ID_LIEK,
-            name: row.NAZOV,
-            amount: row.requestedAmount
-        }));
-
-        console.log(selectedData);
-
-        if(nonEmptyRows.length > 0) {
-            let formattedString = JSON.stringify(transformedData);
-            const token = localStorage.getItem("hospit-user");
-            const headers = { authorization: "Bearer " + token };
-
-            await createHospitalTransfer();
-
-            /*fetch(`/presuny/getNewTransferParams/${selectedHospital.ID_NEMOCNICE}`, { headers })
-                .then((response) => response.json())
-                .then((data) => {
-                    setNewTransferData(data);
-
-                    let currentDate = new Date();
-                    let day = currentDate.getDate();
-                    let month = currentDate.getMonth() + 1;
-                    let year = currentDate.getFullYear();
-
-                    _tr.DATUM_PRESUNU = day + "." + month + "." + year;
-                    _tr.STATUS = "Neprijata";
-                    _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
-                    _tr.ID_PRESUN = newTransferData.ID_PRESUN;
-                    _tr.ID_SKLAD_OBJ = newTransferData.ID_SKLAD_OBJ;
-                    _tr.ID_SKLAD_PRIJ = newTransferData.ID_SKLAD_PRIJ;
-
-                    _transfer.push(_tr);
-
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Successful",
-                        detail: "Presun bol vytvorený",
-                        life: 3000,
-                    });
-
-                    setShowHospitalMedications(false);
-                    setWaitingTransfers(_transfer);
-                    setNewTransferData(null);
-                });*/
-
-        } else {
-            toast.current.show({
-                severity: "error",
-                summary: "Error",
-                detail: "Musíte vyplniť požadovaný počet aspoň pre jeden liek",
-                life: 3000,
-            });
-        }
+    const confirmDeleteProduct = (product) => {
+        setTransfer(product);
+        setDeleteTransferDialog(true);
     }
 
-    //@TODO needs to be changed to suit this site
+    const deleteTransfer = () => {
+        let _transfers = waitingTransfers.filter((val) => val.ID_PRESUN !== transfer.ID_PRESUN);
+        deleteTransferFromDB(transfer);
+        setWaitingTransfers(_transfers);
+        setDeleteTransferDialog(false);
+        setTransfer(emptyTransfer);
+        toast.current.show({
+            severity: "success",
+            summary: "Successful",
+            detail: "Presun bol odstránený",
+            life: 3000,
+        });
+    }
+
+    // Function to remove medication from the list
+    const removeMedication = (index) => {
+        const updatedMedications = [...selectedMedications];
+        updatedMedications.splice(index, 1);
+        setSelectedMedications(updatedMedications);
+    };
+
+    // Function to add selected medication to the list
+    const addMedication = () => {
+        setSelectedMedications([...selectedMedications, { medication: "", quantity: 0, id: 0 }]);
+    };
+
+    /*
+    ******************************************************************************************************************
+                                                    Hide functions
+    ******************************************************************************************************************
+    */
+
+    //Selected Order hide
+    const onHide = () => {
+        setXmlContent(null);
+        setShowDialog(false);
+        setSelectedRow(null);
+    };
+
+    //New order hide
+    const hideDialog = () => {
+        setShowNewTransfer(false);
+    };
+
+    const hideDeleteTransferDialog = () => {
+        setDeleteTransferDialog(false);
+    }
+
+    /*
+    ******************************************************************************************************************
+                                                    Functions for content
+    ******************************************************************************************************************
+    */
+
     //New/Delete toolbar function
     const leftToolbarTemplate = () => {
         return (
@@ -373,11 +441,11 @@ export default function WarehouseTransfers() {
                     onClick={openNewTransfer}
                 />
                 <Button
-                    visible={showHospitalMedications}
+                    visible={showHospitalMedications || showSelectedMedicationsSearch}
                     label="Vytvoriť presun"
                     icon="pi pi-check-square"
                     className="p-button-success mr-2"
-                    onClick={newTransferCheck}
+                    onClick={createHospitalTransfer}
                 />
             </React.Fragment>
         );
@@ -400,24 +468,34 @@ export default function WarehouseTransfers() {
         </React.Fragment>
     );
 
-    /*
-    ******************************************************************************************************************
-                                                    Hide functions
-    ******************************************************************************************************************
-    */
-
-    //Selected Order hide
-    const onHide = () => {
-        setXmlContent(null);
-        setShowDialog(false);
-        setSelectedRow(null);
+    const actionBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button
+                    icon="pi pi-trash"
+                    className="p-button-rounded p-button-warning"
+                    onClick={() => confirmDeleteProduct(rowData)}
+                />
+            </React.Fragment>
+        );
     };
 
-    //New order hide
-    const hideDialog = () => {
-        setShowNewTransfer(false);
-        setShowHospitalSelection(false);
-    };
+    const deleteTransferDialogFooter = (
+        <React.Fragment>
+            <Button
+                label="No"
+                icon="pi pi-times"
+                className="p-button-text"
+                onClick={hideDeleteTransferDialog}
+            />
+            <Button
+                label="Yes"
+                icon="pi pi-check"
+                className="p-button-text"
+                onClick={deleteTransfer}
+            />
+        </React.Fragment>
+    );
 
     return (
         <div>
@@ -472,6 +550,63 @@ export default function WarehouseTransfers() {
                 </DataTable>
             </div> : null}
 
+            {showSelectedMedicationsSearch ? <div>
+                <DataTable
+                    value={medicationsByHospital}
+                    dataKey="ID_LIEK"
+                    paginator={true}
+                    paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
+                    currentPageReportTemplate="Zobrazuje sa {first} - {last} z celkových {totalRecords} záznamov"
+                    rows={10}
+                    rowsPerPageOptions={[15, 20]}
+                >
+                    <Column
+                        field="ID_LIEK"
+                        header="Id lieku"
+                        style={{ minWidth: "8rem" }}
+                    ></Column>
+                    <Column
+                        field="NAZOV"
+                        header="Názov lieku"
+                        style={{ minWidth: "16rem" }}
+                    ></Column>
+                    <Column
+                        field="DATUM_TRVANLIVOSTI"
+                        header="Dátum trvanlivosti"
+                        style={{ minWidth: "12rem" }}
+                    ></Column>
+                    <Column
+                        field="ID_SKLAD"
+                        header="ID skladu"
+                        style={{ minWidth: "10rem" }}
+                    ></Column>
+                    <Column
+                        field="NEMOCNICA"
+                        header="Názov nemocnice"
+                        style={{ minWidth: "12rem" }}
+                    ></Column>
+                    <Column
+                        field="POCET"
+                        header="Voľný počet na sklade"
+                        style={{ minWidth: "10rem" }}
+                    ></Column>
+                    <Column
+                        field="Input"
+                        header="Požadovaný počet"
+                        style={{ minWidth: "10rem" }}
+                        body={(rowData) => (
+                            <input
+                                type="text"
+                                value={inputValues[rowData.ID_LIEK] || ''}
+                                onChange={(e) => handleInputChange(e, rowData)}
+                                pattern="[0-9]*" // Allow only numeric input
+                                inputMode="numeric"
+                            />
+                        )}
+                    ></Column>
+                </DataTable>
+            </div> :null}
+
             <TabView>
                 //Tab for pending orders
                 <TabPanel header="Čakajúce objednávky">
@@ -513,7 +648,7 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "10rem" }}
                         ></Column>
                         <Column
-                            body={NaN} //actionBodyTemplate
+                            body={actionBodyTemplate} //actionBodyTemplate
                             style={{ minWidth: "8rem" }}
                         ></Column>
                     </DataTable>
@@ -618,11 +753,62 @@ export default function WarehouseTransfers() {
                 </div> : null}
 
                 {medicineSearchOption ? <div>
-                    <h2>Vyberte si nemocnicu</h2>
+                    <h2>Vyberte si lieky na vyhľadanie</h2>
+                    <div>
+                        {selectedMedications.map((selectedMedication, index) => (
+                            <div key={index} style={{paddingTop: "20px"}}>
+                                <div className="field col">
+                                    <Dropdown
+                                        style={{width: "auto"}}
+                                        value={selectedMedication.selectedDrug}
+                                        options={drugs}
+                                        onChange={(e) => {
+                                            const updatedMedications = [...selectedMedications];
+                                            updatedMedications[index].selectedDrug = e.value;
+                                            setSelectedMedications(updatedMedications);
+                                        }}
+                                        optionLabel="NAZOV"
+                                        placeholder="Vyberte liek"
+                                    />
+                                </div>
+                                <div>
+                                    <Button
+                                        style={{marginLeft: "10px"}}
+                                        icon="pi pi-times"
+                                        onClick={() => removeMedication(index)}
+                                    />
+                                </div>
+                            </div>
+                        ))}
+                    <div className={"submit-button"}>
+                        <Button style={{width: "15%"}} label="+" onClick={addMedication} />
+                    </div>
+                        </div>
                 </div> : null}
                 {hospitalSearchOption || medicineSearchOption ? <div className={"submit-button"}>
                     <Button style={{width: "50%"}} label="Vyhľadať" onClick={searchMedication} />
                 </div> : null}
+            </Dialog>
+
+            <Dialog
+                visible={showDeleteTransferDialog}
+                style={{ width: "450px" }}
+                header="Confirm"
+                modal
+                footer={deleteTransferDialogFooter}
+                onHide={hideDeleteTransferDialog}
+            >
+                <div className="confirmation-content">
+                    <i
+                        className="pi pi-exclamation-triangle mr-3"
+                        style={{ fontSize: "2rem" }}
+                    />
+                    {transfer && (
+                        <span>
+              Naozaj chcete odstrániť presun s ID: <b>{transfer.ID_PRESUN}</b> ?
+            </span>
+                    )}
+                </div>
             </Dialog>
 
         </div>

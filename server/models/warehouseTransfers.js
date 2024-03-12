@@ -71,24 +71,25 @@ async function getHospitalMedication(id) {
     }
 }
 
-async function getNewTransferParams(id) {
+async function getSelectedMedications(id) {
     try {
         let conn = await database.getConnection();
-
-        const id_sklad = await conn.execute(
-            `select ID_SKLAD from sklad where ID_NEMOCNICE = :id and ID_ODDELENIA is null`,
-            { id }
-        );
-
-        const sqlStatement = `select ID_PRESUN, ID_SKLAD_OBJ, ID_SKLAD_PRIJ from PRESUN_LIEKOV where ID_SKLAD_PRIJ = :id_pres`;
+        const sqlStatement = `select SKLAD.ID_LIEK, LIEK.NAZOV, DATUM_TRVANLIVOSTI, SKLAD.ID_SKLAD, NEMOCNICA.NAZOV as NEMOCNICA,
+                                    (CELKOVY_POCET - SKLAD.MINIMALNY_POCET) as POCET  from SKLAD
+                            join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                            join LIEK on SKLAD.ID_LIEK = LIEK.ID_LIEK
+                            left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
+                            where SKLAD.ID_LIEK = :id_l
+                                AND (CELKOVY_POCET - SKLAD.MINIMALNY_POCET) = (
+                                    select MAX(CELKOVY_POCET - SKLAD.MINIMALNY_POCET) from SKLAD
+                                    where ID_LIEK = :id_l)`;
         let result = await conn.execute(sqlStatement, {
-            id_pres: id_sklad.rows[0].ID_SKLAD
+            id_l: id
         });
         return result.rows;
     } catch (err) {
         throw new Error("Database error: " + err);
     }
-
 }
 
 async function createHospTransfer(body) {
@@ -130,11 +131,30 @@ async function createHospTransfer(body) {
     }
 }
 
+async function deleteTransfer(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `begin 
+                delete_transfer(:id_pres);
+            end;`;
+        console.log(body);
+        let result = await conn.execute(sqlStatement, {
+            id_pres: body.id_presun
+        });
+
+        console.log("Rows inserted " + result.rowsAffected);
+    } catch (err) {
+        throw new Error("Database error: " + err);
+    }
+}
+
 module.exports = {
     getFinishedTransfers,
     getWaitingTransfers,
     getListTransfers,
     getWarehouses,
     getHospitalMedication,
+    getSelectedMedications,
     createHospTransfer,
+    deleteTransfer
 };

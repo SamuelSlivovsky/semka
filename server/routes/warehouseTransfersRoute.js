@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/warehouseTransfersController");
 const verify = require("../middleware/verifyUser");
-const {verifyRoles} = require("../middleware/verifyUser");
 
 router.get(
     "/allFin",
@@ -33,6 +32,18 @@ router.get(
     verify.verifyRoles(0, 2, 3, 5),
     controller.getHospitalMedication
 );
+
+router.get(
+    "/selectedMedications/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getSelectedMedications
+)
+
+router.post(
+    "/deleteTransfer",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.deleteTransfer
+)
 
 router.post(
     "/createHospTransfer",

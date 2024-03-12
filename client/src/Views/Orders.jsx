@@ -59,7 +59,6 @@ export default function Orders() {
 
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
-        const userDataHelper = GetUserData(token);
         const headers = { authorization: "Bearer " + token };
         fetch(`objednavky/all`, { headers })
             .then((response) => response.json())
@@ -199,6 +198,7 @@ export default function Orders() {
         //Add whole list and create new order
         if(unique && checkPocet && selectedMedications.length > 0) {
             const transformedData = selectedMedications.map((item) => ({
+                id: item.selectedDrug.ID_LIEK,
                 name: item.selectedDrug.NAZOV,
                 amount: item.quantity
             }));
@@ -259,7 +259,7 @@ export default function Orders() {
 
     // Function to add selected medication to the list
     const addMedication = () => {
-        setSelectedMedications([...selectedMedications, { medication: "", quantity: 0 }]);
+        setSelectedMedications([...selectedMedications, { NAZOV: "", ID_LIEK: 0, quantity: 0}]);
     };
 
     // Function to remove medication from the list
