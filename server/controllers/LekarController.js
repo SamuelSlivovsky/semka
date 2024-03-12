@@ -1,5 +1,5 @@
 const lekar = require("../models/lekar");
-const {hashPacienti, hashMedical} = require("../utils/hashData");
+const {hashPacienti} = require("../utils/hashData");
 module.exports = {
     getPacienti: (req, res) => {
         const lekar = require("../models/lekar");
@@ -26,7 +26,7 @@ module.exports = {
             if (req.role === 0) {
                 operacie = await lekar.getOperacieAdmin();
                 // operacie = await lekar.getOperacie(req.params.id);
-                operacie = hashMedical(operacie);
+                operacie = hashPacienti(operacie);
             } else {
                 operacie = await lekar.getOperacie(req.params.id);
             }
@@ -39,7 +39,7 @@ module.exports = {
         (async () => {
             if (req.role === 0) {
                 vysetrenia = await lekar.getVysetreniaAdmin();
-                vysetrenia = hashMedical(vysetrenia);
+                vysetrenia = hashPacienti(vysetrenia);
             } else {
                 vysetrenia = await lekar.getVysetrenia(req.params.id);
             }
@@ -53,7 +53,7 @@ module.exports = {
             if (req.role === 0) {
                 hospitalizacie = await lekar.getHospitalizacieAdmin();
                 // hospitalizacie = await lekar.getHospitalizacie(req.params.id);
-                hospitalizacie = hashMedical(hospitalizacie);
+                hospitalizacie = hashPacienti(hospitalizacie);
             } else {
                 hospitalizacie = await lekar.getHospitalizacie(req.params.id);
             }

@@ -235,6 +235,7 @@ async function getHospitalizacie(id) {
     }
 }
 
+//TODO spomenut obmedzenie na 10000 zaznamov z dovodu optimalizacie a rychlosti nacitavania
 async function getHospitalizacieAdmin() {
     try {
         let conn = await database.getConnection();

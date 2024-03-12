@@ -90,7 +90,12 @@ module.exports = {
   getOckovania: (req, res) => {
     const pacient = require("../models/pacient");
     (async () => {
-      ret_val = await pacient.getOckovania(req.params.id);
+     if (req.role === 0) {
+        ret_val = await pacient.getOckovaniaAdmin();
+        ret_val = hashZdravotnaKarta(ret_val);
+      } else {
+        ret_val = await pacient.getOckovania(req.params.id);
+      }
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);
