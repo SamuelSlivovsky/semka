@@ -93,10 +93,10 @@ module.exports = {
     })();
   },
 
-  getNeobsadeneLozka: (req, res) => {
+  getLozka: (req, res) => {
     const lozko = require("../models/lozko");
     (async () => {
-      info = await lozko.getNeobsadeneLozka(req.params.id);
+      info = await lozko.getLozka(req.params.id);
       res.status(200).json(info);
     })();
   },
@@ -113,6 +113,17 @@ module.exports = {
     const lekar = require("../models/lekar");
     (async () => {
       info = await lekar.getOddeleniePrimara(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
+  getZoznamVydanychReceptov: (req, res) => {
+    const lekar = require("../models/lekar");
+    (async () => {
+      info = await lekar.getZoznamVydanychReceptov(
+        req.params.id,
+        req.params.datum
+      );
       res.status(200).json(info);
     })();
   },

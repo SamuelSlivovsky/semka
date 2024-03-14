@@ -49,10 +49,10 @@ async function getPacienti(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT id_pacienta, meno, rod_cislo, priezvisko, psc,
+      `SELECT id_pacienta, meno, rod_cislo, priezvisko, psc, id_poistenca, nazov,
       CASE WHEN id_hosp IS NULL THEN 0 ELSE 1 END AS je_hospit
 FROM (
-   SELECT p.id_pacienta, o.meno, p.rod_cislo, o.priezvisko, o.psc, h.id_hosp, h.dat_do,
+   SELECT p.id_pacienta, o.meno, p.rod_cislo, o.priezvisko, o.psc, h.id_hosp, h.dat_do, id_poistenca, poistovna.nazov,
           ROW_NUMBER() OVER (PARTITION BY p.id_pacienta ORDER BY h.dat_do DESC NULLS FIRST) AS rn_hosp
    FROM pacient p
    LEFT JOIN zdravotna_karta zk ON zk.id_pacienta = p.id_pacienta
@@ -61,6 +61,8 @@ FROM (
    JOIN os_udaje o ON p.rod_cislo = o.rod_cislo
    JOIN nemocnica USING (id_nemocnice)
    JOIN zamestnanci USING (id_nemocnice)
+   JOIN poistenie on (p.id_pacienta = poistenie.id_pacienta)
+   join poistovna using (ICO)
    WHERE zamestnanci.cislo_zam = :pid_lekara
 ) sub
 WHERE rn_hosp = 1
@@ -129,7 +131,7 @@ async function getOperacie(id) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select rod_cislo, meno, priezvisko, to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start",id_operacie as "id" ,id_zaznamu as "id_zaz", to_char(datum,'DD.MM.YYYY') datum from zdravotny_zaz
+      `select rod_cislo, meno, priezvisko, to_char(dat_operacie,'YYYY-MM-DD') || 'T' || to_char(dat_operacie, 'HH24:MI:SS') as "start",id_operacie as "id" ,id_zaznamu as "id_zaz", to_char(dat_operacie,'DD.MM.YYYY') datum from zdravotny_zaz
                 join operacia using(id_zaznamu)
                   join zdravotna_karta using(id_karty)
                     join pacient using(id_pacienta)
@@ -277,6 +279,38 @@ async function getOddeleniePrimara(id) {
   }
 }
 
+async function getZoznamVydanychReceptov(id, datum) {
+  try {
+    let conn = await database.getConnection();
+    let dateSelection;
+    let args;
+    if (datum.includes("&")) {
+      dateSelection =
+        " and to_char(datum_zapisu,'YYYY') = :rok and to_char(datum_zapisu,'MM') = :mesiac";
+      args = {
+        cislo_zam: id,
+        rok: datum.split("&")[0],
+        mesiac: Number(datum.split("&")[1]),
+      };
+    } else {
+      dateSelection = " and to_char(datum_zapisu,'YYYY') = :rok";
+      args = [id, datum];
+    }
+    const info = await conn.execute(
+      `select datum_zapisu, nazov
+      from recept
+      join liek using(id_liek)
+      where cislo_zam = :cislo_zam
+     ${dateSelection}`,
+      args
+    );
+
+    return info.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getLekari,
   getPacienti,
@@ -289,4 +323,5 @@ module.exports = {
   getNemocnicaOddelenia,
   getZoznamLekarov,
   getOddeleniePrimara,
+  getZoznamVydanychReceptov,
 };

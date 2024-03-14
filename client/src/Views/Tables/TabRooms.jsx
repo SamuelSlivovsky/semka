@@ -7,34 +7,32 @@ import { useNavigate } from "react-router";
 import { Tag } from "primereact/tag";
 import GetUserData from "../../Auth/GetUserData";
 
-export default function TabPatients() {
+export default function TabRooms() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
-  const [pacienti, setPacienti] = useState([]);
+  const [rooms, setRooms] = useState([]);
   const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
-    const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
-    fetch(`/lekar/pacienti/${userDataHelper.UserInfo.userid}`, {
-      headers,
-    })
-      .then((response) => response.json())
+    const userData = GetUserData(token);
+    fetch(`lekar/miestnosti/${userData.UserInfo.userid}`, { headers })
+      .then((res) => res.json())
       .then((data) => {
-        setPacienti(data);
+        setRooms(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClick = (value) => {
-    navigate("/patient", { state: value.ID_PACIENTA });
+    navigate("/room", { state: value.ID_MIESTNOSTI });
   };
 
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
         <div className="table-header">
-          Pacienti
+          Hľadaj
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText
@@ -63,34 +61,8 @@ export default function TabPatients() {
   const initFilters = () => {
     setFilters({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-      MENO: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
-      PRIEZVISKO: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
-      ROD_CISLO: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
-      },
-      PSC: {
-        operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
-      },
     });
     setGlobalFilterValue("");
-  };
-
-  const statusBodyTemplate = (rowData) => {
-    return (
-      <Tag
-        style={{ width: "110px" }}
-        severity={rowData.JE_HOSPIT ? "success" : "info"}
-        value={rowData.JE_HOSPIT == 1 ? "Hospitalizovaný" : "Iné"}
-      />
-    );
   };
 
   const header = renderHeader();
@@ -98,28 +70,18 @@ export default function TabPatients() {
     <div>
       <div className="card">
         <DataTable
-          value={pacienti}
+          value={rooms}
           responsiveLayout="scroll"
           selectionMode="single"
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}
           filterDisplay="menu"
-          globalFilterFields={["ROD_CISLO", "MENO", "PRIEZVISKO", "PSC"]}
+          globalFilterFields={["ID_MIESTNOSTI"]}
           emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
-          <Column field="ROD_CISLO" header={"Rodné číslo"}></Column>
-          <Column field="MENO" header={"Meno"}></Column>
-          <Column field="PRIEZVISKO" header={"Priezvisko"}></Column>
-          <Column field="PSC" header={"PSČ"}></Column>
-          <Column field="ID_POISTENCA" header={"Číslo poistenca"}></Column>
-          <Column field="NAZOV" header={"Poisťovňa"}></Column>
-          <Column
-            body={statusBodyTemplate}
-            header={"Status"}
-            field="JE_HOSPIT"
-            sortable
-          ></Column>
+          <Column field="ID_MIESTNOSTI" header={"Miestnosť"}></Column>
+          <Column field="KAPACITA" header={"Kapacita"}></Column>
         </DataTable>
       </div>
     </div>

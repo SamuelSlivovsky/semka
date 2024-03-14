@@ -12,6 +12,7 @@ import storageIcon from "../images/drugs.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
+import bedIcon from "../images/bed.png";
 import "../styles/homepage.css";
 
 function Home() {
@@ -34,6 +35,13 @@ function Home() {
       path="/patients"
       icon={patientIcon}
       key="2"
+    ></HomeCard>,
+    <HomeCard
+      title="Lôžka"
+      isCalendar={false}
+      path="/rooms"
+      icon={bedIcon}
+      key="13"
     ></HomeCard>,
     <HomeCard
       title="Vyšetrenia"
@@ -119,11 +127,11 @@ function Home() {
       key="9"
     ></HomeCard>,
     <HomeCard
-        title="Pacienti"
-        isCalendar={false}
-        path="/patients"
-        icon={patientIcon}
-        key="2"
+      title="Pacienti"
+      isCalendar={false}
+      path="/patients"
+      icon={patientIcon}
+      key="2"
     ></HomeCard>,
   ];
 

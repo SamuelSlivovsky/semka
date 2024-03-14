@@ -72,16 +72,18 @@ router.get(
   controller.getMiestnosti
 );
 
-router.get(
-  "/neobsadeneLozka/:id",
-  verify.verifyRoles(0, 1, 2, 3),
-  controller.getNeobsadeneLozka
-);
+router.get("/lozka/:id", verify.verifyRoles(0, 1, 2, 3), controller.getLozka);
 
 router.get(
   "/oddeleniePrimara/:id",
   verify.verifyRoles(0, 3),
   controller.getOddeleniePrimara
+);
+
+router.get(
+  "/zoznamVydanychReceptov/:id/:datum",
+  verify.verifyRoles(0, 1, 3),
+  controller.getZoznamVydanychReceptov
 );
 
 module.exports = router;

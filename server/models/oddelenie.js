@@ -142,13 +142,60 @@ async function getPocetPacientovOddelenia(cislo_zam) {
 async function getPocetOperaciiOddelenia(cislo_zam, rok) {
   try {
     let conn = await database.getConnection();
+    let dateSelection;
+    let args;
+    if (rok.includes("&")) {
+      dateSelection =
+        "and to_char(dat_operacie,'YYYY') = :rok and to_char(dat_operacie,'MM') = :mesiac";
+      args = {
+        cislo_zam: cislo_zam,
+        rok: rok.split("&")[0],
+        mesiac: Number(rok.split("&")[1]),
+      };
+    } else {
+      dateSelection = "and to_char(dat_operacie,'YYYY') = :rok";
+      args = [cislo_zam, rok];
+    }
+    console.log(args);
     const result = await conn.execute(
       `select count(id_operacie) as poc_operacii from operacia
           join zamestnanci using (cislo_zam)
           where id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
-          and to_char(dat_operacie,'YYYY') = :rok
+          ${dateSelection}
               `,
-      [cislo_zam, rok]
+      args
+    );
+    console.log(result);
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function getPocetOperaciiZamestnanca(cislo_zam, rok) {
+  try {
+    let conn = await database.getConnection();
+    let dateSelection;
+    let args;
+    if (rok.includes("&")) {
+      dateSelection =
+        "and to_char(dat_operacie,'YYYY') = :rok and to_char(dat_operacie,'MM') = :mesiac";
+      args = {
+        cislo_zam: cislo_zam,
+        rok: rok.split("&")[0],
+        mesiac: Number(rok.split("&")[1]),
+      };
+    } else {
+      dateSelection = "and to_char(dat_operacie,'YYYY') = :rok";
+      args = [cislo_zam, rok];
+    }
+    console.log(args);
+    const result = await conn.execute(
+      `select count(id_operacie) as poc_operacii from operacia
+          WHERE cislo_zam = :cislo_zam
+          ${dateSelection}
+              `,
+      args
     );
     console.log(result);
     return result.rows;
@@ -180,13 +227,58 @@ async function getPocetHospitalizaciiOddelenia(cislo_zam, rok) {
 async function getPocetVysetreniOddelenia(cislo_zam, rok) {
   try {
     let conn = await database.getConnection();
+    let dateSelection;
+    let args;
+    if (rok.includes("&")) {
+      dateSelection =
+        "and to_char(datum,'YYYY') = :rok and to_char(datum,'MM') = :mesiac";
+      args = {
+        cislo_zam: cislo_zam,
+        rok: rok.split("&")[0],
+        mesiac: Number(rok.split("&")[1]),
+      };
+    } else {
+      dateSelection = "and to_char(datum,'YYYY') = :rok";
+      args = [cislo_zam, rok];
+    }
     const result = await conn.execute(
       `select count(id_vysetrenia) as poc_vys from vysetrenie
       join zamestnanci using (cislo_zam)
       where id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
-      and to_char(datum,'YYYY') = :rok
+      ${dateSelection}
           `,
-      [cislo_zam, rok]
+      args
+    );
+    console.log(result);
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
+async function getPocetVysetreniZamestnanca(cislo_zam, rok) {
+  try {
+    let conn = await database.getConnection();
+    let dateSelection;
+    let args;
+    if (rok.includes("&")) {
+      dateSelection =
+        " and to_char(datum,'YYYY') = :rok and to_char(datum,'MM') = :mesiac";
+      args = {
+        cislo_zam: cislo_zam,
+        rok: rok.split("&")[0],
+        mesiac: Number(rok.split("&")[1]),
+      };
+    } else {
+      dateSelection = " and to_char(datum,'YYYY') = :rok";
+      args = [cislo_zam, rok];
+    }
+    const result = await conn.execute(
+      `select count(id_vysetrenia) as poc_vys from vysetrenie
+      where cislo_zam = :cislo_zam
+      ${dateSelection}
+          `,
+      args
     );
     console.log(result);
     return result.rows;
@@ -256,4 +348,6 @@ module.exports = {
   getKrvneSkupinyOddelenia,
   getTopZamestnanciVyplatyOddelenie,
   getSumaVyplatRoka,
+  getPocetOperaciiZamestnanca,
+  getPocetVysetreniZamestnanca,
 };

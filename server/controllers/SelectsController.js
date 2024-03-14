@@ -405,6 +405,20 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+  getPocetOperaciiZamestnanca: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+    console.log(req.params);
+    (async () => {
+      ret_val = await oddelenie.getPocetOperaciiZamestnanca(
+        req.params.cislo_zam,
+        req.params.rok
+      );
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
   getPocetHospitalizaciiOddelenia: (req, res) => {
     const oddelenie = require("../models/oddelenie");
     console.log(req.params);
@@ -424,6 +438,20 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetVysetreniOddelenia(
+        req.params.cislo_zam,
+        req.params.rok
+      );
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+  getPocetVysetreniZamestnanca: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+    console.log(req.params);
+    (async () => {
+      ret_val = await oddelenie.getPocetVysetreniZamestnanca(
         req.params.cislo_zam,
         req.params.rok
       );

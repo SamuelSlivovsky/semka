@@ -4,7 +4,7 @@ async function getMiestnosti(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT distinct id_miestnosti FROM miestnost join oddelenie using (id_oddelenia)
+      `SELECT distinct id_miestnosti, miestnost.kapacita FROM miestnost join oddelenie using (id_oddelenia)
     join zamestnanci using (id_oddelenia)
     join lozko on (lozko.id_miestnost = miestnost.id_miestnosti)
     where

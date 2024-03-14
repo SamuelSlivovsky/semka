@@ -5,8 +5,14 @@ const verify = require("../middleware/verifyUser");
 
 router.get(
   "/obsadeneLozka/:id",
-  verify.verifyRoles(0, 2,3),
+  verify.verifyRoles(0, 2, 3),
   controller.getNeobsadeneLozka
+);
+
+router.get(
+  "/pacient/:id",
+  verify.verifyRoles(0, 2, 3),
+  controller.getPacient
 );
 
 module.exports = router;

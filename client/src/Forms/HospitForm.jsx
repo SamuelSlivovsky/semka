@@ -125,7 +125,7 @@ export default function HospitForm(props) {
   const getLozka = (e) => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
-    fetch(`lekar/neobsadeneLozka/${e.value.ID_MIESTNOSTI}`, { headers })
+    fetch(`lekar/lozka/${e.value.ID_MIESTNOSTI}`, { headers })
       .then((res) => res.json())
       .then((data) => {
         setBeds(data);

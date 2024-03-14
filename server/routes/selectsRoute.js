@@ -139,6 +139,11 @@ router.get(
   controller.getPocetOperaciiOddelenia
 );
 router.get(
+  "/pocetOperZamestnanca/:cislo_zam/:rok",
+  verify.verifyRoles(1, 2, 3),
+  controller.getPocetOperaciiZamestnanca
+);
+router.get(
   "/pocetHospitOddelenia/:cislo_zam/:rok",
   verify.verifyRoles(1, 2, 3),
   controller.getPocetHospitalizaciiOddelenia
@@ -147,6 +152,11 @@ router.get(
   "/pocetVyseOddelenia/:cislo_zam/:rok",
   verify.verifyRoles(1, 2, 3),
   controller.getPocetVysetreniOddelenia
+);
+router.get(
+  "/pocetVyseZamestnanca/:cislo_zam/:rok",
+  verify.verifyRoles(1, 2, 3),
+  controller.getPocetVysetreniZamestnanca
 );
 router.get(
   "/krvneSkupinyOddelenia/:cislo_zam",

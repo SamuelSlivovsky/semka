@@ -168,6 +168,18 @@
   width: 20px;
 }
 
+.bed-icon {
+  content: url("./images/bed-black.png");
+  height: 44px;
+  width: 44px;
+}
+
+.bed-icon-small {
+  content: url("./images/bed-black.png");
+  height: 20px;
+  width: 20px;
+}
+
 .chat-icon {
   content: url("./images/chat.png");
   height: 44px;

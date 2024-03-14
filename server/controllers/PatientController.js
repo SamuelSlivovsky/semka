@@ -76,7 +76,7 @@ module.exports = {
     const pacient = require("../models/pacient");
     (async () => {
       ret_val = await pacient.updateTimeOfDeath(req.body);
-      res.status(200);
+      res.status(200).json("success");
     })().catch((err) => {
       console.error(err);
       res.status(403).send(err);

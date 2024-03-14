@@ -7,7 +7,7 @@ import TabPatients from "./Views/Tables/TabPatients";
 import Patient from "./Views/Patient";
 import { Register } from "./Auth/Register";
 import { Login } from "./Auth/Login";
-import Statistics from "./Views/Statistics";
+import Statistics from "./Statistics/Statistics";
 import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
 import "./App.css";
@@ -28,6 +28,7 @@ import HospitalRoom from "./HospitalRoom/HospitalRoom";
 import TabMeetings from "./Views/Tables/TabMeetings";
 import socketService from "./service/socketService";
 import Chat from "./Chat/Chat";
+import TabRooms from "./Views/Tables/TabRooms";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -148,7 +149,13 @@ function App() {
       label="Pacienti"
       icon="patient-icon"
     />,
-
+    <SidebarButton
+      key="13"
+      visibleLeft={visibleLeft}
+      path="/rooms"
+      label="Lôžka"
+      icon="bed-icon"
+    />,
     <SidebarButton
       key="5"
       visibleLeft={visibleLeft}
@@ -264,6 +271,8 @@ function App() {
         <Route path="/add" element={<Add></Add>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/meetings" element={<TabMeetings />}></Route>
+        <Route path="/room" element={<HospitalRoom />}></Route>
+        <Route path="/rooms" element={<TabRooms />}></Route>
       </>
     );
   };
@@ -371,7 +380,6 @@ function App() {
           <Route path="/login" element={<Login></Login>}></Route>
           <Route path="/logout" element={<Logout></Logout>}></Route>
           <Route path="/chat" element={<Chat />}></Route>
-          <Route path="/room" element={<HospitalRoom />}></Route>
           {userData && userData.UserInfo.role === 0 ? (
             renderAdminRoutes()
           ) : userData && userData.UserInfo.role === 2 ? (
