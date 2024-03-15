@@ -2,14 +2,28 @@ const transfers = require("../models/warehouseTransfers");
 module.exports = {
     getFinishedTransfers: (req, res) => {
         (async () => {
-            let ret_val = await transfers.getFinishedTransfers();
+            let ret_val = await transfers.getFinishedTransfers(req.params.id);
             res.status(200).json(ret_val);
         })();
     },
 
     getWaitingTransfers: (req, res) => {
         (async () => {
-            let ret_val = await transfers.getWaitingTransfers();
+            let ret_val = await transfers.getWaitingTransfers(req.params.id);
+            res.status(200).json(ret_val);
+        })();
+    },
+
+    getDeclinedTransfers: (req, res) => {
+        (async () => {
+            let ret_val = await transfers.getDeclinedTransfers(req.params.id);
+            res.status(200).json(ret_val);
+        })();
+    },
+
+    getRequestedTransfers: (req, res) => {
+        (async () => {
+            let ret_val = await transfers.getRequestedTransfers(req.params.id);
             res.status(200).json(ret_val);
         })();
     },
@@ -42,9 +56,20 @@ module.exports = {
         })();
     },
 
-    createHospTransfer: (req, res) => {
+    createTransfer: (req, res) => {
         (async () => {
-            let ret_val = await transfers.createHospTransfer(req.body);
+            let ret_val = await transfers.createTransfer(req.body);
+            res.status(200).json(ret_val);
+        })().catch((err) => {
+            console.log("Error Kontroler");
+            console.error(err);
+            res.status(500).send(err);
+        });
+    },
+
+    deniedTransfer: (req, res) => {
+        (async () => {
+            let ret_val = await transfers.deniedTransfer(req.body);
             res.status(200).json(ret_val);
         })().catch((err) => {
             console.log("Error Kontroler");

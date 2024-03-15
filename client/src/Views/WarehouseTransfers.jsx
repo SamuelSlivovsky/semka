@@ -1,6 +1,8 @@
 //@TODO add automatic transfer for expiring medications + when they are expired or there is large amount in main warehouse
 //@TODO add new tab
 
+//@TODO add new tab that will be for requested orders and add their confirmation/decline
+
 import {TabPanel, TabView} from "primereact/tabview";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
@@ -18,7 +20,7 @@ export default function WarehouseTransfers() {
     let emptyTransfer = {
         ID_PRESUN: null,
         ID_SKLAD_OBJ: null,
-        ID_SKLAD_PRIJ: null,
+        ID_ODDELENIA_LIEKU: null,
         DATUM_PRESUNU: null,
         ZOZNAM_LIEKOV: null,
         STATUS: null
@@ -45,15 +47,18 @@ export default function WarehouseTransfers() {
     const [showNewTransfer, setShowNewTransfer] = useState(false);
     const [waitingTransfers, setWaitingTransfers] = useState(null);
     const [finishedTransfers, setFinishedTransfers] = useState(null);
+    const [deniedTransfers, setDeniedTransfers] = useState(null);
+    const [requestedTransfers, setRequestedTransfers] = useState(null);
     const [hospitals, setHospitals] = useState([]);
     const [hospitalMedications, setHospitalMedication] = useState(null);
-    const [medicationsByHospital, setMedicationsByHospital] = useState(null);
     const [selectedRow, setSelectedRow] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
     const [showHospitalMedications, setShowHospitalMedications] = useState(false);
     const [showDeleteTransferDialog ,setDeleteTransferDialog] = useState(false);
     const [showSelectedMedicationsSearch, setShowSelectedMedicationsSearch] = useState(false);
+    const [showConfirmTransferDialog, setShowConfirmTransferDialog] = useState(false);
+    const [showDeniedTransferDialog, setShowDeniedTransferDialog] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState([]);
     const [xmlContent, setXmlContent] = useState("");
 
@@ -66,9 +71,10 @@ export default function WarehouseTransfers() {
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
         const headers = { authorization: "Bearer " + token };
+        const userDataHelper = GetUserData(token);
 
         //Finished transfers
-        fetch(`/presuny/allFin`, { headers })
+        fetch(`/presuny/allFin/${userDataHelper.UserInfo.userid}`, { headers })
             .then((response) => response.json())
             .then((data) => {
                 setFinishedTransfers(data);
@@ -78,11 +84,39 @@ export default function WarehouseTransfers() {
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
         const headers = { authorization: "Bearer " + token };
+        const userDataHelper = GetUserData(token);
+
         //Waiting transfers
-        fetch(`/presuny/allWait`, { headers })
+        fetch(`/presuny/allWait/${userDataHelper.UserInfo.userid}`, { headers })
             .then((response) => response.json())
             .then((data) => {
                 setWaitingTransfers(data);
+            });
+    }, []);
+
+    useEffect(() => {
+        const token = localStorage.getItem("hospit-user");
+        const headers = { authorization: "Bearer " + token };
+        const userDataHelper = GetUserData(token);
+
+        //Finished transfers
+        fetch(`/presuny/allDec/${userDataHelper.UserInfo.userid}`, { headers })
+            .then((response) => response.json())
+            .then((data) => {
+                setDeniedTransfers(data);
+            });
+    }, []);
+
+    useEffect(() => {
+        const token = localStorage.getItem("hospit-user");
+        const headers = { authorization: "Bearer " + token };
+        const userDataHelper = GetUserData(token);
+
+        //Finished transfers
+        fetch(`/presuny/reqTransfers/${userDataHelper.UserInfo.userid}`, { headers })
+            .then((response) => response.json())
+            .then((data) => {
+                setRequestedTransfers(data);
             });
     }, []);
 
@@ -152,7 +186,6 @@ export default function WarehouseTransfers() {
     }
 
     //Function for searching all medications that are in table medicine
-    //@TODO select needs to be checked, there is some error in searching by hospital
     const getMedicationList = () => {
         const token = localStorage.getItem("hospit-user");
         const headers = { authorization: "Bearer " + token };
@@ -166,81 +199,93 @@ export default function WarehouseTransfers() {
 
     //Function for creating new Transfer from selected hospital
     async function createHospitalTransfer() {
-        //Transfer from hospital, search option by hospital
+        //Declaration of constants
         const _transfer = [...waitingTransfers];
         const _tr = {...emptyTransfer};
+        let nonEmptyRows, transformedData, formattedString = null;
 
-        const nonEmptyRows = hospitalMedications.filter(row => {
+        //Getting rid of empty rows
+        nonEmptyRows = hospitalMedications.filter(row => {
             return inputValues[row.ID_LIEK] !== undefined;
         });
-        if(showSelectedMedicationsSearch) {
-            //New transfer for each hospital or warehouse ,search option by medications
 
-        } else {
+        if(nonEmptyRows.length > 0) {
+            //Sorting all data by ID_ODDELENIA
+            nonEmptyRows.sort((a, b) => a.ID_ODDELENIA - b.ID_ODDELENIA);
+            let finishedInserts = 0;
 
-            const selectedData = nonEmptyRows.map(row => ({
-                ID_LIEK: row.ID_LIEK,
-                NAZOV: row.NAZOV,
-                requestedAmount: inputValues[row.ID_LIEK]
-            }));
+            //Grouping same ID_ODDELENIA into one position in array
+            const groupedData = nonEmptyRows.reduce((acc, currentValue) => {
+                const idOddelenia = currentValue.ID_ODDELENIA;
+                if (!acc[idOddelenia]) {
+                    acc[idOddelenia] = [];
+                }
+                acc[idOddelenia].push(currentValue);
+                return acc;
+            }, {});
 
-            const transformedData = selectedData.map(row => ({
-                id: row.ID_LIEK,
-                name: row.NAZOV,
-                amount: row.requestedAmount
-            }));
+            const arrays = Object.values(groupedData);
 
-            let formattedString = JSON.stringify(transformedData);
+            for(const array of arrays) {
+                //Creating JSON from data
+                transformedData = array.map(row => ({
+                    id: row.ID_LIEK,
+                    name: row.NAZOV,
+                    amount: inputValues[row.ID_LIEK]
+                }));
 
-            const token = localStorage.getItem("hospit-user");
-            const userDataHelper = GetUserData(token);
+                formattedString = JSON.stringify(transformedData);
 
-            const requestOptions = {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    authorization: "Bearer " + token,
-                },
-                body: JSON.stringify({
-                    zoznam_liekov: formattedString,
-                    id_nemocnice: selectedHospital.ID_NEMOCNICE,
-                    user_id: userDataHelper.UserInfo.userid
-                }),
-            };
-            if(nonEmptyRows.length > 0) {
-                fetch(`presuny/createHospTransfer`, requestOptions)
+                const token = localStorage.getItem("hospit-user");
+                const userDataHelper = GetUserData(token);
+
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        authorization: "Bearer " + token,
+                    },
+                    body: JSON.stringify({
+                        zoznam_liekov: formattedString,
+                        id_oddelenia: array[0].ID_ODDELENIA,
+                        user_id: userDataHelper.UserInfo.userid
+                    }),
+                };
+
+                fetch(`/presuny/createTransfer`, requestOptions)
                     .then((response) => response.json())
                     .then((data) => {
-                        console.log(data);
+                        finishedInserts++;
 
-                        _tr.STATUS = "Neprijata";
+                        _tr.STATUS = "Cakajuca";
                         _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
                         _tr.ID_PRESUN = data[0].ID_PRESUN;
                         _tr.ID_SKLAD_OBJ = data[0].ID_SKLAD_OBJ;
-                        _tr.ID_SKLAD_PRIJ = data[0].ID_SKLAD_PRIJ;
+                        _tr.ID_ODDELENIA_LIEKU = data[0].ID_ODDELENIA_LIEKU;
 
-                        _transfer.push(_tr);
+                        _transfer.push({..._tr});
 
-                        toast.current.show({
-                            severity: "success",
-                            summary: "Successful",
-                            detail: "Presun bol vytvorený",
-                            life: 3000,
-                        });
+                        if(finishedInserts === arrays.length) {
+                            setShowHospitalMedications(false);
+                            setWaitingTransfers(_transfer);
+                            toast.current.show({
+                                severity: "success",
+                                summary: "Successful",
+                                detail: "Presuny boli vytvorené",
+                                life: 3000,
+                            });
+                        }
 
-                        setShowHospitalMedications(false);
-                        setWaitingTransfers(_transfer);
                     });
-            } else {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: "Musíte zadať požadovaný počet",
-                    life: 3000,
-                });
             }
+        } else {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Musíte vyplniť požadovaný počet",
+                life: 3000,
+            });
         }
-
 
     }
 
@@ -257,6 +302,49 @@ export default function WarehouseTransfers() {
             }),
         };
         const response = await fetch("/presuny/deleteTransfer", requestOptions);
+    }
+
+    //@TODO CHECK these 2 functions below
+
+    //Function that will send request onto DB to denie request and update it
+    async function denieTransfer() {
+        const token = localStorage.getItem("hospit-user");
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                id_pres: transfer.ID_PRESUN
+            }),
+        };
+        const response = await fetch("/presuny/deniedTransfer", requestOptions);
+    }
+
+    //@TODO get from DB ZOZNAM_LIEKOV and then it needs to be iterated in FOR to update data in DB
+    //@TODO add new route for Confirming transfer and create procedure for it
+    //Function for confirming transfer and updating data in DB
+    async function confTransfer() {
+        const token = localStorage.getItem("hospit-user");
+        const headers = { authorization: "Bearer " + token };
+        //Fetch for getting JSON data from DB that contains all medications in PRESUN_LIEKOV for transfer
+        fetch(`/presuny/list/${transfer.ID_PRESUN}`, { headers })
+            .then((response) => response.json())
+            .then((data) => {
+                //Data now should contain JSON with all requeired medications for transfer, now it needs to be separated
+                const requestOptions = {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        authorization: "Bearer " + token,
+                    },
+                    body: JSON.stringify({
+
+                    }),
+                };
+                //const response = await fetch("/presuny/deniedTransfer", requestOptions);
+            });
     }
 
     //Function for searching medication in selected hospital
@@ -290,7 +378,7 @@ export default function WarehouseTransfers() {
                     finishedFetches++;
 
                     if(finishedFetches === selectedDrugs.length) {
-                        setMedicationsByHospital(newDataArray);
+                        setHospitalMedication(newDataArray);
                     }
                 });
         }
@@ -390,6 +478,51 @@ export default function WarehouseTransfers() {
         });
     }
 
+    //Function for confirming requested transfer and then calling update fetch
+    const confirmRequestedTransfer = () => {
+        let _confirmedTransfers = finishedTransfers;
+        let _requestedTransfers = requestedTransfers.filter((val) => val.ID_PRESUN !== transfer.ID_PRESUN);
+
+        //@TODO add fetch via post method in here and send there ID_PRESUN but first I need whole medication list from DB
+        //@TODO from this list get amount and then send it via post method into DB into procedure
+        confTransfer();
+
+        _confirmedTransfers.push(transfer);
+        setFinishedTransfers(_confirmedTransfers);
+        setRequestedTransfers(_requestedTransfers);
+        hideConfirmDeniedDialog();
+
+        toast.current.show({
+            severity: "success",
+            summary: "Successful",
+            detail: "Presun bol potvrdený a počty liekov boli aktualizované",
+            life: 3000,
+        });
+    }
+
+    //Function for declining requested transfer and then updating that transfer, so it will be denied
+    const deniedRequestedTransfer = () => {
+        let _deniedTransfers = deniedTransfers;
+        let _requestedTransfers = requestedTransfers.filter((val) => val.ID_PRESUN !== transfer.ID_PRESUN);
+        _deniedTransfers.push(transfer);
+
+        //@TODO check if this works alright
+        denieTransfer();
+
+        setRequestedTransfers(_requestedTransfers);
+        setDeniedTransfers(_deniedTransfers);
+        hideConfirmDeniedDialog();
+        setTransfer(emptyTransfer);
+
+        toast.current.show({
+            severity: "success",
+            summary: "Successful",
+            detail: "Presun bol úspešne zamietnutý",
+            life: 3000,
+        });
+
+    }
+
     // Function to remove medication from the list
     const removeMedication = (index) => {
         const updatedMedications = [...selectedMedications];
@@ -401,6 +534,23 @@ export default function WarehouseTransfers() {
     const addMedication = () => {
         setSelectedMedications([...selectedMedications, { medication: "", quantity: 0, id: 0 }]);
     };
+
+    //Functions for setting confirm/denied dialog TRUE false
+    const confirmTransfer = (_transfer) => {
+        setShowConfirmTransferDialog(true);
+        setTransfer(_transfer);
+    }
+
+    const deniedTransfer = (_transfer) => {
+        setShowDeniedTransferDialog(true);
+        setTransfer(_transfer);
+    }
+
+    const hideConfirmDeniedDialog = () => {
+        setShowDeniedTransferDialog(false);
+        setShowConfirmTransferDialog(false);
+        setTransfer(emptyTransfer);
+    }
 
     /*
     ******************************************************************************************************************
@@ -480,6 +630,23 @@ export default function WarehouseTransfers() {
         );
     };
 
+    const reqTransfersBodyTemplate = (rowData) => {
+        return (
+            <React.Fragment>
+                <Button
+                    icon="pi pi-pencil"
+                    className="p-button-rounded p-button-success mr-2"
+                    onClick={() => confirmTransfer(rowData)}
+                />
+                <Button
+                    icon="pi pi-trash"
+                    className="p-button-rounded p-button-warning"
+                    onClick={() => deniedTransfer(rowData)}
+                />
+            </React.Fragment>
+        );
+    };
+
     const deleteTransferDialogFooter = (
         <React.Fragment>
             <Button
@@ -529,6 +696,11 @@ export default function WarehouseTransfers() {
                         style={{ minWidth: "12rem" }}
                     ></Column>
                     <Column
+                        field="ID_ODDELENIA"
+                        header="Id iddelenia"
+                        style={{ minWidth: "12rem" }}
+                    ></Column>
+                    <Column
                         field="POCET"
                         header="Voľný počet na sklade"
                         style={{ minWidth: "12rem" }}
@@ -552,7 +724,7 @@ export default function WarehouseTransfers() {
 
             {showSelectedMedicationsSearch ? <div>
                 <DataTable
-                    value={medicationsByHospital}
+                    value={hospitalMedications}
                     dataKey="ID_LIEK"
                     paginator={true}
                     paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
@@ -576,8 +748,8 @@ export default function WarehouseTransfers() {
                         style={{ minWidth: "12rem" }}
                     ></Column>
                     <Column
-                        field="ID_SKLAD"
-                        header="ID skladu"
+                        field="ID_ODDELENIA"
+                        header="ID oddelenia"
                         style={{ minWidth: "10rem" }}
                     ></Column>
                     <Column
@@ -608,7 +780,6 @@ export default function WarehouseTransfers() {
             </div> :null}
 
             <TabView>
-                //Tab for pending orders
                 <TabPanel header="Čakajúce objednávky">
                     <DataTable
                         value={waitingTransfers}
@@ -617,7 +788,7 @@ export default function WarehouseTransfers() {
                         onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
                         dataKey="ID_LIEK"
                         globalFilter={NaN} //globalFilter
-                        globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_SKLAD_PRIJ", "DATUM_PRESUNU"]}
+                        globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_ODDELENIA_LIEKU", "DATUM_PRESUNU"]}
                         filters={NaN} //filter
                         header={NaN} //header
                         responsiveLayout="scroll"
@@ -633,8 +804,8 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "16rem" }}
                         ></Column>
                         <Column
-                            field="ID_SKLAD_PRIJ"
-                            header="Id prijímajúceho skladu"
+                            field="ID_ODDELENIA_LIEKU"
+                            header="Id oddelenia lieku"
                             style={{ minWidth: "14rem" }}
                         ></Column>
                         <Column
@@ -680,8 +851,90 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "16rem" }}
                         ></Column>
                         <Column
-                            field="ID_SKLAD_PRIJ"
-                            header="Id prijímajúceho skladu"
+                            field="ID_ODDELENIA_LIEKU"
+                            header="Id oddelenia lieku"
+                            style={{ minWidth: "14rem" }}
+                        ></Column>
+                        <Column
+                            field="DATUM_PRESUNU"
+                            header="Dátum presunu"
+                            style={{ minWidth: "10rem" }}
+                        ></Column>
+                        <Column
+                            field="STATUS"
+                            header="Status presunu"
+                            style={{ minWidth: "10rem" }}
+                        ></Column>
+                    </DataTable>
+                </TabPanel>
+
+                <TabPanel header="Zamietnuté objednávky">
+                    <DataTable
+                        value={deniedTransfers}
+                        selection={selectedRow}
+                        selectionMode="single"
+                        onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
+                        dataKey="ID_LIEK"
+                        globalFilter={NaN} //globalFilter
+                        globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_ODDELENIA_LIEKU", "DATUM_PRESUNU"]}
+                        filters={NaN} //filter
+                        header={NaN} //header
+                        responsiveLayout="scroll"
+                    >
+                        <Column
+                            field="ID_PRESUN"
+                            header="Id presunu"
+                            style={{ minWidth: "8rem" }}
+                        ></Column>
+                        <Column
+                            field="ID_SKLAD_OBJ"
+                            header="Id objednávajúceho skladu"
+                            style={{ minWidth: "16rem" }}
+                        ></Column>
+                        <Column
+                            field="ID_ODDELENIA_LIEKU"
+                            header="Id oddelenia lieku"
+                            style={{ minWidth: "14rem" }}
+                        ></Column>
+                        <Column
+                            field="DATUM_PRESUNU"
+                            header="Dátum presunu"
+                            style={{ minWidth: "10rem" }}
+                        ></Column>
+                        <Column
+                            field="STATUS"
+                            header="Status presunu"
+                            style={{ minWidth: "10rem" }}
+                        ></Column>
+                    </DataTable>
+                </TabPanel>
+
+                <TabPanel header="Požadované presuny">
+                    <DataTable
+                        value={requestedTransfers}
+                        selection={selectedRow}
+                        selectionMode="single"
+                        onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
+                        dataKey="ID_LIEK"
+                        globalFilter={NaN} //globalFilter
+                        globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_ODDELENIA_LIEKU", "DATUM_PRESUNU"]}
+                        filters={NaN} //filter
+                        header={NaN} //header
+                        responsiveLayout="scroll"
+                    >
+                        <Column
+                            field="ID_PRESUN"
+                            header="Id presunu"
+                            style={{ minWidth: "8rem" }}
+                        ></Column>
+                        <Column
+                            field="ID_SKLAD_OBJ"
+                            header="Id objednávajúceho skladu"
+                            style={{ minWidth: "16rem" }}
+                        ></Column>
+                        <Column
+                            field="ID_ODDELENIA_LIEKU"
+                            header="Id oddelenia lieku"
                             style={{ minWidth: "14rem" }}
                         ></Column>
                         <Column
@@ -695,7 +948,7 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "10rem" }}
                         ></Column>
                         <Column
-                            body={NaN} //actionBodyTemplate
+                            body={reqTransfersBodyTemplate}
                             style={{ minWidth: "8rem" }}
                         ></Column>
                     </DataTable>
@@ -811,6 +1064,33 @@ export default function WarehouseTransfers() {
                 </div>
             </Dialog>
 
+            //Dialog for confirming transfers
+            <Dialog
+                visible={showConfirmTransferDialog}
+                style={{ width: "450px" }}
+                header="Confirm"
+                modal
+                footer={NaN}
+                onHide={hideConfirmDeniedDialog}
+            >
+                <div className={"submit-button"}>
+                    <Button style={{width: "50%"}} label="Potvrdiť presun" onClick={confirmRequestedTransfer} />
+                </div>
+            </Dialog>
+
+            //Dialog for declining transfers
+            <Dialog
+                visible={showDeniedTransferDialog}
+                style={{ width: "450px" }}
+                header="Confirm"
+                modal
+                footer={NaN}
+                onHide={hideConfirmDeniedDialog}
+            >
+                <div className={"submit-button"}>
+                    <Button style={{width: "50%"}} label="Zamietnuť presun" onClick={deniedRequestedTransfer} />
+                </div>
+            </Dialog>
         </div>
     );
 }

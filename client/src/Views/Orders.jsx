@@ -17,7 +17,6 @@ import {InputNumber} from "primereact/inputnumber";
 
 export default function Orders() {
 
-
     //------------------------------------------------------------------------------------------------
     let skladId = 30;
     //------------------------------------------------------------------------------------------------
@@ -211,10 +210,10 @@ export default function Orders() {
             _order.ID_SKLAD = skladId;
             _order.ZOZNAM_LIEKOV = formattedString;
 
-            var currentDate = new Date();
-            var day = currentDate.getDate();
-            var month = currentDate.getMonth() + 1;
-            var year = currentDate.getFullYear();
+            let currentDate = new Date();
+            let day = currentDate.getDate();
+            let month = currentDate.getMonth() + 1;
+            let year = currentDate.getFullYear();
 
             _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
             _orders.push(_order);

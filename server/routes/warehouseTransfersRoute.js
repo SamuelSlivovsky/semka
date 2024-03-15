@@ -4,16 +4,28 @@ const controller = require("../controllers/warehouseTransfersController");
 const verify = require("../middleware/verifyUser");
 
 router.get(
-    "/allFin",
+    "/allFin/:id",
     verify.verifyRoles(0, 2, 3, 5),
     controller.getFinishedTransfers
 );
 
 router.get(
-    "/allWait",
+    "/allWait/:id",
     verify.verifyRoles(0, 2, 3, 5),
     controller.getWaitingTransfers
 );
+
+router.get(
+    "/allDec/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getDeclinedTransfers
+);
+
+router.get(
+    "/reqTransfers/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getRequestedTransfers
+)
 
 router.get(
     "/list/:id",
@@ -46,10 +58,16 @@ router.post(
 )
 
 router.post(
-    "/createHospTransfer",
+    "/createTransfer",
     verify.verifyRoles(0, 2, 3, 5),
-    controller.createHospTransfer
+    controller.createTransfer
 );
+
+router.post(
+    "/deniedTransfer",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.deniedTransfer
+)
 
 //@TODO add this router and function so new transfers could be added under pharmacy (will be called at same time with addTransfer)
 router.get(
