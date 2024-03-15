@@ -68,7 +68,7 @@ function zistiPohlavie(rodneCislo) {
 }
 
 
-function calculateAgeAndBirthDate(rod_cislo) {
+function calkulaciaDatumuAVeku(rod_cislo) {
     let thirdDigit = parseInt(rod_cislo.substring(2, 3));
     let rok, mesiac, den, datumNarodenia, vek;
 
@@ -153,7 +153,7 @@ function hashPacienti(pacienti) {
             rodneCislo = generujRodneCislo(pohlavie, pacient.ROD_CISLO);
         }
 
-        const podrobnosti = calculateAgeAndBirthDate(rodneCislo);
+        const podrobnosti = calkulaciaDatumuAVeku(rodneCislo);
 
         return {
             ...pacient,

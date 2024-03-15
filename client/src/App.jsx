@@ -397,7 +397,7 @@ function App() {
           <>
             {sidebarButtonsDoctor} {sidebarButtonsChief}
           </>
-        ) : userData !== null && userData.UserInfo.role === 4 ? (
+        ) : userData !== null && userData.UserInfo.role === 9999 ? (
           sidebarButtonsPatient
         ) : userData !== null && userData.UserInfo.role === 5 ? (
             sidebarWarehouseManager
@@ -451,7 +451,7 @@ function App() {
             <>
               {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
-          ) : userData && userData.UserInfo.role === 4 ? (
+          ) : userData && userData.UserInfo.role === 9999 ? (
             renderPatientRoutes()
           ) : typeof userData !== "undefined" &&
           userData !== null &&

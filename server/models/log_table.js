@@ -1,7 +1,7 @@
 const database = require("../database/Database");
 
 
-async function getLogs() {
+async function getAllLogs() {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
@@ -52,6 +52,6 @@ async function insertLogFailedLogin(body) {
 
 module.exports = {
     insertLogFailedLogin,
-    getLogs,
+    getAllLogs,
     getNumberOfWrongLogins,
 };

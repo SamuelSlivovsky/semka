@@ -22,9 +22,7 @@ export default function ErrorLogs() {
         const token = localStorage.getItem("hospit-user");
         const userDataHelper = GetUserData(token);
         const headers = {authorization: "Bearer " + token};
-        fetch(`logs/getLogs`, {
-            headers,
-        })
+        fetch(`logs/getLogs`, {headers})
             .then((response) => {
                 // Kontrola ci response je ok (status:200)
                 if (response.ok) {
