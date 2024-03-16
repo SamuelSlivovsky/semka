@@ -1,7 +1,9 @@
 import 'leaflet/dist/leaflet.css';
+import * as moment from 'moment';
 import { Button } from 'primereact/button';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
+import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
 import React, { useEffect, useState } from 'react';
 import * as ReactDOMServer from 'react-dom/server';
@@ -28,6 +30,26 @@ export default function InteractiveMap() {
   const [hospitalMap, setHospitalMap] = useState('');
   const [bedAvailability, setBedAvailability] = useState([]);
   const [equipment, setEquipment] = useState([]);
+  const [layerPopup, setLayerPopup] = useState({});
+  const [possiblePatientMoveBedsInRoom, setPossiblePatientMoveBedsInRoom] =
+    useState([]);
+  const [displayPatientMoveDialog, setDisplayPatientMoveDialog] =
+    useState(false);
+  const [patientMoveData, setPatientMoveData] = useState({
+    fromBedId: Number,
+    toBedId: Number | null,
+    fromRoomNumber: String,
+    toRoomNumber: String | null,
+    patientHospitalizedFrom: moment.Moment,
+    patientHospitalizedTo: moment.Moment,
+  });
+  const [moveRoomData, setMoveRoomData] = useState({
+    roomNumber: String,
+    isWardRoom: Boolean,
+    departmentName: String,
+    doctor: Object,
+    nurse: Object,
+  });
 
   useEffect(() => {
     setEquipment([{ equipment: 'Teplomer', quantity: 3 }]);
@@ -124,6 +146,66 @@ export default function InteractiveMap() {
     }
   };
 
+  const getBedRoomData = async (roomNumber) => {
+    try {
+      const token = localStorage.getItem('hospit-user');
+      const headers = { authorization: 'Bearer ' + token };
+      let response = await fetch(`/lozko/room/${roomNumber}`, { headers });
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching bed data:', error);
+      throw error;
+    }
+  };
+
+  const movePatient = async () => {
+    try {
+      if (
+        !patientMoveData.toBedId ||
+        !patientMoveData.fromBedId ||
+        !patientMoveData.patientHospitalizedFrom ||
+        !patientMoveData.patientHospitalizedTo
+      ) {
+        throw new Error('Invalid patient move data');
+      }
+
+      const token = localStorage.getItem('hospit-user');
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      };
+      await fetch(
+        `/miestnost/movePatientToAnotherRoom/${patientMoveData.fromBedId}/${
+          patientMoveData.toBedId
+        }/${moment(patientMoveData.patientHospitalizedFrom).format(
+          'DD.MM.YYYY'
+        )}/${moment(patientMoveData.patientHospitalizedTo).format(
+          'DD.MM.YYYY'
+        )}`,
+
+        requestOptions
+      );
+
+      onPatientMoveDialogHide();
+      const changedBeds = await changeBeds(
+        moveRoomData.roomNumber,
+        moveRoomData.isWardRoom,
+        moveRoomData.departmentName,
+        moveRoomData.doctor,
+        moveRoomData.nurse
+      );
+      layerPopup.setContent(ReactDOMServer.renderToString(changedBeds));
+      await getWardRoomAvailability();
+      await getHospitalMapData();
+    } catch (error) {
+      console.error('Error fetching bed data:', error);
+      throw error;
+    }
+  };
+
   const onEachFeature = async (feature, layer) => {
     const roomNumber =
       feature.properties.room_number[
@@ -159,6 +241,7 @@ export default function InteractiveMap() {
 
     layer.on('click', async () => {
       const popup = layer.getPopup();
+      setLayerPopup(popup);
 
       try {
         const roomPopupWithBedData = await changeBeds(
@@ -173,6 +256,42 @@ export default function InteractiveMap() {
         console.error('Error updating beds:', error);
       }
     });
+  };
+
+  /**
+   * Function to be called from the popup button
+   */
+  window.displayPatientMovePopup = (
+    bedID,
+    hospitalizedFrom,
+    hospitalizedTo,
+    roomNumber,
+    departmentName,
+    doctor,
+    nurse
+  ) => {
+    setPatientMoveData({
+      fromBedId: bedID,
+      toBedId: null,
+      fromRoomNumber: roomNumber,
+      toRoomNumber: null,
+      patientHospitalizedFrom: moment(hospitalizedFrom),
+      patientHospitalizedTo: moment(hospitalizedTo),
+    });
+
+    setMoveRoomData({
+      roomNumber,
+      isWardRoom: true,
+      departmentName,
+      doctor,
+      nurse,
+    });
+
+    setDisplayPatientMoveDialog(true);
+  };
+
+  const onPatientMoveDialogHide = () => {
+    setDisplayPatientMoveDialog(false);
   };
 
   const roomPopup = (
@@ -221,7 +340,28 @@ export default function InteractiveMap() {
                 header='Pobyt do'
                 body={(rowData) => renderBedData(rowData, BedInfo.POBYT_DO)}
               ></Column>
-              <Column field='button'></Column>
+              <Column
+                field='button'
+                body={(rowData) =>
+                  rowData.MENO ? (
+                    <div
+                      dangerouslySetInnerHTML={{
+                        __html: `
+                        <button class="p-button p-component pi pi-arrow-up-right" onClick="displayPatientMovePopup(
+                          ${rowData.ID_LOZKA}, 
+                          '${rowData.POBYT_OD}', 
+                          '${rowData.POBYT_DO}', 
+                          '${roomNumber}', 
+                          '${departmentName}', 
+                          ${JSON.stringify(doctor)?.replace(/"/g, '&quot;')}, 
+                          ${JSON.stringify(nurse)?.replace(/"/g, '&quot;')}
+                        )"></button>
+                  `,
+                      }}
+                    ></div>
+                  ) : null
+                }
+              ></Column>
             </DataTable>
           </div>
         ) : null}
@@ -243,23 +383,16 @@ export default function InteractiveMap() {
     doctor,
     nurse
   ) => {
-    try {
-      const token = localStorage.getItem('hospit-user');
-      const headers = { authorization: 'Bearer ' + token };
-      let response = await fetch(`/lozko/room/${roomNumber}`, { headers });
-      response = await response.json();
-      return roomPopup(
-        roomNumber,
-        isWardRoom,
-        departmentName,
-        doctor,
-        nurse,
-        response
-      );
-    } catch (error) {
-      console.error('Error fetching bed data:', error);
-      throw error;
-    }
+    const roomData = await getBedRoomData(roomNumber);
+
+    return roomPopup(
+      roomNumber,
+      isWardRoom,
+      departmentName,
+      doctor,
+      nurse,
+      roomData
+    );
   };
 
   const changeRoomColors = (feature) => {
@@ -405,11 +538,119 @@ export default function InteractiveMap() {
     ).then(() => console.log('a')); */
   };
 
+  const setPatientMoveRoom = (roomNumber) => {
+    setTimeout(() => {
+      setPatientMoveData((prevData) => ({
+        ...prevData,
+        toRoomNumber: roomNumber,
+      }));
+    });
+
+    getBedRoomData(roomNumber).then((data) => {
+      setPossiblePatientMoveBedsInRoom(data.filter((bed) => !bed.MENO));
+    });
+  };
+
+  const renderPatientMoveDialog = () => {
+    const bed = bedAvailability.filter((availableBed) =>
+      rooms.some(
+        (room) =>
+          room.ID_MIESTNOSTI === availableBed.ID_MIESTNOSTI &&
+          availableBed.POCET_PACIENTOV <= availableBed.KAPACITA
+      )
+    );
+
+    return (
+      <Dialog
+        visible={displayPatientMoveDialog}
+        onHide={onPatientMoveDialogHide}
+      >
+        <div className='patient-move-dialog-inputs'>
+          <label htmlFor='patientMoveFromRoom'>Z miestnosti</label>
+          <Dropdown
+            id='patientMoveFromRoom'
+            value={patientMoveData.fromRoomNumber}
+            onChange={(e) =>
+              setPatientMoveData((prevData) => ({
+                ...prevData,
+                fromRoomNumber: e.value,
+              }))
+            }
+            options={[patientMoveData.fromRoomNumber]}
+            placeholder='Z miestnosti'
+            disabled={true}
+            showClear={true}
+          />
+        </div>
+        <div className='patient-move-dialog-inputs'>
+          <label htmlFor='patientMoveFromBedId'>Z lôžka</label>
+          <Dropdown
+            id='patientMoveFromBedId'
+            value={patientMoveData.fromBedId}
+            onChange={(e) =>
+              setPatientMoveData((prevData) => ({
+                ...prevData,
+                fromBedId: Number(e.value) || null,
+              }))
+            }
+            options={[patientMoveData.fromBedId]}
+            placeholder='Z lôžka'
+            disabled={true}
+            showClear={true}
+          />
+        </div>
+        <div className='patient-move-dialog-inputs'>
+          <label htmlFor='patientMoveToRoom'>Do miestnosti</label>
+          <Dropdown
+            id='patientMoveToRoom'
+            value={patientMoveData.toRoomNumber}
+            onChange={(e) => setPatientMoveRoom(e.value || null)}
+            options={[
+              { label: 'Do miestnosti', value: null, disabled: true },
+              ...bed.map((room) => ({
+                label: room.ID_MIESTNOSTI,
+                value: room.ID_MIESTNOSTI,
+              })),
+            ]}
+            placeholder='Do miestnosti'
+            showClear={true}
+          />
+        </div>
+        <div className='patient-move-dialog-inputs'>
+          <label htmlFor='patientMoveToBedId'>Na lôžko</label>
+          <Dropdown
+            id='patientMoveToBedId'
+            value={patientMoveData.toBedId}
+            onChange={(e) =>
+              setPatientMoveData((prevData) => ({
+                ...prevData,
+                toBedId: Number(e.value) || null,
+              }))
+            }
+            options={[
+              { label: 'Na lôžko', value: null, disabled: true },
+              ...possiblePatientMoveBedsInRoom.map((beds) => ({
+                label: beds.ID_LOZKA,
+                value: beds.ID_LOZKA,
+              })),
+            ]}
+            placeholder='Na lôžko'
+            showClear={true}
+          />
+        </div>
+        <div>
+          <Button label='Presunúť pacienta' onClick={movePatient} />
+        </div>
+      </Dialog>
+    );
+  };
+
   const renderMap = () => {
     if (!hospitalMap) return;
 
     return (
       <div className='map-container'>
+        {renderPatientMoveDialog()}
         <MapContainer
           center={[49.05198629377708, 20.303411113943554]}
           zoom={100}

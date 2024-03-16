@@ -1,4 +1,4 @@
-const database = require("../database/Database");
+const database = require('../database/Database');
 
 async function getMiestnosti(id) {
   try {
@@ -94,7 +94,37 @@ async function getDostupneMiestnosti(id_oddelenia, trv, dat_od) {
     );
     return result.rows;
   } catch (err) {
-    throw new Error("Database error: " + err);
+    throw new Error('Database error: ' + err);
+  }
+}
+
+async function movePatientToAnotherRoom(
+  bedIdFrom,
+  bedIdTo,
+  hospitalizedFrom,
+  hospitalizedTo
+) {
+  try {
+    if (!bedIdFrom || !bedIdTo || !hospitalizedFrom || !hospitalizedTo) {
+      throw new Error('Invalid parameters for movePatientToAnotherRoom');
+    }
+
+    let conn = await database.getConnection();
+    const sqlStatement = `
+    BEGIN
+      move_patient_to_another_room(:bedIdFrom, :bedIdTo, TO_DATE(:hospitalizedFrom, 'DD.MM.YYYY'), TO_DATE(:hospitalizedTo, 'DD.MM.YYYY'));
+    END;`;
+
+    const result = await conn.execute(sqlStatement, {
+      bedIdFrom: bedIdFrom,
+      bedIdTo: bedIdTo,
+      hospitalizedFrom: hospitalizedFrom,
+      hospitalizedTo: hospitalizedTo,
+    });
+
+    console.log(`Patient moved from ${bedIdFrom} to ${bedIdTo}`);
+  } catch (err) {
+    console.log(err);
   }
 }
 
@@ -103,4 +133,5 @@ module.exports = {
   getDostupneMiestnosti,
   getRoomsForHospital,
   getWardRoomsAvailability,
+  movePatientToAnotherRoom,
 };

@@ -68,3 +68,7 @@ div.change-floors-container {
     justify-content: center;
     row-gap: 1rem;
 }
+
+.leaflet-popup-content {
+    width: fit-content !important;
+}

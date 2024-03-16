@@ -13,5 +13,10 @@ router.get(
   verify.verifyRoles(0, 2, 3),
   controller.getWardRoomsAvailability
 );
+router.post(
+  '/movePatientToAnotherRoom/:bedIdFrom/:bedIdTo/:hospitalizedFrom/:hospitalizedTo',
+  verify.verifyRoles(0, 2, 3),
+  controller.movePatientToAnotherRoom
+);
 
 module.exports = router;
