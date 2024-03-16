@@ -119,4 +119,15 @@ module.exports = {
       res.status(200).json(info);
     })();
   },
+
+  updateUcinnaLatka: (req, res) => {
+    const ucinnaLatka = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await ucinnaLatka.updateUcinnaLatka(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
 };

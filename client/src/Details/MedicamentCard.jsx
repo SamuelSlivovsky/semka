@@ -65,10 +65,7 @@ export default function MedicamentCard(props) {
           {renderDetail("Typ lieku: ", detail.TYP)}
           {renderDetail("Dávkovanie lieku: ", detail.DAVKOVANIE)}
           {renderDetail("Množstvo: ", detail.MNOZSTVO)}
-          {renderDetail(
-            "Účinná látka: ",
-            detail.ID_UCINNA_LATKA + ": " + detail.NAZOV_UCINNEJ_LATKY
-          )}
+          {renderDetail("Účinná látka: ", detail.NAZOV_UCINNEJ_LATKY)}
           {renderDetail("Účinná látka (latinsky): ", detail.LATINSKY_NAZOV)}
           {renderCardFooter()}
         </Card>

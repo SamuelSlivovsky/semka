@@ -211,10 +211,10 @@ async function getReportInfo(id) {
           count(distinct manazer.cislo_zam) as "POCET_MANAZEROV",
           count(distinct lekarnik.cislo_zam) as "POCET_LEKARNIKOV",
           count(distinct laborant.cislo_zam) as "POCET_LABORANTOV",
-          count(tzp.datum_trvanlivosti) as "POCET_ZDR_POMOCOK",
-          count(tl.datum_trvanlivosti) as "POCET_LIEKOV",
-          count(volnopredajny.na_predpis) as "POCET_LIEKOV_VOLNY",
-          count(predpis.na_predpis) as "POCET_LIEKOV_PREDPIS"
+          count(distinct tzp.datum_trvanlivosti) as "POCET_ZDR_POMOCOK",
+          count(distinct tl.datum_trvanlivosti) as "POCET_LIEKOV",
+          count(distinct volnopredajny.na_predpis) as "POCET_LIEKOV_VOLNY",
+          count(distinct predpis.na_predpis) as "POCET_LIEKOV_PREDPIS"
           from lekaren l
           join zamestnanci manazer on (manazer.id_lekarne = l.id_lekarne)
           join zamestnanci lekarnik on (lekarnik.id_lekarne = l.id_lekarne and lekarnik.id_lekarne = manazer.id_lekarne)
@@ -238,6 +238,33 @@ async function getReportInfo(id) {
   }
 }
 
+async function updateUcinnaLatka(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `UPDATE ucinne_latky_liekov 
+    SET id_ucinna_latka = (
+        SELECT id_ucinna_latka 
+        FROM ucinna_latka 
+        WHERE nazov = :nazov
+    )
+    WHERE id_liek = :id_liek`;
+    console.log(body);
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        nazov: body.nazov,
+        id_liek: body.id_liek,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getManazeriLekarni,
   getLekarnici,
@@ -251,4 +278,5 @@ module.exports = {
   getZoznamZdravotnickychPomocok,
   getDetailZdravotnickejPomocky,
   getReportInfo,
+  updateUcinnaLatka,
 };

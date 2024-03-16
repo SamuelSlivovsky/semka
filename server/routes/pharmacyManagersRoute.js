@@ -80,4 +80,9 @@ router.get(
   controller.getReportInfo
 );
 
+router.post(
+  "/updateUcinnaLatka",
+  verify.verifyRoles(0, 10),
+  controller.updateUcinnaLatka
+);
 module.exports = router;
