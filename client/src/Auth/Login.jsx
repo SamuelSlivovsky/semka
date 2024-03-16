@@ -15,11 +15,11 @@ export const Login = () => {
     const navigate = useNavigate();
     const toast = useRef(null);
     const [logDetails, setLogDetails] = useState(null);
+    const oldLogDetails = null;
     const defaultValues = {
         userid: "",
         password: "",
     };
-
     const {
         control,
         formState: {errors},
@@ -42,13 +42,13 @@ export const Login = () => {
             body: JSON.stringify({
                 userid: data.userid,
                 pwd: data.password,
+                ip: logDetails,
             }),
         };
         fetch("/auth/login", requestOptions)
             .then((response) => response.json())
             .then((res) => {
                 if (res.message !== undefined) {
-                    fetch("")
                     navigate("/logout");
                     navigate("/login")
                     toast.current.show({severity: 'error', summary: res.message, life: 999999999});

@@ -5,13 +5,14 @@ async function getZoznamLekarov() {
     try {
         let conn = await database.getConnection();
 
-        const result = await conn.execute(
-            `SELECT meno || ', ' ||priezvisko as "meno", oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, cislo_zam
+    const result = await conn.execute(
+      `SELECT cislo_zam ,meno || ', ' ||priezvisko as "meno", oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, cislo_zam
       from  zamestnanci
                     join os_udaje using(rod_cislo)
                     join nemocnica using(id_nemocnice)
-                    left join oddelenie on(zamestnanci.id_oddelenia = oddelenie.id_oddelenia)`
-        );
+                    left join oddelenie on(zamestnanci.id_oddelenia = oddelenie.id_oddelenia)
+                    where id_typ = 1 OR id_typ = 2 OR id_typ = 3`
+    );
 
         return result.rows;
     } catch (err) {
@@ -204,11 +205,12 @@ async function getVysetreniaAdmin() {
 
 
 async function getHospitalizacie(id) {
-    try {
-        let conn = await database.getConnection();
-        const hospitalizacie = await conn.execute(
-            `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
-      as "start",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum
+  try {
+    let conn = await database.getConnection();
+    const hospitalizacie = await conn.execute(
+      `select os_udaje.rod_cislo, meno, priezvisko, to_char(zdravotny_zaz.datum,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') 
+      as "start",id_zaznamu as "id_zaz", to_char(zdravotny_zaz.datum,'DD.MM.YYYY') || '-' || nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY'),'Neukončená') datum,
+      hospitalizacia.dat_do, hospitalizacia.id_hosp, hospitalizacia.prepustacia_sprava
        from hospitalizacia
         join zdravotny_zaz using(id_zaznamu)
           join zdravotna_karta using(id_karty)
@@ -218,9 +220,10 @@ async function getHospitalizacie(id) {
                   join miestnost on (lozko.id_miestnost = miestnost.id_miestnosti)
                   join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
                   join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
-                    where zamestnanci.cislo_zam = :id`,
-            [id]
-        );
+                    where zamestnanci.cislo_zam = :id
+                    order by hospitalizacia.dat_do desc`,
+      [id]
+    );
 
         hospitalizacie.rows.forEach((element) => {
             element.type = "HOS";
@@ -232,6 +235,7 @@ async function getHospitalizacie(id) {
     }
 }
 
+//TODO spomenut obmedzenie na 10000 zaznamov z dovodu optimalizacie a rychlosti nacitavania
 async function getHospitalizacieAdmin() {
     try {
         let conn = await database.getConnection();

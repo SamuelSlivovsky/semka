@@ -11,6 +11,7 @@ const verifyJWT = require("./middleware/verifyJWT");
 const credentials = require("./middleware/credentials");
 // ROUTES
 const lekarRoute = require("./routes/lekarRoute");
+const logRoute = require("./routes/logRoute");
 const pharmacyManagersRoute = require("./routes/pharmacyManagersRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
@@ -28,6 +29,7 @@ const updateRoute = require("./routes/updateRoute");
 const chatRoute = require("./routes/chatRoute");
 const ordersRoute = require("./routes/ordersRoute");
 const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
+const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
 
 const server = http.createServer(app); // Create an HTTP server using your Express app
 const io = socketIo(server); // Initialize Socket.io with the HTTP server
@@ -40,9 +42,9 @@ app.use(
 );
 
 app.use(cookieParser()); // Middleware for cookies
-
 app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
+app.use("/logs", logRoute);
 app.use("/sklad", storageRoute);
 app.use("/lekarenskySklad", pharmacyStorageRoute);
 app.use("/lekar", lekarRoute);
@@ -61,24 +63,26 @@ app.use("/update", updateRoute);
 app.use("/chat", chatRoute);
 app.use("/objednavky", ordersRoute);
 app.use("/presuny", warehouseTransfersRoute);
+app.use("/hospitalizacia", hospitalizaciaRoute);
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
   socket.on("sendMessage", (message, params) => {
     io.emit("newMessage", {
       content: message,
+      image: params.image,
       sender: params.userId,
       type: "text",
     });
   });
 
-  socket.on("sendImage", (image, params) => {
-    io.emit("newMessage", {
-      content: image,
-      sender: params.userId,
-      type: "image",
-    });
-  });
+  // socket.on("sendImage", (image, params) => {
+  //   io.emit("newMessage", {
+  //     content: image,
+  //     sender: params.userId,
+  //     type: "image",
+  //   });
+  // });
 
   socket.on("disconnect", () => {});
   socket.on("typing", (params) => {

@@ -47,4 +47,28 @@ router.get(
   controller.getKonzilia
 );
 
+router.post(
+  "/konzilia/update",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.updateKonzilium
+);
+
+router.get(
+  "/zaznamy/:id",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getZaznamy
+);
+
+router.get(
+  "/miestnosti/:id",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getMiestnosti
+);
+
+router.get(
+  "/neobsadeneLozka/:id",
+  verify.verifyRoles(0, 1, 2, 3),
+  controller.getNeobsadeneLozka
+);
+
 module.exports = router;

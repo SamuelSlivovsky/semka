@@ -6,7 +6,9 @@ import { Dialog } from "primereact/dialog";
 import { InputMask } from "primereact/inputmask";
 import { classNames } from "primereact/utils";
 import { AutoComplete } from "primereact/autocomplete";
+import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
+import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
 export default function PatientForm() {
   const [showMessage, setShowMessage] = useState(false);
@@ -33,7 +35,7 @@ export default function PatientForm() {
     if (!data.priezvisko) {
       errors.priezvisko = "Priezvisko je povinné";
     }
-    if (!data.rod_cislo) {
+    if (!data.cudzinec && !data.rod_cislo) {
       errors.rod_cislo = "Rodné číslo je povinné";
     }
     if (!data.psc) {
@@ -42,6 +44,7 @@ export default function PatientForm() {
     if (!data.dat_od) {
       errors.dat_od = "Dátum zápisu je povinný";
     }
+    console.log(errors);
     return errors;
   };
 
@@ -63,13 +66,21 @@ export default function PatientForm() {
         id_lekara: userData.UserInfo.userid,
         ulica: data.ulica,
         dat_od: data.dat_od.toLocaleString("en-GB").replace(",", ""),
-        dat_do: null,
+        dat_narodenia: data.dat_narodenia
+          ? data.dat_narodenia.toLocaleString("en-GB").replace(",", "")
+          : "",
+        cudzinec: data.cudzinec,
+        dat_do:
+          data.dat_do != null && data.dat_do != ""
+            ? data.dat_do.toLocaleString("en-GB").replace(",", "")
+            : null,
+        pohlavie: data.pohlavie,
+        typ_krvi: data.typ_krvi,
       }),
     };
-    const responsePatient = await fetch(
-      "/add/pacient",
-      requestOptionsPatient
-    ).then(() => setShowMessage(true));
+    await fetch("/add/pacient", requestOptionsPatient).then(() =>
+      setShowMessage(true)
+    );
 
     form.restart();
   };
@@ -108,7 +119,7 @@ export default function PatientForm() {
   );
   return (
     <div
-      style={{ width: "100%", marginTop: "2rem" }}
+      style={{ width: "100%", marginTop: "2rem", marginLeft: "10px" }}
       className="p-fluid grid formgrid"
     >
       <Dialog
@@ -139,9 +150,13 @@ export default function PatientForm() {
             priezvisko: "",
             psc: "",
             telefon: "",
+            cudzinec: false,
+            dat_narodenia: null,
+            pohlavie: "M",
+            typ_krvi: "0-",
           }}
           validate={validate}
-          render={({ handleSubmit }) => (
+          render={({ handleSubmit, form, values }) => (
             <form onSubmit={handleSubmit} className="p-fluid">
               <Field
                 name="meno"
@@ -193,27 +208,103 @@ export default function PatientForm() {
                 )}
               />
               <Field
-                name="rod_cislo"
+                type="checkbox"
+                name="cudzinec"
+                render={({ input, meta }) => (
+                  <div className="flex ml-2 mb-4" style={{ gap: "10px" }}>
+                    <Checkbox id="cudzinec" {...input} />
+                    <label htmlFor="cudzinec">Cudzinec?*</label>
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
+              {!values.cudzinec ? (
+                <Field
+                  name="rod_cislo"
+                  render={({ input, meta }) => (
+                    <div className="field col-12">
+                      <label
+                        htmlFor="rod_cislo"
+                        className={classNames({
+                          "p-error": isFormFieldValid(meta),
+                        })}
+                      >
+                        Rodné číslo*
+                      </label>
+                      <InputMask
+                        id="rod_cislo"
+                        mask="999999/9999"
+                        {...input}
+                        className={classNames({
+                          "p-invalid": isFormFieldValid(meta),
+                        })}
+                      />
+
+                      {getFormErrorMessage(meta)}
+                    </div>
+                  )}
+                />
+              ) : (
+                <>
+                  <Field
+                    name="pohlavie"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label htmlFor="dat_narodenia">Pohlavie*</label>
+                        <Dropdown
+                          id="pohlavie"
+                          {...input}
+                          options={["M", "Ž"]}
+                        />
+                      </div>
+                    )}
+                  />
+                  <Field
+                    name="dat_narodenia"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label
+                          htmlFor="dat_narodenia"
+                          className={classNames({
+                            "p-error": isFormFieldValid(meta),
+                          })}
+                        >
+                          Dátum narodenia*
+                        </label>
+                        <Calendar
+                          id="dat_narodenia"
+                          {...input}
+                          className={classNames({
+                            "p-invalid": isFormFieldValid(meta),
+                          })}
+                        />
+
+                        {getFormErrorMessage(meta)}
+                      </div>
+                    )}
+                  />
+                </>
+              )}{" "}
+              <Field
+                name="typ_krvi"
                 render={({ input, meta }) => (
                   <div className="field col-12">
-                    <label
-                      htmlFor="rod_cislo"
-                      className={classNames({
-                        "p-error": isFormFieldValid(meta),
-                      })}
-                    >
-                      Rodné číslo*
-                    </label>
-                    <InputMask
-                      id="rod_cislo"
-                      mask="999999/9999"
+                    <label htmlFor="dat_narodenia">Krvná skupina*</label>
+                    <Dropdown
+                      id="pohlavie"
                       {...input}
-                      className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
-                      })}
+                      filter
+                      options={[
+                        "0-",
+                        "0+",
+                        "B-",
+                        "B+",
+                        "A-",
+                        "A+",
+                        "AB-",
+                        "AB+",
+                      ]}
                     />
-
-                    {getFormErrorMessage(meta)}
                   </div>
                 )}
               />
@@ -292,7 +383,6 @@ export default function PatientForm() {
                   </div>
                 )}
               />
-
               <div
                 className="field col-12 "
                 style={{ justifyContent: "center", display: "grid" }}

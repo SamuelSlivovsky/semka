@@ -8,12 +8,16 @@ export default function TabHospitalizations() {
     const toast = useRef(null);
     const navigate = useNavigate();
     const [hospitalizacie, setHospitalizacie] = useState([]);
+const [loading, setLoading] = useState(false);
+    useEffect(() => {fetchData();
+  }, []);
 
-    useEffect(() => {
+  const fetchData = async () => {
+    setLoading(true);
         const token = localStorage.getItem("hospit-user");
         const userDataHelper = GetUserData(token);
         const headers = {authorization: "Bearer " + token};
-        fetch(`/lekar/hospitalizacie/${userDataHelper.UserInfo.userid}`, {headers})
+        await fetch(`/lekar/hospitalizacie/${userDataHelper.UserInfo.userid}`, {headers})
             .then((response) => {
                 // Kontrola ci response je ok (status:200)
                 if (response.ok) {
@@ -32,23 +36,25 @@ export default function TabHospitalizations() {
                 }
             })
             .then((data) => {
-                setHospitalizacie(data);
+                setHospitalizacie(data);setLoading(false);
             });
-    }, []);
-
-    const data = {
-        tableName: "Hospitalizácie",
-        cellData: hospitalizacie,
-        titles: [
-            {field: "ROD_CISLO", header: "Rodné číslo"},
-            {field: "MENO", header: "Meno"},
-            {field: "PRIEZVISKO", header: "Priezvisko"},
-            {field: "DATUM", header: "Dátum od - Dátum do"},
-        ],
-        allowFilters: true,
-        dialog: true,
-        eventType: "Hospitalizácia",
     };
+
+  const data = {
+    tableName: "Hospitalizácie",
+    cellData: hospitalizacie,
+    fetchData: () => fetchData(),
+    titles: [
+      { field: "ROD_CISLO", header: "Rodné číslo" },
+      { field: "MENO", header: "Meno" },
+      { field: "PRIEZVISKO", header: "Priezvisko" },
+      { field: "DATUM", header: "Dátum od - Dátum do" },
+    ],
+    allowFilters: true,
+    dialog: true,
+    eventType: "Hospitalizácia",
+    tableLoading: loading,
+  };
 
     return <div><Toast ref={toast} position="top-center"/>
         {data && <TableMedicalRecords {...data} />}</div>;

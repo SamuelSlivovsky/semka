@@ -1,7 +1,6 @@
 const fs = require("fs");
 const {hash} = require("bcrypt");
 
-//TODO pridat podmienku aby rok bralo z original Rod_Cisla a okolo neho +-5 rokov
 function generujRodneCislo(pohlavie, rodnecislo) {
 
     let rokRodneCislo = parseInt(rodnecislo.substring(0, 2));
@@ -41,8 +40,6 @@ function generujRodneCislo(pohlavie, rodnecislo) {
 
     // Spojenie všetkých častí do rodného čísla
     const rodneCislo = `${rok}${formatovanyMesiac}${formatovanyDen}/${kontrolnyKod}`;
-    //duplicita rodneho cisla
-
     return rodneCislo;
 }
 
@@ -70,7 +67,40 @@ function zistiPohlavie(rodneCislo) {
 
 }
 
+
+function calkulaciaDatumuAVeku(rod_cislo) {
+    let thirdDigit = parseInt(rod_cislo.substring(2, 3));
+    let rok, mesiac, den, datumNarodenia, vek;
+
+    if (thirdDigit === 2 || thirdDigit === 3) {
+        rok = '19' + rod_cislo.substring(0, 2);
+        mesiac = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 20)).slice(-2);
+        den = rod_cislo.substring(4, 6);
+    } else if (thirdDigit === 7 || thirdDigit === 8) {
+        rok = '19' + rod_cislo.substring(0, 2);
+        mesiac = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 70)).slice(-2);
+        den = rod_cislo.substring(4, 6);
+    } else {
+        rok = '19' + rod_cislo.substring(0, 2);
+        mesiac = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 50)).slice(-2);
+        den = rod_cislo.substring(4, 6);
+    }
+
+    datumNarodenia = new Date(rok, mesiac - 1, den);
+    let aktualnyDatum = new Date();
+    vek = aktualnyDatum.getFullYear() - datumNarodenia.getFullYear();
+    let m = aktualnyDatum.getMonth() - datumNarodenia.getMonth();
+    if (m < 0 || (m === 0 && aktualnyDatum.getDate() < datumNarodenia.getDate())) {
+        vek--;
+    }
+
+    datumNarodenia = datumNarodenia.toLocaleDateString();
+
+    return { vek, datumNarodenia };
+}
+
 function nacitajDataZoSuboru(nazovSuboru) {
+    //Moznost prepojenia s API v buducnosti
     try {
         const obsahSuboru = fs.readFileSync(`${nazovSuboru}`, "utf-8");
         //Oddelovac v subore medzi menami
@@ -105,7 +135,7 @@ function hashPacienti(pacienti) {
         let novepriezvisko;
         let rodneCislo;
         let zoznamRodnychCisel = [];
-        if (pohlavie === "muz") {
+        if (pohlavie.includes("muz")) {
             indexMena = Math.floor(Math.random() * menaMuzy.length);
             indexPriezviska = Math.floor(Math.random() * priezviskoMuzy.length);
             noveMeno = menaMuzy[indexMena];
@@ -122,57 +152,19 @@ function hashPacienti(pacienti) {
         while (zoznamRodnychCisel.includes(rodneCislo)) {
             rodneCislo = generujRodneCislo(pohlavie, pacient.ROD_CISLO);
         }
+
+        const podrobnosti = calkulaciaDatumuAVeku(rodneCislo);
+
         return {
             ...pacient,
             MENO: noveMeno,
             ROD_CISLO: rodneCislo,
             PRIEZVISKO: novepriezvisko,
+            VEK: podrobnosti.vek,
+            DATUM_NARODENIA: podrobnosti.datumNarodenia,
         };
     });
     return hashovaniPacienti;
-}
-
-function hashMedical(data) {
-    const menaMuzy = nacitajDataZoSuboru("../server/utils/menaMuzy.txt");
-    const menaZeny = nacitajDataZoSuboru("../server/utils/menaZeny.txt");
-    const priezviskoMuzy = nacitajDataZoSuboru(
-        "../server/utils/priezviskoMuzy.txt"
-    );
-    const priezviskoZeny = nacitajDataZoSuboru(
-        "../server/utils/priezviskoZeny.txt"
-    );
-    if (menaMuzy.length === 0 || menaZeny === 0) {
-        console.error("Nepodarilo sa načítať mená zo súboru.");
-        return data;
-    }
-    // Zmena mien v medicinskych zaznamoch
-    const hashovaneData = data.map((singlerow) => {
-        const pohlavie = zistiPohlavie(singlerow.ROD_CISLO);
-        // Náhodný výber Udajov
-        let indexMena;
-        let noveMeno;
-        let indexPriezviska;
-        let novepriezvisko;
-        if (pohlavie === "muz") {
-            indexMena = Math.floor(Math.random() * menaMuzy.length);
-            indexPriezviska = Math.floor(Math.random() * priezviskoMuzy.length);
-            noveMeno = menaMuzy[indexMena];
-            novepriezvisko = priezviskoMuzy[indexPriezviska];
-        } else {
-            indexMena = Math.floor(Math.random() * menaZeny.length);
-            indexPriezviska = Math.floor(Math.random() * priezviskoZeny.length);
-            noveMeno = menaZeny[indexMena];
-            novepriezvisko = priezviskoZeny[indexPriezviska];
-        }
-
-        return {
-            ...singlerow,
-            MENO: noveMeno,
-            ROD_CISLO: generujRodneCislo(pohlavie),
-            PRIEZVISKO: novepriezvisko,
-        };
-    });
-    return hashovaneData;
 }
 
 //Hash dat zdravotnej karty + nahodny pocet dat
@@ -200,5 +192,4 @@ function hashZdravotnaKarta(data) {
 module.exports = {
     hashZdravotnaKarta,
     hashPacienti,
-    hashMedical,
 };

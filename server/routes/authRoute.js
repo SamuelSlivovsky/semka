@@ -6,7 +6,7 @@ router.post("/register", controller.handleRegister);
 router.post("/login", controller.handleLogin);
 router.get("/logout", controller.handleLogout);
 router.get("/refreshToken", controller.handleRefreshToken);
-router.get("/logData", controller.insertLog);
+router.post("/logData", controller.insertLog);
 
 
 module.exports = router;
