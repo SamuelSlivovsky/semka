@@ -1,22 +1,39 @@
 const bcrypt = require("bcrypt");
 const userModel = require("../models/user");
 var jwt = require("jsonwebtoken");
+const sklad = require("../models/sklad");
+const logy = require("../models/log_table");
 require("dotenv").config();
 
 const handleRegister = async (req, res) => {
-    const {userid, pwd} = req.body;
+    const {userid, pwd, role} = req.body;
     if (!userid || !pwd)
         return res
             .status(400)
-            .json({message: "Username and password are required."});
-    // check for duplicate usernames in the db
+            .json({message: "Vyžaduje sa používateľské meno a heslo."});
 
+    if (pwd.length < 8){
+        return res
+            .status(400)
+            .json({message: "Heslo musí mať aspoň 8 znakov."});
+    }
+    if (!pwd.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)){
+        return res
+            .status(400)
+            .json({message: "Heslo musí obsahovať aspoň jedno veľké písmeno, jedno malé písmeno, jednu číslicu a jeden špeciálny znak."});
+    }
+
+    // check for duplicate usernames in the db
     try {
         if (await userModel.userExists(userid)) {
-            return res.status(409).json({message: `Already exists`});
+            return res
+                .status(409)
+                .json({message: `Používateľ s týmto menom už existuje`});
             // Kontrola ci uzivatel existuje v pacientoch/zamestnancoch
         } else if (await userModel.userExistsInDB(userid)) {
-            return res.status(409).json({message: `No user in database with that ID`});
+            return res
+                .status(409)
+                .json({message: `Používateľ neexistuje v databáze`});
         } else {
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
@@ -30,10 +47,8 @@ const handleRegister = async (req, res) => {
                     const accessToken = jwt.sign(
                         {
                             UserInfo: {
-                                userid: !isNaN(userid)
-                                    ? Number(userid)
-                                    : userid,
-                                role: 3,
+                                userid: !isNaN(userid) ? Number(userid) : userid,
+                                role: role,
                             },
                         },
                         process.env.ACCESS_TOKEN_SECRET,
@@ -42,7 +57,7 @@ const handleRegister = async (req, res) => {
 
                     let body = req.body;
                     body.userid = userid;
-                    body.role = 3;
+                    body.role = role;
                     body.pwd = hash;
                     body.accessToken = accessToken;
 
@@ -59,13 +74,34 @@ const handleRegister = async (req, res) => {
 };
 
 const handleLogin = async (req, res) => {
+
+    if (await logy.getNumberOfWrongLogins(req.body.ip)) {
+        return res
+            .status(401)
+            .json({message: "Príliš veľa neúspešných pokusov o prihlásenie z tejto IP adresy. Skúste to prosím neskôr."});
+    }
+    const logbodyFailed = {
+        ...req.body,
+        status: "failed login",
+    }
+    const logbodyWrongParam = {
+        ...req.body,
+        status: "Wrong parameters",
+    }
+
     const {userid, pwd} = req.body;
-    if (!userid || !pwd)
+    if (!userid || !pwd) {
+        insertLog(logbodyWrongParam)
         return res
             .status(400)
-            .json({message: "Username and password are required."});
-
-    if (!(await userModel.userExists(userid))) return res.sendStatus(401); //Unauthorized
+            .json({message: "Vyžaduje sa používateľské meno a heslo."});
+    }
+    if (!(await userModel.userExists(userid))) {
+        insertLog(logbodyWrongParam)
+        return res
+            .status(400)
+            .json({message: "Používateľ s týmto prihlasovacím menom neexistuje"}); //Does not exist
+    }
 
     const foundUser = await userModel.getUserByUserId(userid);
     const match = await bcrypt.compare(pwd, foundUser.PWD);
@@ -80,13 +116,13 @@ const handleLogin = async (req, res) => {
                 },
             },
             process.env.ACCESS_TOKEN_SECRET,
-            {expiresIn: "3600s"}
+            {expiresIn: "1d"}
         );
 
         const refreshToken = jwt.sign(
             {userid: foundUser.USERID},
             process.env.REFRESH_TOKEN_SECRET,
-            {expiresIn: "1d"}
+            {expiresIn: "3600s"}
         );
 
         userModel.updateUserRefreshToken({
@@ -97,7 +133,8 @@ const handleLogin = async (req, res) => {
         res.cookie("jwt", refreshToken, {httpOnly: true}); //1 day httponly cookie is not available to javascript
         res.status(200).json({accessToken}); //store in memory not in local storage
     } else {
-        res.status(409).json({message: "Passwords not matching"});
+        insertLog(logbodyFailed)
+        res.status(409).json({message: "Používateľské meno alebo heslo je neplatné"});
     }
 };
 
@@ -125,7 +162,6 @@ const handleLogout = async (req, res) => {
 };
 
 const handleRefreshToken = async (req, res) => {
-
     const cookies = req.cookies;
     if (!cookies?.jwt) return res.sendStatus(401);
 
@@ -151,9 +187,23 @@ const handleRefreshToken = async (req, res) => {
     });
 };
 
+const insertLog = async (body) => {
+    const logy = require("../models/log_table");
+    (async () => {
+        ret_val = await logy.insertLogFailedLogin(body);
+        return 200;
+    })().catch((err) => {
+        console.log("Error Kontroler");
+        console.error(err);
+        return 500;
+    });
+};
+
+
 module.exports = {
     handleRegister,
     handleLogin,
     handleLogout,
     handleRefreshToken,
+    insertLog,
 };

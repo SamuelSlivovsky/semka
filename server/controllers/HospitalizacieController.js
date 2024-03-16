@@ -15,4 +15,14 @@ module.exports = {
       res.status(200).send(hospitalizacie);
     })();
   },
+
+  endHospitalization: (req, res) => {
+    (async () => {
+      ret_val = await hospitalizacia.endHospitalization(req.body);
+      res.status(200);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  },
 };

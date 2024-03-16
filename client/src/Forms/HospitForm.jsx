@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { Form, Field } from "react-final-form";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
@@ -8,10 +8,13 @@ import { classNames } from "primereact/utils";
 import { Calendar } from "primereact/calendar";
 import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
 export default function HospitForm(props) {
   const [showMessage, setShowMessage] = useState(false);
   const [base64Data, setBase64Data] = useState(null);
+  const [rooms, setRooms] = useState([]);
+  const [beds, setBeds] = useState([]);
   const fileUploader = useRef(null);
   const validate = (data) => {
     let errors = {};
@@ -28,6 +31,17 @@ export default function HospitForm(props) {
     }
     return errors;
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    const userData = GetUserData(token);
+    fetch(`lekar/miestnosti/${userData.UserInfo.userid}`, { headers })
+      .then((res) => res.json())
+      .then((data) => {
+        setRooms(data);
+      });
+  }, []);
 
   const onSubmit = async (data, form) => {
     const token = localStorage.getItem("hospit-user");
@@ -49,12 +63,12 @@ export default function HospitForm(props) {
             ? data.datum_do.toLocaleString("en-GB").replace(",", "")
             : null,
         nazov: data.nazov,
+        id_lozka: data.lozko.ID_LOZKA,
       }),
     };
-    const responsePatient = await fetch(
-      "/add/hospitalizacia",
-      requestOptionsPatient
-    ).then(() => setShowMessage(true));
+    await fetch("/add/hospitalizacia", requestOptionsPatient).then(() =>
+      setShowMessage(true)
+    );
 
     form.restart();
   };
@@ -72,7 +86,11 @@ export default function HospitForm(props) {
         label="OK"
         className="p-button-text"
         autoFocus
-        onClick={() => setShowMessage(false)}
+        onClick={() => {
+          setShowMessage(false);
+          props.hideDialog();
+          props.onInsert();
+        }}
       />
     </div>
   );
@@ -103,6 +121,17 @@ export default function HospitForm(props) {
       setBase64Data(reader.result.substring(reader.result.indexOf(",") + 1));
     };
   };
+
+  const getLozka = (e) => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    fetch(`lekar/neobsadeneLozka/${e.value.ID_MIESTNOSTI}`, { headers })
+      .then((res) => res.json())
+      .then((data) => {
+        setBeds(data);
+      });
+  };
+
   return (
     <div
       style={{ width: "100%", marginTop: "2rem" }}
@@ -137,9 +166,11 @@ export default function HospitForm(props) {
             datum: null,
             datum_do: null,
             popis: "",
+            miestnost: null,
+            lozko: null,
           }}
           validate={validate}
-          render={({ handleSubmit }) => (
+          render={({ handleSubmit, values }) => (
             <form onSubmit={handleSubmit} className="p-fluid">
               <Field
                 name="rod_cislo"
@@ -154,6 +185,7 @@ export default function HospitForm(props) {
                       Rodné číslo
                     </label>
                     <InputMask
+                      autoFocus
                       id="rod_cislo"
                       mask="999999/9999"
                       disabled={
@@ -218,6 +250,54 @@ export default function HospitForm(props) {
                       mask="99.99.9999"
                       showIcon
                       showTime
+                    />
+
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
+              <Field
+                name="miestnost"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label
+                      htmlFor="miestnost"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Miestnosť*
+                    </label>
+                    <Dropdown
+                      {...input}
+                      options={rooms}
+                      onChange={(e) => {
+                        values.miestnost = e.value;
+                        getLozka(e);
+                      }}
+                      optionLabel="ID_MIESTNOSTI"
+                    />
+
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
+              <Field
+                name="lozko"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label
+                      htmlFor="lozko"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Lôžko*
+                    </label>
+                    <Dropdown
+                      {...input}
+                      options={beds}
+                      optionLabel="ID_LOZKA"
                     />
 
                     {getFormErrorMessage(meta)}

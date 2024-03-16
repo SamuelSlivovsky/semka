@@ -16,6 +16,7 @@ async function getZdravotneZaznamy() {
 }
 
 async function getPopisZaznamu(id) {
+  console.log(id);
   try {
     let conn = await database.getConnection();
     database.oracledb.fetchAsString = [database.oracledb.CLOB];
@@ -49,7 +50,7 @@ async function insertHospitalizacia(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        hospitalizacia_insert(:rod_cislo, :id_lekara, :datum, :datum_do, :priloha, :nazov, :popis );
+        hospitalizacia_insert(:rod_cislo, :id_lekara, :datum, :datum_do, :priloha, :nazov, :popis, :id_lozka );
         END;`;
 
     let buffer = Buffer.from([0x00]);
@@ -65,6 +66,7 @@ async function insertHospitalizacia(body) {
       id_lekara: body.id_lekara,
       datum_do: body.datum_do,
       nazov: body.nazov,
+      id_lozka: body.id_lozka,
     });
   } catch (err) {
     throw new Error("Database error: " + err);
@@ -122,6 +124,25 @@ async function insertVysetrenie(body) {
   }
 }
 
+async function getZaznamy(id) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `select id_zaznamu, PACIENT.rod_cislo || ', ' || ZDRAVOTNY_ZAZ.nazov as nazov, ID_NEMOCNICE from zdravotny_zaz
+    join zdravotna_karta using (id_karty)
+    join pacient using (id_pacienta)
+    join nemocnica using (id_nemocnice)
+    join zamestnanci using (id_nemocnice)
+    where cislo_zam = :id`;
+
+    const result = await conn.execute(sqlStatement, {
+      id,
+    });
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function updateZaznam(body) {
   console.log(body);
   try {
@@ -146,4 +167,5 @@ module.exports = {
   getPopisZaznamu,
   getPriloha,
   updateZaznam,
+  getZaznamy,
 };

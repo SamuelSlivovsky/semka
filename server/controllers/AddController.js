@@ -69,8 +69,8 @@ module.exports = {
   insertChoroba: (req, res) => {
     const choroba = require('../models/choroba');
     (async () => {
-      ret_val = await choroba.insertOperacia(req.body);
-      res.status(200).json('success');
+      ret_val = await choroba.insertChoroba(req.body);
+      res.status(200).json("success");
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -81,8 +81,8 @@ module.exports = {
   insertTypZtp: (req, res) => {
     const typZtp = require('../models/typ_ztp');
     (async () => {
-      ret_val = await choroba.insertTypZtp(req.body);
-      res.status(200).json('success');
+      ret_val = await typZtp.insertTypZtp(req.body);
+      res.status(200).json("success");
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error
@@ -94,7 +94,31 @@ module.exports = {
     const pacient = require('../models/pacient');
     (async () => {
       ret_val = await pacient.insertPacient(req.body);
-      res.status(200).json('success');
+      res.status(200).json("success");
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
+  
+  insertKonzilium: (req, res) => {
+    const konzilium = require("../models/konzilium");
+    (async () => {
+      ret_val = await konzilium.insertKonzilium(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
+
+  insertKonziliumUser: (req, res) => {
+    const konzilium = require("../models/konzilium");
+    (async () => {
+      ret_val = await konzilium.insertKonziliumUser(req.body);
+      res.status(200).json("success");
     })().catch((err) => {
       // error handling logic 1
       console.error(err); // logging error

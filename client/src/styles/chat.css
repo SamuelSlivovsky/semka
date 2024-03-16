@@ -1,0 +1,135 @@
+/* ChatApp.css */
+
+.chat-container {
+  display: flex;
+  flex-direction: row;
+  max-width: 800px;
+  margin: 20px auto;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  overflow: hidden;
+  min-height: 600px;
+}
+
+.chat-messages {
+  padding: 10px;
+  overflow-y: auto;
+  flex-grow: 1;
+  max-height: 600px;
+  min-height: 600px;
+}
+
+.message-container {
+  display: flex;
+  align-items: center;
+}
+
+.message {
+  background-color: #e4e1e1;
+  border-radius: 20px;
+  margin-bottom: 8px;
+  margin-right: 8px;
+  margin-left: 8px;
+  font-size: 0.875rem;
+  padding: 10px 12px;
+  max-width: 90%;
+  word-wrap: break-word;
+  overflow: hidden;
+}
+
+.current-user {
+  background-color: #58f7e4;
+  margin-left: auto;
+}
+
+.user {
+  background-color: #e6e6e6;
+  align-self: flex-end;
+}
+
+.chat-input {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #f2f2f2;
+}
+
+.chat-container input {
+  flex-grow: 1;
+  padding: 8px;
+  margin-right: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.image-preview {
+  cursor: pointer;
+  max-width: 100px; /* Adjust the max-width as needed */
+}
+
+/* Add this style to ensure the image doesn't overflow its container */
+.image-preview img {
+  max-width: 100%;
+  max-height: 100%;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px; /* Adjust the height as needed */
+  border-radius: 50%;
+  margin-right: 8px; /* Adjust the margin as needed */
+}
+
+.typing-container {
+  background-color: #e4e1e1;
+  padding: 16px 28px;
+  -webkit-border-radius: 10px;
+  -moz-border-radius: 10px;
+  border-radius: 10px;
+  margin-bottom: 8px;
+  margin-left: 8px;
+  padding: 10px 14px;
+  display: inline-block;
+}
+.typing {
+  align-items: center;
+  display: flex;
+  height: 17px;
+}
+.typing .dot {
+  animation: typingAnimation 1.8s infinite ease-in-out;
+  background-color: #58f7e4;
+  border-radius: 50%;
+  height: 7px;
+  margin-right: 4px;
+  vertical-align: middle;
+  width: 7px;
+  display: inline-block;
+}
+.typing .dot:nth-child(1) {
+  animation-delay: 200ms;
+}
+.typing .dot:nth-child(2) {
+  animation-delay: 300ms;
+}
+.typing .dot:nth-child(3) {
+  animation-delay: 400ms;
+}
+.typing .dot:last-child {
+  margin-right: 0;
+}
+
+@keyframes typingAnimation {
+  0% {
+    transform: translateY(0px);
+    background-color: #58f7e4;
+  }
+  28% {
+    transform: translateY(-7px);
+    background-color: #9ecab9;
+  }
+  44% {
+    transform: translateY(0px);
+    background-color: #b5d9cb;
+  }
+}
