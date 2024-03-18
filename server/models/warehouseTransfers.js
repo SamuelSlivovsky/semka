@@ -61,7 +61,7 @@ async function getRequestedTransfers(id) {
                 join ODDELENIE on SKLAD.ID_ODDELENIA = ODDELENIE.ID_ODDELENIA
                 join NEMOCNICA on ODDELENIE.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
                 join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
-                where CISLO_ZAM = :id and STATUS like 'Cakajuca'
+                where CISLO_ZAM = :usr_id and STATUS like 'Cakajuca'
                 order by ID_PRESUN`;
         let result = await conn.execute(sqlStatement, {
             usr_id: id
@@ -185,6 +185,25 @@ async function deniedTransfer(body) {
     }
 }
 
+async function confirmTransfer(body) {
+    try {
+        let conn = await database.getConnection();
+        const sqlStatement = `begin
+                            confirm_transfer(:id_presun, :id_lieku, :pocet);
+                        end;`;
+        console.log(body);
+        let result = await conn.execute(sqlStatement, {
+            id_presun: body.id_pres,
+            id_lieku: body.id_l,
+            pocet: body.poc
+        });
+
+        console.log("Rows inserted " + result.rowsAffected);
+    } catch (err) {
+        throw new Error("Database error: " + err);
+    }
+}
+
 async function deleteTransfer(body) {
     try {
         let conn = await database.getConnection();
@@ -213,5 +232,6 @@ module.exports = {
     getRequestedTransfers,
     createTransfer,
     deniedTransfer,
+    confirmTransfer,
     deleteTransfer
 };

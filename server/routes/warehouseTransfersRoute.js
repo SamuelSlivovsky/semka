@@ -69,6 +69,12 @@ router.post(
     controller.deniedTransfer
 )
 
+router.post(
+    "/confirmTransfer",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.confirmTransfer
+)
+
 //@TODO add this router and function so new transfers could be added under pharmacy (will be called at same time with addTransfer)
 router.get(
     "/addPharmacyTransfer/:id",

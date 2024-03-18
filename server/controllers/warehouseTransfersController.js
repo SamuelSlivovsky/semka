@@ -78,6 +78,17 @@ module.exports = {
         });
     },
 
+    confirmTransfer: (req, res) => {
+        (async () => {
+            let ret_val = await transfers.confirmTransfer(req.body);
+            res.status(200).json(ret_val);
+        })().catch((err) => {
+            console.log("Error Kontroler");
+            console.error(err);
+            res.status(500).send(err);
+        });
+    },
+
     deleteTransfer: (req, res) => {
         (async () => {
             let ret_val = await transfers.deleteTransfer(req.body);

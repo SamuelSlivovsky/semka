@@ -107,6 +107,7 @@ export default function Storage() {
 
   async function insertData() {
     const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
     const requestOptions = {
       method: "POST",
       headers: {
@@ -114,7 +115,7 @@ export default function Storage() {
         authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        id_oddelenia: 216,
+        usr_id: userDataHelper.UserInfo.userid,
         nazov_lieku: product.NAZOV,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
             ",",
@@ -311,7 +312,7 @@ export default function Storage() {
       },
       body: JSON.stringify({
         id_liek: _product.ID_LIEK,
-        datum: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(",", ""),
+        datum: _product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(",", ""),
       }),
     };
     const response = await fetch("/sklad/deleteSarza", requestOptions);
