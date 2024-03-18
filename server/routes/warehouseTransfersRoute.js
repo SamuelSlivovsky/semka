@@ -2,24 +2,35 @@ const express = require("express");
 const router = express.Router();
 const controller = require("../controllers/warehouseTransfersController");
 const verify = require("../middleware/verifyUser");
-const { verifyRoles } = require("../middleware/verifyUser");
 
 router.get(
-  "/allFin",
-  verify.verifyRoles(0, 2, 3, 5, 10),
-  controller.getFinishedTransfers
+    "/allFin/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getFinishedTransfers
 );
 
 router.get(
-  "/allWait",
-  verify.verifyRoles(0, 2, 3, 5, 10),
-  controller.getWaitingTransfers
+    "/allWait/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getWaitingTransfers
 );
 
 router.get(
-  "/list/:id",
-  verify.verifyRoles(0, 2, 3, 5, 10),
-  controller.getListTransfers
+    "/allDec/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getDeclinedTransfers
+);
+
+router.get(
+    "/reqTransfers/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getRequestedTransfers
+)
+
+router.get(
+    "/list/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getListTransfers
 );
 
 router.get(
@@ -29,10 +40,34 @@ router.get(
 );
 
 router.get(
-  "/hospitalMedications/:id",
-  verify.verifyRoles(0, 2, 3, 5, 10),
-  controller.getHospitalMedication
+    "/hospitalMedications/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getHospitalMedication
 );
+
+router.get(
+    "/selectedMedications/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getSelectedMedications
+)
+
+router.post(
+    "/deleteTransfer",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.deleteTransfer
+)
+
+router.post(
+    "/createTransfer",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.createTransfer
+);
+
+router.post(
+    "/deniedTransfer",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.deniedTransfer
+)
 
 //@TODO add this router and function so new transfers could be added under pharmacy (will be called at same time with addTransfer)
 router.get(

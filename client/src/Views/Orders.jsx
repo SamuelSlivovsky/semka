@@ -58,7 +58,6 @@ export default function Orders() {
 
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
-        const userDataHelper = GetUserData(token);
         const headers = { authorization: "Bearer " + token };
         fetch(`objednavky/all`, { headers })
             .then((response) => response.json())
@@ -130,9 +129,6 @@ export default function Orders() {
                     if (jsonData && jsonData[0] && jsonData[0].ZOZNAM_LIEKOV) {
                         const zoznamLiekovArray = JSON.parse(jsonData[0].ZOZNAM_LIEKOV);
 
-                        // Now zoznamLiekovArray should be an array of objects
-                        //console.log('Parsed ZOZNAM_LIEKOV:', zoznamLiekovArray);
-
                         setLoading(false);
                         setXmlContent(zoznamLiekovArray);
                     } else {
@@ -201,6 +197,7 @@ export default function Orders() {
         //Add whole list and create new order
         if(unique && checkPocet && selectedMedications.length > 0) {
             const transformedData = selectedMedications.map((item) => ({
+                id: item.selectedDrug.ID_LIEK,
                 name: item.selectedDrug.NAZOV,
                 amount: item.quantity
             }));
@@ -213,10 +210,10 @@ export default function Orders() {
             _order.ID_SKLAD = skladId;
             _order.ZOZNAM_LIEKOV = formattedString;
 
-            var currentDate = new Date();
-            var day = currentDate.getDate();
-            var month = currentDate.getMonth() + 1;
-            var year = currentDate.getFullYear();
+            let currentDate = new Date();
+            let day = currentDate.getDate();
+            let month = currentDate.getMonth() + 1;
+            let year = currentDate.getFullYear();
 
             _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
             _orders.push(_order);
@@ -261,7 +258,7 @@ export default function Orders() {
 
     // Function to add selected medication to the list
     const addMedication = () => {
-        setSelectedMedications([...selectedMedications, { medication: "", quantity: 0 }]);
+        setSelectedMedications([...selectedMedications, { NAZOV: "", ID_LIEK: 0, quantity: 0}]);
     };
 
     // Function to remove medication from the list
