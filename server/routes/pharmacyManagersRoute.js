@@ -80,6 +80,12 @@ router.get(
   controller.getReportInfo
 );
 
+router.get(
+  "/getUcinnaLatka/:id",
+  verify.verifyRoles(0, 10),
+  controller.getUcinnaLatka
+);
+
 router.post(
   "/updateUcinnaLatka",
   verify.verifyRoles(0, 10),

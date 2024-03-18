@@ -238,21 +238,30 @@ async function getReportInfo(id) {
   }
 }
 
+async function getUcinnaLatka() {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select id_ucinna_latka, nazov from ucinna_latka`
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function updateUcinnaLatka(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `UPDATE ucinne_latky_liekov 
-    SET id_ucinna_latka = (
-        SELECT id_ucinna_latka 
-        FROM ucinna_latka 
-        WHERE nazov = :nazov
-    )
+    SET id_ucinna_latka = :id_ucinna_latka
     WHERE id_liek = :id_liek`;
     console.log(body);
     let result = await conn.execute(
       sqlStatement,
       {
-        nazov: body.nazov,
+        id_ucinna_latka: body.id_ucinna_latka,
         id_liek: body.id_liek,
       },
       { autoCommit: true }
@@ -278,5 +287,6 @@ module.exports = {
   getZoznamZdravotnickychPomocok,
   getDetailZdravotnickejPomocky,
   getReportInfo,
+  getUcinnaLatka,
   updateUcinnaLatka,
 };

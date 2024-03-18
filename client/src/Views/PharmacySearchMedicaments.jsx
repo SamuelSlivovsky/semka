@@ -215,11 +215,17 @@ export default function PharmacySearchMedicaments() {
       <Dialog
         header={
           selectedRow != null ? (
-            <div>
+            <div
+              style={{
+                margin: "auto",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               {selectedRow.NAZOV_LEKARNE}
               <br />
-              <br />
-              {selectedRow.NAZOV_LIEKU}
+              <h5>{selectedRow.NAZOV_LIEKU}</h5>
             </div>
           ) : (
             ""

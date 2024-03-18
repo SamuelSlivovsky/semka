@@ -120,6 +120,14 @@ module.exports = {
     })();
   },
 
+  getUcinnaLatka: (req, res) => {
+    const ucinnaLatka = require("../models/manazer_lekarne");
+    (async () => {
+      ucinneLatky = await ucinnaLatka.getUcinnaLatka(req.params.id);
+      res.status(200).json(ucinneLatky);
+    })();
+  },
+
   updateUcinnaLatka: (req, res) => {
     const ucinnaLatka = require("../models/manazer_lekarne");
     (async () => {

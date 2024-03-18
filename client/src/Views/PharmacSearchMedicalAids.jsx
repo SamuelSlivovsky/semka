@@ -203,11 +203,17 @@ export default function PharmacSearchMedicalAids() {
       <Dialog
         header={
           selectedRow != null ? (
-            <div>
+            <div
+              style={{
+                margin: "auto",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               {selectedRow.NAZOV_LEKARNE}
               <br />
-              <br />
-              {selectedRow.NAZOV_ZDR_POMOCKY}
+              <h5>{selectedRow.NAZOV_ZDR_POMOCKY}</h5>
             </div>
           ) : (
             ""
