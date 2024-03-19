@@ -38,6 +38,33 @@ async function getLekarnici(id) {
   }
 }
 
+async function insertZamestnanecLekarne(body) {
+  console.log(body);
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+    insert_zamestnanec_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_id_lekarne);
+  END;`;
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        p_rod_cislo: body.rod_cislo,
+        p_meno: body.meno,
+        p_priezvisko: body.priezvisko,
+        p_psc: body.psc,
+        p_ulica: body.ulica,
+        p_id_lekarne: body.id_lekarne,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 async function getLaboranti(id) {
   try {
     let conn = await database.getConnection();
@@ -54,6 +81,33 @@ async function getLaboranti(id) {
     );
     return result.rows;
   } catch (err) {
+    console.log(err);
+  }
+}
+
+async function insertLaborantLekarne(body) {
+  console.log(body);
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+    insert_laborant_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_id_lekarne);
+  END;`;
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        p_rod_cislo: body.rod_cislo,
+        p_meno: body.meno,
+        p_priezvisko: body.priezvisko,
+        p_psc: body.psc,
+        p_ulica: body.ulica,
+        p_id_lekarne: body.id_lekarne,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
     console.log(err);
   }
 }
@@ -252,7 +306,7 @@ async function getUcinnaLatka() {
 }
 
 async function updateUcinnaLatka(body) {
-  console.log(body);
+  // console.log(body);
   try {
     let conn = await database.getConnection();
     const sqlStatement = `UPDATE ucinne_latky_liekov 
@@ -275,10 +329,23 @@ async function updateUcinnaLatka(body) {
   }
 }
 
+async function getZoznamMiest() {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(`select PSC, nazov from mesto`);
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getManazeriLekarni,
   getLekarnici,
+  insertZamestnanecLekarne,
   getLaboranti,
+  insertLaborantLekarne,
   getManazerLekarneInfo,
   getLekarniciInfo,
   getLaborantiInfo,
@@ -290,4 +357,5 @@ module.exports = {
   getReportInfo,
   getUcinnaLatka,
   updateUcinnaLatka,
+  getZoznamMiest,
 };

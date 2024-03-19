@@ -5,13 +5,13 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Dropdown } from "primereact/dropdown";
 
-export default function TabPharmacists() {
+export default function TabPharmacists(props) {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -19,19 +19,23 @@ export default function TabPharmacists() {
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
   const [lekarnici, setLekarnici] = useState([]);
+  const location = useLocation();
   const navigate = useNavigate();
   const [nazovLekarne, setNazovLekarne] = useState([]);
+  const [idLekarne, setIdLekarne] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [newPharmacist, setNewPharmacist] = useState({
-    /* initial form data state */
-  });
-  // Assume cities/PSC codes are fetched and stored in the following state:
+  const [newPharmacist, setNewPharmacist] = useState({});
   const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
+    fetchGetLekarnici(headers, userDataHelper);
+    fetchGetZoznamMiest(headers);
+  }, []);
+
+  const fetchGetLekarnici = (headers, userDataHelper) => {
     fetch(`/pharmacyManagers/lekarnici/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
@@ -56,13 +60,79 @@ export default function TabPharmacists() {
         console.log(data);
         if (data.length > 0) {
           setNazovLekarne(data[0].LEKAREN_NAZOV);
+          setIdLekarne(data[0].ID_LEKARNE);
           console.log(data);
         }
       })
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  };
+
+  const fetchGetZoznamMiest = (headers) => {
+    fetch(
+      `pharmacyManagers/getZoznamMiest/${
+        typeof props.cityId !== "undefined" && props.cityId !== null
+          ? props.cityId
+          : location.state
+      }`,
+      { headers }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setCities(data);
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching ucinne latky:", error);
+      });
+  };
+
+  const fetchSubmitNewPharmacist = () => {
+    const pharmacistData = {
+      ...newPharmacist,
+      id_lekarne: idLekarne,
+      psc: newPharmacist.psc.PSC,
+    };
+    console.log(pharmacistData);
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+
+    fetch("/pharmacyManagers/insertZamestnanecLekarne", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(pharmacistData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then((data) => {
+        toast.current.show({
+          severity: "success",
+          summary: "Úspešne pridaný",
+          detail: "Nový lekárnik bol úspešne pridaný do systému.",
+          life: 3000,
+        });
+        setShowAddDialog(false); // Zavrie dialogové okno po úspešnom pridaní
+        setNewPharmacist({}); // Resetuje stav formulára
+        fetchGetLekarnici(headers, GetUserData(token)); // Znovu načíta zoznam lekárnikov po pridaní nového
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri pridávaní",
+          detail: "Nepodarilo sa pridať nového lekárnika.",
+          life: 3000,
+        });
+      });
+  };
 
   const onHide = () => {
     setShowDialog(false);
@@ -125,6 +195,26 @@ export default function TabPharmacists() {
     );
   };
 
+  const formatRodneCislo = (value) => {
+    // Odstráňte všetky znaky okrem čísel a lomiek
+    let cislo = value.replace(/[^\d/]/g, "");
+
+    // Odstráňte všetky lomky, ktoré sú na zlom mieste
+    cislo = cislo.replace(/[/]/g, "");
+
+    // Uistite sa, že lomka je pridávaná iba raz
+    if (cislo.length > 6) {
+      cislo = `${cislo.slice(0, 6)}/${cislo.slice(6)}`;
+    }
+
+    // Orezanie akéhokoľvek nadbytočného textu
+    if (cislo.length > 11) {
+      cislo = cislo.slice(0, 11);
+    }
+
+    return cislo;
+  };
+
   // Form dialog for adding a new pharmacist
   const renderAddPharmacistDialog = () => {
     return (
@@ -137,13 +227,18 @@ export default function TabPharmacists() {
         onHide={() => setShowAddDialog(false)}
       >
         <div className="p-field">
-          <label htmlFor="rodneCislo">Rodné číslo (s lomkou)</label>
+          <label htmlFor="rodneCislo">Rodné číslo</label>
           <InputText
             id="rodneCislo"
-            value={newPharmacist.rodneCislo}
+            value={newPharmacist.rod_cislo}
             onChange={(e) =>
-              setNewPharmacist({ ...newPharmacist, rodneCislo: e.target.value })
+              setNewPharmacist({
+                ...newPharmacist,
+                rod_cislo: formatRodneCislo(e.target.value),
+              })
             }
+            placeholder="______/____"
+            maxLength={11}
           />
         </div>
         <div className="p-field">
@@ -167,15 +262,25 @@ export default function TabPharmacists() {
           />
         </div>
         <div className="p-field">
+          <label htmlFor="ulica">Ulica</label>
+          <InputText
+            id="ulica"
+            value={newPharmacist.ulica}
+            onChange={(e) =>
+              setNewPharmacist({ ...newPharmacist, ulica: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-field">
           <label htmlFor="city">Mesto</label>
           <Dropdown
             id="city"
-            value={newPharmacist.city}
+            value={newPharmacist.psc}
             options={cities}
             onChange={(e) =>
-              setNewPharmacist({ ...newPharmacist, city: e.value })
+              setNewPharmacist({ ...newPharmacist, psc: e.value })
             }
-            optionLabel="name" // Assuming your city objects have a 'name' property
+            optionLabel="NAZOV" // Assuming your city objects have a 'name' property
             placeholder="Vyberte mesto"
           />
         </div>
@@ -184,7 +289,7 @@ export default function TabPharmacists() {
           label="Pridať"
           icon="pi pi-check"
           onClick={() => {
-            /* Handle form submission here */
+            fetchSubmitNewPharmacist();
           }}
         />
       </Dialog>

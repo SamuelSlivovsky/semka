@@ -17,6 +17,12 @@ router.get(
   controller.getLekarnici
 );
 
+router.post(
+  "/insertZamestnanecLekarne",
+  verify.verifyRoles(0, 10),
+  controller.insertZamestnanecLekarne
+);
+
 router.get(
   "/laboranti/:id",
   verify.verifyRoles(0, 10),
@@ -24,16 +30,22 @@ router.get(
   controller.getLaboranti
 );
 
+router.post(
+  "/insertLaborantLekarne",
+  verify.verifyRoles(0, 10),
+  controller.insertLaborantLekarne
+);
+
 router.get(
   "/zoznamLiekov/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   verify.checkForCorrectId(),
   controller.getZoznamLiekov
 );
 
 router.get(
   "/zoznamZdravotnickychPomocok/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   verify.checkForCorrectId(),
   controller.getZoznamZdravotnickychPomocok
 );
@@ -91,4 +103,11 @@ router.post(
   verify.verifyRoles(0, 10),
   controller.updateUcinnaLatka
 );
+
+router.get(
+  "/getZoznamMiest/:id",
+  verify.verifyRoles(0, 10),
+  controller.getZoznamMiest
+);
+
 module.exports = router;

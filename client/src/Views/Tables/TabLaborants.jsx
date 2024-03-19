@@ -5,12 +5,13 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dropdown } from "primereact/dropdown";
 
-export default function TabLaborants() {
+export default function TabLaborants(props) {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -18,13 +19,23 @@ export default function TabLaborants() {
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
   const [laboranti, setLaboranti] = useState([]);
+  const location = useLocation();
   const navigate = useNavigate();
   const [nazovLekarne, setNazovLekarne] = useState([]);
+  const [idLekarne, setIdLekarne] = useState([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newLaborant, setNewLaborant] = useState({});
+  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
+    fetchGetLaboranti(headers, userDataHelper);
+    fetchGetZoznamMiest(headers);
+  }, []);
+
+  const fetchGetLaboranti = (headers, userDataHelper) => {
     fetch(`/pharmacyManagers/laboranti/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
@@ -49,13 +60,79 @@ export default function TabLaborants() {
         console.log(data);
         if (data.length > 0) {
           setNazovLekarne(data[0].LEKAREN_NAZOV);
+          setIdLekarne(data[0].ID_LEKARNE);
           console.log(data);
         }
       })
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  };
+
+  const fetchGetZoznamMiest = (headers) => {
+    fetch(
+      `pharmacyManagers/getZoznamMiest/${
+        typeof props.cityId !== "undefined" && props.cityId !== null
+          ? props.cityId
+          : location.state
+      }`,
+      { headers }
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        setCities(data);
+        console.log(data);
+      })
+      .catch((error) => {
+        console.error("Error fetching ucinne latky:", error);
+      });
+  };
+
+  const fetchSubmitNewLaborant = () => {
+    const laborantData = {
+      ...newLaborant,
+      id_lekarne: idLekarne,
+      psc: newLaborant.psc.PSC,
+    };
+    console.log(laborantData);
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+
+    fetch("/pharmacyManagers/insertLaborantLekarne", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(laborantData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then((data) => {
+        toast.current.show({
+          severity: "success",
+          summary: "Úspešne pridaný",
+          detail: "Nový laborant bol úspešne pridaný do systému.",
+          life: 3000,
+        });
+        setShowAddDialog(false); // Zavrie dialogové okno po úspešnom pridaní
+        setNewLaborant({}); // Resetuje stav formulára
+        fetchGetLaboranti(headers, GetUserData(token)); // Znovu načíta zoznam lekárnikov po pridaní nového
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri pridávaní",
+          detail: "Nepodarilo sa pridať nového laboranta.",
+          life: 3000,
+        });
+      });
+  };
 
   const onHide = () => {
     setShowDialog(false);
@@ -108,8 +185,140 @@ export default function TabLaborants() {
             <h3>{nazovLekarne}</h3>
           </div>
         </div>
+        <Button
+          style={{ height: "50px" }}
+          label="Pridať laboranta"
+          icon="pi pi-plus"
+          onClick={() => setShowAddDialog(true)}
+        />
       </div>
     );
+  };
+
+  const formatRodneCislo = (value) => {
+    // Odstráňte všetky znaky okrem čísel a lomiek
+    let cislo = value.replace(/[^\d/]/g, "");
+
+    // Odstráňte všetky lomky, ktoré sú na zlom mieste
+    cislo = cislo.replace(/[/]/g, "");
+
+    // Uistite sa, že lomka je pridávaná iba raz
+    if (cislo.length > 6) {
+      cislo = `${cislo.slice(0, 6)}/${cislo.slice(6)}`;
+    }
+
+    // Orezanie akéhokoľvek nadbytočného textu
+    if (cislo.length > 11) {
+      cislo = cislo.slice(0, 11);
+    }
+
+    return cislo;
+  };
+
+  // Form dialog for adding a new pharmacist
+  const renderAddLaborantDialog = () => {
+    return (
+      <Dialog
+        visible={showAddDialog}
+        style={{ width: "450px" }}
+        header="Nový laborant"
+        modal
+        className="p-fluid"
+        onHide={() => setShowAddDialog(false)}
+      >
+        <div className="p-field">
+          <label htmlFor="rodneCislo">Rodné číslo</label>
+          <InputText
+            id="rodneCislo"
+            value={newLaborant.rod_cislo}
+            onChange={(e) =>
+              setNewLaborant({
+                ...newLaborant,
+                rod_cislo: formatRodneCislo(e.target.value),
+              })
+            }
+            placeholder="______/____"
+            maxLength={11}
+          />
+        </div>
+        <div className="p-field">
+          <label htmlFor="meno">Meno</label>
+          <InputText
+            id="meno"
+            value={newLaborant.meno}
+            onChange={(e) =>
+              setNewLaborant({ ...newLaborant, meno: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-field">
+          <label htmlFor="priezvisko">Priezvisko</label>
+          <InputText
+            id="priezvisko"
+            value={newLaborant.priezvisko}
+            onChange={(e) =>
+              setNewLaborant({ ...newLaborant, priezvisko: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-field">
+          <label htmlFor="ulica">Ulica</label>
+          <InputText
+            id="ulica"
+            value={newLaborant.ulica}
+            onChange={(e) =>
+              setNewLaborant({ ...newLaborant, ulica: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-field">
+          <label htmlFor="city">Mesto</label>
+          <Dropdown
+            id="city"
+            value={newLaborant.psc}
+            options={cities}
+            onChange={(e) => setNewLaborant({ ...newLaborant, psc: e.value })}
+            optionLabel="NAZOV" // Assuming your city objects have a 'name' property
+            placeholder="Vyberte mesto"
+          />
+        </div>
+        <Button
+          style={{ marginTop: "50px" }}
+          label="Pridať"
+          icon="pi pi-check"
+          onClick={() => {
+            fetchSubmitNewLaborant();
+          }}
+        />
+      </Dialog>
+    );
+  };
+
+  // Function to render Edit and Delete buttons
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <React.Fragment>
+        <Button
+          icon="pi pi-pencil"
+          className="p-button-rounded p-button-warning mr-2"
+          onClick={() => editLaborant(rowData)}
+        />
+        <Button
+          icon="pi pi-trash"
+          className="p-button-rounded p-button-danger"
+          onClick={() => deleteLaborant(rowData)}
+        />
+      </React.Fragment>
+    );
+  };
+
+  // Add these functions to handle edit and delete actions
+  const editLaborant = (pharmacist) => {
+    // Implementation for editing pharmacist
+  };
+
+  const deleteLaborant = (pharmacist) => {
+    // Implementation for deleting pharmacist
   };
 
   const onGlobalFilterChange = (e) => {
@@ -151,6 +360,7 @@ export default function TabLaborants() {
   return (
     <div>
       <Toast ref={toast} position="top-center" />
+      {renderAddLaborantDialog()}
       <div className="card">
         {loading ? (
           <div
@@ -195,6 +405,7 @@ export default function TabLaborants() {
             <Column field="MENO" header={"Meno"} filter></Column>
             <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
             <Column field="CISLO_ZAM" header={"ID zamestnanca"} filter></Column>
+            <Column body={actionBodyTemplate} header=""></Column>
           </DataTable>
         )}
       </div>

@@ -21,6 +21,17 @@ module.exports = {
     })();
   },
 
+  insertZamestnanecLekarne: (req, res) => {
+    const zamestnanecLekarne = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await zamestnanecLekarne.insertZamestnanecLekarne(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+
   getLaboranti: (req, res) => {
     const laborant = require("../models/manazer_lekarne");
     (async () => {
@@ -30,6 +41,17 @@ module.exports = {
       // }
       res.status(200).json(laboranti);
     })();
+  },
+
+  insertLaborantLekarne: (req, res) => {
+    const laborantLekarne = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await laborantLekarne.insertLaborantLekarne(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
   },
 
   getManazerLekarneInfo: (req, res) => {
@@ -137,5 +159,13 @@ module.exports = {
       console.error(err);
       res.status(403).send(err);
     });
+  },
+
+  getZoznamMiest: (req, res) => {
+    const mesto = require("../models/manazer_lekarne");
+    (async () => {
+      zoznamMiest = await mesto.getZoznamMiest(req.params.id);
+      res.status(200).json(zoznamMiest);
+    })();
   },
 };
