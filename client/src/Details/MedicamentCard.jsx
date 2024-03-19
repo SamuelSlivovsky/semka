@@ -173,7 +173,7 @@ export default function MedicamentCard(props) {
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       NAZOV: {
         operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
     });
     setGlobalFilterValue("");
