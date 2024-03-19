@@ -1,16 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useNavigate, useLocation } from "react-router";
+import { Toast } from "primereact/toast";
 
 export default function MedicamentCard(props) {
   const [detail, setDetail] = useState("");
   const [ucinneLatky, setUcinneLatky] = useState("");
   const [displayDialog, setDisplayDialog] = useState(false);
   const [selectedSubstance, setSelectedSubstance] = useState(null); // Added state for selected substance
+  const toast = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -92,9 +94,42 @@ export default function MedicamentCard(props) {
   );
 
   const handleSubstanceSelect = (event) => {
-    setSelectedSubstance(event.data); // Update selected substance state
-    setDisplayDialog(false); // Close dialog
-    // Perform any additional action, such as updating detail with selected substance
+    // setDisplayDialog(false);
+    console.log(event.ID_UCINNA_LATKA);
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json",
+    };
+
+    fetch(`pharmacyManagers/updateUcinnaLatka`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        id_liek: detail.ID_LIEK,
+        id_ucinna_latka: event.ID_UCINNA_LATKA,
+      }),
+    }).then((res) => {
+      if (res.ok) {
+        toast.current.show({
+          severity: "success",
+          summary: "Úspech",
+          detail: "Účinná látka lieku bola aktualizovaná!",
+        });
+        setDisplayDialog(false);
+        setTimeout(() => {
+          redirect();
+        }, 6000);
+      } else {
+        const errorData = res.json();
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: "Nastala chyba pri aktualizácii účinnej látky.",
+        });
+        throw new Error(errorData.message || "Error updating date");
+      }
+    });
   };
 
   return (
@@ -124,11 +159,12 @@ export default function MedicamentCard(props) {
           value={ucinneLatky}
           selectionMode="single"
           selection={selectedSubstance}
-          onSelectionChange={handleSubstanceSelect}
+          onSelectionChange={(e) => handleSubstanceSelect(e.value)}
         >
           <Column field="NAZOV" header="Názov účinnej látky"></Column>
         </DataTable>
       </Dialog>
+      <Toast ref={toast} />
     </div>
   );
 }

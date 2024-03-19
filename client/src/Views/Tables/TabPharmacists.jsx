@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dropdown } from "primereact/dropdown";
 
 export default function TabPharmacists() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -20,6 +21,12 @@ export default function TabPharmacists() {
   const [lekarnici, setLekarnici] = useState([]);
   const navigate = useNavigate();
   const [nazovLekarne, setNazovLekarne] = useState([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newPharmacist, setNewPharmacist] = useState({
+    /* initial form data state */
+  });
+  // Assume cities/PSC codes are fetched and stored in the following state:
+  const [cities, setCities] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -108,8 +115,107 @@ export default function TabPharmacists() {
             <h3>{nazovLekarne}</h3>
           </div>
         </div>
+        <Button
+          style={{ height: "50px" }}
+          label="Pridať lekárnika"
+          icon="pi pi-plus"
+          onClick={() => setShowAddDialog(true)}
+        />
       </div>
     );
+  };
+
+  // Form dialog for adding a new pharmacist
+  const renderAddPharmacistDialog = () => {
+    return (
+      <Dialog
+        visible={showAddDialog}
+        style={{ width: "450px" }}
+        header="Nový lekárnik"
+        modal
+        className="p-fluid"
+        onHide={() => setShowAddDialog(false)}
+      >
+        <div className="p-field">
+          <label htmlFor="rodneCislo">Rodné číslo (s lomkou)</label>
+          <InputText
+            id="rodneCislo"
+            value={newPharmacist.rodneCislo}
+            onChange={(e) =>
+              setNewPharmacist({ ...newPharmacist, rodneCislo: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-field">
+          <label htmlFor="meno">Meno</label>
+          <InputText
+            id="meno"
+            value={newPharmacist.meno}
+            onChange={(e) =>
+              setNewPharmacist({ ...newPharmacist, meno: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-field">
+          <label htmlFor="priezvisko">Priezvisko</label>
+          <InputText
+            id="priezvisko"
+            value={newPharmacist.priezvisko}
+            onChange={(e) =>
+              setNewPharmacist({ ...newPharmacist, priezvisko: e.target.value })
+            }
+          />
+        </div>
+        <div className="p-field">
+          <label htmlFor="city">Mesto</label>
+          <Dropdown
+            id="city"
+            value={newPharmacist.city}
+            options={cities}
+            onChange={(e) =>
+              setNewPharmacist({ ...newPharmacist, city: e.value })
+            }
+            optionLabel="name" // Assuming your city objects have a 'name' property
+            placeholder="Vyberte mesto"
+          />
+        </div>
+        <Button
+          style={{ marginTop: "50px" }}
+          label="Pridať"
+          icon="pi pi-check"
+          onClick={() => {
+            /* Handle form submission here */
+          }}
+        />
+      </Dialog>
+    );
+  };
+
+  // Function to render Edit and Delete buttons
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <React.Fragment>
+        <Button
+          icon="pi pi-pencil"
+          className="p-button-rounded p-button-warning mr-2"
+          onClick={() => editPharmacist(rowData)}
+        />
+        <Button
+          icon="pi pi-trash"
+          className="p-button-rounded p-button-danger"
+          onClick={() => deletePharmacist(rowData)}
+        />
+      </React.Fragment>
+    );
+  };
+
+  // Add these functions to handle edit and delete actions
+  const editPharmacist = (pharmacist) => {
+    // Implementation for editing pharmacist
+  };
+
+  const deletePharmacist = (pharmacist) => {
+    // Implementation for deleting pharmacist
   };
 
   const onGlobalFilterChange = (e) => {
@@ -151,6 +257,7 @@ export default function TabPharmacists() {
   return (
     <div>
       <Toast ref={toast} position="top-center" />
+      {renderAddPharmacistDialog()}
       <div className="card">
         {loading ? (
           <div
@@ -195,6 +302,7 @@ export default function TabPharmacists() {
             <Column field="MENO" header={"Meno"} filter></Column>
             <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
             <Column field="CISLO_ZAM" header={"ID zamestnanca"} filter></Column>
+            <Column body={actionBodyTemplate} header=""></Column>
           </DataTable>
         )}
       </div>

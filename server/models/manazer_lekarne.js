@@ -252,6 +252,7 @@ async function getUcinnaLatka() {
 }
 
 async function updateUcinnaLatka(body) {
+  console.log(body);
   try {
     let conn = await database.getConnection();
     const sqlStatement = `UPDATE ucinne_latky_liekov 
