@@ -6,13 +6,17 @@ import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { useNavigate, useLocation } from "react-router";
 import { Toast } from "primereact/toast";
+import { FilterMatchMode, FilterOperator } from "primereact/api";
+import { InputText } from "primereact/inputtext";
 
 export default function MedicamentCard(props) {
   const [detail, setDetail] = useState("");
   const [ucinneLatky, setUcinneLatky] = useState("");
   const [displayDialog, setDisplayDialog] = useState(false);
-  const [selectedSubstance, setSelectedSubstance] = useState(null); // Added state for selected substance
+  const [selectedRow, setSelectedRow] = useState(null); // Added state for selected substance
   const toast = useRef(null);
+  const [globalFilterValue, setGlobalFilterValue] = useState("");
+  const [filters, setFilters] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -93,6 +97,26 @@ export default function MedicamentCard(props) {
     </div>
   );
 
+  const renderDialogHeader = () => {
+    return (
+      <div className="flex justify-content-between">
+        <div className="table-header">
+          <span className="p-input-icon-left">
+            <i className="pi pi-search" />
+            <InputText
+              value={globalFilterValue}
+              onChange={onGlobalFilterChange}
+              placeholder="Vyhľadať"
+            />
+          </span>
+          <div className="ml-4">
+            <h2>Účinné látky</h2>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const handleSubstanceSelect = (event) => {
     // setDisplayDialog(false);
     console.log(event.ID_UCINNA_LATKA);
@@ -132,6 +156,29 @@ export default function MedicamentCard(props) {
     });
   };
 
+  const onGlobalFilterChange = (e) => {
+    const value = e.target.value;
+    let _filters = { ...filters };
+    _filters["global"].value = value;
+    setFilters(_filters);
+    setGlobalFilterValue(value);
+  };
+
+  useEffect(() => {
+    initFilters();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const initFilters = () => {
+    setFilters({
+      global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+      NAZOV: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+    });
+    setGlobalFilterValue("");
+  };
+
   return (
     <div>
       <div className="flex col-12">
@@ -151,15 +198,20 @@ export default function MedicamentCard(props) {
       <div className="col-12 flex"></div>
       {/* Dialog for displaying active substances */}
       <Dialog
+        style={{ width: "90vh", height: "120vh" }}
         visible={displayDialog}
         onHide={() => setDisplayDialog(false)} // Close dialog when user clicks outside
-        header="Účinné látky"
+        header={renderDialogHeader()}
       >
         <DataTable
           value={ucinneLatky}
           selectionMode="single"
-          selection={selectedSubstance}
+          selection={selectedRow}
           onSelectionChange={(e) => handleSubstanceSelect(e.value)}
+          filters={filters}
+          filterDisplay="menu"
+          globalFilterFields={["NAZOV"]}
+          emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
         >
           <Column field="NAZOV" header="Názov účinnej látky"></Column>
         </DataTable>
