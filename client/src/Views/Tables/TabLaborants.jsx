@@ -546,7 +546,7 @@ export default function TabLaborants(props) {
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            ? "Laborant: " + selectedRow.MENO + " " + selectedRow.PRIEZVISKO
             : ""
         }
         visible={showDialog}

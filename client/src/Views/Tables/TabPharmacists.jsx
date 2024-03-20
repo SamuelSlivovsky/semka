@@ -543,7 +543,7 @@ export default function TabPharmacists(props) {
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            ? "Lekárnik: " + selectedRow.MENO + " " + selectedRow.PRIEZVISKO
             : ""
         }
         visible={showDialog}
