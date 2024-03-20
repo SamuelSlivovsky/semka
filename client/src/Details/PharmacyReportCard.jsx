@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
-import { Button } from "primereact/button";
+// import { Button } from "primereact/button";
 import GetUserData from "../Auth/GetUserData";
-import { useNavigate } from "react-router";
+// import { useNavigate } from "react-router";
 
 export default function PharmacyReportCard(props) {
   const [info, setInfo] = useState("");
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
