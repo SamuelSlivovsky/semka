@@ -27,6 +27,7 @@ export default function TabLaborants(props) {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newLaborant, setNewLaborant] = useState({});
   const [cities, setCities] = useState([]);
+  const [submitted, setSubmitted] = useState(false); //sluzi na to, ze polia v addForm musia byt required
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -215,6 +216,29 @@ export default function TabLaborants(props) {
     return cislo;
   };
 
+  const handleSubmit = () => {
+    setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
+    if (
+      newLaborant.rod_cislo &&
+      newLaborant.meno &&
+      newLaborant.priezvisko &&
+      newLaborant.ulica &&
+      newLaborant.psc
+    ) {
+      // Ak sú všetky polia vyplnené, pokračujeme v odoslaní
+      fetchSubmitNewLaborant();
+    }
+  };
+
+  const renderErrorMessage = (fieldName) => {
+    return (
+      submitted &&
+      !newLaborant[fieldName] && (
+        <small className="p-error">Toto pole je povinné!</small>
+      )
+    );
+  };
+
   // Form dialog for adding a new pharmacist
   const renderAddLaborantDialog = () => {
     return (
@@ -239,7 +263,9 @@ export default function TabLaborants(props) {
             }
             placeholder="______/____"
             maxLength={11}
+            required
           />
+          {renderErrorMessage("rod_cislo")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="meno">Meno</label>
@@ -250,7 +276,9 @@ export default function TabLaborants(props) {
               setNewLaborant({ ...newLaborant, meno: e.target.value })
             }
             placeholder="Zadajte meno laboranta"
+            required
           />
+          {renderErrorMessage("meno")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="priezvisko">Priezvisko</label>
@@ -261,7 +289,9 @@ export default function TabLaborants(props) {
               setNewLaborant({ ...newLaborant, priezvisko: e.target.value })
             }
             placeholder="Zadajte priezvisko laboranta"
+            required
           />
+          {renderErrorMessage("priezvisko")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="ulica">Ulica</label>
@@ -272,7 +302,9 @@ export default function TabLaborants(props) {
               setNewLaborant({ ...newLaborant, ulica: e.target.value })
             }
             placeholder="Zadajte názov ulice"
+            required
           />
+          {renderErrorMessage("ulica")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="city">Mesto</label>
@@ -283,14 +315,16 @@ export default function TabLaborants(props) {
             onChange={(e) => setNewLaborant({ ...newLaborant, psc: e.value })}
             optionLabel="NAZOV" // Assuming your city objects have a 'name' property
             placeholder="Vyberte mesto"
+            required
           />
+          {renderErrorMessage("psc")}
         </div>
         <Button
           style={{ marginTop: "50px" }}
           label="Pridať"
           icon="pi pi-check"
           onClick={() => {
-            fetchSubmitNewLaborant();
+            handleSubmit();
           }}
         />
       </Dialog>

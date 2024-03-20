@@ -27,6 +27,7 @@ export default function TabPharmacists(props) {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newPharmacist, setNewPharmacist] = useState({});
   const [cities, setCities] = useState([]);
+  const [submitted, setSubmitted] = useState(false); //sluzi na to, ze polia v addForm musia byt required
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -215,6 +216,29 @@ export default function TabPharmacists(props) {
     return cislo;
   };
 
+  const handleSubmit = () => {
+    setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
+    if (
+      newPharmacist.rod_cislo &&
+      newPharmacist.meno &&
+      newPharmacist.priezvisko &&
+      newPharmacist.ulica &&
+      newPharmacist.psc
+    ) {
+      // Ak sú všetky polia vyplnené, pokračujeme v odoslaní
+      fetchSubmitNewPharmacist();
+    }
+  };
+
+  const renderErrorMessage = (fieldName) => {
+    return (
+      submitted &&
+      !newPharmacist[fieldName] && (
+        <small className="p-error">Toto pole je povinné!</small>
+      )
+    );
+  };
+
   // Form dialog for adding a new pharmacist
   const renderAddPharmacistDialog = () => {
     return (
@@ -239,7 +263,9 @@ export default function TabPharmacists(props) {
             }
             placeholder="______/____"
             maxLength={11}
+            required
           />
+          {renderErrorMessage("rod_cislo")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="meno">Meno</label>
@@ -250,7 +276,9 @@ export default function TabPharmacists(props) {
               setNewPharmacist({ ...newPharmacist, meno: e.target.value })
             }
             placeholder="Zadajte meno lekárnika"
+            required
           />
+          {renderErrorMessage("meno")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="priezvisko">Priezvisko</label>
@@ -261,7 +289,9 @@ export default function TabPharmacists(props) {
               setNewPharmacist({ ...newPharmacist, priezvisko: e.target.value })
             }
             placeholder="Zadajte priezvisko lekárnika"
+            required
           />
+          {renderErrorMessage("priezvisko")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="ulica">Ulica</label>
@@ -272,7 +302,9 @@ export default function TabPharmacists(props) {
               setNewPharmacist({ ...newPharmacist, ulica: e.target.value })
             }
             placeholder="Zadajte názov ulice"
+            required
           />
+          {renderErrorMessage("ulica")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="city">Mesto</label>
@@ -285,14 +317,16 @@ export default function TabPharmacists(props) {
             }
             optionLabel="NAZOV" // Assuming your city objects have a 'name' property
             placeholder="Vyberte mesto"
+            required
           />
+          {renderErrorMessage("psc")}
         </div>
         <Button
           style={{ marginTop: "50px" }}
           label="Pridať"
           icon="pi pi-check"
           onClick={() => {
-            fetchSubmitNewPharmacist();
+            handleSubmit();
           }}
         />
       </Dialog>
