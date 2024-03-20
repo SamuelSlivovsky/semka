@@ -15,6 +15,7 @@ export default function TabLaborants(props) {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -61,7 +62,6 @@ export default function TabLaborants(props) {
         if (data.length > 0) {
           setNazovLekarne(data[0].LEKAREN_NAZOV);
           setIdLekarne(data[0].ID_LEKARNE);
-          console.log(data);
         }
       })
       .finally(() => {
@@ -226,7 +226,7 @@ export default function TabLaborants(props) {
         className="p-fluid"
         onHide={() => setShowAddDialog(false)}
       >
-        <div className="p-field">
+        <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="rodneCislo">Rodné číslo</label>
           <InputText
             id="rodneCislo"
@@ -241,7 +241,7 @@ export default function TabLaborants(props) {
             maxLength={11}
           />
         </div>
-        <div className="p-field">
+        <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="meno">Meno</label>
           <InputText
             id="meno"
@@ -249,9 +249,10 @@ export default function TabLaborants(props) {
             onChange={(e) =>
               setNewLaborant({ ...newLaborant, meno: e.target.value })
             }
+            placeholder="Zadajte meno laboranta"
           />
         </div>
-        <div className="p-field">
+        <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="priezvisko">Priezvisko</label>
           <InputText
             id="priezvisko"
@@ -259,9 +260,10 @@ export default function TabLaborants(props) {
             onChange={(e) =>
               setNewLaborant({ ...newLaborant, priezvisko: e.target.value })
             }
+            placeholder="Zadajte priezvisko laboranta"
           />
         </div>
-        <div className="p-field">
+        <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="ulica">Ulica</label>
           <InputText
             id="ulica"
@@ -269,9 +271,10 @@ export default function TabLaborants(props) {
             onChange={(e) =>
               setNewLaborant({ ...newLaborant, ulica: e.target.value })
             }
+            placeholder="Zadajte názov ulice"
           />
         </div>
-        <div className="p-field">
+        <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="city">Mesto</label>
           <Dropdown
             id="city"
@@ -306,7 +309,7 @@ export default function TabLaborants(props) {
         <Button
           icon="pi pi-trash"
           className="p-button-rounded p-button-danger"
-          onClick={() => deleteLaborant(rowData)}
+          onClick={() => requestDeleteLaborant(rowData)}
         />
       </React.Fragment>
     );
@@ -317,9 +320,105 @@ export default function TabLaborants(props) {
     // Implementation for editing pharmacist
   };
 
-  const deleteLaborant = (pharmacist) => {
-    // Implementation for deleting pharmacist
+  const deleteLaborant = (rowData) => {
+    console.log(rowData.CISLO_ZAM);
+    const token = localStorage.getItem("hospit-user");
+    fetch(`/pharmacyManagers/deleteZamestnanciLekarne/${rowData.CISLO_ZAM}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          toast.current.show({
+            severity: "success",
+            summary: "Zamestnanec vymazaný",
+            detail: "Zamestnanec bol úspešne vymazaný.",
+            life: 3000,
+          });
+          // Aktualizujte zoznam zamestnancov po úspešnom vymazaní
+          // Možno budete potrebovať prispôsobiť túto časť, aby správne načítala dáta
+          fetchGetLaboranti(
+            { authorization: "Bearer " + token },
+            GetUserData(token)
+          );
+        } else {
+          throw new Error("Problém pri vymazávaní zamestnanca");
+        }
+      })
+      .catch((error) => {
+        console.error("Chyba:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri vymazávaní",
+          detail: "Nepodarilo sa vymazať zamestnanca.",
+          life: 3000,
+        });
+      });
+
+    // Zavrie potvrdzovací dialóg
+    setShowConfirmDialog(false);
   };
+
+  const requestDeleteLaborant = (rowData) => {
+    setSelectedRow(rowData); // Uložíme si vybraného zamestnanca do stavu
+    setShowConfirmDialog(true); // Zobrazíme potvrdzovací dialog
+  };
+
+  const requestDeletePharmacist = (rowData) => {
+    setSelectedRow(rowData); // Uložíme si vybraného zamestnanca do stavu
+    setShowConfirmDialog(true); // Zobrazíme potvrdzovací dialog
+  };
+
+  const renderConfirmDialog = () => {
+    return (
+      <Dialog
+        header="Potvrdenie vymazania"
+        visible={showConfirmDialog}
+        style={{ width: "450px", textAlign: "center" }}
+        modal
+        footer={confirmDialogFooter}
+        onHide={() => setShowConfirmDialog(false)}
+      >
+        <div
+          div
+          className="confirmation-content"
+          style={{ textAlign: "center", display: "grid" }}
+        >
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{
+              fontSize: "2rem",
+              color: "var(--yellow-500)",
+              marginBottom: "1rem",
+            }}
+          ></i>
+          <span style={{ marginBottom: "1rem" }}>
+            Naozaj chcete vymazať zamestnanca: {selectedRow?.MENO}{" "}
+            {selectedRow?.PRIEZVISKO}?
+          </span>
+        </div>
+      </Dialog>
+    );
+  };
+
+  const confirmDialogFooter = (
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <Button
+        label="Nie"
+        icon="pi pi-times"
+        className="p-button-text"
+        onClick={() => setShowConfirmDialog(false)}
+      />
+      <Button
+        label="Áno"
+        icon="pi pi-check"
+        className="p-button-text"
+        onClick={() => deleteLaborant(selectedRow)}
+      />
+    </div>
+  );
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -359,6 +458,7 @@ export default function TabLaborants(props) {
   const header = renderHeader();
   return (
     <div>
+      {renderConfirmDialog()}
       <Toast ref={toast} position="top-center" />
       {renderAddLaborantDialog()}
       <div className="card">

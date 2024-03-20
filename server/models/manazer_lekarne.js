@@ -112,6 +112,24 @@ async function insertLaborantLekarne(body) {
   }
 }
 
+async function deleteZamestnanciLekarne(cisloZam) {
+  console.log(cisloZam);
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+    delete_zamestnanec_lekarne(:p_cislo_zam);
+  END;`;
+    let result = await conn.execute(sqlStatement, [cisloZam], {
+      autoCommit: true,
+    });
+
+    console.log("Rows deleted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 async function getManazerLekarneInfo(id) {
   try {
     let conn = await database.getConnection();
@@ -332,7 +350,9 @@ async function updateUcinnaLatka(body) {
 async function getZoznamMiest() {
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`select PSC, nazov from mesto`);
+    const result = await conn.execute(
+      `select PSC, nazov from mesto order by nazov`
+    );
 
     return result.rows;
   } catch (err) {
@@ -346,6 +366,7 @@ module.exports = {
   insertZamestnanecLekarne,
   getLaboranti,
   insertLaborantLekarne,
+  deleteZamestnanciLekarne,
   getManazerLekarneInfo,
   getLekarniciInfo,
   getLaborantiInfo,

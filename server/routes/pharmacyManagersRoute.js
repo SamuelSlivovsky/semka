@@ -36,6 +36,12 @@ router.post(
   controller.insertLaborantLekarne
 );
 
+router.delete(
+  "/deleteZamestnanciLekarne/:id",
+  verify.verifyRoles(0, 10),
+  controller.deleteZamestnanciLekarne
+);
+
 router.get(
   "/zoznamLiekov/:id",
   verify.verifyRoles(0, 10, 9),

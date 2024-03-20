@@ -54,6 +54,20 @@ module.exports = {
     });
   },
 
+  deleteZamestnanciLekarne: (req, res) => {
+    const zamestnanecLekarne = require("../models/manazer_lekarne");
+    const cisloZam = req.params.id; // Získanie cisla zam z URL parametra
+    zamestnanecLekarne
+      .deleteZamestnanciLekarne(cisloZam)
+      .then(() => {
+        res.status(200).json({ message: "Zamestnanec bol úspešne vymazaný." });
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err.message); // Odoslanie správy o chybe
+      });
+  },
+
   getManazerLekarneInfo: (req, res) => {
     const manazerLekarne = require("../models/manazer_lekarne");
     (async () => {
