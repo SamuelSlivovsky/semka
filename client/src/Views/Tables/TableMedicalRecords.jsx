@@ -288,7 +288,6 @@ export default function TableMedic(props) {
                         <PDFDownloadLink
                             style={{
                 height: "40px",
-                backgroundColor: "red",
                 width: "120px",
                 display: "flex",
                 justifyContent: "center",

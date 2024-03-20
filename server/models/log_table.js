@@ -39,7 +39,7 @@ async function insertLogFailedLogin(body) {
             END;`,
             {
                 status: body.status,
-                description: "User with ip " + body.ip + " has tried to log into " + body.userid + " with password: " + body.pwd,
+                description: "User with ip " + body.ip + " has failed to log in",
                 ip: body.ip,
                 table: "USER_TAB"
             },
