@@ -187,7 +187,7 @@ export default function TabLaborants(props) {
           </div>
         </div>
         <Button
-          style={{ height: "50px" }}
+          style={{ height: "50px", top: "10px", right: "10px" }}
           label="Pridať laboranta"
           icon="pi pi-plus"
           onClick={() => setShowAddDialog(true)}
