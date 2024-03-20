@@ -18,6 +18,8 @@ export default function TabFreeSaleMedicaments() {
   const [volnyPredajLiekov, setVolnyPredajLiekov] = useState([]);
   const navigate = useNavigate();
   const [nazovLekarne, setNazovLekarne] = useState([]);
+  const [vydajPocet, setVydajPocet] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -58,9 +60,92 @@ export default function TabFreeSaleMedicaments() {
     setSelectedRow(null);
   };
 
-  const onSubmit = () => {
-    setShowDialog(false);
-    // navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
+  const updatePocetLiekov = async (
+    idLekarne,
+    idLiek,
+    datumTrvanlivosti,
+    vydanyPocet
+  ) => {
+    try {
+      setIsLoading(true); // Začiatok načítania
+      const response = await fetch(
+        "/lekarenskySklad/updatePocetVolnopredajnehoLieku",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("hospit-user")}`,
+          },
+          body: JSON.stringify({
+            idLekarne,
+            idLiek,
+            datumTrvanlivosti,
+            vydanyPocet,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+      setIsLoading(false); // Koniec načítania
+      return true;
+    } catch (error) {
+      setIsLoading(false); // Koniec načítania
+      toast.current.show({
+        severity: "error",
+        summary: "Chyba pri aktualizácii",
+        detail: error.toString(),
+        life: 3000,
+      });
+      return false;
+    }
+  };
+
+  const onSubmit = async () => {
+    if (vydajPocet > 0 && vydajPocet <= selectedRow.POCET) {
+      const success = await updatePocetLiekov(
+        selectedRow.ID_LEKARNE,
+        selectedRow.ID_LIEK,
+        selectedRow.DATUM_TRVANLIVOSTI,
+        vydajPocet
+      );
+
+      if (success) {
+        setShowDialog(false); // Zatvorenie dialógového okna po úspešnej akcii
+        setVydajPocet(0); // Reset počtu na výdaj
+
+        //@TODO Toto sa odstrani len z tabulky lokalne, ale vdatabaze zaznam stale ostane, treba riesit DELETE
+        // Ak po vydaji bude pocet liekov 0, odstránime liek zo zoznamu
+        if (selectedRow.POCET - vydajPocet === 0) {
+          setVolnyPredajLiekov((prevData) =>
+            prevData.filter((liek) => liek.ID_LIEK !== selectedRow.ID_LIEK)
+          );
+        } else {
+          // Inak aktualizujeme pocet liekov v stave
+          setVolnyPredajLiekov((prevData) =>
+            prevData.map((liek) =>
+              liek.ID_LIEK === selectedRow.ID_LIEK
+                ? { ...liek, POCET: liek.POCET - vydajPocet }
+                : liek
+            )
+          );
+        }
+        toast.current.show({
+          severity: "success",
+          summary: "Liek vydaný",
+          detail: `Liek ${selectedRow.NAZOV_LIEKU} bol úspešne vydany v počte ${vydajPocet} ks.`,
+          life: 8000,
+        });
+      }
+    } else {
+      toast.current.show({
+        severity: "error",
+        summary: "Neplatné množstvo",
+        detail: "Zadané množstvo presahuje dostupné zásoby.",
+        life: 3000,
+      });
+    }
   };
 
   const handleClick = (value) => {
@@ -192,6 +277,14 @@ export default function TabFreeSaleMedicaments() {
               {selectedRow.NAZOV_LEKARNE}
               <br />
               <h5>{selectedRow.NAZOV_LIEKU}</h5>
+              {/* Pridanie vstupného poľa pre zadanie počtu liekov na výdaj */}
+              <InputText
+                value={vydajPocet}
+                onChange={(e) => setVydajPocet(e.target.value)}
+                placeholder="Počet na výdaj"
+                type="number"
+                max={selectedRow.POCET}
+              />
             </div>
           ) : (
             ""

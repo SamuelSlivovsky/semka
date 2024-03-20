@@ -84,7 +84,7 @@ async function getVolnyPredajLiekov(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT l.nazov as "NAZOV_LIEKU", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE", tl.id_lekarensky_sklad, to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET"
+      `select DISTINCT l.id_liek, l.nazov as "NAZOV_LIEKU", tl.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE", tl.id_lekarensky_sklad, to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET"
       from liek l
       join trvanlivost_lieku tl on (tl.id_liek = l.id_liek)
       join lekarensky_sklad ls on (ls.id_lekarensky_sklad = tl.id_lekarensky_sklad)
@@ -100,10 +100,39 @@ async function getVolnyPredajLiekov(id) {
   }
 }
 
+async function updatePocetVolnopredajnehoLieku(body) {
+  console.log(body);
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `UPDATE trvanlivost_lieku
+    SET pocet = pocet - :vydanyPocet
+    WHERE datum_trvanlivosti = TO_DATE(:datumTrvanlivosti, 'DD.MM.YYYY HH24:MI:SS')
+    AND id_liek = :idLiek
+    AND id_lekarensky_sklad IN (SELECT id_lekarensky_sklad FROM lekarensky_sklad WHERE id_lekarne = :idLekarne)
+    AND pocet >= :vydanyPocet`;
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        datumTrvanlivosti: body.datumTrvanlivosti,
+        idLiek: body.idLiek,
+        idLekarne: body.idLekarne,
+        vydanyPocet: body.vydanyPocet,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows updated " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getLiekyLekarenskySklad,
   getZdrPomockyLekarenskySklad,
   getSearchLiecivoLekarenskySklad,
   getSearchZdrPomockaLekarenskySklad,
   getVolnyPredajLiekov,
+  updatePocetVolnopredajnehoLieku,
 };

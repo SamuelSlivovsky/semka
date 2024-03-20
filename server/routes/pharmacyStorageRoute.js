@@ -38,4 +38,10 @@ router.get(
   controller.getVolnyPredajLiekov
 );
 
+router.post(
+  "/updatePocetVolnopredajnehoLieku",
+  verify.verifyRoles(0, 10),
+  controller.updatePocetVolnopredajnehoLieku
+);
+
 module.exports = router;
