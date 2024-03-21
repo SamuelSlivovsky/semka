@@ -14,12 +14,10 @@ import GetUserData from "../Auth/GetUserData";
 import {ProgressSpinner} from "primereact/progressspinner";
 import {Dropdown} from "primereact/dropdown";
 import {InputNumber} from "primereact/inputnumber";
+import {Calendar} from "primereact/calendar";
+import {json} from "react-router-dom";
 
 export default function Orders() {
-
-    //------------------------------------------------------------------------------------------------
-    let skladId = 30;
-    //------------------------------------------------------------------------------------------------
 
     let emptyOrders = {
         ID_OBJEDNAVKY: null,
@@ -43,6 +41,7 @@ export default function Orders() {
     const [showDialog, setShowDialog] = useState(false);
     const [addOrderDialog, setAddOrderDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
+    const [confirmOrder, setConfirmOrder] = useState(false);
     const [changeProductDialog, setChangeProductDialog] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
@@ -59,7 +58,8 @@ export default function Orders() {
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
         const headers = { authorization: "Bearer " + token };
-        fetch(`objednavky/all`, { headers })
+        const userDataHelper = GetUserData(token);
+        fetch(`objednavky/all/${userDataHelper.UserInfo.userid}`, { headers })
             .then((response) => response.json())
             .then((data) => {
                 setProducts(data);
@@ -68,9 +68,9 @@ export default function Orders() {
     }, []);
 
     //Async function for inserting new data into DB
-    //@TODO add ID_SKLAD
     async function insertData() {
         const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
 
         const requestOptions = {
             method: "POST",
@@ -80,13 +80,47 @@ export default function Orders() {
             },
             body: JSON.stringify({
                 zoznam_liekov: formattedString,
-                id_sklad: skladId
+                usr_id: userDataHelper.UserInfo.userid
             }),
         };
+
         const response = await fetch("/objednavky/add", requestOptions).catch((err) =>
             console.log(err)
         );
 
+    }
+
+    async function confirmOrderDB(medication) {
+        const token = localStorage.getItem("hospit-user");
+
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                id: medication.id,
+                poc: medication.amount,
+                id_obj: order.ID_OBJEDNAVKY,
+                sel_date: order.DATUM_DODANIA
+            }),
+        };
+
+        fetch("/objednavky/confirmOrder", requestOptions)
+            .then((response) => response.json())
+            .then((res) => {
+                if(res.message !== undefined) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: res.message,
+                        life: 3000,
+                    });
+                    return false;
+                }
+            });
+        return true;
     }
 
     //Async function for removing order
@@ -123,7 +157,13 @@ export default function Orders() {
             })
             .then((data) => {
                 try {
+
                     const jsonData = JSON.parse(data);
+
+                    if(jsonData[0].DATUM_DODANIA === null) {
+                        setConfirmOrder(true);
+                        order.ID_OBJEDNAVKY = value.ID_OBJEDNAVKY;
+                    }
 
                     // If ZOZNAM_LIEKOV is a string, parse it as JSON
                     if (jsonData && jsonData[0] && jsonData[0].ZOZNAM_LIEKOV) {
@@ -131,8 +171,7 @@ export default function Orders() {
 
                         setLoading(false);
                         setXmlContent(zoznamLiekovArray);
-                    } else {
-                        console.error('Invalid ZOZNAM_LIEKOV structure:', jsonData);
+                    } else {console.error('Invalid ZOZNAM_LIEKOV structure:', jsonData);
                     }
                 } catch (error) {
                     console.error('Error parsing data:', error);
@@ -161,10 +200,10 @@ export default function Orders() {
 
     //Add new order function
     const addOrder = () => {
-        //Checking if there are any values below 0
         let _orders = [...products];
         let _order = { ... order};
 
+        //Checking if there are any values below 0
         let checkPocet = true;
         if(selectedMedications.some((medication) => medication.quantity <= 0)) {
             toast.current.show({
@@ -205,36 +244,110 @@ export default function Orders() {
 
             insertData();
 
-            const lastOrder = _orders[_orders.length - 1];
-            _order.ID_OBJEDNAVKY = lastOrder ? lastOrder.ID_OBJEDNAVKY + 1 : 1;
-            _order.ID_SKLAD = skladId;
-            _order.ZOZNAM_LIEKOV = formattedString;
+            const token = localStorage.getItem("hospit-user");
+            const headers = { authorization: "Bearer " + token };
+            const userDataHelper = GetUserData(token);
 
-            let currentDate = new Date();
-            let day = currentDate.getDate();
-            let month = currentDate.getMonth() + 1;
-            let year = currentDate.getFullYear();
+            //@TODO it seems that this is sometimes faster then insert into table and therefor I am having duplicated
+            //@TODO ids in table and it crashes due to component then, could be fixxed by simple wait (1-2 second)
+            //@TODO tbh I dont know why is it doing this when other inserts have select after it
+            fetch(`/objednavky/getLastOrder/${userDataHelper.UserInfo.userid}`, { headers })
+                .then((response) => response.json())
+                .then((data) => {
+                    _order.ID_OBJEDNAVKY = data[0].ID_OBJEDNAVKY;
+                    _order.ID_SKLAD = data[0].ID_SKLAD;
+                    _order.ZOZNAM_LIEKOV = formattedString;
 
-            _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
-            _orders.push(_order);
+                    let currentDate = new Date();
+                    let day = currentDate.getDate();
+                    let month = currentDate.getMonth() + 1;
+                    let year = currentDate.getFullYear();
 
-            console.log(_order);
-            console.log(_orders);
+                    _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
+                    _orders.push(_order);
 
+                    console.log(_order);
+                    console.log(_orders);
+
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Successful",
+                        detail: "Objednávka vola vytvorená",
+                        life: 3000,
+                    });
+
+                    setSelectedDrug(null);
+                    setSelectedMedications([]);
+                    setAddOrderDialog(false);
+                    setProducts(_orders);
+                    setOrder(emptyOrders);
+                });
+        }
+
+        hideDialog();
+    }
+
+    //Function for confirming orders
+    const confirmOrderDelivery = () => {
+        //@TODO get selected row and update date in it and then update it in table on site
+
+        const selectedDate = new Date(order.DATUM_DODANIA);
+        const currentDate = new Date();
+        let finish = true;
+
+        if(selectedDate > currentDate) {
+            finish = false;
+        } else {
+            for (let index = 0; index < xmlContent.length; index++) {
+                const medication = xmlContent[index];
+
+                if(!confirmOrderDB(medication)) {
+                    //There was an error while performing confirmation
+                    finish = false;
+                    break;
+                }
+
+            }
+
+        }
+
+        if(finish) {
             toast.current.show({
                 severity: "success",
                 summary: "Successful",
-                detail: "Objednávka vola vytvorená",
+                detail: "Objednávka bola potvrdená a lieky boli pridané do skladu",
                 life: 3000,
             });
 
-            setSelectedDrug(null);
-            setSelectedMedications([]);
-            setAddOrderDialog(false);
-            setProducts(_orders);
-            setOrder(emptyOrders);
+            console.log(order);
+
+            const _products = products.filter(product => product.ID_OBJEDNAVKY !== order.ID_OBJEDNAVKY);
+            const index = products.findIndex(product => product.ID_OBJEDNAVKY === order.ID_OBJEDNAVKY);
+
+            const date = new Date(order.DATUM_DODANIA);
+            const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+
+            console.log(formattedDate);
+
+            order.DATUM_OBJEDNAVKY = products[index].DATUM_OBJEDNAVKY;
+            order.DATUM_DODANIA = formattedDate;
+
+            _products.push(order);
+
+            setProducts(_products);
+
+        } else {
+            toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: "Zadaný dátum je väčší ako aktuálny dátum",
+                life: 3000,
+            });
         }
-        hideDialog();
+
+        setOrder(emptyOrders);
+        onHide();
+
     }
 
     const deleteProduct = () => {
@@ -277,8 +390,9 @@ export default function Orders() {
     //Selected Order hide
     const onHide = () => {
         setXmlContent(null);
-        setShowDialog(false);
         setSelectedRow(null);
+        setShowDialog(false);
+        setConfirmOrder(false);
     };
 
     //New order hide
@@ -367,8 +481,8 @@ return (
         <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
         <DataTable
-            value={products} //products
-            selection={selectedRow} //selectedProducts
+            value={products}
+            selection={selectedRow}
             selectionMode="single"
             onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
             dataKey="ID_OBJEDNAVKY"
@@ -407,23 +521,49 @@ return (
 
         <Dialog
             visible={showDialog && dialog}
-            style={{ width: "50vw" }}
+            style={{ maxWidth: "50vw" }}
             footer={NaN} //productDialogFooter
             onHide={() => onHide()}
         >
             {loading ? (
-                <div style={{ width: "100%", display: "flex" }}>
+                <div style={{ width: "500px", display: "flex" }}>
                     <ProgressSpinner />
                 </div>
             ) : selectedRow !== null ? (
-                <div style={{ maxWidth: "100%", overflowWrap: "break-word" }}>
+                <div style={{ maxWidth: "500px", overflowWrap: "break-word" }}>
                     <h3>Zoznam objednaných liekov</h3>
                     {xmlContent.map((item, index) => (
                         <div key={index}>
+                            <p>ID Lieku: {item.id}</p>
                             <p>Názov: {item.name}</p>
                             <p>Počet: {item.amount}</p>
                         </div>
                     ))}
+                </div>
+            ) : (
+                ""
+            )}
+            {confirmOrder  ? (
+                <div>
+                    <h2>Potvrdenie príchodu objednávky</h2>
+                    <div className="formgird grid">
+                        <div className="field col">
+                            <label htmlFor="DATUM_DODANIA">Dátum dodania objednávky</label>
+                            <div>
+
+                                <Calendar
+                                    value={order.DATUM_DODANIA}
+                                    dateFormat="dd.mm.yy"
+                                    onChange={(e) =>
+                                        setOrder({ ...order, DATUM_DODANIA: e.value })
+                                    }
+                                ></Calendar>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={"submit-button"}>
+                        <Button style={{width: "50%"}} label="Potvrdiť doručenie" onClick={confirmOrderDelivery} />
+                    </div>
                 </div>
             ) : (
                 ""

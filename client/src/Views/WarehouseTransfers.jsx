@@ -298,8 +298,6 @@ export default function WarehouseTransfers() {
         const response = await fetch("/presuny/deleteTransfer", requestOptions);
     }
 
-    //@TODO CHECK these 2 functions below
-
     //Function that will send request onto DB to denie request and update it
     async function denieTransfer() {
         const token = localStorage.getItem("hospit-user");
@@ -316,7 +314,6 @@ export default function WarehouseTransfers() {
         const response = await fetch("/presuny/deniedTransfer", requestOptions);
     }
 
-    //@TODO check if this works correctly
     //Function for confirming transfer and updating data in DB
     async function confTransfer() {
         const token = localStorage.getItem("hospit-user");
