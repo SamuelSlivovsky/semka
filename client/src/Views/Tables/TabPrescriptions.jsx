@@ -22,6 +22,7 @@ export default function TabPrescriptions() {
   const [vydaneRecepty, setVydaneRecepty] = useState([]);
   const navigate = useNavigate();
   const [rodneCisloEntered, setRodneCisloEntered] = useState(false);
+  const [dialogContext, setDialogContext] = useState(""); // 'aktualne' alebo 'vydane'
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,28 +73,54 @@ export default function TabPrescriptions() {
     navigate("/prescription_detail", { state: selectedRow.ID_RECEPTU });
   };
 
-  const handleClick = (value) => {
+  const handleClickAktualne = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
+    setDialogContext("aktualne"); // Nastaviť kontext pre aktuálne recepty
+  };
+
+  const handleClickVydane = (value) => {
+    setShowDialog(true);
+    setSelectedRow(value);
+    setDialogContext("vydane"); // Nastaviť kontext pre vydané recepty
   };
 
   const renderDialogFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Zatvoriť"
-          icon="pi pi-times"
-          className="p-button-danger"
-          onClick={() => onHide()}
-        />
-        <Button
-          label="Detail"
-          icon="pi pi-check"
-          onClick={() => onSubmit()}
-          autoFocus
-        />
-      </div>
-    );
+    if (dialogContext === "aktualne") {
+      return (
+        <div>
+          <Button
+            label="Zatvoriť"
+            icon="pi pi-times"
+            className="p-button-danger"
+            onClick={() => onHide()}
+          />
+          <Button
+            label="Vydať"
+            icon="pi pi-check"
+            onClick={() => onSubmit()}
+            autoFocus
+          />
+        </div>
+      );
+    } else if (dialogContext === "vydane") {
+      return (
+        <div>
+          <Button
+            label="Zatvoriť"
+            icon="pi pi-times"
+            className="p-button-danger"
+            onClick={() => onHide()}
+          />
+          <Button
+            label="Detail"
+            icon="pi pi-info-circle"
+            onClick={() => onSubmit()}
+            autoFocus
+          />
+        </div>
+      );
+    }
   };
 
   const onGlobalFilterChange = (e) => {
@@ -135,7 +162,11 @@ export default function TabPrescriptions() {
       },
       PRIEZVISKO_PACIENTA: {
         operator: FilterOperator.AND,
-        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
+      NAZOV_LIEKU: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
     });
     setGlobalFilterValue("");
@@ -192,7 +223,7 @@ export default function TabPrescriptions() {
                     paginator
                     rows={15}
                     selection={selectedRow}
-                    onSelectionChange={(e) => handleClick(e.value)}
+                    onSelectionChange={(e) => handleClickAktualne(e.value)}
                     filters={filters}
                     filterDisplay="menu"
                     globalFilterFields={[
@@ -200,6 +231,7 @@ export default function TabPrescriptions() {
                       "ROD_CISLO",
                       "MENO_PACIENTA",
                       "PRIEZVISKO_PACIENTA",
+                      "NAZOV_LIEKU",
                     ]}
                     emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
                   >
@@ -221,6 +253,11 @@ export default function TabPrescriptions() {
                     <Column
                       field="PRIEZVISKO_PACIENTA"
                       header={"Priezvisko pacienta"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="NAZOV_LIEKU"
+                      header={"Liek na predpis"}
                       filter
                     ></Column>
                   </DataTable>
@@ -266,7 +303,7 @@ export default function TabPrescriptions() {
                     paginator
                     rows={15}
                     selection={selectedRow}
-                    onSelectionChange={(e) => handleClick(e.value)}
+                    onSelectionChange={(e) => handleClickVydane(e.value)}
                     filters={filters}
                     filterDisplay="menu"
                     globalFilterFields={[
@@ -274,6 +311,7 @@ export default function TabPrescriptions() {
                       "ROD_CISLO",
                       "MENO_PACIENTA",
                       "PRIEZVISKO_PACIENTA",
+                      "NAZOV_LIEKU",
                     ]}
                     emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
                   >
@@ -295,6 +333,11 @@ export default function TabPrescriptions() {
                     <Column
                       field="PRIEZVISKO_PACIENTA"
                       header={"Priezvisko pacienta"}
+                      filter
+                    ></Column>
+                    <Column
+                      field="NAZOV_LIEKU"
+                      header={"Vydaný liek"}
                       filter
                     ></Column>
                   </DataTable>
