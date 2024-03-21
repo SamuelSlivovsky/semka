@@ -2,35 +2,33 @@ import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
 import { Chart } from "primereact/chart";
 import GetUserData from "../Auth/GetUserData";
-import { useNavigate } from "react-router";
 
 export default function PharmacyReportCard(props) {
-  const [info, setInfo] = useState("");
-  // Example data for charts - replace with your actual data
-  const [employeeDistribution, setEmployeeDistribution] = useState({});
-  const [medicationDistribution, setMedicationDistribution] = useState({});
+  const [info, setInfo] = useState(null); // Zmena z reťazca na null
+  const [employeeDistribution, setEmployeeDistribution] = useState(null);
+  const [medicationDistribution, setMedicationDistribution] = useState(null);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
-
     const headers = { authorization: "Bearer " + token };
+
     fetch(`pharmacyManagers/reportInfo/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
       .then((response) => response.json())
       .then((data) => {
-        setInfo(data);
-        console.log(data);
-        // Assuming data contains the fields you need
+        const reportData = data[0];
+        setInfo(reportData);
+
         setEmployeeDistribution({
-          labels: ["Managers", "Pharmacists", "Lab Technicians"],
+          labels: ["Manažéri", "Lekárnici", "Laboranti"],
           datasets: [
             {
               data: [
-                data.POCET_MANAZEROV,
-                data.POCET_LEKARNIKOV,
-                data.POCET_LABORANTOV,
+                reportData.POCET_MANAZEROV,
+                reportData.POCET_LEKARNIKOV,
+                reportData.POCET_LABORANTOV,
               ],
               backgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
               hoverBackgroundColor: ["#FF6384", "#36A2EB", "#FFCE56"],
@@ -39,10 +37,13 @@ export default function PharmacyReportCard(props) {
         });
 
         setMedicationDistribution({
-          labels: ["Over-the-Counter", "Prescription"],
+          labels: ["Voľnopredajné", "Na predpis"],
           datasets: [
             {
-              data: [data.POCET_LIEKOV_VOLNY, data.POCET_LIEKOV_PREDPIS],
+              data: [
+                reportData.POCET_LIEKOV_VOLNY,
+                reportData.POCET_LIEKOV_PREDPIS,
+              ],
               backgroundColor: ["#4BC0C0", "#9966FF"],
               hoverBackgroundColor: ["#4BC0C0", "#9966FF"],
             },
@@ -63,23 +64,32 @@ export default function PharmacyReportCard(props) {
 
   return (
     <div>
-      <div className="flex col-12">
-        <Card
-          className="col-5 shadow-4 text-center"
-          style={{ width: "40rem", height: "55rem" }} // Adjust height based on content
-          title={info.NAZOV_LEKARNE}
-        >
-          {/* Existing code */}
-          <Chart
-            type="pie"
-            data={employeeDistribution}
-            options={options}
-            style={{ marginBottom: "20px" }}
-          />
-          <Chart type="pie" data={medicationDistribution} options={options} />
-          {/* Continue with your existing layout */}
-        </Card>
-      </div>
+      {info &&
+        employeeDistribution &&
+        medicationDistribution && ( // Podmienené renderovanie
+          <div className="flex col-12">
+            <Card
+              className="col-5 shadow-4 text-center"
+              style={{ width: "40rem", height: "auto" }} // Upravená výška na auto
+              title={info.NAZOV_LEKARNE}
+            >
+              <div className="card-body" style={{ display: "ruby-text" }}>
+                <Chart
+                  type="pie"
+                  data={employeeDistribution}
+                  options={options}
+                  style={{ width: "60%", height: "60%" }}
+                />
+                <Chart
+                  type="pie"
+                  data={medicationDistribution}
+                  options={options}
+                  style={{ width: "60%", height: "60%" }}
+                />
+              </div>
+            </Card>
+          </div>
+        )}
     </div>
   );
 }

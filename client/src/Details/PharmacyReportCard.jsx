@@ -45,7 +45,9 @@ export default function PharmacyReportCard(props) {
         <h3>{label}</h3>
       </div>
       <div className="col-6">
-        <h4 style={{ color: "gray" }}>{value}</h4>
+        <h3 style={{ color: "gray", fontWeight: "600", fontStyle: "italic" }}>
+          {value}
+        </h3>
       </div>
     </div>
   );
@@ -58,48 +60,51 @@ export default function PharmacyReportCard(props) {
           style={{ width: "40rem", height: "55rem" }}
           title={info.NAZOV_LEKARNE}
         >
-          <div
-            style={{
-              borderRadius: "30px",
-              outlineStyle: "solid",
-              outlineColor: "#14b8a6",
-            }}
-          >
-            {renderDetail(
-              "Celkový počet zamestnancov: ",
-              info.CELKOVY_POCET_ZAMESTNANCOV
-            )}
-          </div>
-          {renderDetail("Počet manažérov: ", info.POCET_MANAZEROV)}
+          <div className="card-body" style={{ marginBlock: "25%" }}>
+            <div
+              style={{
+                borderRadius: "30px",
+                outlineStyle: "solid",
+                outlineColor: "#14b8a6",
+              }}
+            >
+              {renderDetail(
+                "Celkový počet zamestnancov: ",
+                info.CELKOVY_POCET_ZAMESTNANCOV
+              )}
+            </div>
+            <br />
+            {/* {renderDetail("Počet manažérov: ", info.POCET_MANAZEROV)}
           {renderDetail("Počet lekárnikov: ", info.POCET_LEKARNIKOV)}
-          {renderDetail("Počet laborantov: ", info.POCET_LABORANTOV)}
-          <div
-            style={{
-              borderRadius: "30px",
-              outlineStyle: "solid",
-              outlineColor: "#14b8a6",
-            }}
-          >
-            {renderDetail(
-              "Počet liekov v lekárenskom sklade: ",
-              info.POCET_LIEKOV
-            )}
+          {renderDetail("Počet laborantov: ", info.POCET_LABORANTOV)} */}
+            <div
+              style={{
+                borderRadius: "30px",
+                outlineStyle: "solid",
+                outlineColor: "#14b8a6",
+              }}
+            >
+              {renderDetail(
+                "Počet druhov liekov v lekárenskom sklade: ",
+                info.POCET_LIEKOV
+              )}
+            </div>
+            <br />
+            {/* {renderDetail("Voľnopredajné: ", info.POCET_LIEKOV_VOLNY)}
+          {renderDetail("Na predpis: ", info.POCET_LIEKOV_PREDPIS)} */}
+            <div
+              style={{
+                borderRadius: "30px",
+                outlineStyle: "solid",
+                outlineColor: "#14b8a6",
+              }}
+            >
+              {renderDetail(
+                "Počet druhov zdravotníckych pomôcok v lekárenskom sklade: ",
+                info.POCET_ZDR_POMOCOK
+              )}
+            </div>
           </div>
-          {renderDetail("Voľnopredajné: ", info.POCET_LIEKOV_VOLNY)}
-          {renderDetail("Na predpis: ", info.POCET_LIEKOV_PREDPIS)}
-          <div
-            style={{
-              borderRadius: "30px",
-              outlineStyle: "solid",
-              outlineColor: "#14b8a6",
-            }}
-          >
-            {renderDetail(
-              "Počet zdravotníckych pomôcok v lekárenskom sklade: ",
-              info.POCET_ZDR_POMOCOK
-            )}
-          </div>
-          {/* {renderCardFooter()} */}
         </Card>
       </div>
       <div className="col-12 flex"></div>

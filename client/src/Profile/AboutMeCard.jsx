@@ -45,7 +45,9 @@ export default function PharmacistCard(props) {
         <h3>{label}</h3>
       </div>
       <div className="col-6">
-        <h4 style={{ color: "gray" }}>{value}</h4>
+        <h3 style={{ color: "gray", fontWeight: "600", fontStyle: "italic" }}>
+          {value}
+        </h3>
       </div>
     </div>
   );

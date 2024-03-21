@@ -39,12 +39,12 @@ async function getLekarnici(id) {
 }
 
 async function insertZamestnanecLekarne(body) {
-  console.log(body);
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
     insert_zamestnanec_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_id_lekarne);
   END;`;
+    console.log(body);
     let result = await conn.execute(
       sqlStatement,
       {
@@ -86,12 +86,12 @@ async function getLaboranti(id) {
 }
 
 async function insertLaborantLekarne(body) {
-  console.log(body);
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
     insert_laborant_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_id_lekarne);
   END;`;
+    console.log(body);
     let result = await conn.execute(
       sqlStatement,
       {
@@ -113,12 +113,12 @@ async function insertLaborantLekarne(body) {
 }
 
 async function deleteZamestnanciLekarne(cisloZam) {
-  console.log(cisloZam);
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
     delete_zamestnanec_lekarne(:p_cislo_zam);
   END;`;
+    console.log(cisloZam);
     let result = await conn.execute(sqlStatement, [cisloZam], {
       autoCommit: true,
     });
@@ -324,7 +324,6 @@ async function getUcinnaLatka() {
 }
 
 async function updateUcinnaLatka(body) {
-  // console.log(body);
   try {
     let conn = await database.getConnection();
     const sqlStatement = `UPDATE ucinne_latky_liekov 
