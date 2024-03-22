@@ -52,8 +52,7 @@ async function getDetailReceptu(id) {
       to_char(recept.datum_zapisu, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_ZAPISU", to_char(recept.datum_prevzatia, 'DD.MM.YYYY') AS "DATUM_PREVZATIA",
       trvanlivost_lieku.id_liek as "ID_LIEKU", trvanlivost_lieku.datum_trvanlivosti, liek.nazov as "NAZOV_LIEKU", recept.poznamka, recept.opakujuci,
       typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA",
-      trvanlivost_lieku.pocet as "DOSTUPNY_POCET_NA_SKLADE", trvanlivost_lieku.id_lekarensky_sklad, trvanlivost_lieku.id_sklad,
-      lekaren.id_lekarne
+      trvanlivost_lieku.pocet as "DOSTUPNY_POCET_NA_SKLADE", trvanlivost_lieku.id_sklad, lekaren.id_lekarne
       from recept
        left join pacient on (pacient.id_pacienta = recept.id_pacienta)
        left join zamestnanci on (zamestnanci.cislo_zam = recept.cislo_zam)
@@ -62,8 +61,8 @@ async function getDetailReceptu(id) {
        left join os_udaje ouzam on (ouzam.rod_cislo = zamestnanci.rod_cislo)
        left join liek on (liek.id_liek = recept.id_liek)
        left join trvanlivost_lieku on (trvanlivost_lieku.id_liek = liek.id_liek)
-       left join lekarensky_sklad on (lekarensky_sklad.id_lekarensky_sklad = trvanlivost_lieku.id_lekarensky_sklad)
-       left join lekaren on (lekaren.id_lekarne = lekarensky_sklad.id_lekarne)
+       left join sklad on (sklad.id_sklad = trvanlivost_lieku.id_sklad)
+       left join lekaren on (lekaren.id_lekarne = sklad.id_lekarne)
       where recept.id_receptu = :id`,
       [id]
     );

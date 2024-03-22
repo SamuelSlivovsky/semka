@@ -288,19 +288,18 @@ async function getReportInfo(id) {
           count(distinct volnopredajny.na_predpis) as "POCET_LIEKOV_VOLNY",
           count(distinct predpis.na_predpis) as "POCET_LIEKOV_PREDPIS"
           from lekaren l
-          join zamestnanci manazer on (manazer.id_lekarne = l.id_lekarne)
-          join zamestnanci lekarnik on (lekarnik.id_lekarne = l.id_lekarne and lekarnik.id_lekarne = manazer.id_lekarne)
-          join zamestnanci laborant on (laborant.id_lekarne = l.id_lekarne and laborant.id_lekarne = manazer.id_lekarne)
-          left join lekarensky_sklad ls on (ls.id_lekarne = l.id_lekarne)
-          left join trvanlivost_zdr_pomocky tzp on (tzp.id_lekarensky_sklad = ls.id_lekarensky_sklad)
-          left join trvanlivost_lieku tl on (tl.id_lekarensky_sklad = ls.id_lekarensky_sklad)
-          left join trvanlivost_lieku tlv on (tlv.id_lekarensky_sklad = ls.id_lekarensky_sklad)
+          left join zamestnanci manazer on (manazer.id_lekarne = l.id_lekarne)
+          left join zamestnanci lekarnik on (lekarnik.id_lekarne = l.id_lekarne and lekarnik.id_typ = 9)
+          left join zamestnanci laborant on (laborant.id_lekarne = l.id_lekarne and laborant.id_typ = 8)
+          left join sklad ls on (ls.id_lekarne = l.id_lekarne)
+          left join trvanlivost_zdr_pomocky tzp on (tzp.id_sklad = ls.id_sklad)
+          left join trvanlivost_lieku tl on (tl.id_sklad = ls.id_sklad)
+          left join trvanlivost_lieku tlv on (tlv.id_sklad = ls.id_sklad)
           left join liek volnopredajny on (volnopredajny.id_liek = tlv.id_liek and volnopredajny.na_predpis = 'N')
-          left join trvanlivost_lieku tlp on (tlp.id_lekarensky_sklad = ls.id_lekarensky_sklad)
+          left join trvanlivost_lieku tlp on (tlp.id_sklad = ls.id_sklad)
           left join liek predpis on (predpis.id_liek = tlp.id_liek and predpis.na_predpis = 'A')
-          where manazer.cislo_zam = :id and lekarnik.id_typ = 9 and laborant.id_typ = 8  
-          group by l.id_lekarne, l.nazov
-      )`,
+          where manazer.cislo_zam = :id
+          group by l.id_lekarne, l.nazov)`,
       [id]
     );
 
