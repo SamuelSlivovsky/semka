@@ -24,9 +24,12 @@ export default function Storage() {
 
   const [selectedDrug, setSelectedDrug] = useState(null);
   const [drugs, setDrugs] = useState(null);
+  const [idOdd, setIdOdd] = useState(null);
   const [products, setProducts] = useState(null);
+  const [distNum, setDistNum] = useState(0);
   const [addProductDialog, setAddProductDialog] = useState(false);
   const [changeProductDialog, setChangeProductDialog] = useState(false);
+  const [showDistribute, setShowDistribute] = useState(false);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
   const [product, setProduct] = useState(emptyProduct);
@@ -47,6 +50,18 @@ export default function Storage() {
     initFilter();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  useEffect(() => {
+    const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
+    const headers = { authorization: "Bearer " + token };
+    fetch(`sklad/getIdOdd/${userDataHelper.UserInfo.userid}`, { headers })
+        .then((response) => response.json())
+        .then((data) => {
+          setIdOdd(data);
+        });
+    initFilter();
+  }, []);
+
   const initFilter = () => {
     setFilter({
       global: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
@@ -62,6 +77,62 @@ export default function Storage() {
     setFilter(_filter);
     setGlobalFilter(value);
   };
+
+  //Function showing distribution dialog
+  const distribute = () => {
+    setShowDistribute(true);
+  }
+
+  const hideDistribute = () => {
+    setShowDistribute(false);
+  }
+
+  //Function for confirming distribution in Hospital
+  const confirmDistribute = () => {
+
+    const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
+    for(let i = 0; i < products.length; i++) {
+
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          usr_id: userDataHelper.UserInfo.userid,
+          med_id: products[i].ID_LIEK,
+          exp_date: products[i].DAT_EXPIRACIE,
+          poc_liekov: products[i].POCET,
+          min_poc: distNum
+        }),
+      };
+
+      fetch(`/sklad/distributeMedications`,  requestOptions)
+          .then((response) => response.json())
+          .then((res) => {
+            if(res.message !== undefined) {
+              toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: res.message,
+                life: 3000,
+              });
+            }
+          });
+
+    }
+
+  }
+
+  const onInputDistChange = (e) => {
+    const inputValue = e.target.value;
+
+    if (inputValue === '' || /^\d+$/.test(inputValue)) {
+      setDistNum(inputValue);
+    }
+  }
 
   const openNew = () => {
     if (drugs == null) {
@@ -107,6 +178,7 @@ export default function Storage() {
 
   async function insertData() {
     const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
     const requestOptions = {
       method: "POST",
       headers: {
@@ -114,7 +186,7 @@ export default function Storage() {
         authorization: "Bearer " + token,
       },
       body: JSON.stringify({
-        id_oddelenia: 216,
+        usr_id: userDataHelper.UserInfo.userid,
         nazov_lieku: product.NAZOV,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
             ",",
@@ -166,6 +238,9 @@ export default function Storage() {
             product.ID_LIEK
         ) {
           insertData();
+          if(idOdd.length > 0) {
+            product.ID_ODDELENIA = idOdd[0].ID_ODDELENIA;
+          }
           _product.DAT_EXPIRACIE =
               product.DAT_EXPIRACIE.getDate() +
               "." +
@@ -225,7 +300,7 @@ export default function Storage() {
   };
 
   const deleteProduct = () => {
-    let _products = products.filter((val) => val.ID_LIEK !== product.ID_LIEK);
+    let _products = products.filter((val) => val.DAT_EXPIRACIE !== product.DAT_EXPIRACIE);
     deleteSarza(product);
     setProducts(_products);
     setDeleteProductDialog(false);
@@ -283,6 +358,7 @@ export default function Storage() {
 
   async function editDrug(_product) {
     const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
     const requestOptions = {
       method: "POST",
       headers: {
@@ -292,6 +368,7 @@ export default function Storage() {
       body: JSON.stringify({
         id_liek: product.ID_LIEK,
         pocet: product.POCET,
+        usr_id: userDataHelper.UserInfo.userid,
         dat_expiracie: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(
             ",",
             ""
@@ -303,6 +380,7 @@ export default function Storage() {
 
   async function deleteSarza(_product) {
     const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
     const requestOptions = {
       method: "POST",
       headers: {
@@ -311,7 +389,8 @@ export default function Storage() {
       },
       body: JSON.stringify({
         id_liek: _product.ID_LIEK,
-        datum: product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(",", ""),
+        usr_id: userDataHelper.UserInfo.userid,
+        datum: _product.DAT_EXPIRACIE.toLocaleString("en-GB").replace(",", ""),
       }),
     };
     const response = await fetch("/sklad/deleteSarza", requestOptions);
@@ -325,6 +404,12 @@ export default function Storage() {
               icon="pi pi-plus"
               className="p-button-success mr-2"
               onClick={openNew}
+          />
+          <Button
+              label="Distribute"
+              icon="pi pi-plus"
+              className="p-button-success mr-2"
+              onClick={distribute}
           />
           <Button
               label="Delete"
@@ -425,14 +510,13 @@ export default function Storage() {
 
         <div className="card">
           <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
-
           <DataTable
               value={products}
               selection={selectedProducts}
               onSelectionChange={(e) => setSelectedProducts(e.value)}
-              dataKey="ID_LIEK"
+              dataKey="DAT_EXPIRACIE"
               globalFilter={globalFilter}
-              globalFilterFields={["ID_LIEK","ID_ODDELENIA", "NAZOV", "POCET", "DAT_EXPIRACIE"]}
+              globalFilterFields={["DAT_EXPIRACIE", "ID_LIEK","ID_ODDELENIA", "NAZOV", "POCET"]}
               filters={filter}
               header={header}
               responsiveLayout="scroll"
@@ -440,6 +524,11 @@ export default function Storage() {
             <Column
                 selectionMode="multiple"
                 headerStyle={{ width: "3rem" }}
+            ></Column>
+            <Column
+                field="DAT_EXPIRACIE"
+                header="Dátum expirácie"
+                style={{ minWidth: "10rem" }}
             ></Column>
             <Column
                 field="ID_LIEK"
@@ -459,11 +548,6 @@ export default function Storage() {
             <Column
                 field="POCET"
                 header="Počet liekov"
-                style={{ minWidth: "10rem" }}
-            ></Column>
-            <Column
-                field="DAT_EXPIRACIE"
-                header="Dátum expirácie"
                 style={{ minWidth: "10rem" }}
             ></Column>
             <Column
@@ -585,6 +669,32 @@ export default function Storage() {
             {product && <span>Naozaj chcete odstrániť zvolené lieky?</span>}
           </div>
         </Dialog>
+
+        <Dialog
+            visible={showDistribute}
+            style={{ width: "450px" }}
+            header="Ditribuovať lieky"
+            modal
+            footer={NaN} //deleteProductsDialogFooter
+            onHide={hideDistribute}
+        >
+          <div>
+            <label>Počet liekov ktoré chcete nechať na sklade:</label>
+            <input
+                type="text"
+                value={distNum}
+                onChange={(e) => onInputDistChange(e)}
+                pattern="[0-9]*" // Allow only numeric input
+                inputMode="numeric"
+            />
+          </div>
+
+          <div className={"submit-button"}>
+            <Button style={{width: "45%"}} label="Potvrdiť distribúciu" onClick={confirmDistribute} />
+            <Button style={{width: "45%", backgroundColor: "red"}} label="Zrušiť" onClick={hideDistribute} />
+          </div>
+        </Dialog>
+
       </div>
   );
 }

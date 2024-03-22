@@ -1,7 +1,4 @@
 //@TODO add automatic transfer for expiring medications + when they are expired or there is large amount in main warehouse
-//@TODO add new tab
-
-//@TODO add new tab that will be for requested orders and add their confirmation/decline
 
 import {TabPanel, TabView} from "primereact/tabview";
 import {DataTable} from "primereact/datatable";
@@ -149,9 +146,6 @@ export default function WarehouseTransfers() {
                     // If ZOZNAM_LIEKOV is a string, parse it as JSON
                     if (jsonData && jsonData[0] && jsonData[0].ZOZNAM_LIEKOV) {
                         const zoznamLiekovArray = JSON.parse(jsonData[0].ZOZNAM_LIEKOV);
-
-                        // Now zoznamLiekovArray should be an array of objects
-                        //console.log('Parsed ZOZNAM_LIEKOV:', zoznamLiekovArray);
 
                         setLoading(false);
                         setXmlContent(zoznamLiekovArray);
@@ -304,8 +298,6 @@ export default function WarehouseTransfers() {
         const response = await fetch("/presuny/deleteTransfer", requestOptions);
     }
 
-    //@TODO CHECK these 2 functions below
-
     //Function that will send request onto DB to denie request and update it
     async function denieTransfer() {
         const token = localStorage.getItem("hospit-user");
@@ -322,8 +314,6 @@ export default function WarehouseTransfers() {
         const response = await fetch("/presuny/deniedTransfer", requestOptions);
     }
 
-    //@TODO get from DB ZOZNAM_LIEKOV and then it needs to be iterated in FOR to update data in DB
-    //@TODO add new route for Confirming transfer and create procedure for it
     //Function for confirming transfer and updating data in DB
     async function confTransfer() {
         const token = localStorage.getItem("hospit-user");
@@ -331,19 +321,27 @@ export default function WarehouseTransfers() {
         //Fetch for getting JSON data from DB that contains all medications in PRESUN_LIEKOV for transfer
         fetch(`/presuny/list/${transfer.ID_PRESUN}`, { headers })
             .then((response) => response.json())
-            .then((data) => {
-                //Data now should contain JSON with all requeired medications for transfer, now it needs to be separated
-                const requestOptions = {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        authorization: "Bearer " + token,
-                    },
-                    body: JSON.stringify({
+            .then(async (data) => {
+                //Data now should contain JSON with all required medications for transfer, now it needs to be separated
+                const zoznamLiekovArray = JSON.parse(data[0].ZOZNAM_LIEKOV);
 
-                    }),
-                };
-                //const response = await fetch("/presuny/deniedTransfer", requestOptions);
+                for (const medications of zoznamLiekovArray) {
+                    console.log(medications);
+                    const requestOptions = {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            authorization: "Bearer " + token,
+                        },
+                        body: JSON.stringify({
+                            id_pres: transfer.ID_PRESUN,
+                            id_l: medications.id,
+                            poc: medications.amount
+                        }),
+                    };
+                    await fetch("/presuny/confirmTransfer", requestOptions);
+                }
+
             });
     }
 
@@ -634,12 +632,12 @@ export default function WarehouseTransfers() {
         return (
             <React.Fragment>
                 <Button
-                    icon="pi pi-pencil"
+                    icon="pi pi-check"
                     className="p-button-rounded p-button-success mr-2"
                     onClick={() => confirmTransfer(rowData)}
                 />
                 <Button
-                    icon="pi pi-trash"
+                    icon="pi pi-times"
                     className="p-button-rounded p-button-warning"
                     onClick={() => deniedTransfer(rowData)}
                 />
@@ -1064,31 +1062,29 @@ export default function WarehouseTransfers() {
                 </div>
             </Dialog>
 
-            //Dialog for confirming transfers
             <Dialog
                 visible={showConfirmTransferDialog}
-                style={{ width: "450px" }}
-                header="Confirm"
+                style={{ width: "500px" }}
+                header="Naozaj chcete potvrdiť presun?"
                 modal
-                footer={NaN}
                 onHide={hideConfirmDeniedDialog}
             >
                 <div className={"submit-button"}>
-                    <Button style={{width: "50%"}} label="Potvrdiť presun" onClick={confirmRequestedTransfer} />
+                    <Button style={{width: "45%"}} label="Potvrdiť presun" onClick={confirmRequestedTransfer} />
+                    <Button style={{width: "45%", backgroundColor: "red"}} label="Zrušiť" onClick={confirmRequestedTransfer} />
                 </div>
             </Dialog>
 
-            //Dialog for declining transfers
             <Dialog
                 visible={showDeniedTransferDialog}
-                style={{ width: "450px" }}
-                header="Confirm"
+                style={{ width: "500px" }}
+                header="Chcete zamietnuť presun?"
                 modal
-                footer={NaN}
                 onHide={hideConfirmDeniedDialog}
             >
                 <div className={"submit-button"}>
-                    <Button style={{width: "50%"}} label="Zamietnuť presun" onClick={deniedRequestedTransfer} />
+                    <Button style={{width: "45%"}} label="Zamietnuť presun" onClick={deniedRequestedTransfer} />
+                    <Button style={{width: "45%", backgroundColor: "red"}} label="Zrušiť" onClick={confirmRequestedTransfer} />
                 </div>
             </Dialog>
         </div>

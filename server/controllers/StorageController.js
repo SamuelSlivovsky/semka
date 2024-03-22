@@ -1,15 +1,23 @@
+const sklad = require("../models/sklad");
+const database = require("../database/Database");
 module.exports = {
   getDrugsOfDeparment: (req, res) => {
-    const storage = require("../models/sklad");
     (async () => {
       console.log(req.params);
-      ret_val = await storage.getDrugsOfDepartment(req.params.id);
+      ret_val = await sklad.getDrugsOfDepartment(req.params.id);
+      res.status(200).json(ret_val);
+    })();
+  },
+
+  getIdOdd: (req, res) => {
+    (async () => {
+      console.log(req.params);
+      ret_val = await sklad.getIdOdd(req.params.id);
       res.status(200).json(ret_val);
     })();
   },
 
   insertDrug: (req, res) => {
-    const sklad = require("../models/sklad");
     (async () => {
       ret_val = await sklad.insertDrug(req.body);
       res.status(200);
@@ -21,7 +29,6 @@ module.exports = {
   },
 
   updateQuantity: (req, res) => {
-    const sklad = require("../models/sklad");
     (async () => {
       ret_val = await sklad.updateQuantity(req.body);
       res.status(200);
@@ -31,8 +38,39 @@ module.exports = {
     });
   },
 
+  distributeMedications: (req, res) => {
+
+    let poc = req.body.min_poc;
+
+    if(poc === '' || isNaN(poc)) {
+      return res.status(500).json({message: `V počte musí byť číslo`});
+    }
+
+    (async () => {
+      let conn = await database.getConnection();
+
+      let sqlStatement = `select unique(ID_ODDELENIA) AS ID_ODDELENIA from ODDELENIE where 
+            ID_NEMOCNICE = (select ID_NEMOCNICE from ZAMESTNANCI where CISLO_ZAM = :id_zam)`;
+      console.log(req.body);
+      let result = await conn.execute(sqlStatement, {
+        id_zam: req.body.usr_id
+      });
+
+      let avgPocet = Math.floor((req.body.poc_liekov - req.body.min_poc) / result.rows.length);
+
+      if(avgPocet < 0) {
+        return res.status(500).json({message: `Presun nemohol byť vykonaný rovnomerne medzi oddelenia`});
+      }
+
+      ret_val = await sklad.distributeMedications(req.body);
+      res.status(200);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  },
+
   deleteSarza: (req, res) => {
-    const sklad = require("../models/sklad");
     (async () => {
       ret_val = await sklad.deleteSarza(req.body);
       res.status(200);

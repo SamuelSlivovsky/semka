@@ -4,7 +4,7 @@ const controller = require("../controllers/ordersController");
 const verify = require("../middleware/verifyUser");
 
 router.get(
-    "/all",
+    "/all/:id",
     verify.verifyRoles(0, 2, 3, 5),
     controller.getAllOrders
 );
@@ -15,7 +15,19 @@ router.get(
     controller.getListOrders
 );
 
+router.get(
+    "/getLastOrder/:id",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getLastOrder
+)
+
 router.post("/add", verify.verifyRoles(0, 2, 3, 5), controller.insertOrder);
+
+router.post(
+    "/confirmOrder",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.confirmOrder
+)
 
 router.post(
     "/deleteOrder",
