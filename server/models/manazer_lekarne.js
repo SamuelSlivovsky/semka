@@ -285,8 +285,8 @@ async function getReportInfo(id) {
           count(distinct laborant.cislo_zam) as "POCET_LABORANTOV",
           count(distinct tzp.datum_trvanlivosti) as "POCET_ZDR_POMOCOK",
           count(distinct tl.datum_trvanlivosti) as "POCET_LIEKOV",
-          count(distinct volnopredajny.na_predpis) as "POCET_LIEKOV_VOLNY",
-          count(distinct predpis.na_predpis) as "POCET_LIEKOV_PREDPIS"
+          count(distinct volnopredajny.id_liek) as "POCET_LIEKOV_VOLNY",
+          count(distinct predpis.id_liek) as "POCET_LIEKOV_PREDPIS"
           from lekaren l
           left join zamestnanci manazer on (manazer.id_lekarne = l.id_lekarne)
           left join zamestnanci lekarnik on (lekarnik.id_lekarne = l.id_lekarne and lekarnik.id_typ = 9)
