@@ -135,7 +135,7 @@ export default function TabFreeSaleMedicaments() {
           severity: "success",
           summary: "Liek vydaný",
           detail: `Liek ${selectedRow.NAZOV_LIEKU} bol úspešne vydany v počte ${vydajPocet} ks.`,
-          life: 8000,
+          life: 6000,
         });
       }
     } else {
@@ -143,7 +143,7 @@ export default function TabFreeSaleMedicaments() {
         severity: "error",
         summary: "Neplatné množstvo",
         detail: "Zadané množstvo presahuje dostupné zásoby.",
-        life: 3000,
+        life: 6000,
       });
     }
   };

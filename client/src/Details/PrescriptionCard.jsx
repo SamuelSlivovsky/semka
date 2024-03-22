@@ -29,11 +29,19 @@ export default function PrescriptionCard(props) {
       .then((response) => response.json())
       .then((data) => {
         setDetail(...data);
+        console.log(detail.ID_LIEKU);
+        console.log(detail.ID_RECEPTU);
+        console.log(detail.DATUM_TRVANLIVOSI);
+        console.log(detail.ID_LEKARNE);
       });
   }, []); //
 
-  const redirect = () => {
+  const redirectToTabPrescriptions = () => {
     navigate("/prescriptions");
+  };
+
+  const redirectToPresuny = () => {
+    navigate("/presuny");
   };
 
   const formatDate = (date) => {
@@ -49,7 +57,6 @@ export default function PrescriptionCard(props) {
       Authorization: "Bearer " + token,
       "Content-Type": "application/json",
     };
-    console.log("first");
     const formattedDate = formatDate(selectedDate);
 
     fetch(`pharmacyPrescriptions/updateDatumZapisu`, {
@@ -68,7 +75,7 @@ export default function PrescriptionCard(props) {
         });
         setShowEditDialog(false);
         setTimeout(() => {
-          redirect();
+          redirectToTabPrescriptions();
         }, 2000);
       } else {
         // Handle error response
@@ -93,6 +100,9 @@ export default function PrescriptionCard(props) {
           "Dátum prevzatia nemožno editovať, pretože liek je na sklade momentálne nedostupný.",
         life: 5000,
       });
+      setTimeout(() => {
+        redirectToPresuny();
+      }, 5000);
     } else {
       // Ak je liek dostupný, povolí editáciu dátumu prevzatia
       setShowEditDialog(true);
@@ -106,7 +116,7 @@ export default function PrescriptionCard(props) {
           label="Späť"
           icon="pi pi-replay"
           style={{ marginTop: 30 }}
-          onClick={() => redirect()}
+          onClick={() => redirectToTabPrescriptions()}
         />
       </div>
     );
