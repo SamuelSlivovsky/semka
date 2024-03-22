@@ -33,24 +33,6 @@ async function getListOrders(id) {
     }
 }
 
-async function getLastOrder(id) {
-    try {
-        let conn = await database.getConnection();
-        const sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD from OBJEDNAVKA
-                    join SKLAD on OBJEDNAVKA.ID_SKLAD = SKLAD.ID_SKLAD
-                    join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
-                    join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
-                    where CISLO_ZAM = :search_id
-                    order by ID_OBJEDNAVKY desc fetch first 1 row only`;
-        let result = await conn.execute(sqlStatement, {
-            search_id: id
-        });
-        return result.rows;
-    } catch (err) {
-        throw new Error("Database error: " + err);
-    }
-}
-
 async function confirmOrder(body) {
     try {
         let conn = await database.getConnection();
@@ -79,7 +61,7 @@ async function confirmOrder(body) {
 async function insertOrder(body) {
     try {
         let conn = await database.getConnection();
-        const sqlStatement = `BEGIN
+        let sqlStatement = `BEGIN
             insert_order_warehouse(:usr_id, :zoznam_liekov);
         END;`;
         console.log(body);
@@ -88,7 +70,18 @@ async function insertOrder(body) {
             zoznam_liekov: Buffer.from(body.zoznam_liekov, 'utf-8')
         });
 
+        sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD from OBJEDNAVKA
+                    join SKLAD on OBJEDNAVKA.ID_SKLAD = SKLAD.ID_SKLAD
+                    join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                    join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
+                    where CISLO_ZAM = :search_id
+                    order by ID_OBJEDNAVKY desc fetch first 1 row only`;
+        let finalResult = await conn.execute(sqlStatement, {
+            search_id: body.usr_id
+        });
+
         console.log("Rows inserted " + result.rowsAffected);
+        return finalResult.rows;
     } catch (err) {
         console.log("Error Model");
         console.log(err);
@@ -115,7 +108,6 @@ async function deleteObjednavka(body) {
 module.exports = {
     getAllOrders,
     getListOrders,
-    getLastOrder,
     insertOrder,
     confirmOrder,
     deleteObjednavka

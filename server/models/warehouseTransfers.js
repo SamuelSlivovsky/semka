@@ -103,9 +103,9 @@ async function getHospitalMedication(id) {
     try {
         let conn = await database.getConnection();
         const sqlStatement = `SELECT LIEK.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
-           SKLAD.ID_ODDELENIA as ID_ODDELENIA,(SKLAD.CELKOVY_POCET - SKLAD.MINIMALNY_POCET) AS POCET FROM SKLAD
-            JOIN LIEK ON SKLAD.ID_LIEK = LIEK.ID_LIEK
-            JOIN TRVANLIVOST_LIEKU ON LIEK.ID_LIEK = TRVANLIVOST_LIEKU.ID_LIEK
+           SKLAD.ID_ODDELENIA AS ID_ODDELENIA,(SKLAD.CELKOVY_POCET - SKLAD.MINIMALNY_POCET) AS POCET FROM SKLAD
+            join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
+            join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
             WHERE TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI - SYSDATE > 1
               AND SKLAD.CELKOVY_POCET > SKLAD.MINIMALNY_POCET
               AND SKLAD.ID_NEMOCNICE = :search_id
@@ -122,16 +122,14 @@ async function getHospitalMedication(id) {
 async function getSelectedMedications(id) {
     try {
         let conn = await database.getConnection();
-        const sqlStatement = `select SKLAD.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI, 
-                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV as NEMOCNICA, (CELKOVY_POCET - SKLAD.MINIMALNY_POCET) as POCET  from SKLAD
+        const sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
+                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV as NEMOCNICA, POCET from SKLAD
                             join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
-                            join LIEK on SKLAD.ID_LIEK = LIEK.ID_LIEK
                             left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
-                            where SKLAD.ID_LIEK = :id_l
-                                AND (CELKOVY_POCET - SKLAD.MINIMALNY_POCET) = (
-                                    select MAX(CELKOVY_POCET - SKLAD.MINIMALNY_POCET) from SKLAD
-                                    where ID_LIEK = :id_l)
-                            group by SKLAD.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, (CELKOVY_POCET - SKLAD.MINIMALNY_POCET)`;
+                            join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
+                            where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
+                            and POCET = (select MAX(POCET) from TRVANLIVOST_LIEKU where TRVANLIVOST_LIEKU.ID_LIEK = :id_l)
+                            group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET fetch first 1 row only`;
         let result = await conn.execute(sqlStatement, {
             id_l: id
         });
