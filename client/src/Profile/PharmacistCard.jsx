@@ -28,19 +28,18 @@ export default function PharmacistCard(props) {
     navigate("/pharmacists");
   };
 
-  const renderCardFooter = () => {
+  const renderBackButton = () => {
     return (
       <div>
         <Button
-          label="Späť"
+          label="Späťna zoznam lekárnikov"
           icon="pi pi-replay"
-          style={{ marginTop: 20 }}
+          style={{ marginTop: "10px", marginLeft: "10px" }}
           onClick={() => redirect()}
         />
       </div>
     );
   };
-
   const renderDetail = (label, value) => (
     <div className="flex w-100">
       <div className="col-6">
@@ -54,6 +53,7 @@ export default function PharmacistCard(props) {
 
   return (
     <div>
+      {renderBackButton()}
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
@@ -72,7 +72,6 @@ export default function PharmacistCard(props) {
           <div className="mt-5 text-center">
             <Button label="Poslať správu" icon="pi pi-send" />
           </div>
-          {renderCardFooter()}
         </Card>
       </div>
       <div className="col-12 flex"></div>

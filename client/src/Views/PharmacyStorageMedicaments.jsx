@@ -105,10 +105,39 @@ export default function PharmacyStorageMedicaments() {
             />
           </span>
           <div className="ml-4">
-            <h2>Lieky dostupné na sklade v lekárni: </h2>
-            <h3>{nazovLekarne}</h3>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Lieky dostupné na sklade v lekárni:
+            </h2>
+            <h3
+              style={{
+                backgroundColor: "#b3ffda",
+                color: "#004d40",
+                padding: "10px",
+                borderRadius: "8px",
+                display: "inline-block",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {nazovLekarne}
+            </h3>
           </div>
         </div>
+        <Button
+          style={{ height: "50px", top: "10px", right: "10px" }}
+          label="Objednať lieky"
+          icon="pi pi-upload"
+          onClick={() => navigate("/presuny")}
+        />
       </div>
     );
   };
@@ -129,6 +158,10 @@ export default function PharmacyStorageMedicaments() {
     setFilters({
       global: { value: null, matchMode: FilterMatchMode.CONTAINS },
       NAZOV_LIEKU: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
+      UCINNA_LATKA: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
@@ -186,6 +219,7 @@ export default function PharmacyStorageMedicaments() {
             filterDisplay="menu"
             globalFilterFields={[
               "NAZOV_LIEKU",
+              "UCINNA_LATKA",
               "NA_PREDPIS",
               "DATUM_TRVANLIVOSTI",
               "POCET",
@@ -193,6 +227,11 @@ export default function PharmacyStorageMedicaments() {
             emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
           >
             <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
+            <Column
+              field="UCINNA_LATKA"
+              header={"Účinná látka"}
+              filter
+            ></Column>
             <Column
               field="NA_PREDPIS"
               header={"Výdaj"}

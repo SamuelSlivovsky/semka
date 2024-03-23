@@ -182,8 +182,31 @@ export default function TabPharmacists(props) {
             />
           </span>
           <div className="ml-4">
-            <h2>Zoznam lekárnikov pracujúcich v lekárni: </h2>
-            <h3>{nazovLekarne}</h3>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Zoznam lekárnikov pracujúcich v lekárni:
+            </h2>
+            <h3
+              style={{
+                backgroundColor: "#b3ffda",
+                color: "#004d40",
+                padding: "10px",
+                borderRadius: "8px",
+                display: "inline-block",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {nazovLekarne}
+            </h3>
           </div>
         </div>
         <Button

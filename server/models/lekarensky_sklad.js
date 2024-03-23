@@ -4,15 +4,17 @@ async function getLiekyLekarenskySklad(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT l.nazov as "NAZOV_LIEKU", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE",
+      `select DISTINCT l.nazov as "NAZOV_LIEKU", ul.nazov as "UCINNA_LATKA", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE",
       to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET", l.na_predpis
       from trvanlivost_lieku tl
       join liek l on (l.id_liek = tl.id_liek)
+      join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
+      join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
       join sklad ls on (ls.id_sklad = tl.id_sklad)
       right join lekaren lek on (lek.id_lekarne = ls.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
       where zam.cislo_zam = :id
-      order by NAZOV_LIEKU`,
+      order by NAZOV_LIEKU, UCINNA_LATKA`,
       [id]
     );
     return result.rows;
@@ -46,9 +48,11 @@ async function getSearchLiecivoLekarenskySklad() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT l.nazov as "NAZOV_LIEKU", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE",
+      `select DISTINCT l.nazov as "NAZOV_LIEKU", ul.nazov as "UCINNA_LATKA", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE",
       to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY') as "DATUM_TRVANLIVOSTI", tl.pocet, l.na_predpis
       from liek l
+      join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
+      join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
       join trvanlivost_lieku tl on (tl.id_liek = l.id_liek)
       join sklad ls on (ls.id_sklad = tl.id_sklad)
       join lekaren lek on (lek.id_lekarne = ls.id_lekarne)
@@ -84,9 +88,12 @@ async function getVolnyPredajLiekov(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT l.id_liek, l.nazov as "NAZOV_LIEKU", tl.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE",
+      `select DISTINCT l.id_liek, l.nazov as "NAZOV_LIEKU", ul.nazov as "UCINNA_LATKA",
+       tl.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE",
         to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET"
         from liek l
+        join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
+        join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
         join trvanlivost_lieku tl on (tl.id_liek = l.id_liek)
         join sklad ls on (ls.id_sklad = tl.id_sklad)
         right join lekaren lek on (lek.id_lekarne = ls.id_lekarne)

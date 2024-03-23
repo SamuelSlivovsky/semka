@@ -103,7 +103,19 @@ export default function TabMedicalAids() {
             />
           </span>
           <div className="ml-4">
-            <h2>Číselník všetkých zdravotníckych pomôcok</h2>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Číselník všetkých zdravotníckych pomôcok
+            </h2>
           </div>
         </div>
       </div>
@@ -209,7 +221,11 @@ export default function TabMedicalAids() {
         )}
       </div>
       <Dialog
-        header={selectedRow != null ? selectedRow.NAZOV : ""}
+        header={
+          selectedRow != null
+            ? "Zdravotnícka pomôcka: " + selectedRow.NAZOV
+            : ""
+        }
         visible={showDialog}
         style={{ width: "50vw" }}
         footer={renderDialogFooter()}

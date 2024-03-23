@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
-import { Button } from "primereact/button";
 import GetUserData from "../Auth/GetUserData";
-import { useNavigate } from "react-router";
 
 export default function PharmacistCard(props) {
   const [profile, setProfile] = useState("");
-  const navigate = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
@@ -21,23 +18,6 @@ export default function PharmacistCard(props) {
         console.log(data);
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const redirect = () => {
-    navigate("/");
-  };
-
-  const renderCardFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Späť"
-          icon="pi pi-replay"
-          style={{ marginTop: "75px" }}
-          onClick={() => redirect()}
-        />
-      </div>
-    );
-  };
 
   const renderDetail = (label, value) => (
     <div className="flex w-100">
@@ -74,7 +54,6 @@ export default function PharmacistCard(props) {
           {renderDetail("Číslo zamestnanca: ", profile.CISLO_ZAM)}
           {renderDetail("Zamestnanec od: ", profile.DAT_OD)}
           {renderDetail("Pracovisko (lekáreň): ", profile.NAZOV_LEKARNE)}
-          {renderCardFooter()}
         </Card>
       </div>
       <div className="col-12 flex"></div>

@@ -66,20 +66,27 @@ export default function MedicamentCard(props) {
     navigate("/medicaments");
   };
 
+  const renderBackButton = () => {
+    return (
+      <div>
+        <Button
+          label="Späť na číselník liekov"
+          icon="pi pi-replay"
+          style={{ marginTop: "10px", marginLeft: "10px" }}
+          onClick={() => redirect()}
+        />
+      </div>
+    );
+  };
+
   const renderCardFooter = () => {
     return (
       <div>
         <Button
-          label="Späť"
-          icon="pi pi-replay"
-          style={{ marginTop: 50 }}
-          onClick={() => redirect()}
-        />
-        <Button
           label="Upraviť účinnú látku"
           icon="pi pi-file-edit"
           className="p-button-rounded p-button-warning"
-          style={{ marginTop: 50, marginLeft: "50px" }}
+          style={{ marginTop: "75px" }}
           onClick={() => setDisplayDialog(true)} // Open dialog when Edit button is clicked
         />
       </div>
@@ -118,7 +125,6 @@ export default function MedicamentCard(props) {
   };
 
   const handleSubstanceSelect = (event) => {
-    // setDisplayDialog(false);
     console.log(event.ID_UCINNA_LATKA);
     const token = localStorage.getItem("hospit-user");
     const headers = {
@@ -181,6 +187,7 @@ export default function MedicamentCard(props) {
 
   return (
     <div>
+      {renderBackButton()}
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"

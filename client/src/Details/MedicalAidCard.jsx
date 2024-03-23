@@ -29,13 +29,13 @@ export default function MedicalAidCard(props) {
     navigate("/medical_aids");
   };
 
-  const renderCardFooter = () => {
+  const renderBackButton = () => {
     return (
       <div>
         <Button
-          label="Späť"
+          label="Späť na číselník zdr. pomôcok"
           icon="pi pi-replay"
-          style={{ marginTop: 275 }}
+          style={{ marginTop: "10px", marginLeft: "10px" }}
           onClick={() => redirect()}
         />
       </div>
@@ -55,6 +55,7 @@ export default function MedicalAidCard(props) {
 
   return (
     <div>
+      {renderBackButton()}
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
@@ -65,7 +66,6 @@ export default function MedicalAidCard(props) {
             "Doplnok k zdravotníckej pomôcke: ",
             detail.DOPLNOK_NAZVU
           )}
-          {renderCardFooter()}
         </Card>
       </div>
       <div className="col-12 flex"></div>

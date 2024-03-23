@@ -101,7 +101,19 @@ export default function TabPharmacyManagers() {
             />
           </span>
           <div className="ml-4">
-            <h2>Manažéri lekární na Slovensku</h2>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Manažéri lekární na Slovensku
+            </h2>
           </div>
         </div>
       </div>
@@ -213,7 +225,10 @@ export default function TabPharmacyManagers() {
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO + " " + selectedRow.PRIEZVISKO
+            ? "Manažér lekárne: " +
+              selectedRow.MENO +
+              " " +
+              selectedRow.PRIEZVISKO
             : ""
         }
         visible={showDialog}

@@ -108,10 +108,39 @@ export default function PharmacyStorageMedicalAids() {
             />
           </span>
           <div className="ml-4">
-            <h2>Zdravotnícke pomôcky dostupné na sklade v lekárni: </h2>
-            <h3>{nazovLekarne}</h3>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Zdravotnícke pomôcky dostupné na sklade v lekárni:
+            </h2>
+            <h3
+              style={{
+                backgroundColor: "#b3ffda",
+                color: "#004d40",
+                padding: "10px",
+                borderRadius: "8px",
+                display: "inline-block",
+                boxShadow: "0px 4px 6px rgba(0, 0, 0, 0.1)",
+              }}
+            >
+              {nazovLekarne}
+            </h3>
           </div>
         </div>
+        <Button
+          style={{ height: "50px", top: "10px", right: "10px" }}
+          label="Objednať zdr. pomôcky"
+          icon="pi pi-upload"
+          onClick={() => navigate("/presuny")}
+        />
       </div>
     );
   };

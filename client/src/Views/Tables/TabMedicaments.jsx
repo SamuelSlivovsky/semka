@@ -99,7 +99,19 @@ export default function TabMedicaments() {
             />
           </span>
           <div className="ml-4">
-            <h2>Číselník všetkých liekov</h2>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Číselník všetkých liekov
+            </h2>
           </div>
         </div>
       </div>
@@ -210,7 +222,7 @@ export default function TabMedicaments() {
         )}
       </div>
       <Dialog
-        header={selectedRow != null ? selectedRow.NAZOV_LIEKU : ""}
+        header={selectedRow != null ? "Liek: " + selectedRow.NAZOV_LIEKU : ""}
         visible={showDialog}
         style={{ width: "50vw" }}
         footer={renderDialogFooter()}

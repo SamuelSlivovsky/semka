@@ -128,6 +128,10 @@ export default function PharmacySearchMedicaments() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
+      UCINNA_LATKA: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
       NA_PREDPIS: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
@@ -183,6 +187,7 @@ export default function PharmacySearchMedicaments() {
             globalFilterFields={[
               "NAZOV_LEKARNE",
               "NAZOV_LIEKU",
+              "UCINNA_LATKA",
               "NA_PREDPIS",
               "DATUM_TRVANLIVOSTI",
               "POCET",
@@ -195,6 +200,7 @@ export default function PharmacySearchMedicaments() {
               filter
             ></Column>
             <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
+            <Column field="UCINNA_LATKA" header={"Účinná látka"} filter></Column>
             <Column
               field="NA_PREDPIS"
               header={"Výdaj"}
