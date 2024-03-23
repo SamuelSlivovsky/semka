@@ -354,6 +354,8 @@ export default function WarehouseTransfers() {
             .then((data) => {
                 console.log(data);
                 setHospitalMedication(data);
+                setShowSelectedMedicationsSearch(false);
+                setSelectedMedications([]);
             });
     }
 
@@ -377,6 +379,7 @@ export default function WarehouseTransfers() {
 
                     if(finishedFetches === selectedDrugs.length) {
                         setHospitalMedication(newDataArray);
+                        setShowHospitalMedications(false);
                     }
                 });
         }
@@ -485,7 +488,6 @@ export default function WarehouseTransfers() {
         //@TODO from this list get amount and then send it via post method into DB into procedure
         confTransfer();
 
-        _confirmedTransfers.push(transfer);
         setFinishedTransfers(_confirmedTransfers);
         setRequestedTransfers(_requestedTransfers);
         hideConfirmDeniedDialog();
@@ -502,9 +504,7 @@ export default function WarehouseTransfers() {
     const deniedRequestedTransfer = () => {
         let _deniedTransfers = deniedTransfers;
         let _requestedTransfers = requestedTransfers.filter((val) => val.ID_PRESUN !== transfer.ID_PRESUN);
-        _deniedTransfers.push(transfer);
 
-        //@TODO check if this works alright
         denieTransfer();
 
         setRequestedTransfers(_requestedTransfers);
@@ -784,7 +784,7 @@ export default function WarehouseTransfers() {
                         selection={selectedRow}
                         selectionMode="single"
                         onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
-                        dataKey="ID_LIEK"
+                        dataKey="ID_PRESUN"
                         globalFilter={NaN} //globalFilter
                         globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_ODDELENIA_LIEKU", "DATUM_PRESUNU"]}
                         filters={NaN} //filter
@@ -831,7 +831,7 @@ export default function WarehouseTransfers() {
                         selection={selectedRow}
                         selectionMode="single"
                         onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
-                        dataKey="ID_LIEK"
+                        dataKey="ID_PRESUN"
                         globalFilter={NaN} //globalFilter
                         globalFilterFields={["","ID_SKLAD_OBJ", "ID_SKLAD_PRIJ", "DATUM_PRESUNU"]}
                         filters={NaN} //filter
@@ -872,7 +872,7 @@ export default function WarehouseTransfers() {
                         selection={selectedRow}
                         selectionMode="single"
                         onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
-                        dataKey="ID_LIEK"
+                        dataKey="ID_PRESUN"
                         globalFilter={NaN} //globalFilter
                         globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_ODDELENIA_LIEKU", "DATUM_PRESUNU"]}
                         filters={NaN} //filter
@@ -913,7 +913,7 @@ export default function WarehouseTransfers() {
                         selection={selectedRow}
                         selectionMode="single"
                         onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
-                        dataKey="ID_LIEK"
+                        dataKey="ID_PRESUN"
                         globalFilter={NaN} //globalFilter
                         globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_ODDELENIA_LIEKU", "DATUM_PRESUNU"]}
                         filters={NaN} //filter

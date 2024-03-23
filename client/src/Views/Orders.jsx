@@ -84,9 +84,43 @@ export default function Orders() {
             }),
         };
 
-        const response = await fetch("/objednavky/add", requestOptions).catch((err) =>
-            console.log(err)
-        );
+        fetch(`/objednavky/add`, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+
+                if(data.length > 0) {
+                    let _orders = [...products];
+                    let _order = { ... order};
+                    _order.ID_OBJEDNAVKY = data[0].ID_OBJEDNAVKY;
+                    _order.ID_SKLAD = data[0].ID_SKLAD;
+                    _order.ZOZNAM_LIEKOV = formattedString;
+
+                    let currentDate = new Date();
+                    let day = currentDate.getDate();
+                    let month = currentDate.getMonth() + 1;
+                    let year = currentDate.getFullYear();
+
+                    _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
+                    _orders.push(_order);
+
+                    console.log(_order);
+                    console.log(_orders);
+
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Successful",
+                        detail: "Objednávka vola vytvorená",
+                        life: 3000,
+                    });
+
+                    setSelectedDrug(null);
+                    setSelectedMedications([]);
+                    setAddOrderDialog(false);
+                    setProducts(_orders);
+                    setOrder(emptyOrders);
+                }
+
+            });
 
     }
 
@@ -200,8 +234,6 @@ export default function Orders() {
 
     //Add new order function
     const addOrder = () => {
-        let _orders = [...products];
-        let _order = { ... order};
 
         //Checking if there are any values below 0
         let checkPocet = true;
@@ -244,44 +276,6 @@ export default function Orders() {
 
             insertData();
 
-            const token = localStorage.getItem("hospit-user");
-            const headers = { authorization: "Bearer " + token };
-            const userDataHelper = GetUserData(token);
-
-            //@TODO it seems that this is sometimes faster then insert into table and therefor I am having duplicated
-            //@TODO ids in table and it crashes due to component then, could be fixxed by simple wait (1-2 second)
-            //@TODO tbh I dont know why is it doing this when other inserts have select after it
-            fetch(`/objednavky/getLastOrder/${userDataHelper.UserInfo.userid}`, { headers })
-                .then((response) => response.json())
-                .then((data) => {
-                    _order.ID_OBJEDNAVKY = data[0].ID_OBJEDNAVKY;
-                    _order.ID_SKLAD = data[0].ID_SKLAD;
-                    _order.ZOZNAM_LIEKOV = formattedString;
-
-                    let currentDate = new Date();
-                    let day = currentDate.getDate();
-                    let month = currentDate.getMonth() + 1;
-                    let year = currentDate.getFullYear();
-
-                    _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
-                    _orders.push(_order);
-
-                    console.log(_order);
-                    console.log(_orders);
-
-                    toast.current.show({
-                        severity: "success",
-                        summary: "Successful",
-                        detail: "Objednávka vola vytvorená",
-                        life: 3000,
-                    });
-
-                    setSelectedDrug(null);
-                    setSelectedMedications([]);
-                    setAddOrderDialog(false);
-                    setProducts(_orders);
-                    setOrder(emptyOrders);
-                });
         }
 
         hideDialog();
@@ -289,7 +283,6 @@ export default function Orders() {
 
     //Function for confirming orders
     const confirmOrderDelivery = () => {
-        //@TODO get selected row and update date in it and then update it in table on site
 
         const selectedDate = new Date(order.DATUM_DODANIA);
         const currentDate = new Date();

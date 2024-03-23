@@ -15,12 +15,6 @@ router.get(
     controller.getListOrders
 );
 
-router.get(
-    "/getLastOrder/:id",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.getLastOrder
-)
-
 router.post("/add", verify.verifyRoles(0, 2, 3, 5), controller.insertOrder);
 
 router.post(

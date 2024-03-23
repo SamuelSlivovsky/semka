@@ -9,14 +9,7 @@ module.exports = {
     getListOrders: (req, res) => {
         (async () => {
             ret_val = await order.getListOrders(req.params.id);
-            res.status(200).json(ret_val);
-        })();
-    },
-
-    getLastOrder: (req, res) => {
-        (async () => {
-            ret_val = await order.getLastOrder(req.params.id);
-            res.status(200).json(ret_val);
+            res.status(200);
         })();
     },
 
@@ -30,7 +23,7 @@ module.exports = {
 
         (async () => {
             ret_val = await order.confirmOrder(req.body);
-            res.status(200);
+            res.status(200).json(ret_val);
         })().catch((err) => {
             console.log("Error Kontroler");
             console.error(err);
@@ -41,7 +34,7 @@ module.exports = {
     insertOrder: (req, res) => {
         (async () => {
             ret_val = await order.insertOrder(req.body);
-            res.status(200);
+            res.status(200).json(ret_val);
         })().catch((err) => {
             console.log("Error Kontroler");
             console.error(err);
