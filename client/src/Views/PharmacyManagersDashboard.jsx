@@ -1,7 +1,8 @@
 import React from "react";
 import AboutMeCard from "../Profile/AboutMeCard";
 import PharmacyReportCard from "../Details/PharmacyReportCard";
-import PharmacyReportChartCard from "../Details/PharmacyReportChartCard";
+import PharmacyEmployeeReportChartCard from "../Details/PharmacyEmployeeReportChartCard";
+import PharmacyMedicationReportChartCard from "../Details/PharmacyMedicationReportChartCard";
 
 function PharmacyManagersDashboard() {
   return (
@@ -10,7 +11,10 @@ function PharmacyManagersDashboard() {
         <AboutMeCard />
         <PharmacyReportCard />
       </div>
-      <PharmacyReportChartCard />
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <PharmacyEmployeeReportChartCard />
+        <PharmacyMedicationReportChartCard />
+      </div>
     </div>
   );
 }
