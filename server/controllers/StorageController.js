@@ -1,5 +1,8 @@
 const sklad = require("../models/sklad");
 const database = require("../database/Database");
+
+//@TODO add checks for input params here
+
 module.exports = {
   getDrugsOfDeparment: (req, res) => {
     (async () => {
@@ -43,7 +46,7 @@ module.exports = {
     let poc = req.body.min_poc;
 
     if(poc === '' || isNaN(poc)) {
-      return res.status(500).json({message: `V počte musí byť číslo`});
+      return res.status(400).json({message: `V počte musí byť číslo`});
     }
 
     (async () => {
@@ -59,7 +62,8 @@ module.exports = {
       let avgPocet = Math.floor((req.body.poc_liekov - req.body.min_poc) / result.rows.length);
 
       if(avgPocet < 0) {
-        return res.status(500).json({message: `Presun nemohol byť vykonaný rovnomerne medzi oddelenia`});
+        //Distribution cannot be done equally between all departments
+        return res.status(400).json({message: `Presun nemohol byť vykonaný rovnomerne medzi oddelenia`});
       }
 
       ret_val = await sklad.distributeMedications(req.body);
@@ -70,15 +74,45 @@ module.exports = {
     });
   },
 
-  getExpiredMedications: (req, res) => {
+  distributeMedPharmacy : (req, res) => {
     const date = new Date(req.body.exp_date);
-    if(isNaN(date.getTime())) {
-      return res.status(500).json({message: `Musíte zadať dátum expirácie`});
+    if(!isNaN(date.getTime())) {
+      return res.status(400).json({message: `Musíte zadať dátum expirácie`});
     }
     req.body.exp_date = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
     (async () => {
       ret_val = await sklad.getExpiredMedications(req.body);
-      res.status(200).json(ret_val);;
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  },
+
+  getExpiredMedications: (req, res) => {
+    const date = new Date(req.body.exp_date);
+    if(!isNaN(date.getTime())) {
+      return res.status(400).json({message: `Musíte zadať dátum expirácie`});
+    }
+    req.body.exp_date = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+    (async () => {
+      ret_val = await sklad.getExpiredMedications(req.body);
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  },
+
+  getMedicationsByAmount: (req, res) => {
+
+    if(isNaN(req.body.amount)) {
+      return res.status(400).json({message: `Zadaný počet musí byť číslo`});
+    }
+
+    (async () => {
+      ret_val = await sklad.getMedicationsByAmount(req.body);
+      res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);
       res.status(500).send(err);

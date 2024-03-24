@@ -28,9 +28,21 @@ router.post(
 );
 
 router.post(
+    "/distributeMedPharmacy",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.distributeMedPharmacy
+)
+
+router.post(
     "/getExpiredMedications",
     verify.verifyRoles(0, 2, 3, 5),
     controller.getExpiredMedications
+);
+
+router.post(
+    "/getMedicationsByAmount",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getMedicationsByAmount
 )
 
 router.post(

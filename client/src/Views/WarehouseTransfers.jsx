@@ -28,6 +28,10 @@ export default function WarehouseTransfers() {
         DAT_EXPIRACIE: null
     }
 
+    let emptyAmount = {
+        AMOUNT: null
+    }
+
     let dialog = {
         dialog: true
     };
@@ -47,6 +51,7 @@ export default function WarehouseTransfers() {
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedHospital, setSelectedHospital] = useState(emptyHospital);
     const [expirityDate, setExpirityDate] = useState(emptyExpDate);
+    const [medAmount, setMedAmount] = useState(emptyAmount);
     const [showNewTransfer, setShowNewTransfer] = useState(false);
     const [waitingTransfers, setWaitingTransfers] = useState(null);
     const [finishedTransfers, setFinishedTransfers] = useState(null);
@@ -57,19 +62,22 @@ export default function WarehouseTransfers() {
     const [selectedRow, setSelectedRow] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showDialog, setShowDialog] = useState(false);
+    const [showHint, setShowHint] = useState(false);
     const [showHospitalMedications, setShowHospitalMedications] = useState(false);
     const [showDeleteTransferDialog ,setDeleteTransferDialog] = useState(false);
     const [showSelectedMedicationsSearch, setShowSelectedMedicationsSearch] = useState(false);
     const [showConfirmTransferDialog, setShowConfirmTransferDialog] = useState(false);
     const [showDeniedTransferDialog, setShowDeniedTransferDialog] = useState(false);
     const [showExpirityDateTransferDialog, setShowExpirityDateTransferDialog] = useState(false);
+    const [showAmountTransferDialog, setShowAmountTransferDialog] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState([]);
     const [xmlContent, setXmlContent] = useState("");
 
     const dropdownOptions = [
         { value: 'hospital', label: 'Vyhľadať podľa nemocnice' },
         { value: 'medicine', label: 'Vyhľadať podľa liekov' },
-        { value: 'expirity', label: 'Vyhľadať expirované lieky'}
+        { value: 'expirity', label: 'Vyhľadať expirované lieky'},
+        { value: 'amount', label: 'Vyhľadať podľa nedostatku liekov'}
     ];
 
 
@@ -257,27 +265,35 @@ export default function WarehouseTransfers() {
                 fetch(`/presuny/createTransfer`, requestOptions)
                     .then((response) => response.json())
                     .then((data) => {
-                        finishedInserts++;
-
-                        _tr.STATUS = "Cakajuca";
-                        _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
-                        _tr.ID_PRESUN = data[0].ID_PRESUN;
-                        _tr.ID_SKLAD_OBJ = data[0].ID_SKLAD_OBJ;
-                        _tr.ID_ODDELENIA_LIEKU = data[0].ID_ODDELENIA_LIEKU;
-
-                        _transfer.push({..._tr});
-
-                        if(finishedInserts === arrays.length) {
-                            setShowHospitalMedications(false);
-                            setWaitingTransfers(_transfer);
+                        if(data.message) {
                             toast.current.show({
-                                severity: "success",
-                                summary: "Successful",
-                                detail: "Presuny boli vytvorené",
+                                severity: "error",
+                                summary: "Error",
+                                detail: data.message,
                                 life: 3000,
                             });
-                        }
+                        } else {
+                            finishedInserts++;
 
+                            _tr.STATUS = "Cakajuca";
+                            _tr.ZOZNAM_LIEKOV = JSON.stringify(formattedString);
+                            _tr.ID_PRESUN = data[0].ID_PRESUN;
+                            _tr.ID_SKLAD_OBJ = data[0].ID_SKLAD_OBJ;
+                            _tr.ID_ODDELENIA_LIEKU = data[0].ID_ODDELENIA_LIEKU;
+
+                            _transfer.push({..._tr});
+
+                            if(finishedInserts === arrays.length) {
+                                setShowHospitalMedications(false);
+                                setWaitingTransfers(_transfer);
+                                toast.current.show({
+                                    severity: "success",
+                                    summary: "Successful",
+                                    detail: "Presuny boli vytvorené",
+                                    life: 3000,
+                                });
+                            }
+                        }
                     });
             }
         } else {
@@ -303,7 +319,18 @@ export default function WarehouseTransfers() {
                 id_presun: _transfer.ID_PRESUN
             }),
         };
-        const response = await fetch("/presuny/deleteTransfer", requestOptions);
+        fetch(`/presuny/deleteTransfer`, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                }
+            });
     }
 
     //Function that will send request onto DB to denie request and update it
@@ -319,7 +346,19 @@ export default function WarehouseTransfers() {
                 id_pres: transfer.ID_PRESUN
             }),
         };
-        const response = await fetch("/presuny/deniedTransfer", requestOptions);
+
+        fetch(`/presuny/deniedTransfer`, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                }
+            });
     }
 
     //Function for confirming transfer and updating data in DB
@@ -347,7 +386,18 @@ export default function WarehouseTransfers() {
                             poc: medications.amount
                         }),
                     };
-                    await fetch("/presuny/confirmTransfer", requestOptions);
+                    fetch(`/presuny/confirmTransfer`, requestOptions)
+                        .then((response) => response.json())
+                        .then((data) => {
+                            if(data.message) {
+                                toast.current.show({
+                                    severity: "error",
+                                    summary: "Error",
+                                    detail: data.message,
+                                    life: 3000,
+                                });
+                            }
+                        });
                 }
 
             });
@@ -360,16 +410,27 @@ export default function WarehouseTransfers() {
         fetch(`presuny/hospitalMedications/${selectedHospital.ID_NEMOCNICE}`, {headers})
             .then((response) => response.json())
             .then((data) => {
-                console.log(data);
-                setHospitalMedication(data);
-                setShowSelectedMedicationsSearch(false);
-                setSelectedMedications([]);
+                if(data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                } else {
+                    console.log(data);
+                    setHospitalMedication(data);
+                    setShowHospitalMedications(true);
+                    setShowSelectedMedicationsSearch(false);
+                    setSelectedMedications([]);
+                }
             });
     }
 
     const searchSelectedMedications = (selectedDrugs) => {
         const token = localStorage.getItem("hospit-user");
         const headers = {authorization: "Bearer " + token};
+        const userDataHelper = GetUserData(token);
         let finishedFetches = 0;
         const newDataArray = [];
 
@@ -377,7 +438,7 @@ export default function WarehouseTransfers() {
         for (let i = 0; i < selectedDrugs.length; i++) {
             const medication = selectedDrugs[i];
             //console.log(`Index ${i}:`, medication);
-            fetch(`/presuny/selectedMedications/${medication.ID_LIEK}/${expirityDate.DAT_EXPIRACIE}`, {headers})
+            fetch(`/presuny/selectedMedications/${medication.ID_LIEK}/${expirityDate.DAT_EXPIRACIE}/${userDataHelper.UserInfo.userid}`, {headers})
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.length > 0) {
@@ -385,8 +446,9 @@ export default function WarehouseTransfers() {
                     }
                     finishedFetches++;
 
-                    if(finishedFetches === selectedDrugs.length) {
+                    if(finishedFetches === selectedDrugs.length && newDataArray.length > 0) {
                         setHospitalMedication(newDataArray);
+                        setShowSelectedMedicationsSearch(true);
                         setShowHospitalMedications(false);
                     }
                 });
@@ -414,12 +476,56 @@ export default function WarehouseTransfers() {
             .then((data) => {
                 if(data.length > 0) {
                     searchSelectedMedications(data);
+                    setShowSelectedMedicationsSearch(true);
                     setExpirityDate(emptyExpDate);
                 } else {
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
                         detail: "Pre zadaný dátum neboli nájdené žiadne lieky",
+                        life: 3000,
+                    });
+                }
+            });
+    }
+
+    //Function for searching medications by input amount from employee warehouse
+    const searchMedAmount = () => {
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                usr_id: userDataHelper.UserInfo.userid,
+                amount: medAmount.AMOUNT
+            }),
+        };
+
+        fetch(`/sklad/getMedicationsByAmount`,  requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.length > 0) {
+                    searchSelectedMedications(data);
+                    setShowSelectedMedicationsSearch(true);
+                    setMedAmount(emptyAmount);
+                    //@TODO add this else if to every fetch in here
+                } else if (data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                } else {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Pre zadaný počet neboli nájdené žiadne lieky",
                         life: 3000,
                     });
                 }
@@ -433,6 +539,7 @@ export default function WarehouseTransfers() {
         switch (selectedValue) {
             case 'hospital':
                 setHospitalSearchOption(true);
+                setShowAmountTransferDialog(false);
                 setMedicineSearchOption(false);
                 setShowExpirityDateTransferDialog(false);
                 if(hospitals.length <= null) {
@@ -441,6 +548,7 @@ export default function WarehouseTransfers() {
                 break;
             case 'medicine':
                 setMedicineSearchOption(true);
+                setShowAmountTransferDialog(false);
                 setHospitalSearchOption(false);
                 setShowExpirityDateTransferDialog(false);
                 if(drugs == null) {
@@ -449,6 +557,13 @@ export default function WarehouseTransfers() {
                 break;
             case 'expirity':
                 setShowExpirityDateTransferDialog(true);
+                setShowAmountTransferDialog(false);
+                setMedicineSearchOption(false);
+                setHospitalSearchOption(false);
+                break;
+            case 'amount':
+                setShowAmountTransferDialog(true);
+                setShowExpirityDateTransferDialog(false);
                 setMedicineSearchOption(false);
                 setHospitalSearchOption(false);
                 break;
@@ -457,12 +572,12 @@ export default function WarehouseTransfers() {
 
     //Search function for searching medication
     const searchMedication = () => {
-        //If user selected hospital then search by selected hospital
+        setHospitalMedication(null);
+        //Switch for checking user chosen option to search medications
         switch (selectedOption) {
             case 'hospital':
-                if(selectedHospital !== null) {
+                if(selectedHospital.NAZOV !== null) {
                     searchHospitalMedicine();
-                    setShowHospitalMedications(true);
                     hideDialog();
                 } else {
                     toast.current.show({
@@ -488,7 +603,6 @@ export default function WarehouseTransfers() {
                     } else {
                         //Selected medications are unique
                         searchSelectedMedications(selectedDrugs);
-                        setShowSelectedMedicationsSearch(true);
                         hideDialog();
                     }
                 } else {
@@ -505,13 +619,25 @@ export default function WarehouseTransfers() {
                 if(expirityDate.DAT_EXPIRACIE !== null && !isNaN(date.getTime())) {
                     //Date is valid and set
                     searchExpiredMedications();
-                    setShowSelectedMedicationsSearch(true);
                     hideDialog();
                 } else {
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
                         detail: "Musíte zadať dátum expirácie",
+                        life: 3000,
+                    });
+                }
+                break;
+            case 'amount':
+                if(!isNaN(medAmount.AMOUNT) && medAmount.AMOUNT !== null) {
+                    searchMedAmount();
+                    hideDialog();
+                } else {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Zadaný počet musí byť číslo",
                         life: 3000,
                     });
                 }
@@ -529,6 +655,12 @@ export default function WarehouseTransfers() {
             [ID_LIEK]: numericValue
         }));
     };
+
+    const handleAmountChange = (e) => {
+        const { value } = e.target;
+        const numericValue = value.replace(/\D/g, '');
+        setMedAmount({ AMOUNT: numericValue });
+    }
 
     const confirmDeleteProduct = (product) => {
         setTransfer(product);
@@ -1062,7 +1194,7 @@ export default function WarehouseTransfers() {
                     onChange={handleDropdownChange}
                 />
                 {hospitalSearchOption ? <div>
-                    <h2>Vyberte si nemocnicu</h2>
+                    <h2>Hladanie liekov podľa nemocnice</h2>
                     <Dropdown
                         value={selectedHospital}
                         options={hospitals.map(hospital => ({ value: hospital, label: hospital.NAZOV }))}
@@ -1072,7 +1204,7 @@ export default function WarehouseTransfers() {
                 </div> : null}
 
                 {medicineSearchOption ? <div>
-                    <h2>Vyberte si lieky na vyhľadanie</h2>
+                    <h2>Hľadanie podľa zoznamu liekov</h2>
                     <div>
                         {selectedMedications.map((selectedMedication, index) => (
                             <div key={index} style={{paddingTop: "20px"}}>
@@ -1105,6 +1237,7 @@ export default function WarehouseTransfers() {
                         </div>
                 </div> : null}
                 {showExpirityDateTransferDialog ? <div>
+                    <h2>Hľadanie podľa expirácie lieku</h2>
                     <div className="formgird grid">
                         <div className="field col" style={{paddingTop: "50px"}}>
                             <label htmlFor="DAT_EXPIRACIE">Dátum expirácie</label>
@@ -1118,7 +1251,46 @@ export default function WarehouseTransfers() {
                         </div>
                     </div>
                 </div> : null}
-                {hospitalSearchOption || medicineSearchOption || showExpirityDateTransferDialog ?
+                {showAmountTransferDialog ? <div>
+                    <h2>Hladanie podľa počtu liekov</h2>
+                    <div>
+                        <input
+                            type="text"
+                            value={medAmount.AMOUNT || ''}
+                            onChange={handleAmountChange}
+                            pattern="[0-9]*"
+                            inputMode="numeric"
+                        />
+                        <label
+                            style={{
+                                paddingLeft: "10px",
+                                cursor: 'pointer'
+                            }}
+                            onMouseEnter={() => setShowHint(true)}
+                            onMouseLeave={() => setShowHint(false)}
+                        >
+                            ?
+                        </label>
+                        {showHint && (
+                            <div
+                                style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: '50%',
+                                    transform: 'translateX(-50%)',
+                                    backgroundColor: 'white',
+                                    padding: '5px',
+                                    border: '1px solid black',
+                                    borderRadius: '3px',
+                                    zIndex: '999'
+                                }}
+                            >
+                                Podľa zadaného počtu sa budú hľadať lieky v iných skladoch, ktorých počet je menší ako zadaný.
+                            </div>
+                        )}
+                    </div>
+                </div> : null}
+                {hospitalSearchOption || medicineSearchOption || showExpirityDateTransferDialog || showAmountTransferDialog ?
                     <div className={"submit-button"}>
                     <Button style={{width: "50%"}} label="Vyhľadať" onClick={searchMedication} />
                 </div> : null}

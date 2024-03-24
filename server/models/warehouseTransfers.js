@@ -119,11 +119,11 @@ async function getHospitalMedication(id) {
     }
 }
 
-async function getSelectedMedications(id, exp_date) {
+async function getSelectedMedications(id, exp_date, usr_id) {
     try {
         let conn = await database.getConnection();
         let sqlStatement, result = null;
-        if(exp_date === null) {
+        if(exp_date === "null") {
             sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
                             SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV as NEMOCNICA, POCET from SKLAD
                             join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
@@ -131,9 +131,11 @@ async function getSelectedMedications(id, exp_date) {
                             join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
                             where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
                             and POCET = (select MAX(POCET) from TRVANLIVOST_LIEKU where TRVANLIVOST_LIEKU.ID_LIEK = :id_l)
+                            and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
                             group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET fetch first 1 row only`;
             result = await conn.execute(sqlStatement, {
-                id_l: id
+                id_l: id,
+                usr_id: usr_id
             });
         } else {
             sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
@@ -144,10 +146,12 @@ async function getSelectedMedications(id, exp_date) {
                         where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
                         and DATUM_TRVANLIVOSTI > :exp_date
                         and POCET = (select MAX(POCET) from TRVANLIVOST_LIEKU where TRVANLIVOST_LIEKU.ID_LIEK = :id_l)
+                        and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
                         group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET fetch first 1 row only`;
             result = await conn.execute(sqlStatement, {
                 id_l: id,
-                exp_date: exp_date
+                exp_date: exp_date,
+                usr_id: usr_id
             });
         }
 
