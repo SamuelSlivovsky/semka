@@ -364,7 +364,10 @@ export default function TabPrescriptions() {
       <Dialog
         header={
           selectedRow != null
-            ? selectedRow.MENO_PACIENTA + " " + selectedRow.PRIEZVISKO_PACIENTA
+            ? "Liek na recept pre pacienta: " +
+              selectedRow.MENO_PACIENTA +
+              " " +
+              selectedRow.PRIEZVISKO_PACIENTA
             : ""
         }
         visible={showDialog}

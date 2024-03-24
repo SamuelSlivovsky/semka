@@ -83,7 +83,7 @@ export default function MedicamentCard(props) {
     return (
       <div>
         <Button
-          label="Upraviť účinnú látku"
+          label="Spravovať účinnú látku"
           icon="pi pi-file-edit"
           className="p-button-rounded p-button-warning"
           style={{ marginTop: "75px" }}

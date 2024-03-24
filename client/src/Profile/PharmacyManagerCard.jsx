@@ -75,8 +75,26 @@ export default function PharmacyManagerCard(props) {
             <Button label="Poslať správu" icon="pi pi-send" />
           </div>
         </Card>
+
+        <Card
+          className="col-4 shadow-4"
+          title="Predpísané recepty"
+          style={{ width: "40rem", height: "40rem" }}
+        ></Card>
       </div>
-      <div className="col-12 flex"></div>
+
+      <div className="col-12 flex">
+        <Card
+          className="col-5 shadow-4"
+          title="Zdravotné záznamy"
+          style={{ width: "40rem", height: "40rem" }}
+        ></Card>
+        <Card
+          className="col-5 shadow-4"
+          title="Choroby"
+          style={{ width: "40rem", height: "40rem" }}
+        ></Card>
+      </div>
     </div>
   );
 }

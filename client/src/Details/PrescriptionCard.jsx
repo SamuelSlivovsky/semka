@@ -9,6 +9,7 @@ import { Toast } from "primereact/toast";
 export default function PrescriptionCard(props) {
   const [detail, setDetail] = useState("");
   const [showEditDialog, setShowEditDialog] = useState(false);
+  const [showPresunDialog, setShowPresunDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const toast = useRef(null);
   const location = useLocation();
@@ -29,10 +30,6 @@ export default function PrescriptionCard(props) {
       .then((response) => response.json())
       .then((data) => {
         setDetail(...data);
-        console.log(detail.ID_LIEKU);
-        console.log(detail.ID_RECEPTU);
-        console.log(detail.DATUM_TRVANLIVOSI);
-        console.log(detail.ID_LEKARNE);
       });
   }, []); //
 
@@ -42,6 +39,19 @@ export default function PrescriptionCard(props) {
 
   const redirectToPresuny = () => {
     navigate("/presuny");
+  };
+
+  const renderBackButton = () => {
+    return (
+      <div>
+        <Button
+          label="Späť na predpísané recepty"
+          icon="pi pi-replay"
+          style={{ marginTop: "10px", marginLeft: "10px" }}
+          onClick={() => redirectToTabPrescriptions()}
+        />
+      </div>
+    );
   };
 
   const formatDate = (date) => {
@@ -95,31 +105,17 @@ export default function PrescriptionCard(props) {
       // Ak je liek nedostupný, zobrazí upozornenie a nedovolí editáciu
       toast.current.show({
         severity: "warn",
-        summary: "Upozornenie",
-        detail:
-          "Dátum prevzatia nemožno editovať, pretože liek je na sklade momentálne nedostupný.",
+        summary: "Liek na sklade nedostupný",
+        detail: "Nemožno nastaviť dátum prevzatia receptu!",
         life: 5000,
       });
       setTimeout(() => {
-        redirectToPresuny();
-      }, 5000);
+        setShowPresunDialog(true);
+      }, 3000);
     } else {
       // Ak je liek dostupný, povolí editáciu dátumu prevzatia
       setShowEditDialog(true);
     }
-  };
-
-  const renderCardFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Späť"
-          icon="pi pi-replay"
-          style={{ marginTop: 30 }}
-          onClick={() => redirectToTabPrescriptions()}
-        />
-      </div>
-    );
   };
 
   const renderDetail = (label, value, isEditable = false) => (
@@ -144,10 +140,11 @@ export default function PrescriptionCard(props) {
 
   return (
     <div>
+      {renderBackButton()}
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "70rem", height: "55rem" }}
+          style={{ width: "70rem", height: "50rem" }}
           title=<h3>ID receptu: {detail.ID_RECEPTU}</h3>
         >
           {renderDetail("Dátum zapisu: ", detail.DATUM_ZAPISU)}
@@ -170,7 +167,6 @@ export default function PrescriptionCard(props) {
                 : detail.DOSTUPNY_POCET_NA_SKLADE
             )}
           {renderDetail("Dátum prevzatia: ", detail.DATUM_PREVZATIA, true)}
-          {renderCardFooter()}
         </Card>
       </div>
       <div className="col-12 flex"></div>
@@ -203,6 +199,26 @@ export default function PrescriptionCard(props) {
           dateFormat="yy-mm-dd"
         />
       </Dialog>
+      <Dialog
+        visible={showPresunDialog}
+        onHide={() => setShowPresunDialog(false)}
+        header={"Chcete objednať liek " + detail.NAZOV_LIEKU + " ?"}
+        footer={
+          <div>
+            <Button
+              label="Zrušiť"
+              icon="pi pi-times"
+              onClick={() => setShowPresunDialog(false)}
+              className="p-button-text"
+            />
+            <Button
+              label="Potvrdiť"
+              icon="pi pi-check"
+              onClick={() => redirectToPresuny()}
+            />
+          </div>
+        }
+      ></Dialog>
       <Toast ref={toast} />
     </div>
   );
