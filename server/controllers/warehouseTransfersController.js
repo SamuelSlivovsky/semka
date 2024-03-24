@@ -50,8 +50,15 @@ module.exports = {
     },
 
     getSelectedMedications: (req, res) => {
+        if(req.params.exp_date !== null) {
+            const date = new Date(req.params.exp_date);
+            if(isNaN(date.getTime())) {
+                return res.status(500).json({message: `Musíte zadať dátum expirácie`});
+            }
+            req.params.exp_date = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+        }
         (async () => {
-            let ret_val = await transfers.getSelectedMedications(req.params.id);
+            let ret_val = await transfers.getSelectedMedications(req.params.id, req.params.exp_date);
             res.status(200).json(ret_val);
         })();
     },

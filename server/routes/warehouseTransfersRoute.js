@@ -46,7 +46,7 @@ router.get(
 );
 
 router.get(
-    "/selectedMedications/:id",
+    "/selectedMedications/:id/:exp_date",
     verify.verifyRoles(0, 2, 3, 5),
     controller.getSelectedMedications
 )

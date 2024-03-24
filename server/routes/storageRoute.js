@@ -28,6 +28,12 @@ router.post(
 );
 
 router.post(
+    "/getExpiredMedications",
+    verify.verifyRoles(0, 2, 3, 5),
+    controller.getExpiredMedications
+)
+
+router.post(
   "/deleteSarza",
   verify.verifyRoles(0, 2, 3, 5, 10),
   controller.deleteSarza

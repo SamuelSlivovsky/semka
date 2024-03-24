@@ -12,6 +12,7 @@ import {ProgressSpinner} from "primereact/progressspinner";
 import {Dialog} from "primereact/dialog";
 import {Dropdown} from "primereact/dropdown";
 import "../styles/warehouses.css";
+import {Calendar} from "primereact/calendar";
 
 export default function WarehouseTransfers() {
     let emptyTransfer = {
@@ -22,6 +23,10 @@ export default function WarehouseTransfers() {
         ZOZNAM_LIEKOV: null,
         STATUS: null
     };
+
+    let emptyExpDate = {
+        DAT_EXPIRACIE: null
+    }
 
     let dialog = {
         dialog: true
@@ -41,6 +46,7 @@ export default function WarehouseTransfers() {
     const [drugs, setDrugs] = useState(null);
     const [selectedOption, setSelectedOption] = useState(null);
     const [selectedHospital, setSelectedHospital] = useState(emptyHospital);
+    const [expirityDate, setExpirityDate] = useState(emptyExpDate);
     const [showNewTransfer, setShowNewTransfer] = useState(false);
     const [waitingTransfers, setWaitingTransfers] = useState(null);
     const [finishedTransfers, setFinishedTransfers] = useState(null);
@@ -56,12 +62,14 @@ export default function WarehouseTransfers() {
     const [showSelectedMedicationsSearch, setShowSelectedMedicationsSearch] = useState(false);
     const [showConfirmTransferDialog, setShowConfirmTransferDialog] = useState(false);
     const [showDeniedTransferDialog, setShowDeniedTransferDialog] = useState(false);
+    const [showExpirityDateTransferDialog, setShowExpirityDateTransferDialog] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState([]);
     const [xmlContent, setXmlContent] = useState("");
 
     const dropdownOptions = [
         { value: 'hospital', label: 'Vyhľadať podľa nemocnice' },
-        { value: 'medicine', label: 'Vyhľadať podľa liekov' }
+        { value: 'medicine', label: 'Vyhľadať podľa liekov' },
+        { value: 'expirity', label: 'Vyhľadať expirované lieky'}
     ];
 
 
@@ -369,7 +377,7 @@ export default function WarehouseTransfers() {
         for (let i = 0; i < selectedDrugs.length; i++) {
             const medication = selectedDrugs[i];
             //console.log(`Index ${i}:`, medication);
-            fetch(`/presuny/selectedMedications/${medication.ID_LIEK}`, {headers})
+            fetch(`/presuny/selectedMedications/${medication.ID_LIEK}/${expirityDate.DAT_EXPIRACIE}`, {headers})
                 .then((response) => response.json())
                 .then((data) => {
                     if (data.length > 0) {
@@ -385,67 +393,129 @@ export default function WarehouseTransfers() {
         }
     }
 
+    const searchExpiredMedications = () => {
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                usr_id: userDataHelper.UserInfo.userid,
+                exp_date: expirityDate.DAT_EXPIRACIE
+            }),
+        };
+
+        fetch(`/sklad/getExpiredMedications`,  requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.length > 0) {
+                    searchSelectedMedications(data);
+                    setExpirityDate(emptyExpDate);
+                } else {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Pre zadaný dátum neboli nájdené žiadne lieky",
+                        life: 3000,
+                    });
+                }
+            });
+    }
+
     //Function for updating
     const handleDropdownChange = (event) => {
         const selectedValue = event.target.value;
         setSelectedOption(selectedValue);
-        if (selectedValue === 'hospital') {
-            setHospitalSearchOption(true);
-            setMedicineSearchOption(false);
-            if(hospitals.length <= null) {
-                getHospitalsList();
-            }
-        } else if (selectedValue === 'medicine') {
-            setMedicineSearchOption(true);
-            setHospitalSearchOption(false);
-            if(drugs == null) {
-                getMedicationList();
-            }
+        switch (selectedValue) {
+            case 'hospital':
+                setHospitalSearchOption(true);
+                setMedicineSearchOption(false);
+                setShowExpirityDateTransferDialog(false);
+                if(hospitals.length <= null) {
+                    getHospitalsList();
+                }
+                break;
+            case 'medicine':
+                setMedicineSearchOption(true);
+                setHospitalSearchOption(false);
+                setShowExpirityDateTransferDialog(false);
+                if(drugs == null) {
+                    getMedicationList();
+                }
+                break;
+            case 'expirity':
+                setShowExpirityDateTransferDialog(true);
+                setMedicineSearchOption(false);
+                setHospitalSearchOption(false);
+                break;
         }
     };
 
     //Search function for searching medication
     const searchMedication = () => {
         //If user selected hospital then search by selected hospital
-        if(selectedOption === 'hospital') {
-            if(selectedHospital !== null) {
-                searchHospitalMedicine();
-                setShowHospitalMedications(true);
-                hideDialog();
-            } else {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: "Musíte vybrať nemocnicu",
-                    life: 3000,
-                });
-            }
-        } else {
-            if(selectedMedications.length > 0) {
-                const selectedDrugs = selectedMedications.map((medication) => medication.selectedDrug);
-                const uniqueDrugs = new Set(selectedDrugs);
-                if(selectedDrugs.length !== uniqueDrugs.size) {
-                    //Medications are not unique
+        switch (selectedOption) {
+            case 'hospital':
+                if(selectedHospital !== null) {
+                    searchHospitalMedicine();
+                    setShowHospitalMedications(true);
+                    hideDialog();
+                } else {
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
-                        detail: "Lieky v zozname musia byť unikátne",
+                        detail: "Musíte vybrať nemocnicu",
                         life: 3000,
                     });
+                }
+                break;
+            case 'medicine':
+                if(selectedMedications.length > 0) {
+                    const selectedDrugs = selectedMedications.map((medication) => medication.selectedDrug);
+                    const uniqueDrugs = new Set(selectedDrugs);
+                    if(selectedDrugs.length !== uniqueDrugs.size) {
+                        //Medications are not unique
+                        toast.current.show({
+                            severity: "error",
+                            summary: "Error",
+                            detail: "Lieky v zozname musia byť unikátne",
+                            life: 3000,
+                        });
+                    } else {
+                        //Selected medications are unique
+                        searchSelectedMedications(selectedDrugs);
+                        setShowSelectedMedicationsSearch(true);
+                        hideDialog();
+                    }
                 } else {
-                    //Selected medications are unique
-                    searchSelectedMedications(selectedDrugs);
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Musíte vybrať aspoň jeden liek",
+                        life: 3000,
+                    });
+                }
+                break;
+            case 'expirity':
+                const date = new Date(expirityDate.DAT_EXPIRACIE);
+                if(expirityDate.DAT_EXPIRACIE !== null && !isNaN(date.getTime())) {
+                    //Date is valid and set
+                    searchExpiredMedications();
                     setShowSelectedMedicationsSearch(true);
                     hideDialog();
+                } else {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Musíte zadať dátum expirácie",
+                        life: 3000,
+                    });
                 }
-            } else {
-                toast.current.show({
-                    severity: "error",
-                    summary: "Error",
-                    detail: "Musíte vybrať aspoň jeden liek",
-                    life: 3000,
-                });
-            }
+                break;
         }
     }
 
@@ -484,8 +554,6 @@ export default function WarehouseTransfers() {
         let _confirmedTransfers = finishedTransfers;
         let _requestedTransfers = requestedTransfers.filter((val) => val.ID_PRESUN !== transfer.ID_PRESUN);
 
-        //@TODO add fetch via post method in here and send there ID_PRESUN but first I need whole medication list from DB
-        //@TODO from this list get amount and then send it via post method into DB into procedure
         confTransfer();
 
         setFinishedTransfers(_confirmedTransfers);
@@ -1036,7 +1104,22 @@ export default function WarehouseTransfers() {
                     </div>
                         </div>
                 </div> : null}
-                {hospitalSearchOption || medicineSearchOption ? <div className={"submit-button"}>
+                {showExpirityDateTransferDialog ? <div>
+                    <div className="formgird grid">
+                        <div className="field col" style={{paddingTop: "50px"}}>
+                            <label htmlFor="DAT_EXPIRACIE">Dátum expirácie</label>
+                            <Calendar
+                                value={expirityDate.DAT_EXPIRACIE}
+                                dateFormat="dd.mm.yy"
+                                onChange={(e) =>
+                                    setExpirityDate({ ...expirityDate, DAT_EXPIRACIE: e.value })
+                                }
+                            ></Calendar>
+                        </div>
+                    </div>
+                </div> : null}
+                {hospitalSearchOption || medicineSearchOption || showExpirityDateTransferDialog ?
+                    <div className={"submit-button"}>
                     <Button style={{width: "50%"}} label="Vyhľadať" onClick={searchMedication} />
                 </div> : null}
             </Dialog>

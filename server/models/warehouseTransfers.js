@@ -119,10 +119,12 @@ async function getHospitalMedication(id) {
     }
 }
 
-async function getSelectedMedications(id) {
+async function getSelectedMedications(id, exp_date) {
     try {
         let conn = await database.getConnection();
-        const sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
+        let sqlStatement, result = null;
+        if(exp_date === null) {
+            sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
                             SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV as NEMOCNICA, POCET from SKLAD
                             join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
                             left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
@@ -130,9 +132,25 @@ async function getSelectedMedications(id) {
                             where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
                             and POCET = (select MAX(POCET) from TRVANLIVOST_LIEKU where TRVANLIVOST_LIEKU.ID_LIEK = :id_l)
                             group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET fetch first 1 row only`;
-        let result = await conn.execute(sqlStatement, {
-            id_l: id
-        });
+            result = await conn.execute(sqlStatement, {
+                id_l: id
+            });
+        } else {
+            sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
+                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV as NEMOCNICA, POCET from SKLAD
+                        join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                        left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
+                        join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
+                        where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
+                        and DATUM_TRVANLIVOSTI > :exp_date
+                        and POCET = (select MAX(POCET) from TRVANLIVOST_LIEKU where TRVANLIVOST_LIEKU.ID_LIEK = :id_l)
+                        group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET fetch first 1 row only`;
+            result = await conn.execute(sqlStatement, {
+                id_l: id,
+                exp_date: exp_date
+            });
+        }
+
         return result.rows;
     } catch (err) {
         throw new Error("Database error: " + err);

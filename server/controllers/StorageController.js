@@ -70,6 +70,21 @@ module.exports = {
     });
   },
 
+  getExpiredMedications: (req, res) => {
+    const date = new Date(req.body.exp_date);
+    if(isNaN(date.getTime())) {
+      return res.status(500).json({message: `Musíte zadať dátum expirácie`});
+    }
+    req.body.exp_date = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+    (async () => {
+      ret_val = await sklad.getExpiredMedications(req.body);
+      res.status(200).json(ret_val);;
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  },
+
   deleteSarza: (req, res) => {
     (async () => {
       ret_val = await sklad.deleteSarza(req.body);

@@ -599,7 +599,6 @@ export default function Storage() {
               <label htmlFor="DAT_EXPIRACIE">Dátum expirácie</label>
               <Calendar
                   value={product.DAT_EXPIRACIE}
-                  inline
                   dateFormat="dd.mm.yy"
                   onChange={(e) =>
                       setProduct({ ...product, DAT_EXPIRACIE: e.value })

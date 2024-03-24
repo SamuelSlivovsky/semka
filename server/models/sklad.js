@@ -161,6 +161,26 @@ async function distributeMedications(body) {
     }
 }
 
+async function getExpiredMedications(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `select unique(ID_LIEK) from TRVANLIVOST_LIEKU join SKLAD on TRVANLIVOST_LIEKU.ID_SKLAD = SKLAD.ID_SKLAD
+            join NEMOCNICA on NEMOCNICA.ID_NEMOCNICE = SKLAD.ID_NEMOCNICE
+            join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
+            where DATUM_TRVANLIVOSTI > :exp_date and CISLO_ZAM = :usr_id`;
+    console.log(body);
+    let result = await conn.execute(sqlStatement, {
+      usr_id: body.usr_id,
+      exp_date: body.exp_date
+    });
+
+    console.log("Rows inserted " + result.rowsAffected);
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 async function deleteSarza(body) {
   try {
     let conn = await database.getConnection();
@@ -185,6 +205,7 @@ module.exports = {
   insertDrug,
   updateQuantity,
   distributeMedications,
+  getExpiredMedications,
   getIdOdd,
   deleteSarza
 };
