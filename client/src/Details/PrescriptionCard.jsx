@@ -45,7 +45,7 @@ export default function PrescriptionCard(props) {
     return (
       <div>
         <Button
-          label="Späť na predpísané recepty"
+          label="Späť na recepty"
           icon="pi pi-replay"
           style={{ marginTop: "10px", marginLeft: "10px" }}
           onClick={() => redirectToTabPrescriptions()}
