@@ -61,40 +61,6 @@ export default function PharmacyStorageMedicalAids() {
       });
   }, []);
 
-  // const onHide = () => {
-  //   setShowDialog(false);
-  //   setSelectedRow(null);
-  // };
-
-  // const onSubmit = () => {
-  //   setShowDialog(false);
-  //   navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
-  // };
-
-  // const handleClick = (value) => {
-  //   setShowDialog(true);
-  //   setSelectedRow(value);
-  // };
-
-  // const renderDialogFooter = () => {
-  //   return (
-  //     <div>
-  //       <Button
-  //         label="Zatvoriť"
-  //         icon="pi pi-times"
-  //         className="p-button-danger"
-  //         onClick={() => onHide()}
-  //       />
-  //       <Button
-  //         label="Detail"
-  //         icon="pi pi-check"
-  //         onClick={() => onSubmit()}
-  //         autoFocus
-  //       />
-  //     </div>
-  //   );
-  // };
-
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -142,6 +108,60 @@ export default function PharmacyStorageMedicalAids() {
           onClick={() => navigate("/presuny")}
         />
       </div>
+    );
+  };
+
+  //Expiracia zdr. pomocky nastane za 14 dni alebo menej
+  function isSameOrBeforeToday(date1, date2) {
+    return (
+      date1.getFullYear() <= date2.getFullYear() &&
+      date1.getMonth() <= date2.getMonth() &&
+      date1.getDate() <= date2.getDate()
+    );
+  }
+
+  function parseDate(str) {
+    const [day, month, year] = str.split(".");
+    return new Date(year, month - 1, day); // month - 1 because months are 0-indexed
+  }
+
+  const isExpiringSoon = (expiryDateStr) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const twoWeeksFromNow = new Date(today);
+    twoWeeksFromNow.setDate(today.getDate() + 14); // Set the date to 14 days from now
+
+    const expiryDate = parseDate(expiryDateStr);
+    expiryDate.setHours(0, 0, 0, 0);
+
+    return isSameOrBeforeToday(expiryDate, twoWeeksFromNow);
+  };
+
+  const quantityBodyTemplate = (rowData) => {
+    return (
+      <React.Fragment>
+        {rowData.POCET}
+        {rowData.POCET <= 10 && (
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ color: "red", marginLeft: "35px" }}
+          />
+        )}
+      </React.Fragment>
+    );
+  };
+
+  const expirationBodyTemplate = (rowData) => {
+    return (
+      <React.Fragment>
+        {rowData.DATUM_TRVANLIVOSTI}
+        {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) && (
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ color: "red", marginLeft: "35px" }}
+          />
+        )}
+      </React.Fragment>
     );
   };
 
@@ -226,10 +246,16 @@ export default function PharmacyStorageMedicalAids() {
             ></Column>
             <Column
               field="DATUM_TRVANLIVOSTI"
-              header={"Dátum expirácie"}
+              header="Dátum expirácie"
+              body={expirationBodyTemplate}
               filter
             ></Column>
-            <Column field="POCET" header={"Ks na sklade"} filter></Column>
+            <Column
+              field="POCET"
+              header="Ks na sklade"
+              body={quantityBodyTemplate}
+              filter
+            ></Column>
           </DataTable>
         )}
       </div>
