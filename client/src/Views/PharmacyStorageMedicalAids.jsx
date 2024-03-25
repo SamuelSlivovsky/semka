@@ -50,6 +50,7 @@ export default function PharmacyStorageMedicalAids() {
         }
       })
       .then((data) => {
+        processMedicalAidsData(data);
         setZdrPomockyLekarenskySklad(data);
         console.log(data);
         if (data.length >= 0) {
@@ -111,6 +112,65 @@ export default function PharmacyStorageMedicalAids() {
     );
   };
 
+  const processMedicalAidsData = (medicalAids) => {
+    const lowQuantityAids = medicalAids.filter((aid) => aid.POCET <= 10);
+    const expiringSoonAids = medicalAids.filter((aid) =>
+      isExpiringSoon(aid.DATUM_TRVANLIVOSTI)
+    );
+
+    if (lowQuantityAids.length > 0) {
+      const lowStockDetails = lowQuantityAids.map((aid) => (
+        <React.Fragment key={aid.ID}>
+          {aid.NAZOV_ZDR_POMOCKY}: ({aid.POCET} ks)
+          <br />
+          <br />
+        </React.Fragment>
+      ));
+
+      toast.current.show({
+        severity: "warn",
+        summary: "Upozornenie na nízke zásoby!",
+        detail: (
+          <div>
+            <strong>
+              Nasledujúce zdravotnícke pomôcky majú nízky stav zásob:
+            </strong>
+            <br />
+            <br />
+            {lowStockDetails}
+          </div>
+        ),
+        sticky: true, // if you want it to remain until manually closed
+      });
+    }
+
+    if (expiringSoonAids.length > 0) {
+      const expiringDetails = expiringSoonAids.map((aid) => (
+        <React.Fragment key={aid.ID}>
+          {aid.NAZOV_ZDR_POMOCKY}: (Expirácia: {aid.DATUM_TRVANLIVOSTI})
+          <br />
+          <br />
+        </React.Fragment>
+      ));
+
+      toast.current.show({
+        severity: "warn",
+        summary: "Upozornenie na blížiacu sa expiráciu",
+        detail: (
+          <div>
+            <strong>
+              Čoskoro sa končí trvanlivosť týchto zdravotníckych pomôcok:
+            </strong>
+            <br />
+            <br />
+            {expiringDetails}
+          </div>
+        ),
+        sticky: true, // if you want it to remain until manually closed
+      });
+    }
+  };
+
   //Expiracia zdr. pomocky nastane za 14 dni alebo menej
   function isSameOrBeforeToday(date1, date2) {
     return (
@@ -144,7 +204,7 @@ export default function PharmacyStorageMedicalAids() {
         {rowData.POCET <= 10 && (
           <i
             className="pi pi-exclamation-triangle"
-            style={{ color: "red", marginLeft: "35px" }}
+            style={{ color: "red", marginLeft: "10px" }}
           />
         )}
       </React.Fragment>
@@ -158,7 +218,7 @@ export default function PharmacyStorageMedicalAids() {
         {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) && (
           <i
             className="pi pi-exclamation-triangle"
-            style={{ color: "red", marginLeft: "35px" }}
+            style={{ color: "red", marginLeft: "10px" }}
           />
         )}
       </React.Fragment>

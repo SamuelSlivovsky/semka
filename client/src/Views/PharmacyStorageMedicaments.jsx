@@ -48,6 +48,7 @@ export default function PharmacyStorageMedicaments() {
         }
       })
       .then((data) => {
+        processMedicationsData(data);
         setLiekyLekarenskySklad(data);
         if (data.length > 0) {
           setNazovLekarne(data[0].NAZOV_LEKARNE);
@@ -108,6 +109,61 @@ export default function PharmacyStorageMedicaments() {
     );
   };
 
+  const processMedicationsData = (medications) => {
+    const lowQuantityMeds = medications.filter((med) => med.POCET <= 10);
+    const expiringSoonMeds = medications.filter((med) =>
+      isExpiringSoon(med.DATUM_TRVANLIVOSTI)
+    );
+
+    if (lowQuantityMeds.length > 0) {
+      const lowStockDetails = lowQuantityMeds.map((med) => (
+        <React.Fragment key={med.ID}>
+          {med.NAZOV_LIEKU}: ({med.POCET} ks)
+          <br />
+          <br />
+        </React.Fragment>
+      ));
+
+      toast.current.show({
+        severity: "warn",
+        summary: "Upozornenie na nízke zásoby!",
+        detail: (
+          <div>
+            <strong>Nasledujúce lieky majú nízky stav zásob:</strong>
+            <br />
+            <br />
+            {lowStockDetails}
+          </div>
+        ),
+        sticky: true, // if you want it to remain until manually closed
+      });
+    }
+
+    if (expiringSoonMeds.length > 0) {
+      const expiringDetails = expiringSoonMeds.map((med) => (
+        <React.Fragment key={med.ID}>
+          {med.NAZOV_LIEKU}: (Expirácia: {med.DATUM_TRVANLIVOSTI})
+          <br />
+          <br />
+        </React.Fragment>
+      ));
+
+      toast.current.show({
+        severity: "warn",
+        summary: "Upozornenie na blížiacu sa expiráciu",
+        detail: (
+          <div>
+            <strong>Čoskoro sa končí trvanlivosť týchto liekov:</strong>
+            <br />
+            <br />
+            {expiringDetails}
+          </div>
+        ),
+        sticky: true, // if you want it to remain until manually closed
+      });
+    }
+  };
+
   //Expiracia lieku nastane za 14 dni alebo menej
   function isSameOrBeforeToday(date1, date2) {
     return (
@@ -141,7 +197,7 @@ export default function PharmacyStorageMedicaments() {
         {rowData.POCET <= 10 && (
           <i
             className="pi pi-exclamation-triangle"
-            style={{ color: "red", marginLeft: "35px" }}
+            style={{ color: "red", marginLeft: "10px" }}
           />
         )}
       </React.Fragment>
@@ -155,7 +211,7 @@ export default function PharmacyStorageMedicaments() {
         {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) && (
           <i
             className="pi pi-exclamation-triangle"
-            style={{ color: "red", marginLeft: "35px" }}
+            style={{ color: "red", marginLeft: "10px" }}
           />
         )}
       </React.Fragment>
