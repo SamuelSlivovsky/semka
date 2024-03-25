@@ -29,4 +29,10 @@ router.post(
   controller.updateDatumZapisu
 );
 
+router.post(
+  "/updatePocetLiekuVydajReceptu",
+  verify.verifyRoles(0, 10),
+  controller.updatePocetLiekuVydajReceptu
+);
+
 module.exports = router;

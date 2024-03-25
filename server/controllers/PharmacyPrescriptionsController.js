@@ -37,4 +37,15 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+
+  updatePocetLiekuVydajReceptu: (req, res) => {
+    const receptLiek = require("../models/lekaren_recepty");
+    (async () => {
+      ret_val = await receptLiek.updatePocetLiekuVydajReceptu(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
 };

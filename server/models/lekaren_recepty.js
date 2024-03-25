@@ -50,7 +50,8 @@ async function getDetailReceptu(id) {
     const detail = await conn.execute(
       `select oupac.rod_cislo, oupac.meno as "MENO_PACIENTA", oupac.priezvisko as "PRIEZVISKO_PACIENTA", recept.id_receptu as "ID_RECEPTU",
       to_char(recept.datum_zapisu, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_ZAPISU", to_char(recept.datum_prevzatia, 'DD.MM.YYYY') AS "DATUM_PREVZATIA",
-      trvanlivost_lieku.id_liek as "ID_LIEKU", trvanlivost_lieku.datum_trvanlivosti, liek.nazov as "NAZOV_LIEKU", recept.poznamka, recept.opakujuci,
+      trvanlivost_lieku.id_liek as "ID_LIEKU", to_char(trvanlivost_lieku.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_TRVANLIVOSTI", 
+      liek.nazov as "NAZOV_LIEKU", recept.poznamka, recept.opakujuci,
       typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA",
       trvanlivost_lieku.pocet as "DOSTUPNY_POCET_NA_SKLADE", trvanlivost_lieku.id_sklad, lekaren.id_lekarne
       from recept
@@ -95,9 +96,38 @@ async function updateDatumZapisu(body) {
   }
 }
 
+async function updatePocetLiekuVydajReceptu(body) {
+  console.log(body);
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `UPDATE trvanlivost_lieku
+    SET pocet = pocet - :vydanyPocet
+    WHERE datum_trvanlivosti = TO_DATE(:datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS')
+    AND id_liek = :id_liek
+    AND id_sklad IN (SELECT id_sklad FROM sklad WHERE id_lekarne = :id_lekarne)
+    AND pocet >= :vydanyPocet`;
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        datum_trvanlivosti: body.datum_trvanlivosti,
+        id_liek: body.id_liek,
+        id_lekarne: body.id_lekarne,
+        vydanyPocet: body.vydanyPocet,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows updated " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getZoznamAktualnychReceptov,
   getZoznamVydanychReceptov,
   getDetailReceptu,
   updateDatumZapisu,
+  updatePocetLiekuVydajReceptu,
 };

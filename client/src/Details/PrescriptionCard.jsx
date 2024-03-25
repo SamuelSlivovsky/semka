@@ -76,28 +76,72 @@ export default function PrescriptionCard(props) {
         id_receptu: detail.ID_RECEPTU,
         datum_prevzatia: formattedDate,
       }),
-    }).then((res) => {
-      if (res.ok) {
-        toast.current.show({
-          severity: "success",
-          summary: "Úspech",
-          detail: "Dátum prevzatia bol úspešne aktualizovaný!",
-        });
-        setShowEditDialog(false);
-        setTimeout(() => {
-          redirectToTabPrescriptions();
-        }, 2000);
-      } else {
-        // Handle error response
-        const errorData = res.json();
+    })
+      .then((res) => {
+        if (res.ok) {
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "Dátum prevzatia bol úspešne aktualizovaný!",
+          });
+          decrementPocetNaSklade().then(() => {
+            setShowEditDialog(false);
+            setTimeout(() => {
+              redirectToTabPrescriptions();
+            }, 2000);
+          });
+        } else {
+          // Handle error response
+          res.json().then((errorData) => {
+            toast.current.show({
+              severity: "error",
+              summary: "Chyba",
+              detail:
+                errorData.message ||
+                "Nastala chyba pri aktualizácii dátumu prevzatia.",
+            });
+          });
+        }
+      })
+      .catch((error) => {
+        // V prípade chyby v sieti alebo inej chyby
         toast.current.show({
           severity: "error",
           summary: "Chyba",
-          detail: "Nastala chyba pri aktualizácii dátumu prevzatia.",
+          detail: "Nepodarilo sa odoslať požiadavku.",
         });
-        throw new Error(errorData.message || "Error updating date");
-      }
-    });
+      });
+  };
+
+  const decrementPocetNaSklade = async () => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json",
+    };
+    try {
+      await fetch(`pharmacyPrescriptions/updatePocetLiekuVydajReceptu`, {
+        method: "POST",
+        headers: headers,
+        body: JSON.stringify({
+          datum_trvanlivosti: detail.DATUM_TRVANLIVOSTI,
+          id_liek: detail.ID_LIEKU,
+          id_lekarne: detail.ID_LEKARNE,
+          vydanyPocet: 1,
+        }),
+      });
+      toast.current.show({
+        severity: "success",
+        summary: "Úspech",
+        detail: "Počet na sklade bol úspešne aktualizovaný!",
+      });
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Chyba",
+        detail: "Nepodarilo sa aktualizovať počet na sklade.",
+      });
+    }
   };
 
   const tryEditDate = () => {
