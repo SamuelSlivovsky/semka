@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from "react";
 import { InputText } from "primereact/inputtext";
 import { AutoComplete } from "primereact/autocomplete";
-import { PDFDownloadLink, PDFViewer } from "@react-pdf/renderer";
-import { Pdf } from "./PdfResult";
 import GetUserData from "../../Auth/GetUserData";
+import { Button } from "primereact/button";
+import { InputTextarea } from "primereact/inputtextarea";
 
 export default function Basic() {
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [reason, setReason] = useState(null);
   const [patient, setPatient] = useState(null);
-  const [myDoc, setMyDoc] = useState(null);
-
+  const [patientData, setPatientData] = useState(null);
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
@@ -33,9 +32,11 @@ export default function Basic() {
         headers,
       })
         .then((response) => response.json())
-        .then((data) => {});
+        .then((data) => {
+          setPatientData(...data);
+        });
     }
-  }, [patient, reason]); // Update when patient or reason changes
+  }, [patient]);
 
   const searchPatient = (event) => {
     setTimeout(() => {
@@ -52,6 +53,21 @@ export default function Basic() {
 
       setFilteredPatients(_filtered);
     }, 250);
+  };
+
+  const handleDownload = () => {
+    const queryString = new URLSearchParams({
+      name: patientData.MENO,
+      surname: patientData.PRIEZVISKO,
+      birthId: patientData.ROD_CISLO,
+      insurance: patientData.NAZOV_POISTOVNE,
+      city: patientData.NAZOV_OBCE,
+      age: patientData.VEK,
+      PSC: patientData.PSC,
+      reason: reason,
+    }).toString();
+
+    window.open(`/add/basicPdf?${queryString}`, "_blank");
   };
 
   return (
@@ -74,51 +90,16 @@ export default function Basic() {
 
         <div className="field col-12">
           <label htmlFor="dovod">Dôvod*</label>
-          <InputText
+          <InputTextarea
             id="dovod"
+            autoResize
+            rows={5}
             value={reason}
             onChange={(e) => setReason(e.target.value)}
           />
-          <PDFDownloadLink
-            style={{
-              height: "40px",
-              backgroundColor: "#14B8A6",
-              width: "100%",
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              borderRadius: "5px",
-              textDecoration: "none",
-              marginBottom: "10px",
-              margin: "10px",
-            }}
-            document={<Pdf data={{ MENO: "dssdsdsd" }} reason={"dssdsdsdsd"} />}
-            fileName={`ziadanka.pdf`}
-          >
-            {({ loading }) =>
-              loading ? (
-                "Načítavam"
-              ) : (
-                <span
-                  style={{
-                    fontWeight: "bold",
-                    color: "white",
-                    display: "flex",
-                    gap: "10px",
-                  }}
-                >
-                  {" "}
-                  <i
-                    className="pi pi-file-pdf"
-                    style={{ fontSize: "20px" }}
-                  ></i>
-                  Stiahnuť
-                </span>
-              )
-            }
-          </PDFDownloadLink>
         </div>
       </div>
+      <Button label="Stiahnuť" onClick={() => handleDownload()} />
     </div>
   );
 }

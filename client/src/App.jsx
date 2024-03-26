@@ -29,6 +29,9 @@ import TabMeetings from "./Views/Tables/TabMeetings";
 import socketService from "./service/socketService";
 import Chat from "./Chat/Chat";
 import TabRooms from "./Views/Tables/TabRooms";
+import { PdfBasic } from "./Forms/Request/PdfBasic";
+import { PdfMandate } from "./Forms/Request/PdfMandate";
+import { PdfResults } from "./Forms/Request/PdfResults";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -47,10 +50,16 @@ function App() {
     setUserData(userDataHelper);
     if (typeof userDataHelper !== "undefined" && userDataHelper !== null) {
       const headers = { authorization: "Bearer " + token };
-      if (userDataHelper.UserInfo.role === 4) {
-        fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, {
-          headers,
-        })
+      if (userDataHelper.UserInfo.role === 9999) {
+        fetch(
+          `/patient/pacientId/${userDataHelper.UserInfo.userid.replace(
+            "/",
+            "$"
+          )}`,
+          {
+            headers,
+          }
+        )
           .then((response) => response.json())
           .then((data) => {
             setPatientId(data[0].ID_PACIENTA);
@@ -70,21 +79,23 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
-    const headers = { authorization: "Bearer " + token };
-    socketService.connect();
-    socketService.on("newMessage", (message) => {
-      fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
-        headers,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setNotifications(data.POCET);
-        });
-    });
+    if (userDataHelper?.UserInfo.role !== 9999) {
+      const headers = { authorization: "Bearer " + token };
+      socketService.connect();
+      socketService.on("newMessage", (message) => {
+        fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
+          headers,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            setNotifications(data.POCET);
+          });
+      });
 
-    return () => {
-      socketService.disconnect();
-    };
+      return () => {
+        socketService.disconnect();
+      };
+    }
   }, [location.pathname]);
 
   const sidebarButtonsAdmin = [
@@ -119,7 +130,7 @@ function App() {
       icon="storage-icon"
     />,
     <SidebarButton
-      key="13"
+      key="selects"
       visibleLeft={visibleLeft}
       path="/combobox"
       label="Admin selecty"
@@ -150,7 +161,7 @@ function App() {
       icon="patient-icon"
     />,
     <SidebarButton
-      key="13"
+      key="beds"
       visibleLeft={visibleLeft}
       path="/rooms"
       label="Lôžka"
@@ -192,7 +203,7 @@ function App() {
       icon="storage-icon"
     />,
     <SidebarButton
-      key="13"
+      key="stats"
       visibleLeft={visibleLeft}
       path="/statistics"
       label="Štatistiky"
@@ -204,6 +215,14 @@ function App() {
       path="/meetings"
       label="Konzíliá"
       icon="meeting-icon"
+    />,
+    <SidebarButton
+      key="11"
+      visibleLeft={visibleLeft}
+      path="/chat"
+      label="Správy"
+      icon="chat-icon"
+      notifications={notifications}
     />,
   ];
 
@@ -273,6 +292,9 @@ function App() {
         <Route path="/meetings" element={<TabMeetings />}></Route>
         <Route path="/room" element={<HospitalRoom />}></Route>
         <Route path="/rooms" element={<TabRooms />}></Route>
+        <Route path="/add/basicPdf" element={<PdfBasic />}></Route>
+        <Route path="/add/mandatePdf" element={<PdfMandate />}></Route>
+        <Route path="/add/resultsPdf" element={<PdfResults />}></Route>
       </>
     );
   };
@@ -343,22 +365,13 @@ function App() {
           <>
             {sidebarButtonsDoctor} {sidebarButtonsChief}
           </>
-        ) : userData !== null && userData.UserInfo.role === 4 ? (
+        ) : userData !== null && userData.UserInfo.role === 9999 ? (
           sidebarButtonsPatient
         ) : (
           ""
         )}
         {typeof userData !== "undefined" && userData !== null ? (
           <>
-            {" "}
-            <SidebarButton
-              key="11"
-              visibleLeft={visibleLeft}
-              path="/chat"
-              label="Správy"
-              icon="chat-icon"
-              notifications={notifications}
-            />{" "}
             <SidebarButton
               key="12"
               visibleLeft={visibleLeft}
@@ -388,7 +401,7 @@ function App() {
             <>
               {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
-          ) : userData && userData.UserInfo.role === 4 ? (
+          ) : userData && userData.UserInfo.role === 9999 ? (
             renderPatientRoutes()
           ) : (
             ""

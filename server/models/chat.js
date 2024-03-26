@@ -124,7 +124,7 @@ async function getUnread(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT count(userid) as pocet from user_sprava where userid =:id and precital = 'N'`,
+      `SELECT count(userid) as pocet from user_sprava where userid =:id`,
       { id }
     );
 
@@ -267,6 +267,38 @@ async function updateHistory(body) {
   }
 }
 
+async function createGroup(body) {
+  try {
+    let conn = await database.getConnection();
+    const groupId = await conn.execute(
+      "select max(id_skupiny) as MAXID from chat_skupina"
+    );
+    await conn.execute(
+      "insert into chat_skupina values(:groupId, :nazov)",
+      {
+        groupId: groupId.rows[0].MAXID + 1,
+        nazov: body.nazov,
+      },
+      { autoCommit: true }
+    );
+    await conn.execute("begin chat_user_insert(:groupId, :userid, 1); end;", {
+      groupId: groupId.rows[0].MAXID + 1,
+      userid: body.userid,
+    });
+    const users = body.lekari;
+    await users.forEach((element) => {
+      conn.execute("begin chat_user_insert(:groupId, :userid, 0); end;", {
+        groupId: groupId.rows[0].MAXID + 1,
+        userid: element.CISLO_ZAM,
+      });
+    });
+
+    console.log("inserted new group");
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 module.exports = {
   getSpravy,
   insertSprava,
@@ -279,4 +311,5 @@ module.exports = {
   isAdmin,
   getOtherUsers,
   updateHistory,
+  createGroup,
 };

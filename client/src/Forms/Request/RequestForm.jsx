@@ -2,6 +2,8 @@ import React, { useState } from "react";
 
 import { RadioButton } from "primereact/radiobutton";
 import Basic from "./Basic";
+import Mandate from "./Mandate";
+import Results from "./Results";
 export default function RequestForm() {
   const categories = [
     { name: "Základná", key: "B" },
@@ -36,9 +38,9 @@ export default function RequestForm() {
       {selectedCategory.key == "B" ? (
         <Basic />
       ) : selectedCategory.key == "M" ? (
-        ""
+        <Mandate />
       ) : (
-        ""
+        <Results />
       )}
     </div>
   );

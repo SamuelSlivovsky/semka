@@ -13,9 +13,7 @@ async function getPacienti() {
 }
 
 async function getIdPacienta(rod_cislo) {
-  rod_cislo = String(rod_cislo);
-  rod_cislo = rod_cislo.substring(0, 6) + "R" + rod_cislo.substring(6);
-  rod_cislo = rod_cislo.replace("R", "/");
+  rod_cislo = rod_cislo.replace("$", "/");
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
@@ -252,9 +250,7 @@ async function getDoctorsOfPatient(id) {
 }
 
 async function getUdalosti(rod_cislo) {
-  rod_cislo = String(rod_cislo);
-  rod_cislo = rod_cislo.substring(0, 6) + "R" + rod_cislo.substring(6);
-  rod_cislo = rod_cislo.replace("R", "/");
+  rod_cislo = rod_cislo.replace("$", "/");
   try {
     let udalosti = [];
 
@@ -286,6 +282,7 @@ async function getOperacie(rod_cislo) {
     const operacie = await conn.execute(
       `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaz
         join operacia using(id_zaznamu) 
+        join zdravotna_karta using(id_karty)
         join pacient using(id_pacienta)
         where rod_cislo = :rod_cislo`,
       [rod_cislo]
@@ -327,8 +324,10 @@ async function getVysetrenia(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const vysetrenia = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaznam_new
-        join vysetrenie using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
+      `select to_char(vysetrenie.datum,'YYYY-MM-DD') || 'T' || to_char(vysetrenie.datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaz
+      join vysetrenie using(id_zaznamu)
+        join zdravotna_karta using (id_karty)
+        join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
       [rod_cislo]
     );
 
@@ -346,8 +345,10 @@ async function getHospitalizacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const hospitalizacia = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaznam
-        join hospitalizacia using(id_zaznamu) join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
+      `select to_char(hospitalizacia.dat_od,'YYYY-MM-DD') || 'T' || to_char(hospitalizacia.dat_od, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaz
+      join hospitalizacia using(id_zaznamu) 
+      join zdravotna_karta using (id_karty)
+      join pacient using(id_pacienta) where rod_cislo = :rod_cislo`,
       [rod_cislo]
     );
 
@@ -447,7 +448,7 @@ async function insertPacient(body) {
     let result;
     if (!body.cudzinec) {
       sqlStatement = `BEGIN
-    pacient_insert(:meno, :priezvisko, :psc, :rod_cislo, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi);
+    pacient_insert(:meno, :priezvisko, :psc, :rod_cislo, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi, :poistenec ,:poistovna);
     END;`;
       result = await conn.execute(sqlStatement, {
         rod_cislo: body.rod_cislo,
@@ -459,6 +460,8 @@ async function insertPacient(body) {
         dat_od: body.dat_od,
         dat_do: body.dat_do,
         typ_krvi: body.typ_krvi,
+        poistenec: body.poistenec,
+        poistovna: body.poistovna,
       });
     } else {
       sqlStatement = `BEGIN

@@ -9,6 +9,7 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { SelectButton } from "primereact/selectbutton";
 import { ProgressBar } from "primereact/progressbar";
+import { Dropdown } from "primereact/dropdown";
 import "../styles/calendar.css";
 
 function EventCalendar(props) {
@@ -23,6 +24,9 @@ function EventCalendar(props) {
   const [eventType, setEventType] = useState(null);
   const [selectButtonValue, setSelectButtonValue] =
     useState("Detaily udalosti");
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [calendarKey, setCalendarKey] = useState(Date.now());
 
   const calendarRef = useRef(null);
   const eventTypes = [
@@ -34,18 +38,31 @@ function EventCalendar(props) {
   const patientOptions = ["Detaily udalosti"];
 
   useEffect(() => {
+    fetchCalendar(props.userData.UserInfo.userid);
+    if (props.userData.UserInfo.role === 3) fetchDoctors();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const fetchCalendar = (userid) => {
+    setCalendarVisible(false);
+
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     let route =
       props.userData.UserInfo.role === 2 || props.userData.UserInfo.role === 3
         ? "calendar/udalostiLekara/"
-        : props.userData.UserInfo.role === 4
+        : props.userData.UserInfo.role === 9999
         ? "calendar/udalostiPacienta/"
         : "calendar/udalostiLekara/";
-    fetch(`${route}${props.userData.UserInfo.userid}`, { headers })
+    fetch(
+      `${route}${
+        props.userData.UserInfo.role === 9999
+          ? userid.replace("/", "$")
+          : userid
+      }`,
+      { headers }
+    )
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
         data.forEach((element) => {
           switch (element.type) {
             case "OPE":
@@ -64,11 +81,29 @@ function EventCalendar(props) {
               break;
           }
         });
-        console.log(data);
         setCurrentEvents(data);
         setCalendarVisible(true);
+        setCalendarKey(Date.now());
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  };
+
+  const fetchDoctors = () => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    fetch(`/lekar/lekari/${props.userData.UserInfo.userid}`, { headers })
+      .then((res) => res.json())
+      .then((result) => {
+        result = result.map((item) => {
+          return { ...item, name: `${item.MENO} ${item.PRIEZVISKO}` };
+        });
+        setSelectedDoctor(
+          result.find(
+            (item) => item.CISLO_ZAM == props.userData.UserInfo.userid
+          )
+        );
+        setDoctors(result);
+      });
+  };
 
   const handleEventClick = (clickInfo) => {
     setShowDialog(true);
@@ -141,7 +176,6 @@ function EventCalendar(props) {
           currentEvent.setDates(startDate, endDate, {
             allDay: false,
           });
-          console.log("first");
           setShowConfirmChanges(false);
           setShowDialog(false);
         });
@@ -223,7 +257,6 @@ function EventCalendar(props) {
         <div className="field col-12 ">
           <h3 htmlFor="basic">Začiatok udalosti</h3>
           <p>
-            {console.log(eventDateStart)}
             {eventDateStart !== null
               ? eventDateStart.toLocaleString("sk").replaceAll(". ", ".")
               : ""}
@@ -249,28 +282,58 @@ function EventCalendar(props) {
               style={{ height: "6px" }}
             ></ProgressBar>
           ) : (
-            <FullCalendar
-              plugins={[
-                dayGridPlugin,
-                timeGridPlugin,
-                interactionPlugin,
-                listPlugin,
-              ]}
-              ref={calendarRef}
-              headerToolbar={{
-                left: "prev,next today prevYear,nextYear",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
-              }}
-              initialView="dayGridMonth"
-              editable={true}
-              selectable={true}
-              weekends={true}
-              initialEvents={currentEvents}
-              eventClick={handleEventClick}
-              eventsSet={handleEvents}
-              locale="SK"
-            />
+            <div>
+              {props.userData.UserInfo.role === 3 ? (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    marginBottom: "10px",
+                    alignItems: "center",
+                  }}
+                >
+                  <label>
+                    <h2>Kalendár lekára</h2>
+                  </label>
+                  <Dropdown
+                    style={{ height: "50px" }}
+                    value={selectedDoctor}
+                    options={doctors}
+                    optionLabel="name"
+                    onChange={(e) => {
+                      setSelectedDoctor(e.value);
+                      fetchCalendar(e.value.CISLO_ZAM);
+                    }}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+
+              <FullCalendar
+                key={calendarKey}
+                plugins={[
+                  dayGridPlugin,
+                  timeGridPlugin,
+                  interactionPlugin,
+                  listPlugin,
+                ]}
+                ref={calendarRef}
+                headerToolbar={{
+                  left: "prev,next today prevYear,nextYear",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+                }}
+                initialView="dayGridMonth"
+                editable={true}
+                selectable={true}
+                weekends={true}
+                initialEvents={currentEvents}
+                eventClick={handleEventClick}
+                eventsSet={handleEvents}
+                locale="SK"
+              />
+            </div>
           )}
         </Suspense>
       </div>

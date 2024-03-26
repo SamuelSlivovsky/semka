@@ -3,7 +3,7 @@
 .chat-container {
   display: flex;
   flex-direction: row;
-  max-width: 800px;
+  max-width: 900px;
   margin: 20px auto;
   border: 1px solid #ccc;
   border-radius: 5px;
@@ -38,7 +38,7 @@
 }
 
 .current-user {
-  background-color: #58f7e4;
+  background-color: #9fd6d0;
   margin-left: auto;
 }
 
@@ -64,10 +64,9 @@
 
 .image-preview {
   cursor: pointer;
-  max-width: 100px; /* Adjust the max-width as needed */
+  max-width: 100px;
 }
 
-/* Add this style to ensure the image doesn't overflow its container */
 .image-preview img {
   max-width: 100%;
   max-height: 100%;
@@ -75,9 +74,9 @@
 
 .avatar {
   width: 30px;
-  height: 30px; /* Adjust the height as needed */
+  height: 30px;
   border-radius: 50%;
-  margin-right: 8px; /* Adjust the margin as needed */
+  margin-right: 8px;
 }
 
 .typing-container {

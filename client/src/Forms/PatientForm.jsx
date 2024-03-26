@@ -9,11 +9,13 @@ import { AutoComplete } from "primereact/autocomplete";
 import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
+import { InputNumber } from "primereact/inputnumber";
 import GetUserData from "../Auth/GetUserData";
 export default function PatientForm() {
   const [showMessage, setShowMessage] = useState(false);
   const [cities, setCities] = useState([]);
   const [filteredPsc, setFilteredPsc] = useState(null);
+  const [insurances, setInsurances] = useState([]);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -25,10 +27,14 @@ export default function PatientForm() {
         array = res.map((item) => item);
         setCities(array);
       });
+    fetch("/poistovna/all", { headers })
+      .then((response) => response.json())
+      .then((res) => {
+        setInsurances(res);
+      });
   }, []); // eslint-disable-line;
   const validate = (data) => {
     let errors = {};
-
     if (!data.meno) {
       errors.meno = "Meno je povinné";
     }
@@ -38,13 +44,19 @@ export default function PatientForm() {
     if (!data.cudzinec && !data.rod_cislo) {
       errors.rod_cislo = "Rodné číslo je povinné";
     }
+    if (!data.cudzinec && !data.poistovna) {
+      errors.poistovna = "Poisťovňa je povinná";
+    }
+    if (!data.cudzinec && !data.poistenec) {
+      errors.poistenec = "Číslo poistenca je povinné";
+    }
     if (!data.psc) {
       errors.psc = "PSČ je povinné";
     }
     if (!data.dat_od) {
       errors.dat_od = "Dátum zápisu je povinný";
     }
-    console.log(errors);
+
     return errors;
   };
 
@@ -76,6 +88,8 @@ export default function PatientForm() {
             : null,
         pohlavie: data.pohlavie,
         typ_krvi: data.typ_krvi,
+        poistenec: data.poistenec,
+        poistovna: data.poistovna?.ICO,
       }),
     };
     await fetch("/add/pacient", requestOptionsPatient).then(() =>
@@ -154,6 +168,8 @@ export default function PatientForm() {
             dat_narodenia: null,
             pohlavie: "M",
             typ_krvi: "0-",
+            poistenec: 0,
+            poistovna: null,
           }}
           validate={validate}
           render={({ handleSubmit, form, values }) => (
@@ -333,6 +349,61 @@ export default function PatientForm() {
                   </div>
                 )}
               />
+              {!values.cudzinec ? (
+                <>
+                  <Field
+                    name="poistenec"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label
+                          htmlFor="poistenec"
+                          className={classNames({
+                            "p-error": isFormFieldValid(meta),
+                          })}
+                        >
+                          *Číslo poistenca
+                        </label>
+                        <InputMask
+                          mask="99999999"
+                          {...input}
+                          id="poistenec"
+                          className={classNames({
+                            "p-invalid": isFormFieldValid(meta),
+                          })}
+                        />
+                        {getFormErrorMessage(meta)}
+                      </div>
+                    )}
+                  />
+                  <Field
+                    name="poistovna"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label
+                          htmlFor="poistovna"
+                          className={classNames({
+                            "p-error": isFormFieldValid(meta),
+                          })}
+                        >
+                          *Poisťovňa
+                        </label>
+                        <Dropdown
+                          id="poistovna"
+                          options={insurances}
+                          optionLabel="NAZOV"
+                          {...input}
+                          className={classNames({
+                            "p-invalid": isFormFieldValid(meta),
+                          })}
+                        />
+                        {getFormErrorMessage(meta)}
+                      </div>
+                    )}
+                  />
+                </>
+              ) : (
+                ""
+              )}
               <Field
                 name="ulica"
                 render={({ input, meta }) => (

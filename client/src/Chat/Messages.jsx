@@ -387,12 +387,13 @@ const Messages = (props) => {
         style={{
           height: "40px",
           width: "100%",
-          backgroundColor: "rgb(174, 253, 243)",
+          backgroundColor: "rgb(69,69,69)",
           display: "flex",
           alignItems: "center",
           fontSize: "20px",
           fontWeight: "bold",
           paddingLeft: "10px",
+          color: "white",
         }}
       >
         {props.group.NAZOV}

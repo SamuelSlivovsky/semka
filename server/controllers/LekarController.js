@@ -116,6 +116,14 @@ module.exports = {
       res.status(200).json(info);
     })();
   },
+  
+  getKolegovia: (req, res) => {
+    const lekar = require("../models/lekar");
+    (async () => {
+      info = await lekar.getKolegovia(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
 
   getZoznamVydanychReceptov: (req, res) => {
     const lekar = require("../models/lekar");

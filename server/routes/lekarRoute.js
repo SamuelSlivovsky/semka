@@ -81,6 +81,12 @@ router.get(
 );
 
 router.get(
+  "/kolegovia/:id",
+  verify.verifyRoles(0, 3),
+  controller.getKolegovia
+);
+
+router.get(
   "/zoznamVydanychReceptov/:id/:datum",
   verify.verifyRoles(0, 1, 3),
   controller.getZoznamVydanychReceptov

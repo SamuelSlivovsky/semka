@@ -24,6 +24,27 @@ const equipmentRoute = require("./routes/equipmentRoute");
 const updateRoute = require("./routes/updateRoute");
 const chatRoute = require("./routes/chatRoute");
 const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
+const poistovnaRoute = require("./routes/poistovnaRoute");
+
+// Set session date format
+async function setSessionDateFormat() {
+  const database = require("./database/Database");
+  try {
+    const connection = await database.getConnection();
+
+    await connection.execute(
+      "ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/YYYY HH24:MI:SS'"
+    );
+
+    console.log("Session date format set successfully.");
+    await connection.close();
+  } catch (err) {
+    console.error("Error setting session date format:", err);
+  }
+}
+
+// Call the function to set session date format
+setSessionDateFormat();
 
 const server = http.createServer(app); // Create an HTTP server using your Express app
 const io = socketIo(server); // Initialize Socket.io with the HTTP server
@@ -53,6 +74,7 @@ app.use("/vybavenie", equipmentRoute);
 app.use("/update", updateRoute);
 app.use("/chat", chatRoute);
 app.use("/hospitalizacia", hospitalizaciaRoute);
+app.use("/poistovna", poistovnaRoute);
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);

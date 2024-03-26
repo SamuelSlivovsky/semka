@@ -126,4 +126,15 @@ module.exports = {
       res.status(500).send(err);
     });
   },
+  createGroup: (req, res) => {
+    const chat = require("../models/chat");
+    (async () => {
+      ret_val = await chat.createGroup(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
 };

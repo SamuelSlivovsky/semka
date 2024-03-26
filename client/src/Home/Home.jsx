@@ -41,7 +41,7 @@ function Home() {
       isCalendar={false}
       path="/rooms"
       icon={bedIcon}
-      key="13"
+      key="beds"
     ></HomeCard>,
     <HomeCard
       title="Vyšetrenia"
@@ -162,7 +162,7 @@ function Home() {
             {doctorCards} {chiefCards}
           </>
         );
-      else if (userData.UserInfo.role === 4) return patientCards;
+      else if (userData.UserInfo.role === 9999) return patientCards;
     }
   };
 

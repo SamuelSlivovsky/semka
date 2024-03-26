@@ -61,8 +61,8 @@ FROM (
    JOIN os_udaje o ON p.rod_cislo = o.rod_cislo
    JOIN nemocnica USING (id_nemocnice)
    JOIN zamestnanci USING (id_nemocnice)
-   JOIN poistenie on (p.id_pacienta = poistenie.id_pacienta)
-   join poistovna using (ICO)
+   LEFT JOIN poistenie on (p.id_pacienta = poistenie.id_pacienta)
+   LEFT join poistovna using (ICO)
    WHERE zamestnanci.cislo_zam = :pid_lekara
 ) sub
 WHERE rn_hosp = 1
@@ -279,6 +279,24 @@ async function getOddeleniePrimara(id) {
   }
 }
 
+async function getKolegovia(id) {
+  try {
+    let conn = await database.getConnection();
+    const info = await conn.execute(
+      `select meno || ' ' || priezvisko || ' - ' || typ_oddelenia as lekar , cislo_zam 
+      from zamestnanci
+      join os_udaje using(rod_cislo)
+      join oddelenie o on(o.id_oddelenia = zamestnanci.id_oddelenia)
+      where zamestnanci.id_nemocnice in (select id_nemocnice from zamestnanci where cislo_zam = :id) and cislo_zam <>:id`,
+      [id, id]
+    );
+
+    return info.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getZoznamVydanychReceptov(id, datum) {
   try {
     let conn = await database.getConnection();
@@ -324,4 +342,5 @@ module.exports = {
   getZoznamLekarov,
   getOddeleniePrimara,
   getZoznamVydanychReceptov,
+  getKolegovia,
 };
