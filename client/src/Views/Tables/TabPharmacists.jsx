@@ -116,7 +116,7 @@ export default function TabPharmacists(props) {
       .then((data) => {
         toast.current.show({
           severity: "success",
-          summary: "Úspešne pridaný",
+          summary: "Zamestnanec pridaný",
           detail: "Nový lekárnik bol úspešne pridaný do systému.",
           life: 3000,
         });

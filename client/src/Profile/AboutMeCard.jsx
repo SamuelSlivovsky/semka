@@ -47,6 +47,8 @@ export default function PharmacistCard(props) {
           )}
           {renderDetail("Okres: ", profile.NAZOV_OKRESU)}
           {renderDetail("Kraj: ", profile.NAZOV_KRAJA)}
+          {renderDetail("Mobil: ", profile.TELEFON)}
+          {renderDetail("E - mail: ", profile.EMAIL)}
           {renderDetail(
             "Rola zamestnanca: ",
             profile.ID_TYP + ": " + profile.NAZOV_ROLE

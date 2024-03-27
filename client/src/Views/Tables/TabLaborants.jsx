@@ -116,7 +116,7 @@ export default function TabLaborants(props) {
       .then((data) => {
         toast.current.show({
           severity: "success",
-          summary: "Úspešne pridaný",
+          summary: "Zamestnanec pridaný",
           detail: "Nový laborant bol úspešne pridaný do systému.",
           life: 3000,
         });

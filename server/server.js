@@ -29,7 +29,7 @@ const updateRoute = require("./routes/updateRoute");
 const chatRoute = require("./routes/chatRoute");
 const ordersRoute = require("./routes/ordersRoute");
 const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
-const warehouseStatistics = require("./routes/warehouseStatisticsRoute")
+const warehouseStatistics = require("./routes/warehouseStatisticsRoute");
 const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
 
 const server = http.createServer(app); // Create an HTTP server using your Express app

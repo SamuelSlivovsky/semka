@@ -199,11 +199,11 @@ function Home() {
       key="11"
     ></HomeCard>,
     <HomeCard
-        title="Štatistiky skladu"
-        isCalendar={false}
-        path="/skladStatistiky"
-        icon={statIcon}
-        key="12"
+      title="Štatistiky skladu"
+      isCalendar={false}
+      path="/skladStatistiky"
+      icon={statIcon}
+      key="12"
     ></HomeCard>,
   ];
 

@@ -191,7 +191,8 @@ async function getPouzivatelInfo(id) {
   try {
     let conn = await database.getConnection();
     const info = await conn.execute(
-      `select os_udaje.meno, os_udaje.priezvisko, os_udaje.rod_cislo, os_udaje.ulica, os_udaje.PSC, mesto.nazov as "NAZOV_MESTA", okres.nazov_okresu,
+      `select os_udaje.meno, os_udaje.priezvisko, os_udaje.rod_cislo, os_udaje.ulica, os_udaje.PSC, os_udaje.telefon, os_udaje.email,
+      mesto.nazov as "NAZOV_MESTA", okres.nazov_okresu,
       kraj.nazov_kraja, zamestnanci.cislo_zam, zamestnanci.id_typ, to_char(zamestnanci.dat_od, 'DD.MM.YYYY') AS "DAT_OD", typ_zam.nazov as "NAZOV_ROLE", lekaren.nazov as "NAZOV_LEKARNE"
       from zamestnanci
       join os_udaje on (os_udaje.rod_cislo = zamestnanci.rod_cislo)

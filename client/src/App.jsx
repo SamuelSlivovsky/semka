@@ -318,13 +318,13 @@ function App() {
       label="Presuny"
       icon="warehouse-move-icon"
     />,
-      <SidebarButton
-          key="16"
-          visibleLeft={visibleLeft}
-          path="/skladStatistiky"
-          label="Štatistiky skladu"
-          icon="stat-icon"
-      />,
+    <SidebarButton
+      key="16"
+      visibleLeft={visibleLeft}
+      path="/skladStatistiky"
+      label="Štatistiky skladu"
+      icon="stat-icon"
+    />,
   ];
 
   const sidebarButtonsPharmacyManager = [
@@ -494,7 +494,10 @@ function App() {
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/objednavky" element={<Orders />}></Route>
         <Route path="/presuny" element={<WarehouseTransfers />}></Route>
-              <Route path="/skladStatistiky" element={<WarehouseStatistics />}></Route>
+        <Route
+          path="/skladStatistiky"
+          element={<WarehouseStatistics />}
+        ></Route>
       </>
     );
   };
