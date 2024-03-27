@@ -57,18 +57,19 @@ export default function PharmacistCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "40rem", height: "40rem" }}
+          style={{ width: "45rem", height: "45rem" }}
           title={profile.MENO + " " + profile.PRIEZVISKO}
         >
           {renderDetail("ID lekárnika: ", profile.CISLO_ZAM)}
           {renderDetail("Rodné číslo: ", profile.ROD_CISLO)}
-          {renderDetail("Rok narodenia: ", profile.DATUM_NARODENIA)}
+          {renderDetail("Dátum narodenia: ", profile.DATUM_NARODENIA)}
           {renderDetail("Vek: ", profile.VEK)}
           {renderDetail(
             "Adresa bydliska: ",
             profile.NAZOV_OBCE + " " + profile.PSC
           )}
-
+          {renderDetail("Mobil: ", profile.TELEFON)}
+          {renderDetail("E - mail: ", profile.EMAIL)}
           <div className="mt-5 text-center">
             <Button label="Poslať správu" icon="pi pi-send" />
           </div>
@@ -77,7 +78,7 @@ export default function PharmacistCard(props) {
         <Card
           className="col-4 shadow-4"
           title="Predpísané recepty"
-          style={{ width: "40rem", height: "40rem" }}
+          style={{ width: "45rem", height: "45rem" }}
         ></Card>
       </div>
 
@@ -85,12 +86,12 @@ export default function PharmacistCard(props) {
         <Card
           className="col-5 shadow-4"
           title="Zdravotné záznamy"
-          style={{ width: "40rem", height: "40rem" }}
+          style={{ width: "45rem", height: "45rem" }}
         ></Card>
         <Card
           className="col-5 shadow-4"
           title="Choroby"
-          style={{ width: "40rem", height: "40rem" }}
+          style={{ width: "45rem", height: "45rem" }}
         ></Card>
       </div>
     </div>

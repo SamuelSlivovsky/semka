@@ -136,10 +136,12 @@ async function getManazerLekarneInfo(id) {
     const info = await conn.execute(
       `select os_udaje.rod_cislo, meno, priezvisko,trunc(months_between(sysdate, to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) 
         || '.' || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek, to_char(to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) || '.' 
-        || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, zamestnanci.cislo_zam, PSC, mesto.nazov as nazov_obce from zamestnanci
-                    join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
-                    join mesto using(PSC) 
-                      where zamestnanci.cislo_zam = :id`,
+        || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia, zamestnanci.cislo_zam, PSC, mesto.nazov as nazov_obce,
+        os_udaje.telefon, os_udaje.email
+        from zamestnanci 
+        join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
+        join mesto using(PSC) 
+        where zamestnanci.cislo_zam = :id`,
       [id]
     );
 
@@ -155,10 +157,12 @@ async function getLekarniciInfo(id) {
     const info = await conn.execute(
       `select os_udaje.rod_cislo, meno, priezvisko,trunc(months_between(sysdate, to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) 
         || '.' || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek, to_char(to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) || '.' 
-        || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,zamestnanci.cislo_zam, PSC, mesto.nazov as nazov_obce from zamestnanci
-                    join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
-                    join mesto using(PSC) 
-                      where zamestnanci.cislo_zam = :id`,
+        || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,zamestnanci.cislo_zam, PSC, mesto.nazov as nazov_obce,
+        os_udaje.telefon, os_udaje.email
+        from zamestnanci
+        join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
+        join mesto using(PSC) 
+        where zamestnanci.cislo_zam = :id`,
       [id]
     );
 
@@ -174,10 +178,12 @@ async function getLaborantiInfo(id) {
     const info = await conn.execute(
       `select os_udaje.rod_cislo, meno, priezvisko,trunc(months_between(sysdate, to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) 
         || '.' || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12) as Vek, to_char(to_date('19' || substr(os_udaje.rod_cislo, 0, 2) || '.' || mod(substr(os_udaje.rod_cislo, 3, 2),50) || '.' 
-        || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,zamestnanci.cislo_zam, PSC, mesto.nazov as nazov_obce from zamestnanci
-                    join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
-                    join mesto using(PSC) 
-                      where zamestnanci.cislo_zam = :id`,
+        || substr(os_udaje.rod_cislo, 5, 2), 'YYYY.MM.DD'),'DD.MM.YYYY') as datum_narodenia,zamestnanci.cislo_zam, PSC, mesto.nazov as nazov_obce,
+        os_udaje.telefon, os_udaje.email
+        from zamestnanci
+        join os_udaje on(os_udaje.rod_cislo = zamestnanci.rod_cislo) 
+        join mesto using(PSC) 
+        where zamestnanci.cislo_zam = :id`,
       [id]
     );
 
