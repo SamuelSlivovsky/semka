@@ -237,6 +237,20 @@ function Home() {
       key="22"
     ></HomeCard>,
     <HomeCard
+      title="Sklad"
+      isCalendar={false}
+      path="/sklad"
+      icon={warehouseIcon}
+      key="9"
+    ></HomeCard>,
+    <HomeCard
+      title="Objednávky"
+      isCalendar={false}
+      path="/objednavky"
+      icon={orderIcon}
+      key="10"
+    ></HomeCard>,
+    <HomeCard
       title="Presuny"
       isCalendar={false}
       path="/presuny"

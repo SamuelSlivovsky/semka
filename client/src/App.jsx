@@ -363,6 +363,20 @@ function App() {
       icon="pharmacy-employee-icon"
     />,
     <SidebarButton
+      key="10"
+      visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
+    />,
+    <SidebarButton
+      key="14"
+      visibleLeft={visibleLeft}
+      path="/objednavky"
+      label="Objednavky"
+      icon="order-icon"
+    />,
+    <SidebarButton
       key="15"
       visibleLeft={visibleLeft}
       path="/presuny"
@@ -561,6 +575,8 @@ function App() {
           path="/reservations"
           element={<TabReservations></TabReservations>}
         ></Route>
+        <Route path="/sklad" element={<Storage />}></Route>
+        <Route path="/objednavky" element={<Orders />}></Route>
         <Route path="/presuny" element={<WarehouseTransfers />}></Route>
       </>
     );
