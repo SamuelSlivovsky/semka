@@ -12,6 +12,7 @@ import { Dropdown } from "primereact/dropdown";
 import { FilterMatchMode } from "primereact/api";
 import GetUserData from "../Auth/GetUserData";
 import "../App.css";
+import {wait} from "@testing-library/user-event/dist/utils";
 
 export default function Storage() {
   let emptyProduct = {
@@ -25,12 +26,12 @@ export default function Storage() {
   const [selectedDrug, setSelectedDrug] = useState(null);
   const [drugs, setDrugs] = useState(null);
   const [idOdd, setIdOdd] = useState(null);
+  const [nazov, setNazov] = useState(null);
   const [products, setProducts] = useState(null);
   const [distNum, setDistNum] = useState(0);
   const [addProductDialog, setAddProductDialog] = useState(false);
   const [changeProductDialog, setChangeProductDialog] = useState(false);
   const [showDistribute, setShowDistribute] = useState(false);
-  const [showPharmacyDistribute, setShowPharmacyDistribute] = useState(false);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
   const [product, setProduct] = useState(emptyProduct);
@@ -58,7 +59,15 @@ export default function Storage() {
     fetch(`sklad/getIdOdd/${userDataHelper.UserInfo.userid}`, { headers })
         .then((response) => response.json())
         .then((data) => {
-          setIdOdd(data);
+          setNazov(data[0].NAZOV_NEM);
+          if(data[0].ID_ODDELENIA !== null) {
+            //Employee is from department
+            setIdOdd(true);
+          } else if(data[0].ID_LEKARNE !== null) {
+            //Employee is from pharmacy
+            setIdOdd(true);
+            setNazov(data[0].NAZOV_LEK);
+          }
         });
     initFilter();
   }, []);
@@ -84,13 +93,8 @@ export default function Storage() {
     setShowDistribute(true);
   }
 
-  const pharmacyDistribute = () => {
-    setShowPharmacyDistribute(true);
-  }
-
   const hideDistribute = () => {
     setShowDistribute(false);
-    setShowPharmacyDistribute(false);
   }
 
   //Function for confirming distribution in Hospital
@@ -120,52 +124,33 @@ export default function Storage() {
       fetch(`/sklad/distributeMedications`,  requestOptions)
           .then((response) => response.json())
           .then((res) => {
-            if(res.message !== undefined) {
+            if(res.message) {
               message = res.message;
             }
             finished++;
-            if(finished === products.length) {
+            if(finished === products.length && message !== null) {
               toast.current.show({
                 severity: "error",
                 summary: "Error",
                 detail: message,
                 life: 3000,
               });
+            } else if (finished === products.length){
+              toast.current.show({
+                severity: "success",
+                summary: "Successful",
+                detail: "Lieky boli úspešne distribované do odelení",
+                life: 3000,
+              });
+              setTimeout(() => {
+                console.log("Paused");
+                window.location.reload();
+              }, 3000);
             }
           });
 
     }
 
-  }
-
-  //@TODO finish this function
-  //Function for distributing medications to pharmacies under hospital
-  const confirmPharmacyDistribute = () => {
-    const token = localStorage.getItem("hospit-user");
-    const userDataHelper = GetUserData(token);
-
-    let message = null;
-    let finished = 0;
-    for(let i = 0; i < products.length; i++) {
-
-      const requestOptions = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          authorization: "Bearer " + token,
-        },
-        body: JSON.stringify({
-          usr_id: userDataHelper.UserInfo.userid,
-          med_id: products[i].ID_LIEK,
-          exp_date: products[i].DAT_EXPIRACIE,
-          poc_liekov: products[i].POCET,
-          min_poc: distNum
-        }),
-      };
-
-
-
-    }
   }
 
   const onInputDistChange = (e) => {
@@ -280,7 +265,7 @@ export default function Storage() {
             product.ID_LIEK
         ) {
           insertData();
-          if(idOdd.length > 0) {
+          if(idOdd) {
             product.ID_ODDELENIA = idOdd[0].ID_ODDELENIA;
           }
           _product.DAT_EXPIRACIE =
@@ -369,6 +354,9 @@ export default function Storage() {
     setDeleteProductsDialog(true);
   };
 
+  //@TODO could be changed, when deleting multiple just send there array containing ID_S and EXPIRATION DATES
+  //@TODO then it could be faster (dont need to connect onto DB X times)
+  //@TODO currently it is just sending one by one
   const deleteSelectedProducts = () => {
     selectedProducts.map((selProduct) => deleteSarza(selProduct));
     let _products = products.filter((val) => !selectedProducts.includes(val));
@@ -448,16 +436,11 @@ export default function Storage() {
               onClick={openNew}
           />
           <Button
+              visible={idOdd === null}
               label="Distribute"
               icon="pi pi-plus"
               className="p-button-success mr-2"
               onClick={distribute}
-          />
-          <Button
-              label="Pharmacy distribute"
-              icon="pi pi-plus"
-              className="p-button-success mr-2"
-              onClick={pharmacyDistribute}
           />
           <Button
               label="Delete"
@@ -558,13 +541,20 @@ export default function Storage() {
 
         <div className="card">
           <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
+          {idOdd !== null ? <div style={{marginLeft: "20px"}}>
+                <h2>{nazov}</h2>
+          </div> :
+              <div style={{marginLeft: "20px"}}>
+                <h2>Centrálny sklad {nazov}</h2>
+              </div>
+          }
           <DataTable
               value={products}
               selection={selectedProducts}
               onSelectionChange={(e) => setSelectedProducts(e.value)}
               dataKey="DAT_EXPIRACIE"
               globalFilter={globalFilter}
-              globalFilterFields={["DAT_EXPIRACIE", "ID_LIEK","ID_ODDELENIA", "NAZOV", "POCET"]}
+              globalFilterFields={["DAT_EXPIRACIE", "ID_LIEK", "NAZOV", "POCET"]}
               filters={filter}
               header={header}
               responsiveLayout="scroll"
@@ -582,11 +572,6 @@ export default function Storage() {
                 field="ID_LIEK"
                 header="Id lieku"
                 style={{ minWidth: "12rem" }}
-            ></Column>
-            <Column
-                field="ID_ODDELENIA"
-                header="Id oddelenia"
-                style={{ minWidth: "16rem" }}
             ></Column>
             <Column
                 field="NAZOV"
@@ -738,31 +723,6 @@ export default function Storage() {
 
           <div className={"submit-button"}>
             <Button style={{width: "45%"}} label="Potvrdiť distribúciu" onClick={confirmDistribute} />
-            <Button style={{width: "45%", backgroundColor: "red"}} label="Zrušiť" onClick={hideDistribute} />
-          </div>
-        </Dialog>
-
-        <Dialog
-            visible={showPharmacyDistribute}
-            style={{ width: "450px" }}
-            header="Distribuovať lieky do lekárne"
-            modal
-            footer={NaN} //deleteProductsDialogFooter
-            onHide={hideDistribute}
-        >
-          <div>
-            <label>Počet liekov ktoré chcete nechať na sklade:</label>
-            <input
-                type="text"
-                value={distNum}
-                onChange={(e) => onInputDistChange(e)}
-                pattern="[0-9]*" // Allow only numeric input
-                inputMode="numeric"
-            />
-          </div>
-
-          <div className={"submit-button"}>
-            <Button style={{width: "45%"}} label="Potvrdiť distribúciu" onClick={confirmPharmacyDistribute} />
             <Button style={{width: "45%", backgroundColor: "red"}} label="Zrušiť" onClick={hideDistribute} />
           </div>
         </Dialog>

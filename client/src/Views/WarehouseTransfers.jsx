@@ -1,5 +1,3 @@
-//@TODO add automatic transfer for expiring medications + when they are expired or there is large amount in main warehouse
-
 import {TabPanel, TabView} from "primereact/tabview";
 import {DataTable} from "primereact/datatable";
 import {Column} from "primereact/column";
@@ -1017,7 +1015,7 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "10rem" }}
                         ></Column>
                         <Column
-                            body={actionBodyTemplate} //actionBodyTemplate
+                            body={actionBodyTemplate}
                             style={{ minWidth: "8rem" }}
                         ></Column>
                     </DataTable>

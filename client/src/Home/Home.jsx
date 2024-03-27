@@ -198,6 +198,13 @@ function Home() {
       icon={moveIcon}
       key="11"
     ></HomeCard>,
+    <HomeCard
+        title="Štatistiky skladu"
+        isCalendar={false}
+        path="/skladStatistiky"
+        icon={statIcon}
+        key="12"
+    ></HomeCard>,
   ];
 
   const pharmacyManagerCards = [
