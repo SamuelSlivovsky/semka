@@ -87,7 +87,7 @@ export default function Orders() {
         fetch(`/objednavky/add`, requestOptions)
             .then((response) => response.json())
             .then((data) => {
-
+                //@TODO issue is in here with JSON
                 if(data.length > 0) {
                     let _orders = [...products];
                     let _order = { ... order};
@@ -143,12 +143,12 @@ export default function Orders() {
 
         fetch("/objednavky/confirmOrder", requestOptions)
             .then((response) => response.json())
-            .then((res) => {
-                if(res.message !== undefined) {
+            .then((data) => {
+                if(data.message) {
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
-                        detail: res.message,
+                        detail: data.message,
                         life: 3000,
                     });
                     return false;
@@ -167,10 +167,29 @@ export default function Orders() {
                 authorization: "Bearer " + token,
             },
             body: JSON.stringify({
-                id_obj: _order.ID_OBJEDNAVKY
+                id_obj: _order.ID_OBJEDNAVKY,
+                dat: _order.DATUM_DODANIA
             }),
         };
-        const response = await fetch("/objednavky/deleteOrder", requestOptions);
+        fetch(`/objednavky/deleteOrder`, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                } else {
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Successful",
+                        detail: "Objednávka bola odstránená",
+                        life: 3000,
+                    });
+                }
+            });
     }
 
     //Function that will be called after clicking on one of the rows
@@ -322,6 +341,7 @@ export default function Orders() {
 
             console.log(formattedDate);
 
+            order.ID_SKLAD = products[index].ID_SKLAD;
             order.DATUM_OBJEDNAVKY = products[index].DATUM_OBJEDNAVKY;
             order.DATUM_DODANIA = formattedDate;
 
@@ -432,15 +452,20 @@ const leftToolbarTemplate = () => {
     );
 
     const actionBodyTemplate = (rowData) => {
-        return (
-            <React.Fragment>
-                <Button
-                    icon="pi pi-trash"
-                    className="p-button-rounded p-button-warning"
-                    onClick={() => confirmDeleteProduct(rowData)}
-                />
-            </React.Fragment>
-        );
+        if (!rowData.DATUM_DODANIA) {
+            return (
+                <React.Fragment>
+                    <Button
+                        icon="pi pi-trash"
+                        className="p-button-rounded p-button-warning"
+                        onClick={() => confirmDeleteProduct(rowData)}
+                    />
+                </React.Fragment>
+            );
+        } else {
+            //If DATUM_DODANIA is null return nothing, It cannot be deleted
+            return null;
+        }
     };
 
     const deleteProductDialogFooter = (

@@ -13,6 +13,7 @@ router.get(
     verify.verifyRoles(0, 2, 3, 5, 10),
     controller.getIdOdd
 )
+
 router.post("/add", verify.verifyRoles(0, 2, 3, 5, 10), controller.insertDrug);
 
 router.post(
@@ -26,12 +27,6 @@ router.post(
     verify.verifyRoles(0, 2, 3, 5),
     controller.distributeMedications
 );
-
-router.post(
-    "/distributeMedPharmacy",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.distributeMedPharmacy
-)
 
 router.post(
     "/getExpiredMedications",

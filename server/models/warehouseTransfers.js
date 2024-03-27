@@ -119,6 +119,7 @@ async function getHospitalMedication(id) {
     }
 }
 
+//@TODO there is issue when searching by exp_date, it will fetch nothing even when there are already expired medications
 async function getSelectedMedications(id, exp_date, usr_id) {
     try {
         let conn = await database.getConnection();
@@ -130,9 +131,9 @@ async function getSelectedMedications(id, exp_date, usr_id) {
                             left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
                             join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
                             where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
-                            and POCET = (select MAX(POCET) from TRVANLIVOST_LIEKU where TRVANLIVOST_LIEKU.ID_LIEK = :id_l)
                             and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
-                            group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET fetch first 1 row only`;
+                            group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET
+                            order by DATUM_TRVANLIVOSTI, POCET fetch first 1 row only`;
             result = await conn.execute(sqlStatement, {
                 id_l: id,
                 usr_id: usr_id
@@ -145,9 +146,9 @@ async function getSelectedMedications(id, exp_date, usr_id) {
                         join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
                         where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
                         and DATUM_TRVANLIVOSTI > :exp_date
-                        and POCET = (select MAX(POCET) from TRVANLIVOST_LIEKU where TRVANLIVOST_LIEKU.ID_LIEK = :id_l)
                         and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
-                        group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET fetch first 1 row only`;
+                        group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET
+                        order by DATUM_TRVANLIVOSTI, POCET fetch first 1 row only`;
             result = await conn.execute(sqlStatement, {
                 id_l: id,
                 exp_date: exp_date,

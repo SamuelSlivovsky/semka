@@ -1,9 +1,9 @@
 const sklad = require("../models/sklad");
-const database = require("../database/Database");
 
 //@TODO add checks for input params here
 
 module.exports = {
+  //Function for selecting all medications of department
   getDrugsOfDeparment: (req, res) => {
     (async () => {
       console.log(req.params);
@@ -12,6 +12,7 @@ module.exports = {
     })();
   },
 
+  //Function for getting deparment ID
   getIdOdd: (req, res) => {
     (async () => {
       console.log(req.params);
@@ -20,6 +21,7 @@ module.exports = {
     })();
   },
 
+  //Function for adding ned medication into warehouse
   insertDrug: (req, res) => {
     (async () => {
       ret_val = await sklad.insertDrug(req.body);
@@ -31,6 +33,7 @@ module.exports = {
     });
   },
 
+  //Function for updating medication quantity
   updateQuantity: (req, res) => {
     (async () => {
       ret_val = await sklad.updateQuantity(req.body);
@@ -41,48 +44,18 @@ module.exports = {
     });
   },
 
+  //Function for distribution medications from main warehouse to departments
   distributeMedications: (req, res) => {
 
     let poc = req.body.min_poc;
 
-    if(poc === '' || isNaN(poc)) {
+    if(poc === '' || isNaN(poc) || poc < 0) {
       return res.status(400).json({message: `V počte musí byť číslo`});
     }
 
     (async () => {
-      let conn = await database.getConnection();
-
-      let sqlStatement = `select unique(ID_ODDELENIA) AS ID_ODDELENIA from ODDELENIE where 
-            ID_NEMOCNICE = (select ID_NEMOCNICE from ZAMESTNANCI where CISLO_ZAM = :id_zam)`;
-      console.log(req.body);
-      let result = await conn.execute(sqlStatement, {
-        id_zam: req.body.usr_id
-      });
-
-      let avgPocet = Math.floor((req.body.poc_liekov - req.body.min_poc) / result.rows.length);
-
-      if(avgPocet < 0) {
-        //Distribution cannot be done equally between all departments
-        return res.status(400).json({message: `Presun nemohol byť vykonaný rovnomerne medzi oddelenia`});
-      }
-
       ret_val = await sklad.distributeMedications(req.body);
-      res.status(200);
-    })().catch((err) => {
-      console.error(err);
-      res.status(500).send(err);
-    });
-  },
-
-  distributeMedPharmacy : (req, res) => {
-    const date = new Date(req.body.exp_date);
-    if(!isNaN(date.getTime())) {
-      return res.status(400).json({message: `Musíte zadať dátum expirácie`});
-    }
-    req.body.exp_date = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
-    (async () => {
-      ret_val = await sklad.getExpiredMedications(req.body);
-      res.status(200).json(ret_val);
+      res.status(200).json(ret_val);;
     })().catch((err) => {
       console.error(err);
       res.status(500).send(err);

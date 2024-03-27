@@ -32,6 +32,7 @@ import User from "./Views/User";
 import HospitalRoom from "./HospitalRoom/HospitalRoom";
 import TabMeetings from "./Views/Tables/TabMeetings";
 import socketService from "./service/socketService";
+import WarehouseStatistics from "./Views/WarehouseStatistics";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -286,6 +287,13 @@ function App() {
           label="Presuny"
           icon="warehouse-move-icon"
       />,
+      <SidebarButton
+          key="16"
+          visibleLeft={visibleLeft}
+          path="/skladStatistiky"
+          label="Štatistiky skladu"
+          icon="stat-icon"
+      />,
   ]
 
   const renderDoctorRoutes = () => {
@@ -368,6 +376,7 @@ function App() {
               <Route path="/sklad" element={<Storage />}></Route>
               <Route path="/objednavky" element={<Orders />}></Route>
               <Route path="/presuny" element={<WarehouseTransfers />}></Route>
+              <Route path="/skladStatistiky" element={<WarehouseStatistics />}></Route>
           </>
       )
   };

@@ -3,15 +3,49 @@ const database = require("../database/Database");
 async function getAllOrders(id) {
     try {
         let conn = await database.getConnection();
-        const sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD, to_char(DATUM_OBJEDNAVKY,'DD.MM.YYYY') AS DATUM_OBJEDNAVKY, to_char(DATUM_DODANIA,'DD.MM.YYYY') AS DATUM_DODANIA
+
+        let sqlStatement = `select ID_ODDELENIA, ID_LEKARNE from ZAMESTNANCI where CISLO_ZAM = :usr_id`;
+        let userCheck = await conn.execute(sqlStatement, {
+            usr_id: id
+        });
+
+        let result = null;
+
+        if(userCheck.rows[0].ID_LEKARNE !== null) {
+            //Employee is from pharmacy
+            sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD, to_char(DATUM_OBJEDNAVKY,'DD.MM.YYYY') AS DATUM_OBJEDNAVKY, to_char(DATUM_DODANIA,'DD.MM.YYYY') AS DATUM_DODANIA
+                from OBJEDNAVKA join SKLAD on OBJEDNAVKA.ID_SKLAD = SKLAD.ID_SKLAD
+                join LEKAREN on SKLAD.ID_LEKARNE = LEKAREN.ID_LEKARNE
+                join ZAMESTNANCI on LEKAREN.ID_LEKARNE = ZAMESTNANCI.ID_LEKARNE
+                where CISLO_ZAM = :id
+                order by DATUM_DODANIA nulls first`;
+            result = await conn.execute(sqlStatement, {
+                id: id
+            });
+        } else if(userCheck.rows[0].ID_ODDELENIA === null){
+            //Employee is from central warehouse
+            sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD, to_char(DATUM_OBJEDNAVKY,'DD.MM.YYYY') AS DATUM_OBJEDNAVKY, to_char(DATUM_DODANIA,'DD.MM.YYYY') AS DATUM_DODANIA
                 from OBJEDNAVKA join SKLAD on OBJEDNAVKA.ID_SKLAD = SKLAD.ID_SKLAD
                 join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
                 join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
                 where CISLO_ZAM = :id
+                and SKLAD.ID_ODDELENIA is null
                 order by DATUM_DODANIA nulls first`;
-        let result = await conn.execute(sqlStatement, {
-            id: id
-        });
+            result = await conn.execute(sqlStatement, {
+                id: id
+            });
+        } else {
+            //Employee is from department warehouse
+            sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD, to_char(DATUM_OBJEDNAVKY,'DD.MM.YYYY') AS DATUM_OBJEDNAVKY, to_char(DATUM_DODANIA,'DD.MM.YYYY') AS DATUM_DODANIA
+                from OBJEDNAVKA join SKLAD on OBJEDNAVKA.ID_SKLAD = SKLAD.ID_SKLAD
+                join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                where SKLAD.ID_NEMOCNICE = (select ID_NEMOCNICE from ZAMESTNANCI where CISLO_ZAM = :id) and
+                      ID_ODDELENIA = (select ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :id)`;
+            result = await conn.execute(sqlStatement, {
+                id: id
+            });
+        }
+
         return result.rows;
     } catch (err) {
         throw new Error("Database error: " + err);
@@ -52,6 +86,7 @@ async function confirmOrder(body) {
         });
 
         console.log("Rows inserted " + result.rowsAffected);
+        return "OK";
     } catch (err) {
         console.log("Error Model");
         console.log(err);
@@ -60,25 +95,43 @@ async function confirmOrder(body) {
 
 async function insertOrder(body) {
     try {
+        let result, finalResult = null;
         let conn = await database.getConnection();
         let sqlStatement = `BEGIN
-            insert_order_warehouse(:usr_id, :zoznam_liekov);
+            insert_order_warehouse(:usr_id, :zoz_liek);
         END;`;
         console.log(body);
-        let result = await conn.execute(sqlStatement, {
+        result = await conn.execute(sqlStatement, {
             usr_id: body.usr_id,
-            zoznam_liekov: Buffer.from(body.zoznam_liekov, 'utf-8')
+            zoz_liek: body.zoznam_liekov
         });
 
-        sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD from OBJEDNAVKA
+        sqlStatement = `select ID_LEKARNE from ZAMESTNANCI where CISLO_ZAM = :usr_id`;
+        let userCheck = await conn.execute(sqlStatement, {
+            usr_id: body.usr_id,
+        });
+
+        if(userCheck.rows[0].ID_LEKARNE === null) {
+            sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD from OBJEDNAVKA
                     join SKLAD on OBJEDNAVKA.ID_SKLAD = SKLAD.ID_SKLAD
                     join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
                     join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
                     where CISLO_ZAM = :search_id
                     order by ID_OBJEDNAVKY desc fetch first 1 row only`;
-        let finalResult = await conn.execute(sqlStatement, {
-            search_id: body.usr_id
-        });
+            finalResult = await conn.execute(sqlStatement, {
+                search_id: body.usr_id,
+            });
+        } else {
+            sqlStatement = `select ID_OBJEDNAVKY, OBJEDNAVKA.ID_SKLAD AS ID_SKLAD from OBJEDNAVKA
+                    join SKLAD on OBJEDNAVKA.ID_SKLAD = SKLAD.ID_SKLAD
+                    join LEKAREN on SKLAD.ID_LEKARNE = LEKAREN.ID_LEKARNE
+                    join ZAMESTNANCI on LEKAREN.ID_LEKARNE = ZAMESTNANCI.ID_LEKARNE
+                    where CISLO_ZAM = :search_id
+                    order by ID_OBJEDNAVKY desc fetch first 1 row only`;
+            finalResult = await conn.execute(sqlStatement, {
+                search_id: body.usr_id,
+            });
+        }
 
         console.log("Rows inserted " + result.rowsAffected);
         return finalResult.rows;
@@ -100,6 +153,7 @@ async function deleteObjednavka(body) {
         });
 
         console.log("Rows inserted " + result.rowsAffected);
+        return "OK";
     } catch (err) {
         throw new Error("Database error: " + err);
     }
