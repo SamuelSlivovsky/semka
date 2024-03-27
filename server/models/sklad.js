@@ -16,7 +16,7 @@ async function getDrugsOfDepartment(cis_zam) {
           from TRVANLIVOST_LIEKU join LEKARENSKY_SKLAD on TRVANLIVOST_LIEKU.ID_LEKARENSKY_SKLAD = LEKARENSKY_SKLAD.ID_LEKARENSKY_SKLAD
           join LEKAREN on LEKARENSKY_SKLAD.ID_LEKARNE = LEKAREN.ID_LEKARNE
           where LEKAREN.ID_LEKARNE = :id_lek
-            and pocet > 0`,
+            and pocet > 0 order by DATUM_TRVANLIVOSTI`,
           {id_lek: lekaren.rows[0].ID_LEKARNE}
       );
     } else {
@@ -26,7 +26,7 @@ async function getDrugsOfDepartment(cis_zam) {
             FROM trvanlivost_lieku tl join sklad sk on (sk.id_sklad = tl.id_sklad)
                           join liek l on (l.id_liek = tl.id_liek)
             where sk.ID_ODDELENIA = :id_od
-            and tl.pocet > 0`,
+            and tl.pocet > 0 order by tl.datum_trvanlivosti`,
           {id_od: lekaren.rows[0].ID_ODDELENIA}
       );
     }
@@ -181,6 +181,26 @@ async function getExpiredMedications(body) {
   }
 }
 
+async function getMedicationsByAmount(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `select unique(ID_LIEK) from TRVANLIVOST_LIEKU join SKLAD on TRVANLIVOST_LIEKU.ID_SKLAD = SKLAD.ID_SKLAD
+            join NEMOCNICA on NEMOCNICA.ID_NEMOCNICE = SKLAD.ID_NEMOCNICE
+            join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
+            where POCET < :amount and CISLO_ZAM = :usr_id`;
+    console.log(body);
+    let result = await conn.execute(sqlStatement, {
+      usr_id: body.usr_id,
+      amount: body.amount
+    });
+
+    console.log("Rows inserted " + result.rowsAffected);
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 async function deleteSarza(body) {
   try {
     let conn = await database.getConnection();
@@ -206,6 +226,7 @@ module.exports = {
   updateQuantity,
   distributeMedications,
   getExpiredMedications,
+  getMedicationsByAmount,
   getIdOdd,
   deleteSarza
 };

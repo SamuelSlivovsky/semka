@@ -30,6 +30,7 @@ export default function Storage() {
   const [addProductDialog, setAddProductDialog] = useState(false);
   const [changeProductDialog, setChangeProductDialog] = useState(false);
   const [showDistribute, setShowDistribute] = useState(false);
+  const [showPharmacyDistribute, setShowPharmacyDistribute] = useState(false);
   const [deleteProductDialog, setDeleteProductDialog] = useState(false);
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
   const [product, setProduct] = useState(emptyProduct);
@@ -83,8 +84,13 @@ export default function Storage() {
     setShowDistribute(true);
   }
 
+  const pharmacyDistribute = () => {
+    setShowPharmacyDistribute(true);
+  }
+
   const hideDistribute = () => {
     setShowDistribute(false);
+    setShowPharmacyDistribute(false);
   }
 
   //Function for confirming distribution in Hospital
@@ -92,6 +98,8 @@ export default function Storage() {
 
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
+    let message = null;
+    let finished = 0;
     for(let i = 0; i < products.length; i++) {
 
       const requestOptions = {
@@ -113,10 +121,14 @@ export default function Storage() {
           .then((response) => response.json())
           .then((res) => {
             if(res.message !== undefined) {
+              message = res.message;
+            }
+            finished++;
+            if(finished === products.length) {
               toast.current.show({
                 severity: "error",
                 summary: "Error",
-                detail: res.message,
+                detail: message,
                 life: 3000,
               });
             }
@@ -124,6 +136,36 @@ export default function Storage() {
 
     }
 
+  }
+
+  //@TODO finish this function
+  //Function for distributing medications to pharmacies under hospital
+  const confirmPharmacyDistribute = () => {
+    const token = localStorage.getItem("hospit-user");
+    const userDataHelper = GetUserData(token);
+
+    let message = null;
+    let finished = 0;
+    for(let i = 0; i < products.length; i++) {
+
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          usr_id: userDataHelper.UserInfo.userid,
+          med_id: products[i].ID_LIEK,
+          exp_date: products[i].DAT_EXPIRACIE,
+          poc_liekov: products[i].POCET,
+          min_poc: distNum
+        }),
+      };
+
+
+
+    }
   }
 
   const onInputDistChange = (e) => {
@@ -412,6 +454,12 @@ export default function Storage() {
               onClick={distribute}
           />
           <Button
+              label="Pharmacy distribute"
+              icon="pi pi-plus"
+              className="p-button-success mr-2"
+              onClick={pharmacyDistribute}
+          />
+          <Button
               label="Delete"
               icon="pi pi-trash"
               className="p-button-danger"
@@ -672,7 +720,7 @@ export default function Storage() {
         <Dialog
             visible={showDistribute}
             style={{ width: "450px" }}
-            header="Ditribuovať lieky"
+            header="Distribuovať lieky do oddelení nemocnice"
             modal
             footer={NaN} //deleteProductsDialogFooter
             onHide={hideDistribute}
@@ -690,6 +738,31 @@ export default function Storage() {
 
           <div className={"submit-button"}>
             <Button style={{width: "45%"}} label="Potvrdiť distribúciu" onClick={confirmDistribute} />
+            <Button style={{width: "45%", backgroundColor: "red"}} label="Zrušiť" onClick={hideDistribute} />
+          </div>
+        </Dialog>
+
+        <Dialog
+            visible={showPharmacyDistribute}
+            style={{ width: "450px" }}
+            header="Distribuovať lieky do lekárne"
+            modal
+            footer={NaN} //deleteProductsDialogFooter
+            onHide={hideDistribute}
+        >
+          <div>
+            <label>Počet liekov ktoré chcete nechať na sklade:</label>
+            <input
+                type="text"
+                value={distNum}
+                onChange={(e) => onInputDistChange(e)}
+                pattern="[0-9]*" // Allow only numeric input
+                inputMode="numeric"
+            />
+          </div>
+
+          <div className={"submit-button"}>
+            <Button style={{width: "45%"}} label="Potvrdiť distribúciu" onClick={confirmPharmacyDistribute} />
             <Button style={{width: "45%", backgroundColor: "red"}} label="Zrušiť" onClick={hideDistribute} />
           </div>
         </Dialog>
