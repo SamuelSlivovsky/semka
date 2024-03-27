@@ -91,7 +91,10 @@ export default function CreateNewGroup(props) {
         _filtered = [...doctors];
       } else {
         _filtered = doctors.filter((doctor) => {
-          return doctor.LEKAR.toLowerCase().includes(event.query.toLowerCase());
+          return (
+            doctor.LEKAR.toLowerCase().includes(event.query.toLowerCase()) ||
+            doctor.CISLO_ZAM == event.query
+          );
         });
       }
 

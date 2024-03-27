@@ -359,7 +359,7 @@ function App() {
         userData !== null &&
         userData.UserInfo.role === 0 ? (
           sidebarButtonsAdmin
-        ) : userData !== null && userData.UserInfo.role === 2 ? (
+        ) : userData !== null && userData.UserInfo.role === 1 ? (
           sidebarButtonsDoctor
         ) : userData !== null && userData.UserInfo.role === 3 ? (
           <>
@@ -395,7 +395,7 @@ function App() {
           <Route path="/chat" element={<Chat />}></Route>
           {userData && userData.UserInfo.role === 0 ? (
             renderAdminRoutes()
-          ) : userData && userData.UserInfo.role === 2 ? (
+          ) : userData && userData.UserInfo.role === 1 ? (
             renderDoctorRoutes()
           ) : userData && userData.UserInfo.role === 3 ? (
             <>

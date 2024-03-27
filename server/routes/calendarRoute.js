@@ -12,7 +12,7 @@ router.get(
 
 router.get(
   "/udalostiLekara/:id",
-  verify.verifyRoles(0, 2, 3),
+  verify.verifyRoles(0, 1, 3),
   controller.getUdalostiLekara
 );
 router.post("/zmenaZaznamu", controller.updateZaznam);

@@ -4,6 +4,7 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import allLocales from "@fullcalendar/core/locales-all";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
@@ -42,6 +43,10 @@ function EventCalendar(props) {
     if (props.userData.UserInfo.role === 3) fetchDoctors();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const isAfterToday = (element) => {
+    return new Date(element.DAT_DO) > new Date();
+  };
+
   const fetchCalendar = (userid) => {
     setCalendarVisible(false);
 
@@ -67,12 +72,18 @@ function EventCalendar(props) {
           switch (element.type) {
             case "OPE":
               element.backgroundColor = "#00916E";
+
               break;
             case "VYS":
               element.backgroundColor = "#593F62";
+
               break;
             case "HOS":
               element.backgroundColor = "#8499B1";
+              element.end =
+                element.DAT_DO != null && isAfterToday(element)
+                  ? element.DAT_DO
+                  : null;
               break;
             case "KONZ":
               element.backgroundColor = "blue";
@@ -81,6 +92,7 @@ function EventCalendar(props) {
               break;
           }
         });
+        console.log(data);
         setCurrentEvents(data);
         setCalendarVisible(true);
         setCalendarKey(Date.now());
@@ -311,6 +323,7 @@ function EventCalendar(props) {
               )}
 
               <FullCalendar
+                locales={allLocales}
                 key={calendarKey}
                 plugins={[
                   dayGridPlugin,
@@ -331,7 +344,7 @@ function EventCalendar(props) {
                 initialEvents={currentEvents}
                 eventClick={handleEventClick}
                 eventsSet={handleEvents}
-                locale="SK"
+                locale={"sk"}
               />
             </div>
           )}

@@ -155,7 +155,7 @@ function Home() {
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
       if (userData.UserInfo.role === 0) return adminCards;
-      else if (userData.UserInfo.role === 2) return doctorCards;
+      else if (userData.UserInfo.role === 1) return doctorCards;
       else if (userData.UserInfo.role === 3)
         return (
           <>
