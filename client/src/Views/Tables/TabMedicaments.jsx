@@ -202,7 +202,7 @@ export default function TabMedicaments() {
             ]}
             emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
           >
-            <Column field="ID_LIEK" header={"Id lieku"} filter></Column>
+            <Column field="ID_LIEK" header={"ID lieku"} filter></Column>
             <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
             <Column field="ATC" header={"ATC"} filter></Column>
             <Column

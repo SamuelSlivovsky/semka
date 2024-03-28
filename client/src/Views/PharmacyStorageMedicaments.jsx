@@ -103,7 +103,7 @@ export default function PharmacyStorageMedicaments() {
           style={{ height: "50px", top: "10px", right: "10px" }}
           label="Objednať lieky"
           icon="pi pi-upload"
-          onClick={() => navigate("/presuny")}
+          onClick={() => navigate("/objednavky")}
         />
       </div>
     );

@@ -402,7 +402,7 @@ export default function TabMedicaments() {
           >
             <Column
               field="ID_UCINNA_LATKA"
-              header={"Id účinnej látky"}
+              header={"ID účinnej látky"}
               filter
             ></Column>
             <Column

@@ -145,10 +145,6 @@ export default function TabMedicalAids() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
-      // DOPLNOK_NAZVU: {
-      //     operator: FilterOperator.AND,
-      //     constraints: [{value: null, matchMode: FilterMatchMode.STARTS_WITH}],
-      // },
       TYP: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
@@ -193,17 +189,12 @@ export default function TabMedicalAids() {
             header={header}
             filters={filters}
             filterDisplay="menu"
-            globalFilterFields={[
-              "ID_ZDR_POMOCKY",
-              "NAZOV",
-              "DOPLNOK_NAZVU",
-              "TYP",
-            ]}
+            globalFilterFields={["ID_ZDR_POMOCKY", "NAZOV", "TYP"]}
             emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
           >
             <Column
               field="ID_ZDR_POMOCKY"
-              header={"Id zdravotníckej pomôcky"}
+              header={"ID zdravotníckej pomôcky"}
               filter
             ></Column>
             <Column
@@ -211,7 +202,6 @@ export default function TabMedicalAids() {
               header={"Názov zdravotníckej pomôcky"}
               filter
             ></Column>
-            {/* <Column field="DOPLNOK_NAZVU" header={"Doplnok k názvu"} filter></Column> */}
             <Column
               field="TYP"
               header={"Typ zdravotníckej pomôcky"}

@@ -32,7 +32,7 @@ export default function PharmacistCard(props) {
     return (
       <div>
         <Button
-          label="Späťna zoznam lekárnikov"
+          label="Späť na zoznam lekárnikov"
           icon="pi pi-replay"
           style={{ marginTop: "10px", marginLeft: "10px" }}
           onClick={() => redirect()}

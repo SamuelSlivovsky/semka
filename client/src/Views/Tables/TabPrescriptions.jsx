@@ -237,7 +237,7 @@ export default function TabPrescriptions() {
                   >
                     <Column
                       field="ID_RECEPTU"
-                      header={"Id receptu"}
+                      header={"ID receptu"}
                       filter
                     ></Column>
                     <Column
@@ -317,7 +317,7 @@ export default function TabPrescriptions() {
                   >
                     <Column
                       field="ID_RECEPTU"
-                      header={"Id receptu"}
+                      header={"ID receptu"}
                       filter
                     ></Column>
                     <Column
