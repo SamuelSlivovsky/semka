@@ -378,8 +378,9 @@ async function updateUcinnaLatka(body) {
 async function deleteUcinnaLatka(ucinnaLatka) {
   try {
     let conn = await database.getConnection();
-    const sqlStatement = `delete from ucinna_latka 
-    where id_ucinna_latka = :ucinnaLatka`;
+    const sqlStatement = `BEGIN
+    delete_ucinna_latka(:ucinnaLatka);
+  END;`;
     console.log(ucinnaLatka);
     let result = await conn.execute(sqlStatement, [ucinnaLatka], {
       autoCommit: true,
