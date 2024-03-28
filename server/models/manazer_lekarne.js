@@ -223,8 +223,8 @@ async function getZoznamLiekov() {
     const result = await conn.execute(
       `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis
       from  liek l 
-      join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
-      join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
+      left join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
+      left join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
       order by NAZOV_LIEKU`
     );
     return result.rows;
@@ -320,11 +320,34 @@ async function getUcinnaLatka() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select id_ucinna_latka, nazov from ucinna_latka`
+      `select id_ucinna_latka, nazov, latinsky_nazov from ucinna_latka`
     );
 
     return result.rows;
   } catch (err) {
+    console.log(err);
+  }
+}
+
+async function insertUcinnaLatka(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+    insert_ucinna_latka(:p_nazov, :p_latinsky_nazov);
+  END;`;
+    console.log(body);
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        p_nazov: body.nazov,
+        p_latinsky_nazov: body.latinsky_nazov,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
     console.log(err);
   }
 }
@@ -382,6 +405,7 @@ module.exports = {
   getDetailZdravotnickejPomocky,
   getReportInfo,
   getUcinnaLatka,
+  insertUcinnaLatka,
   updateUcinnaLatka,
   getZoznamMiest,
 };

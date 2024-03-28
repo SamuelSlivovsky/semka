@@ -375,7 +375,7 @@ export default function TabPharmacists(props) {
   };
 
   //@TODO Add these functions to handle edit and delete actions
-  const editPharmacist = (pharmacist) => {
+  const editPharmacist = () => {
     // Implementation for editing pharmacist
   };
 

@@ -105,6 +105,12 @@ router.get(
 );
 
 router.post(
+  "/insertUcinnaLatka",
+  verify.verifyRoles(0, 10),
+  controller.insertUcinnaLatka
+);
+
+router.post(
   "/updateUcinnaLatka",
   verify.verifyRoles(0, 10),
   controller.updateUcinnaLatka
