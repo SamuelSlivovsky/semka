@@ -57,7 +57,7 @@ export default function PharmacyReportCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "40rem", height: "55rem" }}
+          style={{ width: "45rem", height: "55rem" }}
           title={info.NAZOV_LEKARNE}
         >
           <div className="card-body" style={{ marginBlock: "25%" }}>

@@ -251,13 +251,13 @@ function Home() {
       icon={pharmacyEmployeeIcon}
       key="22"
     ></HomeCard>,
-    <HomeCard
-      title="Sklad"
-      isCalendar={false}
-      path="/sklad"
-      icon={warehouseIcon}
-      key="9"
-    ></HomeCard>,
+    // <HomeCard
+    //   title="Sklad"
+    //   isCalendar={false}
+    //   path="/sklad"
+    //   icon={warehouseIcon}
+    //   key="9"
+    // ></HomeCard>,
     <HomeCard
       title="Objednávky"
       isCalendar={false}
@@ -265,13 +265,13 @@ function Home() {
       icon={orderIcon}
       key="10"
     ></HomeCard>,
-    <HomeCard
-      title="Presuny"
-      isCalendar={false}
-      path="/presuny"
-      icon={moveIcon}
-      key="11"
-    ></HomeCard>,
+    // <HomeCard
+    //   title="Presuny"
+    //   isCalendar={false}
+    //   path="/presuny"
+    //   icon={moveIcon}
+    //   key="11"
+    // ></HomeCard>,
     <HomeCard
       title="Lekárenský sklad"
       isCalendar={false}

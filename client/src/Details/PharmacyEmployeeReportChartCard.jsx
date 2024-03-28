@@ -54,7 +54,7 @@ export default function PharmacyEmployeeReportChartCard(props) {
           <div className="flex col-12">
             <Card
               className="col-5 shadow-4 text-center"
-              style={{ width: "40rem", height: "auto" }} // Upravená výška na auto
+              style={{ width: "45rem", height: "auto" }} // Upravená výška na auto
               title="Rozloženie zamestnancov lekárne"
             >
               <div className="card-body" style={{ display: "ruby-text" }}>

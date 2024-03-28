@@ -37,7 +37,7 @@ export default function PharmacistCard(props) {
       <div className="flex col-12">
         <Card
           className="col-5 shadow-4 text-center"
-          style={{ width: "40rem", height: "55rem" }}
+          style={{ width: "45rem", height: "55rem" }}
           title={profile.MENO + " " + profile.PRIEZVISKO}
         >
           {renderDetail("Rodné číslo: ", profile.ROD_CISLO)}
