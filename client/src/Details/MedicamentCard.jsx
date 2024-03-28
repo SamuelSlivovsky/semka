@@ -12,7 +12,8 @@ import { InputText } from "primereact/inputtext";
 export default function MedicamentCard(props) {
   const [detail, setDetail] = useState("");
   const [ucinneLatky, setUcinneLatky] = useState("");
-  const [displayDialog, setDisplayDialog] = useState(false);
+  const [displayDialogForInsert, setDisplayDialogForInsert] = useState(false);
+  const [displayDialogForUpdate, setDisplayDialogForUpdate] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null); // Added state for selected substance
   const toast = useRef(null);
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -80,17 +81,31 @@ export default function MedicamentCard(props) {
   };
 
   const renderCardFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Spravovať účinnú látku"
-          icon="pi pi-file-edit"
-          className="p-button-rounded p-button-warning"
-          style={{ marginTop: "75px" }}
-          onClick={() => setDisplayDialog(true)} // Open dialog when Edit button is clicked
-        />
-      </div>
-    );
+    if (detail && detail.NAZOV_UCINNEJ_LATKY) {
+      return (
+        <div>
+          <Button
+            label="Spravovať účinnú látku"
+            icon="pi pi-file-edit"
+            className="p-button-rounded p-button-warning"
+            style={{ marginTop: "75px" }}
+            onClick={() => setDisplayDialogForUpdate(true)} // Open dialog when Edit button is clicked
+          />
+        </div>
+      );
+    } else {
+      return (
+        <div>
+          <Button
+            label="Pridať účinnú látku"
+            icon="pi pi-plus"
+            className="p-button-rounded p-button-success"
+            style={{ marginTop: "75px" }}
+            onClick={() => setDisplayDialogForInsert(true)} // Open dialog when Edit button is clicked
+          />
+        </div>
+      );
+    }
   };
 
   const renderDetail = (label, value) => (
@@ -124,7 +139,7 @@ export default function MedicamentCard(props) {
     );
   };
 
-  const handleSubstanceSelect = (event) => {
+  const handleSubstanceSelectUpdate = (event) => {
     console.log(event.ID_UCINNA_LATKA);
     const token = localStorage.getItem("hospit-user");
     const headers = {
@@ -146,7 +161,7 @@ export default function MedicamentCard(props) {
           summary: "Úspech",
           detail: "Účinná látka lieku bola aktualizovaná!",
         });
-        setDisplayDialog(false);
+        setDisplayDialogForUpdate(false);
         setTimeout(() => {
           redirect();
         }, 6000);
@@ -156,6 +171,44 @@ export default function MedicamentCard(props) {
           severity: "error",
           summary: "Chyba",
           detail: "Nastala chyba pri aktualizácii účinnej látky.",
+        });
+        throw new Error(errorData.message || "Error updating date");
+      }
+    });
+  };
+
+  const handleSubstanceSelectInsert = (event) => {
+    console.log(event.ID_UCINNA_LATKA);
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      Authorization: "Bearer " + token,
+      "Content-Type": "application/json",
+    };
+
+    fetch(`pharmacyManagers/insertUcinnaLatka`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        id_liek: detail.ID_LIEK,
+        id_ucinna_latka: event.ID_UCINNA_LATKA,
+      }),
+    }).then((res) => {
+      if (res.ok) {
+        toast.current.show({
+          severity: "success",
+          summary: "Úspech",
+          detail: "Účinná látka lieku bola priradená!",
+        });
+        setDisplayDialogForInsert(false);
+        setTimeout(() => {
+          redirect();
+        }, 6000);
+      } else {
+        const errorData = res.json();
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: "Nastala chyba pri priradení účinnej látky.",
         });
         throw new Error(errorData.message || "Error updating date");
       }
@@ -206,15 +259,34 @@ export default function MedicamentCard(props) {
       {/* Dialog for displaying active substances */}
       <Dialog
         style={{ width: "90vh", height: "120vh" }}
-        visible={displayDialog}
-        onHide={() => setDisplayDialog(false)} // Close dialog when user clicks outside
+        visible={displayDialogForUpdate}
+        onHide={() => setDisplayDialogForUpdate(false)} // Close dialog when user clicks outside
         header={renderDialogHeader()}
       >
         <DataTable
           value={ucinneLatky}
           selectionMode="single"
           selection={selectedRow}
-          onSelectionChange={(e) => handleSubstanceSelect(e.value)}
+          onSelectionChange={(e) => handleSubstanceSelectUpdate(e.value)}
+          filters={filters}
+          filterDisplay="menu"
+          globalFilterFields={["NAZOV"]}
+          emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+        >
+          <Column field="NAZOV" header="Názov účinnej látky"></Column>
+        </DataTable>
+      </Dialog>
+      <Dialog
+        style={{ width: "90vh", height: "120vh" }}
+        visible={displayDialogForInsert}
+        onHide={() => setDisplayDialogForInsert(false)} // Close dialog when user clicks outside
+        header={renderDialogHeader()}
+      >
+        <DataTable
+          value={ucinneLatky}
+          selectionMode="single"
+          selection={selectedRow}
+          onSelectionChange={(e) => handleSubstanceSelectInsert(e.value)}
           filters={filters}
           filterDisplay="menu"
           globalFilterFields={["NAZOV"]}

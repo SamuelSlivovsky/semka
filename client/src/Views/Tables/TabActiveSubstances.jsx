@@ -72,7 +72,7 @@ export default function TabMedicaments() {
       "Content-Type": "application/json",
       Authorization: "Bearer " + token,
     };
-    fetch("/pharmacyManagers/insertUcinnaLatka", {
+    fetch("/pharmacyManagers/insertUcinneLatky", {
       method: "POST",
       headers: headers,
       body: JSON.stringify(activeSubstanceData),

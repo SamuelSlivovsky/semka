@@ -329,7 +329,7 @@ async function getUcinnaLatka() {
   }
 }
 
-async function insertUcinnaLatka(body) {
+async function insertUcinneLatky(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
@@ -358,6 +358,28 @@ async function updateUcinnaLatka(body) {
     const sqlStatement = `UPDATE ucinne_latky_liekov 
     SET id_ucinna_latka = :id_ucinna_latka
     WHERE id_liek = :id_liek`;
+    console.log(body);
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        id_ucinna_latka: body.id_ucinna_latka,
+        id_liek: body.id_liek,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
+async function insertUcinnaLatka(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `insert into ucinne_latky_liekov
+    values(:id_liek, :id_ucinna_latka)`;
     console.log(body);
     let result = await conn.execute(
       sqlStatement,
@@ -423,8 +445,9 @@ module.exports = {
   getDetailZdravotnickejPomocky,
   getReportInfo,
   getUcinnaLatka,
-  insertUcinnaLatka,
+  insertUcinneLatky,
   updateUcinnaLatka,
+  insertUcinnaLatka,
   deleteUcinnaLatka,
   getZoznamMiest,
 };

@@ -105,15 +105,21 @@ router.get(
 );
 
 router.post(
-  "/insertUcinnaLatka",
+  "/insertUcinneLatky",
   verify.verifyRoles(0, 10),
-  controller.insertUcinnaLatka
+  controller.insertUcinneLatky
 );
 
 router.post(
   "/updateUcinnaLatka",
   verify.verifyRoles(0, 10),
   controller.updateUcinnaLatka
+);
+
+router.post(
+  "/insertUcinnaLatka",
+  verify.verifyRoles(0, 10),
+  controller.insertUcinnaLatka
 );
 
 router.delete(

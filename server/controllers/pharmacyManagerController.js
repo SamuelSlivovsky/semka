@@ -164,10 +164,10 @@ module.exports = {
     })();
   },
 
-  insertUcinnaLatka: (req, res) => {
-    const ucinnaLatka = require("../models/manazer_lekarne");
+  insertUcinneLatky: (req, res) => {
+    const ucinneLatky = require("../models/manazer_lekarne");
     (async () => {
-      ret_val = await ucinnaLatka.insertUcinnaLatka(req.body);
+      ret_val = await ucinneLatky.insertUcinneLatky(req.body);
       res.status(200).json("success");
     })().catch((err) => {
       console.error(err);
@@ -179,6 +179,17 @@ module.exports = {
     const ucinnaLatka = require("../models/manazer_lekarne");
     (async () => {
       ret_val = await ucinnaLatka.updateUcinnaLatka(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+
+  insertUcinnaLatka: (req, res) => {
+    const ucinnaLatka = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await ucinnaLatka.insertUcinnaLatka(req.body);
       res.status(200).json("success");
     })().catch((err) => {
       console.error(err);
