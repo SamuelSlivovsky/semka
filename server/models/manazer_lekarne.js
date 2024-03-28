@@ -240,8 +240,8 @@ async function getDetailLieku(id) {
       `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", l.typ, l.davkovanie, l.mnozstvo,
       ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis
       from  liek l 
-      join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
-      join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
+      left join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
+      left join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
       where l.id_liek = :id`,
       [id]
     );
@@ -375,6 +375,23 @@ async function updateUcinnaLatka(body) {
   }
 }
 
+async function deleteUcinnaLatka(ucinnaLatka) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `delete from ucinna_latka 
+    where id_ucinna_latka = :ucinnaLatka`;
+    console.log(ucinnaLatka);
+    let result = await conn.execute(sqlStatement, [ucinnaLatka], {
+      autoCommit: true,
+    });
+
+    console.log("Rows deleted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 async function getZoznamMiest() {
   try {
     let conn = await database.getConnection();
@@ -407,5 +424,6 @@ module.exports = {
   getUcinnaLatka,
   insertUcinnaLatka,
   updateUcinnaLatka,
+  deleteUcinnaLatka,
   getZoznamMiest,
 };

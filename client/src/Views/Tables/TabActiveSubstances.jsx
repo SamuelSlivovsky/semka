@@ -236,51 +236,48 @@ export default function TabMedicaments() {
     // Implementation for editing Active Substances
   };
 
-  //   const deleteUcinnaLatka = (rowData) => {
-  //     console.log(rowData.ID_UCINNA_LATKA);
-  //     const token = localStorage.getItem("hospit-user");
-  //     fetch(
-  //       `/pharmacyManagers/deleteZamestnanciLekarne/${rowData.ID_UCINNA_LATKA}`,
-  //       {
-  //         method: "DELETE",
-  //         headers: {
-  //           Authorization: "Bearer " + token,
-  //         },
-  //       }
-  //     )
-  //       .then((response) => {
-  //         if (response.ok) {
-  //           toast.current.show({
-  //             severity: "success",
-  //             summary: "Účinná látka vymazaná",
-  //             detail: "Účinná látka bola úspešne vymazaná.",
-  //             life: 3000,
-  //           });
-  //           fetchGetZoznamUcinnychLatok(
-  //             { authorization: "Bearer " + token },
-  //             GetUserData(token)
-  //           );
-  //         } else {
-  //           throw new Error("Problém pri vymazávaní účinnej látky");
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error("Chyba:", error);
-  //         toast.current.show({
-  //           severity: "error",
-  //           summary: "Chyba pri vymazávaní",
-  //           detail: "Nepodarilo sa vymazať účinnú látku.",
-  //           life: 3000,
-  //         });
-  //       });
+  const deleteUcinnaLatka = (rowData) => {
+    console.log(rowData.ID_UCINNA_LATKA);
+    const token = localStorage.getItem("hospit-user");
+    fetch(`/pharmacyManagers/deleteUcinnaLatka/${rowData.ID_UCINNA_LATKA}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          toast.current.show({
+            severity: "success",
+            summary: "Účinná látka vymazaná",
+            detail: "Účinná látka bola úspešne vymazaná.",
+            life: 3000,
+          });
+          fetchGetZoznamUcinnychLatok(
+            { authorization: "Bearer " + token },
+            GetUserData(token)
+          );
+        } else {
+          throw new Error("Problém pri vymazávaní účinnej látky");
+        }
+      })
+      .catch((error) => {
+        console.error("Chyba:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri vymazávaní",
+          detail: "Nepodarilo sa vymazať účinnú látku.",
+          life: 3000,
+        });
+      });
 
-  //     // Zavrie potvrdzovací dialóg
-  //     setShowConfirmDialog(false);
-  //   };
+    // Zavrie potvrdzovací dialóg
+    setShowConfirmDialog(false);
+  };
 
   const requestDeleteActiveSubstance = (rowData) => {
-    setSelectedRow(rowData); // Uložíme si vybraného zamestnanca do stavu
-    setShowConfirmDialog(true); // Zobrazíme potvrdzovací dialog
+    setSelectedRow(rowData);
+    setShowConfirmDialog(true);
   };
 
   const renderConfirmDialog = () => {
@@ -326,7 +323,7 @@ export default function TabMedicaments() {
         label="Áno"
         icon="pi pi-check"
         className="p-button-text"
-        // onClick={() => deleteUcinnaLatka(selectedRow)}
+        onClick={() => deleteUcinnaLatka(selectedRow)}
       />
     </div>
   );

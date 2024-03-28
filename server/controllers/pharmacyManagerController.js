@@ -186,6 +186,22 @@ module.exports = {
     });
   },
 
+  deleteUcinnaLatka: (req, res) => {
+    const ucinnaLatka = require("../models/manazer_lekarne");
+    const idUcinnaLatka = req.params.id; // Získanie idUcinnaLatka z URL parametra
+    ucinnaLatka
+      .deleteUcinnaLatka(idUcinnaLatka)
+      .then(() => {
+        res
+          .status(200)
+          .json({ message: "Účinná látka bola úspešne vymazaná." });
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err.message); // Odoslanie správy o chybe
+      });
+  },
+
   getZoznamMiest: (req, res) => {
     const mesto = require("../models/manazer_lekarne");
     (async () => {

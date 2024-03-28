@@ -116,6 +116,12 @@ router.post(
   controller.updateUcinnaLatka
 );
 
+router.delete(
+  "/deleteUcinnaLatka/:id",
+  verify.verifyRoles(0, 10),
+  controller.deleteUcinnaLatka
+);
+
 router.get(
   "/getZoznamMiest/:id",
   verify.verifyRoles(0, 10),
