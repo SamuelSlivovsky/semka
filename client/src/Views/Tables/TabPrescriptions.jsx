@@ -127,7 +127,7 @@ export default function TabPrescriptions() {
     const value = e.target.value;
     const trimmedValue = value.trim();
 
-    if (trimmedValue.length >= 6) {
+    if (trimmedValue.length >= 11) {
       let _filters = { ...filters };
       _filters["global"].value = trimmedValue;
 
@@ -206,7 +206,7 @@ export default function TabPrescriptions() {
                       <InputText
                         value={globalFilterValue}
                         onChange={onGlobalFilterChange}
-                        placeholder="Vyhľadať"
+                        placeholder="Zadajte rodné číslo s /"
                       />
                     </span>
                     <div className="ml-4">
@@ -286,7 +286,7 @@ export default function TabPrescriptions() {
                       <InputText
                         value={globalFilterValue}
                         onChange={onGlobalFilterChange}
-                        placeholder="Vyhľadať"
+                        placeholder="Zadajte rodné číslo s /"
                       />
                     </span>
                     <div className="ml-4">

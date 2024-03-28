@@ -205,6 +205,11 @@
   height: 44px;
   width: 44px;
 }
+.active-substance-icon {
+  content: url("./images/active_substances_black.png");
+  height: 44px;
+  width: 44px;
+}
 .medical-aids-icon {
   content: url("./images/medical_aids_black.png");
   height: 44px;

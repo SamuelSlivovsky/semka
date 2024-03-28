@@ -18,6 +18,7 @@ import pharmacyManagerIcon from "../images/pharmacist_manager.png";
 import pharmacyEmployeeIcon from "../images/emloyee.png";
 import dispensingMedicinesIcon from "../images/dispense_medicaments.png";
 import medicamentsIcon from "../images/medicaments.png";
+import activeSubstanceIcon from "../images/active_substances.png";
 import medicalAidsIcon from "../images/medical_aids.png";
 import reservationsIcon from "../images/reservations.png";
 import GetUserData from "../Auth/GetUserData";
@@ -221,6 +222,13 @@ function Home() {
       path="/medicaments"
       icon={medicamentsIcon}
       key="18"
+    ></HomeCard>,
+    <HomeCard
+      title="Zoznam účinných látok"
+      isCalendar={false}
+      path="/active_substances"
+      icon={activeSubstanceIcon}
+      key="25"
     ></HomeCard>,
     <HomeCard
       title="Číselník zdravotníckych pomôcok"

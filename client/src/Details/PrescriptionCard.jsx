@@ -9,7 +9,7 @@ import { Toast } from "primereact/toast";
 export default function PrescriptionCard(props) {
   const [detail, setDetail] = useState("");
   const [showEditDialog, setShowEditDialog] = useState(false);
-  const [showPresunDialog, setShowPresunDialog] = useState(false);
+  const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const toast = useRef(null);
   const location = useLocation();
@@ -37,8 +37,8 @@ export default function PrescriptionCard(props) {
     navigate("/prescriptions");
   };
 
-  const redirectToPresuny = () => {
-    navigate("/presuny");
+  const redirectToObjednavky = () => {
+    navigate("/objednavky");
   };
 
   const renderBackButton = () => {
@@ -83,12 +83,13 @@ export default function PrescriptionCard(props) {
             severity: "success",
             summary: "Úspech",
             detail: "Dátum prevzatia bol úspešne aktualizovaný!",
+            life: 6000,
           });
           decrementPocetNaSklade().then(() => {
             setShowEditDialog(false);
             setTimeout(() => {
               redirectToTabPrescriptions();
-            }, 2000);
+            }, 6000);
           });
         } else {
           // Handle error response
@@ -99,6 +100,7 @@ export default function PrescriptionCard(props) {
               detail:
                 errorData.message ||
                 "Nastala chyba pri aktualizácii dátumu prevzatia.",
+              life: 6000,
             });
           });
         }
@@ -109,6 +111,7 @@ export default function PrescriptionCard(props) {
           severity: "error",
           summary: "Chyba",
           detail: "Nepodarilo sa odoslať požiadavku.",
+          life: 6000,
         });
       });
   };
@@ -134,12 +137,14 @@ export default function PrescriptionCard(props) {
         severity: "success",
         summary: "Úspech",
         detail: "Počet na sklade bol úspešne aktualizovaný!",
+        life: 6000,
       });
     } catch (error) {
       toast.current.show({
         severity: "error",
         summary: "Chyba",
         detail: "Nepodarilo sa aktualizovať počet na sklade.",
+        life: 6000,
       });
     }
   };
@@ -151,11 +156,11 @@ export default function PrescriptionCard(props) {
         severity: "warn",
         summary: "Liek na sklade nedostupný",
         detail: "Nemožno nastaviť dátum prevzatia receptu!",
-        life: 5000,
+        life: 6000,
       });
       setTimeout(() => {
-        setShowPresunDialog(true);
-      }, 3000);
+        setShowOrderDialog(true);
+      }, 6000);
     } else {
       // Ak je liek dostupný, povolí editáciu dátumu prevzatia
       setShowEditDialog(true);
@@ -191,7 +196,7 @@ export default function PrescriptionCard(props) {
           style={{ width: "70rem", height: "50rem" }}
           title=<h3>ID receptu: {detail.ID_RECEPTU}</h3>
         >
-          {renderDetail("Dátum zapisu: ", detail.DATUM_ZAPISU)}
+          {renderDetail("Dátum zápisu: ", detail.DATUM_ZAPISU)}
           {renderDetail("Liek na recept: ", detail.NAZOV_LIEKU)}
           {renderDetail("Poznámka: ", detail.POZNAMKA)}
           {renderDetail(
@@ -244,21 +249,21 @@ export default function PrescriptionCard(props) {
         />
       </Dialog>
       <Dialog
-        visible={showPresunDialog}
-        onHide={() => setShowPresunDialog(false)}
+        visible={showOrderDialog}
+        onHide={() => setShowOrderDialog(false)}
         header={"Chcete objednať liek " + detail.NAZOV_LIEKU + " ?"}
         footer={
           <div>
             <Button
               label="Zrušiť"
               icon="pi pi-times"
-              onClick={() => setShowPresunDialog(false)}
+              onClick={() => setShowOrderDialog(false)}
               className="p-button-text"
             />
             <Button
               label="Potvrdiť"
               icon="pi pi-check"
-              onClick={() => redirectToPresuny()}
+              onClick={() => redirectToObjednavky()}
             />
           </div>
         }

@@ -28,6 +28,7 @@ import PharmacyStorageMedicalAids from "./Views/PharmacyStorageMedicalAids";
 import PharmacSearchMedicalAids from "./Views/PharmacSearchMedicalAids";
 import TabMedicaments from "./Views/Tables/TabMedicaments";
 import MedicamentCard from "./Details/MedicamentCard";
+import TabActiveSubstances from "./Views/Tables/TabActiveSubstances";
 import TabMedicalAids from "./Views/Tables/TabMedicalAids";
 import MedicalAidCard from "./Details/MedicalAidCard";
 import TabPharmacyManagers from "./Views/Tables/TabPharmacyManagers";
@@ -350,6 +351,13 @@ function App() {
       icon="medicaments-icon"
     />,
     <SidebarButton
+      key="25"
+      visibleLeft={visibleLeft}
+      path="/active_substances"
+      label="Zoznam účinných látok"
+      icon="active-substance-icon"
+    />,
+    <SidebarButton
       key="19"
       visibleLeft={visibleLeft}
       path="/medical_aids"
@@ -516,6 +524,10 @@ function App() {
         <Route
           path="/medicament_detail"
           element={<MedicamentCard></MedicamentCard>}
+        ></Route>
+        <Route
+          path="/active_substances"
+          element={<TabActiveSubstances></TabActiveSubstances>}
         ></Route>
         <Route
           path="/medical_aids"
