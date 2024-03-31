@@ -23,7 +23,7 @@ export default function Add() {
 
   return (
     <div
-      style={{ width: "90%", marginTop: "2rem" }}
+      style={{ width: "90%", marginTop: "2rem", paddingLeft: "10px" }}
       className="p-fluid grid formgrid"
     >
       <Toast ref={toast} />

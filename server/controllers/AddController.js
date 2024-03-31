@@ -20,17 +20,17 @@ module.exports = {
       res.status(500).send(err);
     });
   },
-  insertVysetrenie: (req, res) => {
+  insertVysetrenie: async (req, res) => {
     const zdravotny_zaznam = require("../models/zdravotny_zaznam");
-    (async () => {
-      ret_val = await zdravotny_zaznam.insertVysetrenie(req.body);
+    try {
+      await zdravotny_zaznam.insertVysetrenie(req.body);
       res.status(200).json("success");
-    })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
-      res.status(500).send(err);
-    });
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).json({ error: err.message });
+    }
   },
+
   insertHospitalizacia: (req, res) => {
     const zdravotny_zaznam = require("../models/zdravotny_zaznam");
     (async () => {

@@ -184,6 +184,8 @@ async function getInfo(id) {
     then 1
     else 0
     end as cudzinec,
+    telefon,
+    email,
     CASE
         WHEN substr(rod_cislo,3,1) = 2 OR substr(rod_cislo,3,1) = 3 THEN
             trunc(months_between(sysdate, to_date('19' || substr(rod_cislo, 0, 2) || '.' || mod(substr(rod_cislo, 3, 2),20) || '.' || substr(rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)

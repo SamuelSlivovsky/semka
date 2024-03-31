@@ -33,7 +33,7 @@ export default function TabRooms() {
       <div className="flex justify-content-between">
         <div className="table-header">
           Hľadaj
-          <span className="p-input-icon-left">
+          <span className="p-input-icon-left" style={{ marginLeft: "10px" }}>
             <i className="pi pi-search" />
             <InputText
               value={globalFilterValue}

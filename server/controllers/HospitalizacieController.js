@@ -19,7 +19,7 @@ module.exports = {
   endHospitalization: (req, res) => {
     (async () => {
       ret_val = await hospitalizacia.endHospitalization(req.body);
-      res.status(200);
+      res.status(200).json("success");
     })().catch((err) => {
       console.error(err);
       res.status(500).send(err);

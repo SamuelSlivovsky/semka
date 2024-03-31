@@ -56,6 +56,11 @@ export default function TableMedic(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     setSelectedRow(value);
+    setLeaveMessage(
+      value.PREPUSTACIA_SPRAVA != null
+        ? value.PREPUSTACIA_SPRAVA.replace(/\\n/g, "\n")
+        : ""
+    );
     setEndDate(
       value.UNFORMATED_DAT_DO
         ? new Date(value.UNFORMATED_DAT_DO)
@@ -199,7 +204,7 @@ export default function TableMedic(props) {
       },
       body: JSON.stringify({
         dat_do: endDate.toLocaleString("en-GB").replace(",", ""),
-        sprava: leaveMessage,
+        sprava: leaveMessage.replace(/\n/g, "\\n"),
         id_hosp: selectedRow.ID_HOSP,
       }),
     };
@@ -324,11 +329,11 @@ export default function TableMedic(props) {
                 )
               }
             </PDFDownloadLink>
-            <img src={imgUrl} alt="" width={"400"} height={"auto"} />
             {selectedRow.type != null ? getRecordDetails() : ""}
             <h2>{nazov} </h2>
             <h5>{"Dátum: " + selectedRow.DATUM} </h5>
             <div>{popis}</div>
+            <img src={imgUrl} alt="" width={"200"} height={"auto"} />
             {selectedRow.type == "HOS" ||
             selectedRow.TYP == "Hospitalizácia" ? (
               <div

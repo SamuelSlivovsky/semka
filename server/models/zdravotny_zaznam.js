@@ -120,7 +120,12 @@ async function insertVysetrenie(body) {
       nazov: body.nazov,
     });
   } catch (err) {
-    console.log(err);
+    if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 

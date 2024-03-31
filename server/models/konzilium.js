@@ -59,7 +59,6 @@ async function insertKonziliumUser(body) {
   try {
     let conn = await database.getConnection();
     body.lekari.forEach((element) => {
-      console.log(element);
       conn.execute(
         `begin zam_konzilium_insert(:cislo_zam, :id_zaznamu); end;`,
         {

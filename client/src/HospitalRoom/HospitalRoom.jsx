@@ -64,7 +64,7 @@ const HospitalRoom = () => {
       </div>
       <Dialog
         header={`Lôžko číslo ${selectedBed ? selectedBed.ID_LOZKA : ""}`}
-        style={{ width: "400px", height: "400px" }}
+        style={{ width: "400px", height: "500px" }}
         blockScroll
         visible={show}
         onHide={() => {
@@ -92,6 +92,16 @@ const HospitalRoom = () => {
         </h3>
         <h3>
           Rodné číslo: {selectedBed?.ROD_CISLO ? selectedBed.ROD_CISLO : ""}
+        </h3>
+        <h3>
+          Dátum do:{" "}
+          {selectedBed?.DAT_DO
+            ? new Date(selectedBed.DAT_DO).toLocaleDateString("de", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })
+            : "Neuvedený"}
         </h3>
       </Dialog>
     </div>

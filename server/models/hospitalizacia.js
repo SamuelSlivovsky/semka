@@ -16,6 +16,7 @@ async function getHospitalizacie() {
 
 async function endHospitalization(body) {
   try {
+    console.log(body);
     let conn = await database.getConnection();
     await conn.execute(
       `update hospitalizacia set dat_do= :dat_do, prepustacia_sprava =:sprava where 
@@ -27,6 +28,7 @@ async function endHospitalization(body) {
       },
       { autoCommit: true }
     );
+    console.log("success");
   } catch (err) {
     console.log(err);
   }

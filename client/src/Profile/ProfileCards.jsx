@@ -472,7 +472,7 @@ export default function ProfileCard(props) {
             </div>
             <div className="col-6 text-center m-0">
               <h4>Mobil</h4>
-              <div>{profile.TEL}</div>
+              <div>{profile.TELEFON}</div>
             </div>
           </div>
 
@@ -521,8 +521,9 @@ export default function ProfileCard(props) {
             </div>
           </div>
           <div className="flex">
-            <div className="mt-5 text-center col-6 text-center m-0">
-              <Button label="Poslať správu" icon="pi pi-send" />
+            <div className="col-6 text-center m-0">
+              <h4>Email</h4>
+              <div>{profile.EMAIL}</div>
             </div>
             <div className="mt-5 text-center col-6 text-center m-0">
               <Button
