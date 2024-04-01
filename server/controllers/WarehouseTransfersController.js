@@ -119,6 +119,30 @@ module.exports = {
         });
     },
 
+    createTransferSelMedAmount : (req, res) => {
+        const medCheck = req.body.medications;
+        let checkAmount = 0;
+
+        for (const med of medCheck) {
+            if(med.quantity > 0) {
+                checkAmount+=1;
+            }
+        }
+
+        if(medCheck.length < 0 || checkAmount === 0) {
+            return res.status(400).json({message: `Nesprávne zadané parametre`});
+        }
+
+        (async () => {
+            let ret_val = await transfers.createTransferSelMedAmount(req.body);
+            res.status(200).json(ret_val);
+        })().catch((err) => {
+            console.log("Error Kontroler");
+            console.error(err);
+            res.status(500).send(err);
+        });
+    },
+
     deleteTransfer: (req, res) => {
         if(req.body.id_presun < 0 || isNaN(req.body.id_presun)) {
             return res.status(400).json({message: `Nesprávne zadané parametre`});
