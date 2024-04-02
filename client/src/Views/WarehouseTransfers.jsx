@@ -11,6 +11,7 @@ import {Dialog} from "primereact/dialog";
 import {Dropdown} from "primereact/dropdown";
 import "../styles/warehouses.css";
 import {Calendar} from "primereact/calendar";
+import {InputNumber} from "primereact/inputnumber";
 
 export default function WarehouseTransfers() {
     let emptyTransfer = {
@@ -43,6 +44,8 @@ export default function WarehouseTransfers() {
     const toast = useRef(null);
     const [inputValues, setInputValues] = useState({});
     const [transfer, setTransfer] = useState(emptyTransfer);
+    const [idOdd, setIdOdd] = useState(null);
+    const [nazov, setNazov] = useState(null);
     const [hospitalSearchOption, setHospitalSearchOption] = useState(false);
     const [medicineSearchOption, setMedicineSearchOption] = useState(false);
     const [drugs, setDrugs] = useState(null);
@@ -68,6 +71,7 @@ export default function WarehouseTransfers() {
     const [showDeniedTransferDialog, setShowDeniedTransferDialog] = useState(false);
     const [showExpirityDateTransferDialog, setShowExpirityDateTransferDialog] = useState(false);
     const [showAmountTransferDialog, setShowAmountTransferDialog] = useState(false);
+    const [showMedAmountTransferDialog, setShowMedAmountTransferDialog] = useState(false);
     const [selectedMedications, setSelectedMedications] = useState([]);
     const [xmlContent, setXmlContent] = useState("");
 
@@ -75,7 +79,8 @@ export default function WarehouseTransfers() {
         { value: 'hospital', label: 'Vyhľadať podľa nemocnice' },
         { value: 'medicine', label: 'Vyhľadať podľa liekov' },
         { value: 'expirity', label: 'Vyhľadať expirované lieky'},
-        { value: 'amount', label: 'Vyhľadať podľa nedostatku liekov'}
+        { value: 'amount', label: 'Vyhľadať podľa nedostatku liekov'},
+        { value: 'medAmount', label: 'Vyhľadať podľa lieku a počtu'}
     ];
 
 
@@ -131,6 +136,25 @@ export default function WarehouseTransfers() {
             });
     }, []);
 
+    useEffect(() => {
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+        const headers = { authorization: "Bearer " + token };
+        fetch(`sklad/getIdOdd/${userDataHelper.UserInfo.userid}`, { headers })
+            .then((response) => response.json())
+            .then((data) => {
+                setNazov(data[0].NAZOV_NEM);
+                if(data[0].ID_ODDELENIA !== null) {
+                    //Employee is from department
+                    setIdOdd(true);
+                } else if(data[0].ID_LEKARNE !== null) {
+                    //Employee is from pharmacy
+                    setIdOdd(true);
+                    setNazov(data[0].NAZOV_LEK);
+                }
+            });
+    }, []);
+
     /*
     ----------------------------------------------------------------------------------------
     Functions section
@@ -159,7 +183,11 @@ export default function WarehouseTransfers() {
 
                     // If ZOZNAM_LIEKOV is a string, parse it as JSON
                     if (jsonData && jsonData[0] && jsonData[0].ZOZNAM_LIEKOV) {
-                        const zoznamLiekovArray = JSON.parse(jsonData[0].ZOZNAM_LIEKOV);
+                        const zoznamLiekov = JSON.parse(jsonData[0].ZOZNAM_LIEKOV);
+
+                        // Ensure that zoznamLiekov is always an array
+                        const zoznamLiekovArray = Array.isArray(zoznamLiekov) ? zoznamLiekov : [zoznamLiekov];
+
 
                         setLoading(false);
                         setXmlContent(zoznamLiekovArray);
@@ -511,7 +539,6 @@ export default function WarehouseTransfers() {
                     searchSelectedMedications(data);
                     setShowSelectedMedicationsSearch(true);
                     setMedAmount(emptyAmount);
-                    //@TODO add this else if to every fetch in here
                 } else if (data.message) {
                     toast.current.show({
                         severity: "error",
@@ -530,6 +557,64 @@ export default function WarehouseTransfers() {
             });
     }
 
+    //Function for searching selected medications by amount
+    const searchSelectedMedAmount = () => {
+
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                usr_id: userDataHelper.UserInfo.userid,
+                medications: selectedMedications
+            }),
+        };
+
+        let insertedData = 0;
+        let _transfers = [...waitingTransfers];
+        let _transfer =  {...transfer};
+
+        fetch(`/presuny/createTransferSelMedAmount`,  requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                } else if(data.length > 0) {
+                    //Adding returned data into array of requested transfers
+                    for (const retData of data) {
+                        _transfer.ID_PRESUN = retData.ID_PRESUN;
+                        _transfer.ID_SKLAD_OBJ = retData.ID_SKLAD_OBJ;
+                        _transfer.ID_ODDELENIA_LIEKU = retData.ID_ODDELENIA_LIEKU;
+                        _transfer.DATUM_PRESUNU = retData.DATUM_PRESUNU;
+                        _transfer.STATUS = retData.STATUS;
+                        _transfers.push({..._transfer});
+                        insertedData++;
+
+                        if(insertedData === data.length) {
+                            setWaitingTransfers(_transfers);
+                            toast.current.show({
+                                severity: "success",
+                                summary: "Successful",
+                                detail: "Presuny boli vytvorené",
+                                life: 3000,
+                            });
+                        }
+                    }
+                }
+            });
+
+    }
+
     //Function for updating
     const handleDropdownChange = (event) => {
         const selectedValue = event.target.value;
@@ -537,6 +622,7 @@ export default function WarehouseTransfers() {
         switch (selectedValue) {
             case 'hospital':
                 setHospitalSearchOption(true);
+                setShowMedAmountTransferDialog(false);
                 setShowAmountTransferDialog(false);
                 setMedicineSearchOption(false);
                 setShowExpirityDateTransferDialog(false);
@@ -546,6 +632,7 @@ export default function WarehouseTransfers() {
                 break;
             case 'medicine':
                 setMedicineSearchOption(true);
+                setShowMedAmountTransferDialog(false);
                 setShowAmountTransferDialog(false);
                 setHospitalSearchOption(false);
                 setShowExpirityDateTransferDialog(false);
@@ -555,15 +642,27 @@ export default function WarehouseTransfers() {
                 break;
             case 'expirity':
                 setShowExpirityDateTransferDialog(true);
+                setShowMedAmountTransferDialog(false);
                 setShowAmountTransferDialog(false);
                 setMedicineSearchOption(false);
                 setHospitalSearchOption(false);
                 break;
             case 'amount':
                 setShowAmountTransferDialog(true);
+                setShowMedAmountTransferDialog(false);
                 setShowExpirityDateTransferDialog(false);
                 setMedicineSearchOption(false);
                 setHospitalSearchOption(false);
+                break;
+            case 'medAmount':
+                setShowMedAmountTransferDialog(true);
+                setShowAmountTransferDialog(false);
+                setShowExpirityDateTransferDialog(false);
+                setMedicineSearchOption(false);
+                setHospitalSearchOption(false);
+                if(drugs == null) {
+                    getMedicationList();
+                }
                 break;
         }
     };
@@ -636,6 +735,19 @@ export default function WarehouseTransfers() {
                         severity: "error",
                         summary: "Error",
                         detail: "Zadaný počet musí byť číslo",
+                        life: 3000,
+                    });
+                }
+                break;
+            case 'medAmount':
+                if(selectedMedications.length > 0) {
+                    searchSelectedMedAmount();
+                    hideDialog();
+                } else {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: "Musíte vybrať liek zo zoznamu",
                         life: 3000,
                     });
                 }
@@ -866,16 +978,29 @@ export default function WarehouseTransfers() {
 
             <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
+            {idOdd !== null ? <div style={{marginLeft: "20px"}}>
+                    <h2>{nazov}</h2>
+                </div> :
+                <div style={{marginLeft: "20px"}}>
+                    <h2>Centrálny sklad {nazov}</h2>
+                </div>
+            }
+
             {showHospitalMedications ? <div>
                 <DataTable
                     value={hospitalMedications}
-                    dataKey="ID_LIEK"
+                    dataKey="DATUM_TRVANLIVOSTI"
                     paginator={true}
                     paginatorTemplate="CurrentPageReport FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink RowsPerPageDropdown"
                     currentPageReportTemplate="Zobrazuje sa {first} - {last} z celkových {totalRecords} záznamov"
                     rows={10}
                     rowsPerPageOptions={[15, 20]}
                 >
+                    <Column
+                        field="DATUM_TRVANLIVOSTI"
+                        header="Dátum trvanlivosti"
+                        style={{ minWidth: "12rem" }}
+                    ></Column>
                     <Column
                         field="ID_LIEK"
                         header="Id lieku"
@@ -887,13 +1012,8 @@ export default function WarehouseTransfers() {
                         style={{ minWidth: "16rem" }}
                     ></Column>
                     <Column
-                        field="DATUM_TRVANLIVOSTI"
-                        header="Dátum trvanlivosti"
-                        style={{ minWidth: "12rem" }}
-                    ></Column>
-                    <Column
-                        field="ID_ODDELENIA"
-                        header="Id iddelenia"
+                        field="TYP_ODDELENIA"
+                        header="Oddelenie"
                         style={{ minWidth: "12rem" }}
                     ></Column>
                     <Column
@@ -984,7 +1104,7 @@ export default function WarehouseTransfers() {
                         onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
                         dataKey="ID_PRESUN"
                         globalFilter={NaN} //globalFilter
-                        globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "ID_ODDELENIA_LIEKU", "DATUM_PRESUNU"]}
+                        globalFilterFields={["ID_PRESUN","ID_SKLAD_OBJ", "NAZOV", "TYP_ODDELENIA", "DATUM_PRESUNU"]}
                         filters={NaN} //filter
                         header={NaN} //header
                         responsiveLayout="scroll"
@@ -1000,8 +1120,13 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "16rem" }}
                         ></Column>
                         <Column
-                            field="ID_ODDELENIA_LIEKU"
-                            header="Id oddelenia lieku"
+                            field="NAZOV"
+                            header="Dodávajúca nemocnica"
+                            style={{ minWidth: "14rem" }}
+                        ></Column>
+                        <Column
+                            field="TYP_ODDELENIA"
+                            header="Oddelenie"
                             style={{ minWidth: "14rem" }}
                         ></Column>
                         <Column
@@ -1047,8 +1172,13 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "16rem" }}
                         ></Column>
                         <Column
-                            field="ID_ODDELENIA_LIEKU"
-                            header="Id oddelenia lieku"
+                            field="NAZOV"
+                            header="Dodávajúca nemocnica"
+                            style={{ minWidth: "14rem" }}
+                        ></Column>
+                        <Column
+                            field="TYP_ODDELENIA"
+                            header="Oddelenie"
                             style={{ minWidth: "14rem" }}
                         ></Column>
                         <Column
@@ -1088,8 +1218,13 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "16rem" }}
                         ></Column>
                         <Column
-                            field="ID_ODDELENIA_LIEKU"
-                            header="Id oddelenia lieku"
+                            field="NAZOV"
+                            header="Dodávajúca nemocnica"
+                            style={{ minWidth: "14rem" }}
+                        ></Column>
+                        <Column
+                            field="TYP_ODDELENIA"
+                            header="Oddelenie"
                             style={{ minWidth: "14rem" }}
                         ></Column>
                         <Column
@@ -1129,8 +1264,13 @@ export default function WarehouseTransfers() {
                             style={{ minWidth: "16rem" }}
                         ></Column>
                         <Column
-                            field="ID_ODDELENIA_LIEKU"
-                            header="Id oddelenia lieku"
+                            field="NAZOV"
+                            header="Objednávajúca nemocnica"
+                            style={{ minWidth: "14rem" }}
+                        ></Column>
+                        <Column
+                            field="TYP_ODDELENIA"
+                            header="Objednávajúce oddelenie"
                             style={{ minWidth: "14rem" }}
                         ></Column>
                         <Column
@@ -1154,7 +1294,7 @@ export default function WarehouseTransfers() {
             <Dialog
                 visible={showDialog && dialog}
                 style={{ width: "40vw" }}
-                footer={NaN} //productDialogFooter
+                //footer={NaN} //productDialogFooter
                 onHide={() => onHide()}
             >
                 {loading ? (
@@ -1288,7 +1428,50 @@ export default function WarehouseTransfers() {
                         )}
                     </div>
                 </div> : null}
-                {hospitalSearchOption || medicineSearchOption || showExpirityDateTransferDialog || showAmountTransferDialog ?
+                { showMedAmountTransferDialog ? <div>
+
+                    {selectedMedications.map((selectedMedication, index) => (
+                        <div key={index} style={{paddingTop: "20px"}}>
+                            <div className="field col">
+                                <Dropdown
+                                    style={{width: "auto"}}
+                                    value={selectedMedication.selectedDrug}
+                                    options={drugs}
+                                    onChange={(e) => {
+                                        const updatedMedications = [...selectedMedications];
+                                        updatedMedications[index].selectedDrug = e.value;
+                                        setSelectedMedications(updatedMedications);
+                                    }}
+                                    optionLabel="NAZOV"
+                                    placeholder="Vyberte liek"
+                                />
+                            </div>
+                            <label style={{paddingLeft: "15px"}} htmlFor="quantity">Počet</label>
+                            <div className="field col">
+                                <InputNumber
+                                    style={{width: "100px"}}
+                                    value={selectedMedication.quantity}
+                                    onChange={(e) => {
+                                        const updatedMedications = [...selectedMedications];
+                                        updatedMedications[index].quantity = e.value;
+                                        setSelectedMedications(updatedMedications);
+                                    }}
+                                    integeronly
+                                />
+                                <Button
+                                    style={{marginLeft: "10px"}}
+                                    icon="pi pi-times"
+                                    onClick={() => removeMedication(index)}
+                                />
+                            </div>
+                        </div>
+                    ))}
+                    <div className={"submit-button"}>
+                        <Button style={{width: "50%"}} label="Pridať do zoznamu" onClick={addMedication} />
+                    </div>
+                </div> : null}
+                {hospitalSearchOption || medicineSearchOption || showExpirityDateTransferDialog
+                || showAmountTransferDialog || showMedAmountTransferDialog ?
                     <div className={"submit-button"}>
                     <Button style={{width: "50%"}} label="Vyhľadať" onClick={searchMedication} />
                 </div> : null}
