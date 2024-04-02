@@ -44,6 +44,7 @@ import TabReservations from "./Views/Tables/TabResevations";
 import PharmacyEmployees from "./Views/PharmacyEmployees";
 import PharmacyDispensing from "./Views/PharmacyDispensing";
 import TabFreeSaleMedicaments from "./Views/Tables/TabFreeSaleMedicaments";
+import NotFoundPage404 from "./Views/NotFound404Page";
 
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
@@ -513,30 +514,15 @@ function App() {
   const renderPharmacyManagerRoutes = () => {
     return (
       <>
-        <Route
-          path="/about_me"
-          element={<PharmacyManagersDashboard></PharmacyManagersDashboard>}
-        ></Route>
-        <Route
-          path="/medicaments"
-          element={<TabMedicaments></TabMedicaments>}
-        ></Route>
-        <Route
-          path="/medicament_detail"
-          element={<MedicamentCard></MedicamentCard>}
-        ></Route>
+        <Route path="/about_me" element={<PharmacyManagersDashboard />}></Route>
+        <Route path="/medicaments" element={<TabMedicaments />}></Route>
+        <Route path="/medicament_detail" element={<MedicamentCard />}></Route>
         <Route
           path="/active_substances"
-          element={<TabActiveSubstances></TabActiveSubstances>}
+          element={<TabActiveSubstances />}
         ></Route>
-        <Route
-          path="/medical_aids"
-          element={<TabMedicalAids></TabMedicalAids>}
-        ></Route>
-        <Route
-          path="/medicalAid_detail"
-          element={<MedicalAidCard></MedicalAidCard>}
-        ></Route>
+        <Route path="/medical_aids" element={<TabMedicalAids />}></Route>
+        <Route path="/medicalAid_detail" element={<MedicalAidCard />}></Route>
         <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
         <Route
           path="/lekarensky_sklad_lieky"
@@ -556,52 +542,38 @@ function App() {
         ></Route>
         <Route
           path="/pharmacy_managers"
-          element={<TabPharmacyManagers></TabPharmacyManagers>}
+          element={<TabPharmacyManagers />}
         ></Route>
         <Route
           path="/pharmacy_manager"
-          element={<PharmacyManagerCard></PharmacyManagerCard>}
+          element={<PharmacyManagerCard />}
         ></Route>
         <Route
           path="/pharmacy_employees"
-          element={<PharmacyEmployees></PharmacyEmployees>}
+          element={<PharmacyEmployees />}
         ></Route>
-        <Route
-          path="/pharmacists"
-          element={<TabPharmacists></TabPharmacists>}
-        ></Route>
-        <Route
-          path="/pharmacist"
-          element={<PharmacistCard></PharmacistCard>}
-        ></Route>
-        <Route
-          path="/laborants"
-          element={<TabLaborants></TabLaborants>}
-        ></Route>
+        <Route path="/pharmacists" element={<TabPharmacists />}></Route>
+        <Route path="/pharmacist" element={<PharmacistCard />}></Route>
+        <Route path="/laborants" element={<TabLaborants />}></Route>
         <Route path="/laborant" element={<LaborantCard></LaborantCard>}></Route>
         <Route
           path="/dispensing_medicines"
-          element={<PharmacyDispensing></PharmacyDispensing>}
+          element={<PharmacyDispensing />}
         ></Route>
-        <Route
-          path="/prescriptions"
-          element={<TabPrescriptions></TabPrescriptions>}
-        ></Route>
+        <Route path="/prescriptions" element={<TabPrescriptions />}></Route>
         <Route
           path="/prescription_detail"
-          element={<PrecsriptionCard></PrecsriptionCard>}
+          element={<PrecsriptionCard />}
         ></Route>
         <Route
           path="/free_sale_medicaments"
-          element={<TabFreeSaleMedicaments></TabFreeSaleMedicaments>}
+          element={<TabFreeSaleMedicaments />}
         ></Route>
-        <Route
-          path="/reservations"
-          element={<TabReservations></TabReservations>}
-        ></Route>
+        <Route path="/reservations" element={<TabReservations />}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/objednavky" element={<Orders />}></Route>
         {/* <Route path="/presuny" element={<WarehouseTransfers />}></Route> */}
+        <Route path="*" element={<NotFoundPage404 />}></Route>
       </>
     );
   };
@@ -696,8 +668,10 @@ function App() {
             <>
               {renderWarehouseManagerRoutes()} {renderChiefRoutes()}
             </>
-          ) : userData && userData.UserInfo.role === 10 ? (
-            renderPharmacyManagerRoutes()
+          ) : typeof userData !== "undefined" &&
+            userData !== null &&
+            userData.UserInfo.role === 10 ? (
+            <>{renderPharmacyManagerRoutes()}</>
           ) : (
             ""
           )}

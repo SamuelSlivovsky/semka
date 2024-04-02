@@ -12,9 +12,10 @@ async function getDrugsOfDepartment(cis_zam) {
     if (lekaren.rows[0].ID_LEKARNE !== null) {
       //Employee is not from hospital but from pharmacy
       result = await conn.execute(
-        `select TRVANLIVOST_LIEKU.id_liek, LEKAREN.id_lekarne, LEKAREN.nazov, to_char(DATUM_TRVANLIVOSTI, 'DD.MM.YYYY') as DAT_EXPIRACIE, pocet
+        `select TRVANLIVOST_LIEKU.id_liek, liek.nazov, LEKAREN.id_lekarne, LEKAREN.nazov, to_char(DATUM_TRVANLIVOSTI, 'DD.MM.YYYY') as DAT_EXPIRACIE, pocet
         from TRVANLIVOST_LIEKU join sklad on TRVANLIVOST_LIEKU.ID_SKLAD = sklad.ID_SKLAD
             join LEKAREN on sklad.ID_LEKARNE = LEKAREN.ID_LEKARNE
+            join liek on (liek.id_liek = TRVANLIVOST_LIEKU.id_liek)
         where LEKAREN.ID_LEKARNE = :id_lek
           and pocet > 0 order by DATUM_TRVANLIVOSTI`,
         { id_lek: lekaren.rows[0].ID_LEKARNE }
