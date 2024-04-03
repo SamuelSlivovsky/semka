@@ -220,4 +220,12 @@ module.exports = {
       res.status(200).json(zoznamMiest);
     })();
   },
+
+  getZoznamRezervacii: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      zoznamRezervacii = await rezervacia.getZoznamRezervacii(req.params.id);
+      res.status(200).json(zoznamRezervacii);
+    })();
+  },
 };

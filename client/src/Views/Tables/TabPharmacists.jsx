@@ -436,7 +436,6 @@ export default function TabPharmacists(props) {
         onHide={() => setShowConfirmDialog(false)}
       >
         <div
-          div
           className="confirmation-content"
           style={{ textAlign: "center", display: "grid" }}
         >

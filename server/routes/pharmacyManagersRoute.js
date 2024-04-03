@@ -134,4 +134,11 @@ router.get(
   controller.getZoznamMiest
 );
 
+router.get(
+  "/getZoznamRezervacii/:id",
+  verify.verifyRoles(0, 10),
+  controller.getZoznamRezervacii
+);
+
+
 module.exports = router;

@@ -198,7 +198,7 @@ export default function TabMedicaments() {
                 latinsky_nazov: e.target.value,
               })
             }
-            placeholder="Zadajte lainský názov"
+            placeholder="Zadajte latinský názov"
           />
         </div>
         <Button

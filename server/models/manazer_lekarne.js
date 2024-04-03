@@ -428,6 +428,29 @@ async function getZoznamMiest() {
   }
 }
 
+async function getZoznamRezervacii(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH:MM:SS') as "DATUM_REZERVACIE", 
+      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", rl.datum_prevzatia, lek.nazov as "NAZOV_LEKARNE"
+      from rezervacia_lieku rl
+      join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
+      join os_udaje ou on (ou.rod_cislo = rl.rod_cislo)
+      join liek l on (l.id_liek = tl.id_liek)
+      join sklad s on (s.id_sklad = tl.id_sklad)
+      join lekaren lek on (lek.id_lekarne = s.id_lekarne)
+      join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
+      where cislo_zam = :id`,
+      [id]
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getManazeriLekarni,
   getLekarnici,
@@ -450,4 +473,5 @@ module.exports = {
   insertUcinnaLatka,
   deleteUcinnaLatka,
   getZoznamMiest,
+  getZoznamRezervacii,
 };
