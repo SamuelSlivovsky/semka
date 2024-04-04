@@ -140,6 +140,12 @@ router.get(
   controller.getZoznamAktualnychRezervacii
 );
 
+router.get(
+  "/getZoznamPrevzatychRezervacii/:id",
+  verify.verifyRoles(0, 10),
+  controller.getZoznamPrevzatychRezervacii
+);
+
 router.post(
   "/insertRezervaciaLieku",
   verify.verifyRoles(0, 10),

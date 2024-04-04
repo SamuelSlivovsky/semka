@@ -433,7 +433,7 @@ async function getZoznamAktualnychRezervacii(id) {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
-      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", rl.datum_prevzatia, 
+      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
       lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
       from rezervacia_lieku rl
       join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
@@ -443,6 +443,31 @@ async function getZoznamAktualnychRezervacii(id) {
       join lekaren lek on (lek.id_lekarne = s.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
       where rl.datum_prevzatia is NULL and cislo_zam = :id
+      order by rl.id_rezervacie`,
+      [id]
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getZoznamPrevzatychRezervacii(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
+      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
+      from rezervacia_lieku rl
+      join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
+      join os_udaje ou on (ou.rod_cislo = rl.rod_cislo)
+      join liek l on (l.id_liek = tl.id_liek)
+      join sklad s on (s.id_sklad = tl.id_sklad)
+      join lekaren lek on (lek.id_lekarne = s.id_lekarne)
+      join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
+      where rl.datum_prevzatia is NOT NULL and cislo_zam = :id
       order by rl.id_rezervacie`,
       [id]
     );
@@ -538,6 +563,7 @@ module.exports = {
   deleteUcinnaLatka,
   getZoznamMiest,
   getZoznamAktualnychRezervacii,
+  getZoznamPrevzatychRezervacii,
   insertRezervaciaLieku,
   deleteRezervaciaLieku,
 };

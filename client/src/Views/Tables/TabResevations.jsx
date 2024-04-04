@@ -10,6 +10,7 @@ import { useNavigate } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { TabView, TabPanel } from "primereact/tabview";
 
 export default function TabResevations() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -21,79 +22,98 @@ export default function TabResevations() {
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
-  const [zoznamRezervacii, setZoznamRezervacii] = useState([]);
   const navigate = useNavigate();
+  const [aktualneRezervacie, setAktualneRezervacie] = useState([]);
+  const [prevzateRezervacie, setPrevzateRezervacie] = useState([]);
+  const [dialogContext, setDialogContext] = useState(""); // 'aktualne' alebo 'vydane'
 
   useEffect(() => {
-    const token = localStorage.getItem("hospit-user");
-    const userDataHelper = GetUserData(token);
-    const headers = { authorization: "Bearer " + token };
-    fetchGetZoznamAktualnychRezervacii(headers, userDataHelper);
-  }, []);
+    const fetchData = async () => {
+      try {
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+        const headers = { authorization: "Bearer " + token };
 
-  const fetchGetZoznamAktualnychRezervacii = (headers, userDataHelper) => {
-    fetch(
-      `/pharmacyManagers/getZoznamAktualnychRezervacii/${userDataHelper.UserInfo.userid}`,
-      {
-        headers,
-      }
-    )
-      .then((response) => {
-        // Kontrola ci response je ok (status:200)
-        if (response.ok) {
-          return response.json();
-        } else if (response.status === 401) {
-          // Token expiroval redirect na logout
-          toast.current.show({
-            severity: "error",
-            summary: "Session timeout redirecting to login page",
-            life: 999999999,
-          });
-          setTimeout(() => {
-            navigate("/logout");
-          }, 3000);
+        const [aktualneResponse, prevzateResponse] = await Promise.all([
+          fetch(
+            `/pharmacyManagers/getZoznamAktualnychRezervacii/${userDataHelper.UserInfo.userid}`,
+            { headers }
+          ),
+          fetch(
+            `/pharmacyManagers/getZoznamPrevzatychRezervacii/${userDataHelper.UserInfo.userid}`,
+            { headers }
+          ),
+        ]);
+
+        if (!aktualneResponse.ok || !prevzateResponse.ok) {
+          // Handle error (show toast or redirect)
+          return;
         }
-      })
-      .then((data) => {
-        setZoznamRezervacii(data);
-        console.log(data);
-      })
-      .finally(() => {
+
+        const aktualneData = await aktualneResponse.json();
+        const prevzateData = await prevzateResponse.json();
+
+        setAktualneRezervacie(aktualneData);
+        console.log(aktualneData);
+        setPrevzateRezervacie(prevzateData);
+        console.log(prevzateData);
+      } catch (error) {
+        // Handle error
+      } finally {
         setLoading(false);
-      });
-  };
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const onHide = () => {
     setShowDialog(false);
     setSelectedRow(null);
   };
 
-  const onSubmit = () => {
-    setShowDialog(false);
-  };
-
-  const handleClick = (value) => {
+  const handleClickAktualne = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
+    setDialogContext("aktualne"); // Nastaviť kontext pre aktuálne recepty
+  };
+
+  const handleClickPrevzate = (value) => {
+    setShowDialog(true);
+    setSelectedRow(value);
+    setDialogContext("prevzate"); // Nastaviť kontext pre vydané recepty
   };
 
   const renderDialogFooter = () => {
-    return (
-      <div>
-        <Button
-          label="Zavrieť"
-          icon="pi pi-times"
-          className="p-button-danger"
-          onClick={() => onHide()}
-        />
-        <Button
-          label="Vydať rezervovaný liek"
-          icon="pi pi-check"
-          onClick={() => setShowEditDialog(true)}
-          autoFocus
-        />
-      </div>
-    );
+    if (dialogContext === "aktualne") {
+      return (
+        <div>
+          <Button
+            label="Zavrieť"
+            icon="pi pi-times"
+            className="p-button-danger"
+            onClick={() => onHide()}
+          />
+          <Button
+            label="Vydať rezervovaný liek"
+            icon="pi pi-check"
+            onClick={() => setShowEditDialog(true)}
+            autoFocus
+          />
+        </div>
+      );
+    } else if (dialogContext === "prevzate") {
+      return (
+        <div>
+          <Button
+            label="Zavrieť"
+            icon="pi pi-times"
+            className="p-button-danger"
+            onClick={() => onHide()}
+          />
+        </div>
+      );
+    }
   };
 
   const renderHeader = () => {
@@ -161,7 +181,7 @@ export default function TabResevations() {
             detail: "Rezervácia bola úspešne zrušená.",
             life: 3000,
           });
-          fetchGetZoznamAktualnychRezervacii(
+          setAktualneRezervacie(
             { authorization: "Bearer " + token },
             GetUserData(token)
           );
@@ -267,6 +287,10 @@ export default function TabResevations() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
+      DATUM_PREVZATIA: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
+      },
       ROD_CISLO: {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
@@ -285,124 +309,243 @@ export default function TabResevations() {
 
   const header = renderHeader();
   return (
-    <div>
-      {renderConfirmDialog()}
-      <Toast ref={toast} position="top-center" />
-      <div className="card">
-        {loading ? (
-          <div
-            className="p-d-flex p-jc-center p-ai-center"
-            style={{ height: "300px" }}
-          >
-            <ProgressSpinner
-              className="p-d-flex p-jc-center p-ai-center"
-              style={{
-                height: "100vh",
-                position: "fixed",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                background: "rgba(255, 255, 255, 0.8)",
-              }}
-              strokeWidth="4"
-            />
+    <TabView>
+      <TabPanel header="Aktuálne rezervácie liekov">
+        <div>
+          {renderConfirmDialog()}
+          <Toast ref={toast} position="top-center" />
+          <div className="card">
+            {loading ? (
+              <div
+                className="p-d-flex p-jc-center p-ai-center"
+                style={{ height: "300px" }}
+              >
+                <ProgressSpinner
+                  className="p-d-flex p-jc-center p-ai-center"
+                  style={{
+                    height: "100vh",
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(255, 255, 255, 0.8)",
+                  }}
+                  strokeWidth="4"
+                />
+              </div>
+            ) : (
+              <DataTable
+                value={aktualneRezervacie}
+                responsiveLayout="scroll"
+                selectionMode="single"
+                paginator
+                rows={15}
+                selection={selectedRow}
+                onSelectionChange={(e) => handleClickAktualne(e.value)}
+                header={header}
+                filters={filters}
+                filterDisplay="menu"
+                globalFilterFields={[
+                  "ID_REZERVACIE",
+                  "DATUM_REZERVACIE",
+                  "ROD_CISLO",
+                  "MENO",
+                  "PRIEZVISKO",
+                ]}
+                emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+              >
+                <Column
+                  field="ID_REZERVACIE"
+                  header={"ID rezervácie"}
+                  filter
+                ></Column>
+                <Column
+                  field="DATUM_REZERVACIE"
+                  header={"Dátum rezervácie"}
+                  filter
+                ></Column>
+                <Column
+                  field="ROD_CISLO"
+                  header={"Rodné číslo"}
+                  filter
+                ></Column>
+                <Column field="MENO" header={"Meno"} filter></Column>
+                <Column
+                  field="PRIEZVISKO"
+                  header={"Priezvisko"}
+                  filter
+                ></Column>
+                <Column body={actionBodyTemplate} header=""></Column>
+              </DataTable>
+            )}
           </div>
-        ) : (
-          <DataTable
-            value={zoznamRezervacii}
-            responsiveLayout="scroll"
-            selectionMode="single"
-            paginator
-            rows={15}
-            selection={selectedRow}
-            onSelectionChange={(e) => handleClick(e.value)}
-            header={header}
-            filters={filters}
-            filterDisplay="menu"
-            globalFilterFields={[
-              "ID_REZERVACIE",
-              "DATUM_REZERVACIE",
-              "ROD_CISLO",
-              "MENO",
-              "PRIEZVISKO",
-            ]}
-            emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+          <Dialog
+            header="Detail rezervácie"
+            visible={showDialog}
+            style={{ textAlign: "center", width: "950px" }}
+            modal
+            footer={renderDialogFooter()}
+            onHide={() => onHide()}
           >
-            <Column
-              field="ID_REZERVACIE"
-              header={"ID rezervácie"}
-              filter
-            ></Column>
-            <Column
-              field="DATUM_REZERVACIE"
-              header={"Dátum rezervácie"}
-              filter
-            ></Column>
-            <Column field="ROD_CISLO" header={"Rodné číslo"} filter></Column>
-            <Column field="MENO" header={"Meno"} filter></Column>
-            <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
-            <Column body={actionBodyTemplate} header=""></Column>
-          </DataTable>
-        )}
-      </div>
-      <Dialog
-        header="Detail rezervácie"
-        visible={showDialog}
-        style={{ textAlign: "center", width: "950px" }}
-        modal
-        footer={renderDialogFooter()}
-        onHide={() => onHide()}
-      >
-        <div className="confirmation-content" style={{ display: "grid" }}>
-          <i
-            className="pi pi-info-circle"
-            style={{
-              fontSize: "2rem",
-              color: "var(--blue-500)",
-              marginBottom: "1rem",
-            }}
-          ></i>
-          <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
-            <b>Názov rezervovaného lieku:</b> {selectedRow?.NAZOV_LIEKU}
-          </span>
-          <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
-            <b>Rezervované množstvo lieku:</b> {selectedRow?.REZERVOVANY_POCET}
-          </span>
-          <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
-            <b>Dostupné množstvo lieku na sklade:</b>{" "}
-            {selectedRow?.DOSTUPNY_POCET}
-          </span>
+            <div className="confirmation-content" style={{ display: "grid" }}>
+              <i
+                className="pi pi-info-circle"
+                style={{
+                  fontSize: "2rem",
+                  color: "var(--blue-500)",
+                  marginBottom: "1rem",
+                }}
+              ></i>
+              <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
+                <b>Názov rezervovaného lieku:</b> {selectedRow?.NAZOV_LIEKU}
+              </span>
+              <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
+                <b>Rezervované množstvo lieku:</b>{" "}
+                {selectedRow?.REZERVOVANY_POCET}
+              </span>
+              <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
+                <b>Dostupné množstvo lieku na sklade:</b>{" "}
+                {selectedRow?.DOSTUPNY_POCET}
+              </span>
+            </div>
+          </Dialog>
+          {/* Edit Date Dialog */}
+          <Dialog
+            visible={showEditDialog}
+            onHide={() => setShowEditDialog(false)}
+            header="Nastaviť dátum prevzatia"
+            footer={
+              <div>
+                <Button
+                  label="Zrušiť"
+                  icon="pi pi-times"
+                  onClick={() => setShowEditDialog(false)}
+                  className="p-button-text"
+                />
+                <Button
+                  label="Potvrdiť"
+                  icon="pi pi-check"
+                  // onClick={() => handleEditDate()}
+                />
+              </div>
+            }
+          >
+            <Calendar
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.value)}
+              showIcon
+              dateFormat="yy-mm-dd"
+            />
+          </Dialog>
         </div>
-      </Dialog>
-      {/* Edit Date Dialog */}
-      <Dialog
-        visible={showEditDialog}
-        onHide={() => setShowEditDialog(false)}
-        header="Nastaviť dátum prevzatia"
-        footer={
-          <div>
-            <Button
-              label="Zrušiť"
-              icon="pi pi-times"
-              onClick={() => setShowEditDialog(false)}
-              className="p-button-text"
-            />
-            <Button
-              label="Potvrdiť"
-              icon="pi pi-check"
-              // onClick={() => handleEditDate()}
-            />
+      </TabPanel>
+      <TabPanel header="Prevzaté rezervácie liekov">
+        <div>
+          {renderConfirmDialog()}
+          <Toast ref={toast} position="top-center" />
+          <div className="card">
+            {loading ? (
+              <div
+                className="p-d-flex p-jc-center p-ai-center"
+                style={{ height: "300px" }}
+              >
+                <ProgressSpinner
+                  className="p-d-flex p-jc-center p-ai-center"
+                  style={{
+                    height: "100vh",
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    background: "rgba(255, 255, 255, 0.8)",
+                  }}
+                  strokeWidth="4"
+                />
+              </div>
+            ) : (
+              <DataTable
+                value={prevzateRezervacie}
+                responsiveLayout="scroll"
+                selectionMode="single"
+                paginator
+                rows={15}
+                selection={selectedRow}
+                onSelectionChange={(e) => handleClickPrevzate(e.value)}
+                header={header}
+                filters={filters}
+                filterDisplay="menu"
+                globalFilterFields={[
+                  "ID_REZERVACIE",
+                  "DATUM_REZERVACIE",
+                  "DATUM_PREVZATIA",
+                  "ROD_CISLO",
+                  "MENO",
+                  "PRIEZVISKO",
+                ]}
+                emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+              >
+                <Column
+                  field="ID_REZERVACIE"
+                  header={"ID rezervácie"}
+                  filter
+                ></Column>
+                <Column
+                  field="DATUM_REZERVACIE"
+                  header={"Dátum rezervácie"}
+                  filter
+                ></Column>
+                <Column
+                  field="DATUM_PREVZATIA"
+                  header={"Dátum prevzatia"}
+                  filter
+                ></Column>
+                <Column
+                  field="ROD_CISLO"
+                  header={"Rodné číslo"}
+                  filter
+                ></Column>
+                <Column field="MENO" header={"Meno"} filter></Column>
+                <Column
+                  field="PRIEZVISKO"
+                  header={"Priezvisko"}
+                  filter
+                ></Column>
+              </DataTable>
+            )}
           </div>
-        }
-      >
-        <Calendar
-          value={selectedDate}
-          onChange={(e) => setSelectedDate(e.value)}
-          showIcon
-          dateFormat="yy-mm-dd"
-        />
-      </Dialog>
-    </div>
+          <Dialog
+            header="Detail rezervácie"
+            visible={showDialog}
+            style={{ textAlign: "center", width: "950px" }}
+            modal
+            footer={renderDialogFooter()}
+            onHide={() => onHide()}
+          >
+            <div className="confirmation-content" style={{ display: "grid" }}>
+              <i
+                className="pi pi-info-circle"
+                style={{
+                  fontSize: "2rem",
+                  color: "var(--blue-500)",
+                  marginBottom: "1rem",
+                }}
+              ></i>
+              <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
+                <b>Názov rezervovaného lieku:</b> {selectedRow?.NAZOV_LIEKU}
+              </span>
+              <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
+                <b>Rezervované množstvo lieku:</b>{" "}
+                {selectedRow?.REZERVOVANY_POCET}
+              </span>
+              <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
+                <b>Dátum prevzatia:</b> {selectedRow?.DATUM_PREVZATIA}
+              </span>
+            </div>
+          </Dialog>
+        </div>
+      </TabPanel>
+    </TabView>
   );
 }

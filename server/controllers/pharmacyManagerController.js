@@ -231,6 +231,16 @@ module.exports = {
     })();
   },
 
+  getZoznamPrevzatychRezervacii: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      zoznamRezervacii = await rezervacia.getZoznamPrevzatychRezervacii(
+        req.params.id
+      );
+      res.status(200).json(zoznamRezervacii);
+    })();
+  },
+
   insertRezervaciaLieku: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
