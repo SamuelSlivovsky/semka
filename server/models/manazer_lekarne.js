@@ -432,7 +432,7 @@ async function getZoznamAktualnychRezervacii(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
+      `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
       l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", rl.datum_prevzatia, 
       lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
       from rezervacia_lieku rl
@@ -442,7 +442,8 @@ async function getZoznamAktualnychRezervacii(id) {
       join sklad s on (s.id_sklad = tl.id_sklad)
       join lekaren lek on (lek.id_lekarne = s.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
-      where rl.datum_prevzatia is NULL and cislo_zam = :id`,
+      where rl.datum_prevzatia is NULL and cislo_zam = :id
+      order by rl.id_rezervacie`,
       [id]
     );
 

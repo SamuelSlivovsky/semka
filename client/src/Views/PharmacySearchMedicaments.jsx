@@ -212,14 +212,44 @@ export default function PharmacySearchMedicaments(props) {
 
   const handleSubmit = () => {
     setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
+    // Pridáme kontrolu na počet
+    const requestedCount = parseInt(newReservation.pocet, 10); // získame počet ako číslo
+    const availableCount = parseInt(selectedRow.POCET, 10); // dostupný počet na sklade
+
     if (
       newReservation.rod_cislo &&
       newReservation.meno &&
       newReservation.priezvisko &&
-      newReservation.pocet
+      requestedCount > 0
     ) {
-      // Ak sú všetky polia vyplnené, pokračujeme v odoslaní
-      fetchSubmitNewReservation();
+      if (requestedCount > availableCount) {
+        // Ak je požadovaný počet väčší než dostupný
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: "Presiahli ste dostupný počet kusov na sklade.",
+          life: 5000,
+        });
+      } else {
+        // Ak je všetko v poriadku, pokračujeme v odoslaní
+        fetchSubmitNewReservation();
+      }
+    } else if (requestedCount <= 0) {
+      // Ak je zadaný záporný počet
+      toast.current.show({
+        severity: "error",
+        summary: "Neplatná hodnota",
+        detail: "Počet kusov musí byť kladné číslo.",
+        life: 5000,
+      });
+    } else {
+      // Ak nie sú vyplnené všetky povinné polia
+      toast.current.show({
+        severity: "warn",
+        summary: "Nevyplnené povinné polia",
+        detail: "Prosím, vyplňte všetky povinné polia.",
+        life: 5000,
+      });
     }
   };
 
