@@ -504,7 +504,7 @@ module.exports = {
     const lekar = require("../models/lekar");
 
     (async () => {
-      ret_val = await lekar.getZoznamLekarov();
+      ret_val = await lekar.getZoznamLekarov(req.params.id);
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);

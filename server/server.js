@@ -87,7 +87,6 @@ io.on("connection", (socket) => {
     });
   });
 
-  socket.on("disconnect", () => {});
   socket.on("typing", (params) => {
     io.emit("isTyping", {
       id: params.userId,

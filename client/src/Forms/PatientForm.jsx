@@ -9,7 +9,6 @@ import { AutoComplete } from "primereact/autocomplete";
 import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
-import { InputNumber } from "primereact/inputnumber";
 import GetUserData from "../Auth/GetUserData";
 export default function PatientForm() {
   const [showMessage, setShowMessage] = useState(false);
@@ -53,6 +52,9 @@ export default function PatientForm() {
     if (!data.psc) {
       errors.psc = "PSČ je povinné";
     }
+    if (!data.tel) {
+      errors.tel = "Telefón je povinný";
+    }
     if (!data.dat_od) {
       errors.dat_od = "Dátum zápisu je povinný";
     }
@@ -90,6 +92,8 @@ export default function PatientForm() {
         typ_krvi: data.typ_krvi,
         poistenec: data.poistenec,
         poistovna: data.poistovna?.ICO,
+        tel: data.tel,
+        mail: data.mail,
       }),
     };
     await fetch("/add/pacient", requestOptionsPatient).then(() =>
@@ -170,6 +174,8 @@ export default function PatientForm() {
             typ_krvi: "0-",
             poistenec: 0,
             poistovna: null,
+            tel: "",
+            mail: null,
           }}
           validate={validate}
           render={({ handleSubmit, form, values }) => (
@@ -349,6 +355,29 @@ export default function PatientForm() {
                   </div>
                 )}
               />
+              <Field
+                name="ulica"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label
+                      htmlFor="ulica"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Ulica
+                    </label>
+                    <InputText
+                      id="ulica"
+                      {...input}
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
               {!values.cudzinec ? (
                 <>
                   <Field
@@ -361,7 +390,7 @@ export default function PatientForm() {
                             "p-error": isFormFieldValid(meta),
                           })}
                         >
-                          *Číslo poistenca
+                          Číslo poistenca*
                         </label>
                         <InputMask
                           mask="99999999"
@@ -385,7 +414,7 @@ export default function PatientForm() {
                             "p-error": isFormFieldValid(meta),
                           })}
                         >
-                          *Poisťovňa
+                          Poisťovňa*
                         </label>
                         <Dropdown
                           id="poistovna"
@@ -405,19 +434,43 @@ export default function PatientForm() {
                 ""
               )}
               <Field
-                name="ulica"
+                name="tel"
                 render={({ input, meta }) => (
                   <div className="field col-12">
                     <label
-                      htmlFor="ulica"
+                      htmlFor="tel"
                       className={classNames({
                         "p-error": isFormFieldValid(meta),
                       })}
                     >
-                      Ulica
+                      Telefónne číslo*
                     </label>
                     <InputText
-                      id="ulica"
+                      id="basic"
+                      {...input}
+                      placeholder="+4210912345678"
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
+              <Field
+                name="mail"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label
+                      htmlFor="mail"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Email
+                    </label>
+                    <InputText
+                      id="basic"
                       {...input}
                       className={classNames({
                         "p-invalid": isFormFieldValid(meta),

@@ -450,7 +450,7 @@ async function insertPacient(body) {
     let result;
     if (!body.cudzinec) {
       sqlStatement = `BEGIN
-    pacient_insert(:meno, :priezvisko, :psc, :rod_cislo, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi, :poistenec ,:poistovna);
+    pacient_insert(:meno, :priezvisko, :psc, :rod_cislo, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi, :poistenec ,:poistovna,:tel,:mail);
     END;`;
       result = await conn.execute(sqlStatement, {
         rod_cislo: body.rod_cislo,
@@ -464,10 +464,12 @@ async function insertPacient(body) {
         typ_krvi: body.typ_krvi,
         poistenec: body.poistenec,
         poistovna: body.poistovna,
+        tel: body.tel,
+        mail: body.mail,
       });
     } else {
       sqlStatement = `BEGIN
-    cudzinec_insert(:meno, :priezvisko, :psc, :dat_narodenia,:pohlavie, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi);
+    cudzinec_insert(:meno, :priezvisko, :psc, :dat_narodenia,:pohlavie, :id_lekara, :ulica, :dat_od, :dat_do, :typ_krvi,:tel,:mail);
     END;`;
       result = await conn.execute(sqlStatement, {
         meno: body.meno,
@@ -480,6 +482,8 @@ async function insertPacient(body) {
         dat_od: body.dat_od,
         dat_do: body.dat_do,
         typ_krvi: body.typ_krvi,
+        tel: body.tel,
+        mail: body.mail,
       });
     }
     console.log("Rows inserted " + result.rowsAffected);

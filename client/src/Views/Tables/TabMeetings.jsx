@@ -161,7 +161,7 @@ function TabMeetings() {
           setShow(false);
           setImages([]);
         }}
-        style={{ maxWidth: "80%", minWidth: "600px", wordBreak: "break-all" }}
+        style={{ maxWidth: "80%", minWidth: "800px", wordBreak: "break-all" }}
       >
         {selectedRow ? (
           <div style={{ display: "flex", flexDirection: "column" }}>

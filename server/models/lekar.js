@@ -1,7 +1,7 @@
 const { element } = require("xml");
 const database = require("../database/Database");
 
-async function getZoznamLekarov() {
+async function getZoznamLekarov(id) {
   try {
     let conn = await database.getConnection();
 
@@ -9,9 +9,12 @@ async function getZoznamLekarov() {
       `SELECT cislo_zam ,meno || ', ' ||priezvisko as "meno", oddelenie.typ_oddelenia as oddelenie_nazov, nemocnica.nazov as nemocnica_nazov, cislo_zam
       from  zamestnanci
                     join os_udaje using(rod_cislo)
-                    join nemocnica using(id_nemocnice)
+                    join nemocnica on(zamestnanci.id_nemocnice = nemocnica.id_nemocnice)
                     left join oddelenie on(zamestnanci.id_oddelenia = oddelenie.id_oddelenia)
-                    where id_typ = 1 OR id_typ = 2 OR id_typ = 3`
+                    where (id_typ = 1 OR id_typ = 2 OR id_typ = 3)
+                    AND nemocnica.id_nemocnice in (select id_nemocnice from zamestnanci where cislo_zam = :id)
+                    AND cislo_zam <> :id`,
+      [id, id]
     );
 
     return result.rows;

@@ -184,7 +184,7 @@ router.get(
   controller.getTopZamestnanciVyplatyOddelenie
 );
 router.get(
-  "/zoznamLekarov",
+  "/zoznamLekarov/:id",
   verify.verifyRoles(0, 1, 2, 3),
   controller.getZoznamLekarov
 );

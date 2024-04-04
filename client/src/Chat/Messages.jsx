@@ -5,10 +5,10 @@ import { Button } from "primereact/button";
 import { ProgressSpinner } from "primereact/progressspinner";
 import socketService from "../service/socketService.js";
 import GetUserData from "../Auth/GetUserData.jsx";
-import "../styles/chat.css";
 import { Dialog } from "primereact/dialog";
 import AddUserForm from "../Forms/AddUserForm.jsx";
 import ChatSettings from "./ChatSettings.jsx";
+import "../styles/chat.css";
 
 const Messages = (props) => {
   const messagesEndRef = useRef([]);

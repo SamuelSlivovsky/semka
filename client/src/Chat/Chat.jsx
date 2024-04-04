@@ -130,18 +130,6 @@ const Chat = () => {
       });
   }, []);
 
-  const createNewGroup = () => {
-    const requestOptions = {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + localStorage.getItem("hospit-user"),
-      },
-      body: JSON.stringify({}),
-    };
-    fetch(`/chat/new`, requestOptions);
-  };
-
   return (
     <div className="chat-container">
       <div
