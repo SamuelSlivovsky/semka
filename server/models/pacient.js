@@ -322,6 +322,24 @@ async function getOckovania(id) {
   }
 }
 
+async function getOckovaniaAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const ockovania = await conn.execute(
+      `select nazov, typ, to_char(dat_ockovania,'DD.MM.YYYY') as "DATUM" from zdravotna_karta
+        join zoznam_vakcin using(id_karty)
+        join vakcina using(id_vakciny)`
+    );
+
+    ockovania.rows.forEach((element) => {
+      element.type = "OCK";
+    });
+    return ockovania.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 async function getVysetrenia(rod_cislo) {
   try {
     let conn = await database.getConnection();
@@ -383,6 +401,23 @@ async function getRecepty(pid_pacienta) {
   }
 }
 
+async function getReceptyAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const recepty = await conn.execute(
+      `select nazov, to_char(datum_zapisu, 'DD.MM.YYYY') as datum_zapisu, meno || ' ' || priezvisko as lekar
+            from recept join liek using(id_liek)
+                        join zamestnanci zc using(cislo_zam)
+                        join os_udaje ou on(ou.rod_cislo = zc.rod_cislo) 
+                  order by recept.datum_zapisu`
+    );
+    console.log(recepty.rows);
+    return recepty.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getZdravZaznamy(pid_pacienta) {
   try {
     let conn = await database.getConnection();
@@ -408,6 +443,23 @@ async function getZdravZaznamy(pid_pacienta) {
   }
 }
 
+//TODO Spomenut v diplomovej praci obmedzenie na 1000 zaznamov z dovodu optimalizacie rychlosti.
+async function getZdravZaznamyAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const zdravZaznamy = await conn.execute(
+      `select id_zaznamu as "id_zaz", to_char(datum, 'DD.MM.YYYY') datum, get_typ_zdrav_zaznamu(id_zaznamu) as typ
+            from zdravotny_zaz
+                    join zdravotna_karta using (id_karty)
+                    order by zdravotny_zaz.datum desc
+                    fetch first 1000 rows only`
+    );
+    return zdravZaznamy.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getChoroby(pid_pacienta) {
   try {
     let conn = await database.getConnection();
@@ -426,6 +478,21 @@ async function getChoroby(pid_pacienta) {
   }
 }
 
+async function getChorobyAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const choroby = await conn.execute(
+      `select nazov, typ, to_char(zo.dat_od,'DD.MM.YYYY') dat_od, nvl(to_char(zo.dat_do,'DD.MM.YYYY'), 'Súčasnosť') dat_do
+            from zoznam_ochoreni zo join choroba on(zo.id_choroby = choroba.id_choroby)
+                          join zdravotna_karta zk on(zo.id_karty = zk.id_karty)
+                          order by dat_od, dat_do`
+    );
+    return choroby.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getTypyZTP(pid_pacienta) {
   try {
     let conn = await database.getConnection();
@@ -437,6 +504,20 @@ async function getTypyZTP(pid_pacienta) {
       { pid_pacienta }
     );
     console.log(typyZTP.rows);
+    return typyZTP.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getTypyZTPAdmin() {
+  try {
+    let conn = await database.getConnection();
+    const typyZTP = await conn.execute(
+      `select id_postihnutia, nazov, to_char(datum_od,'DD.MM.YYYY') dat_od, nvl(to_char(datum_do,'DD.MM.YYYY'), 'Súčasnosť') dat_do
+          from zoznam_postihnuti join postihnutie using (id_postihnutia)
+                              join zdravotna_karta using (id_karty)`
+    );
     return typyZTP.rows;
   } catch (err) {
     console.log(err);
@@ -520,10 +601,15 @@ module.exports = {
   getZdravZaznamy,
   getChoroby,
   getTypyZTP,
-  insertPacient,
   getDoctorsOfPatient,
-  insertPacient,
   getIdPacienta,
   getOckovania,
   updateTimeOfDeath,
+  getChorobyAdmin,
+  getOckovaniaAdmin,
+  getZdravZaznamyAdmin,
+  getTypyZTPAdmin,
+  getReceptyAdmin,
+  getDoctorsOfPatient,
+  insertPacient,
 };

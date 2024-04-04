@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
@@ -11,6 +11,8 @@ import { Pdf } from "../../Forms/Pdf";
 import GetUserData from "../../Auth/GetUserData";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
+import { useNavigate } from "react-router";
+import { Toast } from "primereact/toast";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -37,6 +39,8 @@ export default function TableMedic(props) {
   } = props;
   const [popis, setPopis] = useState(null);
   const [nazov, setNazov] = useState(null);
+  const toast = useRef(null);
+  const navigate = useNavigate();
 
   const onHide = () => {
     setImgUrl(null);
@@ -74,7 +78,23 @@ export default function TableMedic(props) {
         setImgUrl(URL.createObjectURL(result));
       });
     fetch(`/zaznamy/popis/${value.id_zaz}`, { headers })
-      .then((response) => response.json())
+      .then((response) => {
+        // Kontrola ci response je ok (status:200)
+        if (response.ok) {
+          return response.json();
+          // Kontrola ci je token expirovany (status:410)
+        } else if (response.status === 410) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((data) => {
         setPopis(data[0].POPIS);
         setNazov(data[0].NAZOV);
@@ -215,6 +235,7 @@ export default function TableMedic(props) {
   return (
     <div>
       <div className="card">
+        <Toast ref={toast} position="top-center" />
         <DataTable
           editMode={editor ? "row" : ""}
           loading={tableLoading}
@@ -222,7 +243,7 @@ export default function TableMedic(props) {
           scrollable
           selectionMode="single"
           paginator
-          rows={25}
+          rows={15}
           selection={selectedRow}
           onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
           header={header}

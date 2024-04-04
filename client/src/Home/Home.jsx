@@ -9,6 +9,9 @@ import plusIcon from "../images/plus.png";
 import statIcon from "../images/statistics.png";
 import HomeCard from "./HomeCard";
 import storageIcon from "../images/drugs.png";
+import warehouseIcon from "../images/warehouse.png";
+import moveIcon from "../images/warehouse-move.png";
+import orderIcon from "../images/order.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
@@ -113,9 +116,9 @@ function Home() {
       key="7"
     ></HomeCard>,
     <HomeCard
-      title="Databáza"
+      title="Admin Panel"
       isCalendar={false}
-      path="/combobox"
+      path="/adminPanel"
       icon={comboboxIcon}
       key="2"
     ></HomeCard>,
@@ -133,6 +136,27 @@ function Home() {
       icon={patientIcon}
       key="2"
     ></HomeCard>,
+    <HomeCard
+      title="Vyšetrenia"
+      isCalendar={false}
+      path="/examinations"
+      icon={examinationIcon}
+      key="4"
+    ></HomeCard>,
+    <HomeCard
+      title="Hospitalizácie"
+      isCalendar={false}
+      path="/hospitalizations"
+      icon={hospitalizationIcon}
+      key="5"
+    ></HomeCard>,
+    <HomeCard
+      title="Operácie"
+      isCalendar={false}
+      path="/operations"
+      icon={operationIcon}
+      key="6"
+    ></HomeCard>,
   ];
 
   const patientCards = [
@@ -147,8 +171,32 @@ function Home() {
       title="Karta pacienta"
       isCalendar={false}
       path="/patient"
-      icon={patientIcon}
+      icon={storageIcon}
       key="2"
+    ></HomeCard>,
+  ];
+
+  const warehouseCards = [
+    <HomeCard
+      title="Sklad"
+      isCalendar={false}
+      path="/sklad"
+      icon={warehouseIcon}
+      key="9"
+    ></HomeCard>,
+    <HomeCard
+      title="Objednávky"
+      isCalendar={false}
+      path="/objednavky"
+      icon={orderIcon}
+      key="10"
+    ></HomeCard>,
+    <HomeCard
+      title="Presuny"
+      isCalendar={false}
+      path="/presuny"
+      icon={moveIcon}
+      key="11"
     ></HomeCard>,
   ];
 
@@ -163,6 +211,7 @@ function Home() {
           </>
         );
       else if (userData.UserInfo.role === 9999) return patientCards;
+      else if (userData.UserInfo.role === 5) return warehouseCards;
     }
   };
 

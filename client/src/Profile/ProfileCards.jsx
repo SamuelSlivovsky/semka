@@ -243,7 +243,6 @@ export default function ProfileCard(props) {
     fetchDisables();
     fetchDiseases();
     fetchMedRecords();
-    fetchPatientInfo();
     fetchRecipies();
     fetchVacs();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
@@ -561,7 +560,10 @@ export default function ProfileCard(props) {
           <TableMedicalRecords {...diseasesTable} />
         </Card>
       </div>
-      {props.userData.UserInfo.role === 3 ? (
+      {props.userData.UserInfo.role === 0 ||
+      props.userData.UserInfo.role === 1 ||
+      props.userData.UserInfo.role === 2 ||
+      props.userData.UserInfo.role === 3 ? (
         <>
           <div className="flex ">
             <div className="col-2 m-4">

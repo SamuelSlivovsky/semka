@@ -1,15 +1,21 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { Dialog } from "primereact/dialog";
+import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
 import { Tag } from "primereact/tag";
 import GetUserData from "../../Auth/GetUserData";
+import { Toast } from "primereact/toast";
 
 export default function TabPatients() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
+  const [showDialog, setShowDialog] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  const toast = useRef(null);
   const [pacienti, setPacienti] = useState([]);
   const navigate = useNavigate();
 
@@ -20,11 +26,26 @@ export default function TabPatients() {
     fetch(`/lekar/pacienti/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
-      .then((response) => response.json())
+      .then((response) => {
+        // Kontrola ci response je ok (status:200)
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 401) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((data) => {
         setPacienti(data);
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleClick = (value) => {
     navigate("/patient", { state: value.ID_PACIENTA });
@@ -100,11 +121,14 @@ export default function TabPatients() {
   const header = renderHeader();
   return (
     <div>
+      <Toast ref={toast} position="top-center" />
       <div className="card">
         <DataTable
           value={pacienti}
           responsiveLayout="scroll"
           selectionMode="single"
+          paginator
+          rows={15}
           onSelectionChange={(e) => handleClick(e.value)}
           header={header}
           filters={filters}

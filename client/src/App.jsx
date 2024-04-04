@@ -16,12 +16,16 @@ import "../node_modules/primeflex/primeflex.css";
 import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
+
 import Storage from "./Views/Storage";
+import Orders from "./Views/Orders";
+import WarehouseTransfers from "./Views/WarehouseTransfers";
+
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
 import { useNavigate, useLocation } from "react-router-dom";
-import Combobox from "./Views/Combobox";
+import AdminPanel from "./Views/AdminPanel";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
 import HospitalRoom from "./HospitalRoom/HospitalRoom";
@@ -113,7 +117,48 @@ function App() {
       label="Pacienti"
       icon="patient-icon"
     />,
-
+    <SidebarButton
+      key="8"
+      visibleLeft={visibleLeft}
+      path="/statistics"
+      label="Štatistiky"
+      icon="stat-icon"
+    />,
+    <SidebarButton
+      key="10"
+      visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
+    />,
+    <SidebarButton
+      key="13"
+      visibleLeft={visibleLeft}
+      path="/adminPanel"
+      label="Admin Panel"
+      icon="database-icon"
+    />,
+    <SidebarButton
+      key="5"
+      visibleLeft={visibleLeft}
+      path="/examinations"
+      label="Vyšetrenia"
+      icon="examination-icon"
+    />,
+    <SidebarButton
+      key="6"
+      visibleLeft={visibleLeft}
+      path="/hospitalizations"
+      icon="hospit-icon"
+      label="Hospitalizácie"
+    />,
+    <SidebarButton
+      key="7"
+      visibleLeft={visibleLeft}
+      path="/operations"
+      label="Operácie"
+      icon="operation-icon"
+    />,
     <SidebarButton
       key="8"
       visibleLeft={visibleLeft}
@@ -260,6 +305,37 @@ function App() {
     />,
   ];
 
+  const sidebarWarehouseManager = [
+    <SidebarButton
+      key="1"
+      visibleLeft={visibleLeft}
+      path="/"
+      label="Domov"
+      icon="home-icon"
+    />,
+    <SidebarButton
+      key="10"
+      visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
+    />,
+    <SidebarButton
+      key="14"
+      visibleLeft={visibleLeft}
+      path="/objednavky"
+      label="Objednavky"
+      icon="order-icon"
+    />,
+    <SidebarButton
+      key="15"
+      visibleLeft={visibleLeft}
+      path="/presuny"
+      label="Presuny"
+      icon="warehouse-move-icon"
+    />,
+  ];
+
   const renderDoctorRoutes = () => {
     return (
       <>
@@ -317,7 +393,7 @@ function App() {
         <Route path="/statistics" element={<Statistics></Statistics>}></Route>
         <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
-        <Route path="/combobox" element={<Combobox />}></Route>
+        <Route path="/adminPanel" element={<AdminPanel />}></Route>
       </>
     );
   };
@@ -335,6 +411,16 @@ function App() {
             <Patient userData={userData} patientId={patientId}></Patient>
           }
         ></Route>
+      </>
+    );
+  };
+
+  const renderWarehouseManagerRoutes = () => {
+    return (
+      <>
+        <Route path="/sklad" element={<Storage />}></Route>
+        <Route path="/objednavky" element={<Orders />}></Route>
+        <Route path="/presuny" element={<WarehouseTransfers />}></Route>
       </>
     );
   };
@@ -367,6 +453,8 @@ function App() {
           </>
         ) : userData !== null && userData.UserInfo.role === 9999 ? (
           sidebarButtonsPatient
+        ) : userData !== null && userData.UserInfo.role === 5 ? (
+          sidebarWarehouseManager
         ) : (
           ""
         )}
@@ -403,6 +491,12 @@ function App() {
             </>
           ) : userData && userData.UserInfo.role === 9999 ? (
             renderPatientRoutes()
+          ) : typeof userData !== "undefined" &&
+            userData !== null &&
+            userData.UserInfo.role === 5 ? (
+            <>
+              {renderWarehouseManagerRoutes()} {renderChiefRoutes()}
+            </>
           ) : (
             ""
           )}

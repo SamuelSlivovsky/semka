@@ -11,6 +11,7 @@ const verifyJWT = require("./middleware/verifyJWT");
 const credentials = require("./middleware/credentials");
 // ROUTES
 const lekarRoute = require("./routes/lekarRoute");
+const logRoute = require("./routes/logRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
 const patientRoute = require("./routes/patientRoute");
@@ -25,7 +26,8 @@ const updateRoute = require("./routes/updateRoute");
 const chatRoute = require("./routes/chatRoute");
 const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
 const poistovnaRoute = require("./routes/poistovnaRoute");
-
+const ordersRoute = require("./routes/ordersRoute");
+const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
 // Set session date format
 async function setSessionDateFormat() {
   const database = require("./database/Database");
@@ -57,9 +59,9 @@ app.use(
 );
 
 app.use(cookieParser()); // Middleware for cookies
-
 app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
+app.use("/logs", logRoute);
 app.use("/sklad", storageRoute);
 app.use("/lekar", lekarRoute);
 app.use("/selects", selectsRoute);
@@ -75,6 +77,8 @@ app.use("/update", updateRoute);
 app.use("/chat", chatRoute);
 app.use("/hospitalizacia", hospitalizaciaRoute);
 app.use("/poistovna", poistovnaRoute);
+app.use("/objednavky", ordersRoute);
+app.use("/presuny", warehouseTransfersRoute);
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
