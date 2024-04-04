@@ -146,4 +146,10 @@ router.post(
   controller.insertRezervaciaLieku
 );
 
+router.delete(
+  "/deleteRezervaciaLieku/:id",
+  verify.verifyRoles(0, 10),
+  controller.deleteRezervaciaLieku
+);
+
 module.exports = router;

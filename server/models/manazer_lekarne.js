@@ -499,6 +499,22 @@ async function insertRezervaciaLieku(body) {
   }
 }
 
+async function deleteRezervaciaLieku(idRezervacie) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `delete from rezervacia_lieku where id_rezervacie = :idRezervacie`;
+    console.log(idRezervacie);
+    let result = await conn.execute(sqlStatement, [idRezervacie], {
+      autoCommit: true,
+    });
+
+    console.log("Rows deleted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getManazeriLekarni,
   getLekarnici,
@@ -523,4 +539,5 @@ module.exports = {
   getZoznamMiest,
   getZoznamAktualnychRezervacii,
   insertRezervaciaLieku,
+  deleteRezervaciaLieku,
 };

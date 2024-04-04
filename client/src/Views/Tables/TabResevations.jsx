@@ -143,43 +143,41 @@ export default function TabResevations() {
 
   const deleteReservation = (rowData) => {
     console.log(rowData.ID_REZERVACIE);
-    // const token = localStorage.getItem("hospit-user");
-    // fetch(`/pharmacyManagers/deleteZamestnanciLekarne/${rowData.CISLO_ZAM}`, {
-    //   method: "DELETE",
-    //   headers: {
-    //     Authorization: "Bearer " + token,
-    //   },
-    // })
-    //   .then((response) => {
-    //     if (response.ok) {
-    //       toast.current.show({
-    //         severity: "success",
-    //         summary: "Zamestnanec vymazaný",
-    //         detail: "Zamestnanec bol úspešne vymazaný.",
-    //         life: 3000,
-    //       });
-    //       // Aktualizujte zoznam zamestnancov po úspešnom vymazaní
-    //       // Možno budete potrebovať prispôsobiť túto časť, aby správne načítala dáta
-    //       fetchGetZoznamAktualnychRezervacii(
-    //         { authorization: "Bearer " + token },
-    //         GetUserData(token)
-    //       );
-    //     } else {
-    //       throw new Error("Problém pri vymazávaní zamestnanca");
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.error("Chyba:", error);
-    //     toast.current.show({
-    //       severity: "error",
-    //       summary: "Chyba pri vymazávaní",
-    //       detail: "Nepodarilo sa vymazať zamestnanca.",
-    //       life: 3000,
-    //     });
-    //   });
+    const token = localStorage.getItem("hospit-user");
+    fetch(`/pharmacyManagers/deleteRezervaciaLieku/${rowData.ID_REZERVACIE}`, {
+      method: "DELETE",
+      headers: {
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          toast.current.show({
+            severity: "success",
+            summary: "Rezervácia zrušená",
+            detail: "Rezervácia bola úspešne zrušená.",
+            life: 3000,
+          });
+          fetchGetZoznamAktualnychRezervacii(
+            { authorization: "Bearer " + token },
+            GetUserData(token)
+          );
+        } else {
+          throw new Error("Problém pri zrušení rezervácie");
+        }
+      })
+      .catch((error) => {
+        console.error("Chyba:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri zrušení",
+          detail: "Nepodarilo sa zrušiť rezerváciu.",
+          life: 3000,
+        });
+      });
 
-    // // Zavrie potvrdzovací dialóg
-    // setShowConfirmDialog(false);
+    // Zavrie potvrdzovací dialóg
+    setShowConfirmDialog(false);
   };
 
   const requestDeleteReservation = (rowData) => {

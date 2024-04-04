@@ -224,7 +224,9 @@ module.exports = {
   getZoznamAktualnychRezervacii: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
-      zoznamRezervacii = await rezervacia.getZoznamAktualnychRezervacii(req.params.id);
+      zoznamRezervacii = await rezervacia.getZoznamAktualnychRezervacii(
+        req.params.id
+      );
       res.status(200).json(zoznamRezervacii);
     })();
   },
@@ -240,4 +242,17 @@ module.exports = {
     });
   },
 
+  deleteRezervaciaLieku: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    const idRezervacie = req.params.id; // Získanie idRezervacie z URL parametra
+    rezervacia
+      .deleteRezervaciaLieku(idRezervacie)
+      .then(() => {
+        res.status(200).json({ message: "Rezervácia bola úspešne zrušená." });
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err.message); // Odoslanie správy o chybe
+      });
+  },
 };
