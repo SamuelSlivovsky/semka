@@ -14,6 +14,7 @@ export default function TabResevations() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -24,6 +25,10 @@ export default function TabResevations() {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
+    fetchGetZoznamAktualnychRezervacii(headers, userDataHelper);
+  }, []);
+
+  const fetchGetZoznamAktualnychRezervacii = (headers, userDataHelper) => {
     fetch(
       `/pharmacyManagers/getZoznamAktualnychRezervacii/${userDataHelper.UserInfo.userid}`,
       {
@@ -53,7 +58,7 @@ export default function TabResevations() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  };
 
   const onHide = () => {
     setShowDialog(false);
@@ -62,7 +67,6 @@ export default function TabResevations() {
 
   const onSubmit = () => {
     setShowDialog(false);
-    navigate("/medicament_detail", { state: selectedRow.ID_LIEK });
   };
 
   const handleClick = (value) => {
@@ -74,13 +78,13 @@ export default function TabResevations() {
     return (
       <div>
         <Button
-          label="Zatvoriť"
+          label="Zavrieť"
           icon="pi pi-times"
           className="p-button-danger"
           onClick={() => onHide()}
         />
         <Button
-          label="Vydať"
+          label="Vydať rezervovaný liek"
           icon="pi pi-check"
           onClick={() => onSubmit()}
           autoFocus
@@ -120,6 +124,124 @@ export default function TabResevations() {
       </div>
     );
   };
+
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <React.Fragment>
+        <Button
+          icon="pi pi-minus-circle"
+          className="p-button-rounded p-button-raised"
+          style={{
+            backgroundColor: "#18dec8",
+            color: "white",
+          }}
+          onClick={() => requestDeleteReservation(rowData)}
+        />
+      </React.Fragment>
+    );
+  };
+
+  const deleteReservation = (rowData) => {
+    console.log(rowData.ID_REZERVACIE);
+    // const token = localStorage.getItem("hospit-user");
+    // fetch(`/pharmacyManagers/deleteZamestnanciLekarne/${rowData.CISLO_ZAM}`, {
+    //   method: "DELETE",
+    //   headers: {
+    //     Authorization: "Bearer " + token,
+    //   },
+    // })
+    //   .then((response) => {
+    //     if (response.ok) {
+    //       toast.current.show({
+    //         severity: "success",
+    //         summary: "Zamestnanec vymazaný",
+    //         detail: "Zamestnanec bol úspešne vymazaný.",
+    //         life: 3000,
+    //       });
+    //       // Aktualizujte zoznam zamestnancov po úspešnom vymazaní
+    //       // Možno budete potrebovať prispôsobiť túto časť, aby správne načítala dáta
+    //       fetchGetZoznamAktualnychRezervacii(
+    //         { authorization: "Bearer " + token },
+    //         GetUserData(token)
+    //       );
+    //     } else {
+    //       throw new Error("Problém pri vymazávaní zamestnanca");
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error("Chyba:", error);
+    //     toast.current.show({
+    //       severity: "error",
+    //       summary: "Chyba pri vymazávaní",
+    //       detail: "Nepodarilo sa vymazať zamestnanca.",
+    //       life: 3000,
+    //     });
+    //   });
+
+    // // Zavrie potvrdzovací dialóg
+    // setShowConfirmDialog(false);
+  };
+
+  const requestDeleteReservation = (rowData) => {
+    setSelectedRow(rowData); // Uložíme si vybranu rezervaciu do stavu
+    setShowConfirmDialog(true); // Zobrazíme potvrdzovací dialog
+  };
+
+  const renderConfirmDialog = () => {
+    return (
+      <Dialog
+        header="Zrušenie rezervácie v lekárni"
+        visible={showConfirmDialog}
+        style={{ width: "950px", textAlign: "center" }}
+        modal
+        footer={confirmDialogFooter}
+        onHide={() => setShowConfirmDialog(false)}
+      >
+        <div
+          className="confirmation-content"
+          style={{ textAlign: "center", display: "grid" }}
+        >
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{
+              fontSize: "2rem",
+              color: "var(--yellow-500)",
+              marginBottom: "1rem",
+            }}
+          ></i>
+          <span style={{ marginBottom: "1rem" }}>
+            <b>Naozaj chcete zrušiť rezerváciu lieku v tejto lekárni?</b>
+            <br />
+            <br />
+            <br />
+            {selectedRow?.ROD_CISLO}
+            {": "}
+            {selectedRow?.MENO} {selectedRow?.PRIEZVISKO}
+            <br />
+            <br />
+            <b>Rezervovaný liek:</b> {selectedRow?.NAZOV_LIEKU}
+          </span>
+        </div>
+      </Dialog>
+    );
+  };
+
+  const confirmDialogFooter = (
+    <div style={{ display: "flex", justifyContent: "center" }}>
+      <Button
+        label="Nie"
+        icon="pi pi-times"
+        className="p-button-text"
+        onClick={() => setShowConfirmDialog(false)}
+      />
+      <Button
+        label="Áno"
+        icon="pi pi-check"
+        className="p-button-text"
+        onClick={() => deleteReservation(selectedRow)}
+      />
+    </div>
+  );
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
@@ -163,6 +285,7 @@ export default function TabResevations() {
   const header = renderHeader();
   return (
     <div>
+      {renderConfirmDialog()}
       <Toast ref={toast} position="top-center" />
       <div className="card">
         {loading ? (
@@ -218,13 +341,14 @@ export default function TabResevations() {
             <Column field="ROD_CISLO" header={"Rodné číslo"} filter></Column>
             <Column field="MENO" header={"Meno"} filter></Column>
             <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
+            <Column body={actionBodyTemplate} header=""></Column>
           </DataTable>
         )}
       </div>
       <Dialog
         header="Detail rezervácie"
         visible={showDialog}
-        style={{ textAlign: "center" }}
+        style={{ textAlign: "center", width: "950px" }}
         modal
         footer={renderDialogFooter()}
         onHide={() => onHide()}
