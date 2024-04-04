@@ -175,11 +175,12 @@ function App() {
       icon="storage-icon"
     />,
     <SidebarButton
-      key="selects"
+      key="11"
       visibleLeft={visibleLeft}
-      path="/combobox"
-      label="Admin selecty"
-      icon="database-icon"
+      path="/chat"
+      label="Správy"
+      icon="chat-icon"
+      notifications={notifications}
     />,
   ];
 

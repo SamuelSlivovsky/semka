@@ -80,22 +80,57 @@ app.use("/poistovna", poistovnaRoute);
 app.use("/objednavky", ordersRoute);
 app.use("/presuny", warehouseTransfersRoute);
 
+// Store user socket IDs and groups
+const users = {};
+
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
+
+  // When a user connects, store their socket ID
+  socket.on("storeUserData", ({ userId, group }) => {
+    users[userId] = {
+      socketId: socket.id,
+      group: group, // Store user's groups, default to empty array
+    };
+  });
+
+  // Send a private message to users in the same group
   socket.on("sendMessage", (message, params) => {
-    io.emit("newMessage", {
-      content: message,
-      image: params.image,
-      sender: params.userId,
-      type: "text",
+    const groupUsers = Object.values(users).filter(
+      (user) => user.group == params.groupId
+    );
+
+    groupUsers.forEach((user) => {
+      io.to(user.socketId).emit("newMessage", {
+        content: message,
+        sender: params.userId,
+        image: params.image,
+        type: "text",
+      });
     });
   });
 
   socket.on("typing", (params) => {
-    io.emit("isTyping", {
-      id: params.userId,
-      isEmpty: params.isEmpty,
+    const groupUsers = Object.values(users).filter(
+      (user) => user.group == params.groupId
+    );
+    groupUsers.forEach((user) => {
+      io.to(user.socketId).emit("isTyping", {
+        id: params.userId,
+        isEmpty: params.isEmpty,
+      });
     });
+  });
+
+  // Handle disconnection
+  socket.on("disconnect", () => {
+    // Remove the disconnected user from the users object
+    const userId = Object.keys(users).find(
+      (key) => users[key].socketId === socket.id
+    );
+    if (userId) {
+      delete users[userId];
+    }
   });
 });
 

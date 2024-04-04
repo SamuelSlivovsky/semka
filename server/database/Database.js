@@ -1,17 +1,22 @@
 const oracledb = require("oracledb");
+const path = require("path");
+
+// Set the path to the Instant Client libraries
+const instantClientPath = path.join(__dirname, "instantclient_21_7");
 try {
-  oracledb.initOracleClient({ libDir: "C:\\oracle\\instantclient_21_7" });
+  // Initialize Oracle Client with the Instant Client libraries path
+  oracledb.initOracleClient({ libDir: instantClientPath });
 } catch (err) {
   console.error("Whoops!");
   console.error(err);
   process.exit(1);
 }
+
+// Set the output format
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
+
 const fs = require("fs");
-const path = require("path");
-
 const configFilePath = path.join(__dirname, "../config/dbConfig.json");
-
 const dbConfig = JSON.parse(fs.readFileSync(configFilePath, "UTF-8"));
 
 async function getConnection() {

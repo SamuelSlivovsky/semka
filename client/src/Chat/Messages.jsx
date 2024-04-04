@@ -134,6 +134,12 @@ const Messages = (props) => {
 
   useEffect(() => {
     socketService.connect();
+
+    socketService.emit("storeUserData", {
+      userId: userDataHelper.UserInfo.userid,
+      group: props.group.ID_SKUPINY,
+    });
+
     socketService.on("yourSocketId", (socketId) => {
       setMySocketId(socketId);
     });
@@ -214,7 +220,7 @@ const Messages = (props) => {
       socketService.disconnect();
       if (container) container.removeEventListener("scroll", handleScroll);
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [props.group]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const sendMessage = () => {
     setAllowScroll(true);
@@ -222,6 +228,7 @@ const Messages = (props) => {
       "sendMessage",
       newMessage == "" && image ? " " : newMessage,
       {
+        groupId: props.group.ID_SKUPINY,
         userId: userDataHelper.UserInfo.userid,
         image: image,
       }
@@ -254,6 +261,7 @@ const Messages = (props) => {
   const handleInputChange = (e) => {
     setNewMessage(e.target.value);
     socketService.emit("typing", {
+      groupId: props.group.ID_SKUPINY,
       userId: userDataHelper.UserInfo.userid,
       isEmpty: e.target.value === "",
     });
