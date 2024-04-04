@@ -135,15 +135,15 @@ router.get(
 );
 
 router.get(
-  "/getZoznamAktualnychRezervacii/:id",
+  "/getZoznamAktualnychRezervaciiLieku/:id",
   verify.verifyRoles(0, 10),
-  controller.getZoznamAktualnychRezervacii
+  controller.getZoznamAktualnychRezervaciiLieku
 );
 
 router.get(
-  "/getZoznamPrevzatychRezervacii/:id",
+  "/getZoznamPrevzatychRezervaciiLieku/:id",
   verify.verifyRoles(0, 10),
-  controller.getZoznamPrevzatychRezervacii
+  controller.getZoznamPrevzatychRezervaciiLieku
 );
 
 router.post(

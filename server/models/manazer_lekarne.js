@@ -428,7 +428,7 @@ async function getZoznamMiest() {
   }
 }
 
-async function getZoznamAktualnychRezervacii(id) {
+async function getZoznamAktualnychRezervaciiLieku(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
@@ -453,7 +453,7 @@ async function getZoznamAktualnychRezervacii(id) {
   }
 }
 
-async function getZoznamPrevzatychRezervacii(id) {
+async function getZoznamPrevzatychRezervaciiLieku(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
@@ -562,8 +562,8 @@ module.exports = {
   insertUcinnaLatka,
   deleteUcinnaLatka,
   getZoznamMiest,
-  getZoznamAktualnychRezervacii,
-  getZoznamPrevzatychRezervacii,
+  getZoznamAktualnychRezervaciiLieku,
+  getZoznamPrevzatychRezervaciiLieku,
   insertRezervaciaLieku,
   deleteRezervaciaLieku,
 };

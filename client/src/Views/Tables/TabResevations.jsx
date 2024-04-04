@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar";
+// import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
@@ -17,14 +17,14 @@ export default function TabResevations() {
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-  const [showEditDialog, setShowEditDialog] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
+  // const [showEditDialog, setShowEditDialog] = useState(false);
+  // const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
-  const [aktualneRezervacie, setAktualneRezervacie] = useState([]);
-  const [prevzateRezervacie, setPrevzateRezervacie] = useState([]);
+  const [aktualneRezervacieLiekov, setAktualneRezervacieLiekov] = useState([]);
+  const [prevzateRezervacieLiekov, setPrevzateRezervacieLiekov] = useState([]);
   const [dialogContext, setDialogContext] = useState(""); // 'aktualne' alebo 'vydane'
 
   useEffect(() => {
@@ -34,29 +34,30 @@ export default function TabResevations() {
         const userDataHelper = GetUserData(token);
         const headers = { authorization: "Bearer " + token };
 
-        const [aktualneResponse, prevzateResponse] = await Promise.all([
-          fetch(
-            `/pharmacyManagers/getZoznamAktualnychRezervacii/${userDataHelper.UserInfo.userid}`,
-            { headers }
-          ),
-          fetch(
-            `/pharmacyManagers/getZoznamPrevzatychRezervacii/${userDataHelper.UserInfo.userid}`,
-            { headers }
-          ),
-        ]);
+        const [aktualneLiekyResponse, prevzateLiekyResponse] =
+          await Promise.all([
+            fetch(
+              `/pharmacyManagers/getZoznamAktualnychRezervaciiLieku/${userDataHelper.UserInfo.userid}`,
+              { headers }
+            ),
+            fetch(
+              `/pharmacyManagers/getZoznamPrevzatychRezervaciiLieku/${userDataHelper.UserInfo.userid}`,
+              { headers }
+            ),
+          ]);
 
-        if (!aktualneResponse.ok || !prevzateResponse.ok) {
+        if (!aktualneLiekyResponse.ok || !prevzateLiekyResponse.ok) {
           // Handle error (show toast or redirect)
           return;
         }
 
-        const aktualneData = await aktualneResponse.json();
-        const prevzateData = await prevzateResponse.json();
+        const aktualneLiekyData = await aktualneLiekyResponse.json();
+        const prevzateLiekyData = await prevzateLiekyResponse.json();
 
-        setAktualneRezervacie(aktualneData);
-        console.log(aktualneData);
-        setPrevzateRezervacie(prevzateData);
-        console.log(prevzateData);
+        setAktualneRezervacieLiekov(aktualneLiekyData);
+        console.log(aktualneLiekyData);
+        setPrevzateRezervacieLiekov(prevzateLiekyData);
+        console.log(prevzateLiekyData);
       } catch (error) {
         // Handle error
       } finally {
@@ -97,7 +98,7 @@ export default function TabResevations() {
           <Button
             label="Vydať rezervovaný liek"
             icon="pi pi-check"
-            onClick={() => setShowEditDialog(true)}
+            // onClick={() => setShowEditDialog(true)}
             autoFocus
           />
         </div>
@@ -181,7 +182,7 @@ export default function TabResevations() {
             detail: "Rezervácia bola úspešne zrušená.",
             life: 3000,
           });
-          setAktualneRezervacie(
+          setAktualneRezervacieLiekov(
             { authorization: "Bearer " + token },
             GetUserData(token)
           );
@@ -336,7 +337,7 @@ export default function TabResevations() {
               </div>
             ) : (
               <DataTable
-                value={aktualneRezervacie}
+                value={aktualneRezervacieLiekov}
                 responsiveLayout="scroll"
                 selectionMode="single"
                 paginator
@@ -410,7 +411,7 @@ export default function TabResevations() {
               </span>
             </div>
           </Dialog>
-          {/* Edit Date Dialog */}
+          {/* Edit Date Dialog
           <Dialog
             visible={showEditDialog}
             onHide={() => setShowEditDialog(false)}
@@ -437,7 +438,7 @@ export default function TabResevations() {
               showIcon
               dateFormat="yy-mm-dd"
             />
-          </Dialog>
+          </Dialog> */}
         </div>
       </TabPanel>
       <TabPanel header="Prevzaté rezervácie liekov">
@@ -466,7 +467,7 @@ export default function TabResevations() {
               </div>
             ) : (
               <DataTable
-                value={prevzateRezervacie}
+                value={prevzateRezervacieLiekov}
                 responsiveLayout="scroll"
                 selectionMode="single"
                 paginator

@@ -221,20 +221,20 @@ module.exports = {
     })();
   },
 
-  getZoznamAktualnychRezervacii: (req, res) => {
+  getZoznamAktualnychRezervaciiLieku: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
-      zoznamRezervacii = await rezervacia.getZoznamAktualnychRezervacii(
+      zoznamRezervacii = await rezervacia.getZoznamAktualnychRezervaciiLieku(
         req.params.id
       );
       res.status(200).json(zoznamRezervacii);
     })();
   },
 
-  getZoznamPrevzatychRezervacii: (req, res) => {
+  getZoznamPrevzatychRezervaciiLieku: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
-      zoznamRezervacii = await rezervacia.getZoznamPrevzatychRezervacii(
+      zoznamRezervacii = await rezervacia.getZoznamPrevzatychRezervaciiLieku(
         req.params.id
       );
       res.status(200).json(zoznamRezervacii);
