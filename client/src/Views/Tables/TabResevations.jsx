@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Dialog } from "primereact/dialog";
+import { Calendar } from "primereact/calendar";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
@@ -15,6 +16,8 @@ export default function TabResevations() {
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -86,7 +89,7 @@ export default function TabResevations() {
         <Button
           label="Vydať rezervovaný liek"
           icon="pi pi-check"
-          onClick={() => onSubmit()}
+          onClick={() => setShowEditDialog(true)}
           autoFocus
         />
       </div>
@@ -371,6 +374,34 @@ export default function TabResevations() {
             {selectedRow?.DOSTUPNY_POCET}
           </span>
         </div>
+      </Dialog>
+      {/* Edit Date Dialog */}
+      <Dialog
+        visible={showEditDialog}
+        onHide={() => setShowEditDialog(false)}
+        header="Nastaviť dátum prevzatia"
+        footer={
+          <div>
+            <Button
+              label="Zrušiť"
+              icon="pi pi-times"
+              onClick={() => setShowEditDialog(false)}
+              className="p-button-text"
+            />
+            <Button
+              label="Potvrdiť"
+              icon="pi pi-check"
+              // onClick={() => handleEditDate()}
+            />
+          </div>
+        }
+      >
+        <Calendar
+          value={selectedDate}
+          onChange={(e) => setSelectedDate(e.value)}
+          showIcon
+          dateFormat="yy-mm-dd"
+        />
       </Dialog>
     </div>
   );
