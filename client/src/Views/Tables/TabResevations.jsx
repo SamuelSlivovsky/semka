@@ -25,7 +25,7 @@ export default function TabResevations() {
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(
-      `/pharmacyManagers/getZoznamRezervacii/${userDataHelper.UserInfo.userid}`,
+      `/pharmacyManagers/getZoznamAktualnychRezervacii/${userDataHelper.UserInfo.userid}`,
       {
         headers,
       }

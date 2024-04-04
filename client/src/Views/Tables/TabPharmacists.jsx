@@ -85,7 +85,7 @@ export default function TabPharmacists(props) {
         console.log(data);
       })
       .catch((error) => {
-        console.error("Error fetching ucinne latky:", error);
+        console.error("Error fetching zoznam miest:", error);
       });
   };
 

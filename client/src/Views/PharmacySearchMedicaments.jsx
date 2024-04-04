@@ -5,27 +5,40 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import GetUserData from "../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dropdown } from "primereact/dropdown";
 
-export default function PharmacySearchMedicaments() {
+export default function PharmacySearchMedicaments(props) {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
+  const location = useLocation();
   const [searchLiekyLekarenskySklad, setSearchLiekyLekarenskySklad] = useState(
     []
   );
   const navigate = useNavigate();
+  // const [idLekarne, setIdLekarne] = useState([]);
+  const [idSkladu, setIdSkladu] = useState([]);
+  const [idLieku, setIdLieku] = useState([]);
+  const [datumTrvanlivosti, setDatumTrvanlivosti] = useState([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newReservation, setNewReservation] = useState({});
+  const [submitted, setSubmitted] = useState(false); //sluzi na to, ze polia v addForm musia byt required
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
+    fetchGetLiekyPodlaLekarne(headers, userDataHelper);
+  }, []);
+
+  const fetchGetLiekyPodlaLekarne = (headers, userDataHelper) => {
     fetch(
       `/lekarenskySklad/lekarenskySkladVyhladavnieLieciva/${userDataHelper.UserInfo.userid}`,
       {
@@ -54,7 +67,56 @@ export default function PharmacySearchMedicaments() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  };
+
+  const fetchSubmitNewReservation = () => {
+    const reservationData = {
+      ...newReservation,
+      // id_lekarne: idLekarne,
+      id_sklad: idSkladu,
+      id_liek: idLieku,
+      datum_trvanlivosti: datumTrvanlivosti,
+    };
+    console.log(reservationData);
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+
+    fetch("/pharmacyManagers/insertRezervaciaLieku", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(reservationData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then((data) => {
+        toast.current.show({
+          severity: "success",
+          summary: "Rezervácia bola vytvorená",
+          detail: "Nová rezervácia lieku v lekárni bola úspešne vytvorená.",
+          life: 5000,
+        });
+        setShowAddDialog(false); // Zavrie dialogové okno po úspešnom pridaní
+        setNewReservation({}); // Resetuje stav formulára
+        fetchGetLiekyPodlaLekarne(headers, GetUserData(token));
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri vytváraní rezervácie",
+          detail: "Nepodarilo sa vytvoriť rezerváciu.",
+          life: 5000,
+        });
+      });
+  };
+
   const onHide = () => {
     setShowDialog(false);
     setSelectedRow(null);
@@ -62,13 +124,24 @@ export default function PharmacySearchMedicaments() {
 
   const onSubmit = () => {
     setShowDialog(false);
-    // navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
+    setShowAddDialog(true);
   };
 
   const handleClick = (value) => {
+    //moznost kliknut a otvori dialog iba v pripade, ze liek je volnopredajny
     if (value && value.NA_PREDPIS === "N") {
       setShowDialog(true);
       setSelectedRow(value);
+      setIdSkladu(value.ID_SKLAD);
+      setIdLieku(value.ID_LIEK);
+      setDatumTrvanlivosti(value.DATUM_TRVANLIVOSTI);
+    } else {
+      toast.current.show({
+        severity: "warn",
+        summary: "Upozornenie",
+        detail: "Rezervácia je možné len pre voľnopredajné lieky.",
+        life: 5000,
+      });
     }
   };
 
@@ -98,10 +171,169 @@ export default function PharmacySearchMedicaments() {
             />
           </span>
           <div className="ml-4">
-            <h2>Vyhľadávanie lekárne, ktorá má liečivo skladom</h2>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Vyhľadávanie lekárne, ktorá má liek skladom
+            </h2>
           </div>
         </div>
       </div>
+    );
+  };
+
+  const formatRodneCislo = (value) => {
+    // Odstráňte všetky znaky okrem čísel a lomiek
+    let cislo = value.replace(/[^\d/]/g, "");
+
+    // Odstráňte všetky lomky, ktoré sú na zlom mieste
+    cislo = cislo.replace(/[/]/g, "");
+
+    // Uistite sa, že lomka je pridávaná iba raz
+    if (cislo.length > 6) {
+      cislo = `${cislo.slice(0, 6)}/${cislo.slice(6)}`;
+    }
+
+    // Orezanie akéhokoľvek nadbytočného textu
+    if (cislo.length > 11) {
+      cislo = cislo.slice(0, 11);
+    }
+
+    return cislo;
+  };
+
+  const handleSubmit = () => {
+    setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
+    if (
+      newReservation.rod_cislo &&
+      newReservation.meno &&
+      newReservation.priezvisko &&
+      newReservation.pocet
+    ) {
+      // Ak sú všetky polia vyplnené, pokračujeme v odoslaní
+      fetchSubmitNewReservation();
+    }
+  };
+
+  const renderErrorMessage = (fieldName) => {
+    return (
+      submitted &&
+      !newReservation[fieldName] && (
+        <small className="p-error">Toto pole je povinné!</small>
+      )
+    );
+  };
+
+  // Form dialog for adding a new reservation
+  const renderAddReservationDialog = () => {
+    return (
+      <Dialog
+        visible={showAddDialog}
+        style={{ width: "450px" }}
+        header="Vytvoriť rezerváciu lieku v lekárni"
+        modal
+        className="p-fluid"
+        onHide={() => setShowAddDialog(false)}
+      >
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="rodneCislo">Rodné číslo</label>
+          <InputText
+            id="rodneCislo"
+            value={newReservation.rod_cislo}
+            onChange={(e) =>
+              setNewReservation({
+                ...newReservation,
+                rod_cislo: formatRodneCislo(e.target.value),
+              })
+            }
+            placeholder="______/____"
+            maxLength={11}
+            required
+          />
+          {renderErrorMessage("rod_cislo")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="meno">Meno</label>
+          <InputText
+            id="meno"
+            value={newReservation.meno}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, meno: e.target.value })
+            }
+            placeholder="Zadajte meno"
+            required
+          />
+          {renderErrorMessage("meno")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="priezvisko">Priezvisko</label>
+          <InputText
+            id="priezvisko"
+            value={newReservation.priezvisko}
+            onChange={(e) =>
+              setNewReservation({
+                ...newReservation,
+                priezvisko: e.target.value,
+              })
+            }
+            placeholder="Zadajte priezvisko"
+            required
+          />
+          {renderErrorMessage("priezvisko")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="ulica">Telefón</label>
+          <InputText
+            id="telefon"
+            value={newReservation.telefon}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, telefon: e.target.value })
+            }
+            placeholder="Zadajte telefónne číslo (Nepovinné)"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="ulica">E - mail</label>
+          <InputText
+            id="email"
+            value={newReservation.email}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, email: e.target.value })
+            }
+            placeholder="Zadajte e - mail (Nepovinné)"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "4rem" }}>
+          <label htmlFor="pocet">Počet</label>
+          <InputText
+            id="pocet"
+            value={newReservation.pocet}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, pocet: e.target.value })
+            }
+            placeholder="Zadajte počet kusov"
+            type="number"
+            required
+          />
+          {renderErrorMessage("pocet")}
+        </div>
+        <Button
+          style={{ marginTop: "50px" }}
+          label="Rezervovať"
+          icon="pi pi-check"
+          onClick={() => {
+            handleSubmit();
+          }}
+        />
+      </Dialog>
     );
   };
 
@@ -152,6 +384,7 @@ export default function PharmacySearchMedicaments() {
   return (
     <div>
       <Toast ref={toast} position="top-center" />
+      {renderAddReservationDialog()}
       <div className="card">
         {loading ? (
           <div
@@ -200,7 +433,11 @@ export default function PharmacySearchMedicaments() {
               filter
             ></Column>
             <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
-            <Column field="UCINNA_LATKA" header={"Účinná látka"} filter></Column>
+            <Column
+              field="UCINNA_LATKA"
+              header={"Účinná látka"}
+              filter
+            ></Column>
             <Column
               field="NA_PREDPIS"
               header={"Výdaj"}

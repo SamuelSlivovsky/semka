@@ -135,10 +135,15 @@ router.get(
 );
 
 router.get(
-  "/getZoznamRezervacii/:id",
+  "/getZoznamAktualnychRezervacii/:id",
   verify.verifyRoles(0, 10),
-  controller.getZoznamRezervacii
+  controller.getZoznamAktualnychRezervacii
 );
 
+router.post(
+  "/insertRezervaciaLieku",
+  verify.verifyRoles(0, 10),
+  controller.insertRezervaciaLieku
+);
 
 module.exports = router;

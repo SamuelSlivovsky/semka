@@ -428,12 +428,13 @@ async function getZoznamMiest() {
   }
 }
 
-async function getZoznamRezervacii(id) {
+async function getZoznamAktualnychRezervacii(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH:MM:SS') as "DATUM_REZERVACIE", 
-      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", rl.datum_prevzatia, lek.nazov as "NAZOV_LEKARNE"
+      `select id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
+      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", rl.datum_prevzatia, 
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
       from rezervacia_lieku rl
       join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
       join os_udaje ou on (ou.rod_cislo = rl.rod_cislo)
@@ -441,12 +442,58 @@ async function getZoznamRezervacii(id) {
       join sklad s on (s.id_sklad = tl.id_sklad)
       join lekaren lek on (lek.id_lekarne = s.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
-      where cislo_zam = :id`,
+      where rl.datum_prevzatia is NULL and cislo_zam = :id`,
       [id]
     );
 
     return result.rows;
   } catch (err) {
+    console.log(err);
+  }
+}
+
+async function insertRezervaciaLieku(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+      insert_rezervacia_lieku(
+        :p_rod_cislo, 
+        :p_id_liek, 
+        :p_datum_trvanlivosti, 
+        :p_id_sklad, 
+        :p_datum_rezervacie, 
+        :p_pocet, 
+        :p_datum_prevzatia, 
+        :p_meno, 
+        :p_priezvisko, 
+        :p_ulica, 
+        :p_telefon, 
+        :p_email
+      );
+    END;`;
+
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        p_rod_cislo: body.rod_cislo,
+        p_id_liek: body.id_liek,
+        p_datum_trvanlivosti: body.datum_trvanlivosti,
+        p_id_sklad: body.id_sklad,
+        p_datum_rezervacie: body.datum_rezervacie || new Date(),
+        p_pocet: body.pocet,
+        p_datum_prevzatia: body.datum_prevzatia || null,
+        p_meno: body.meno,
+        p_priezvisko: body.priezvisko,
+        p_ulica: body.ulica,
+        p_telefon: body.telefon,
+        p_email: body.email,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Error Model");
     console.log(err);
   }
 }
@@ -473,5 +520,6 @@ module.exports = {
   insertUcinnaLatka,
   deleteUcinnaLatka,
   getZoznamMiest,
-  getZoznamRezervacii,
+  getZoznamAktualnychRezervacii,
+  insertRezervaciaLieku,
 };

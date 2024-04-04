@@ -48,7 +48,7 @@ async function getSearchLiecivoLekarenskySklad() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT l.nazov as "NAZOV_LIEKU", ul.nazov as "UCINNA_LATKA", tl.id_sklad, lek.nazov as "NAZOV_LEKARNE",
+      `select DISTINCT tl.id_liek, l.nazov as "NAZOV_LIEKU", ul.nazov as "UCINNA_LATKA", tl.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE",
       to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY') as "DATUM_TRVANLIVOSTI", tl.pocet, l.na_predpis
       from liek l
       join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)

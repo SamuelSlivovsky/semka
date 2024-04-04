@@ -221,11 +221,23 @@ module.exports = {
     })();
   },
 
-  getZoznamRezervacii: (req, res) => {
+  getZoznamAktualnychRezervacii: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
-      zoznamRezervacii = await rezervacia.getZoznamRezervacii(req.params.id);
+      zoznamRezervacii = await rezervacia.getZoznamAktualnychRezervacii(req.params.id);
       res.status(200).json(zoznamRezervacii);
     })();
   },
+
+  insertRezervaciaLieku: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await rezervacia.insertRezervaciaLieku(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+
 };
