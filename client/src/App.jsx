@@ -40,7 +40,9 @@ import LaborantCard from "./Profile/LaborantCard";
 import PharmacyManagersDashboard from "./Views/PharmacyManagersDashboard";
 import TabPrescriptions from "./Views/Tables/TabPrescriptions";
 import PrecsriptionCard from "./Details/PrescriptionCard";
-import TabReservations from "./Views/Tables/TabResevations";
+import PharmacyReservations from "./Views/PharmacyReservations";
+import TabMedicamentsResevations from "./Views/Tables/TabMedicamentsResevations";
+import TabMedicalAidsReservations from "./Views/Tables/TabMedicalAidsReservations";
 import PharmacyEmployees from "./Views/PharmacyEmployees";
 import PharmacyDispensing from "./Views/PharmacyDispensing";
 import TabFreeSaleMedicaments from "./Views/Tables/TabFreeSaleMedicaments";
@@ -569,7 +571,15 @@ function App() {
           path="/free_sale_medicaments"
           element={<TabFreeSaleMedicaments />}
         ></Route>
-        <Route path="/reservations" element={<TabReservations />}></Route>
+        <Route path="/reservations" element={<PharmacyReservations />}></Route>
+        <Route
+          path="/medicaments_reservations"
+          element={<TabMedicamentsResevations />}
+        ></Route>
+        <Route
+          path="/medical_aids_reservations"
+          element={<TabMedicalAidsReservations />}
+        ></Route>
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/objednavky" element={<Orders />}></Route>
         {/* <Route path="/presuny" element={<WarehouseTransfers />}></Route> */}

@@ -266,10 +266,10 @@ module.exports = {
       });
   },
 
-  updateStavRezervacie: (req, res) => {
+  updateStavRezervacieLieku: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
-      ret_val = await rezervacia.updateStavRezervacie(req.body);
+      ret_val = await rezervacia.updateStavRezervacieLieku(req.body);
       res.status(200).json("success");
     })().catch((err) => {
       console.error(err);
@@ -277,10 +277,55 @@ module.exports = {
     });
   },
 
+  getZoznamAktualnychRezervaciiZdrPomocky: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      zoznamRezervacii = await rezervacia.getZoznamAktualnychRezervaciiZdrPomocky(
+        req.params.id
+      );
+      res.status(200).json(zoznamRezervacii);
+    })();
+  },
+
+  getZoznamPrevzatychRezervaciiZdrPomocky: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      zoznamRezervacii = await rezervacia.getZoznamPrevzatychRezervaciiZdrPomocky(
+        req.params.id
+      );
+      res.status(200).json(zoznamRezervacii);
+    })();
+  },
+
   insertRezervaciaZdrPomocky: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
       ret_val = await rezervacia.insertRezervaciaZdrPomocky(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+
+  deleteRezervaciaZdrPomocky: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    const idRezervacie = req.params.id; // Získanie idRezervacie z URL parametra
+    rezervacia
+      .deleteRezervaciaZdrPomocky(idRezervacie)
+      .then(() => {
+        res.status(200).json({ message: "Rezervácia bola úspešne zrušená." });
+      })
+      .catch((err) => {
+        console.error(err);
+        res.status(500).send(err.message); // Odoslanie správy o chybe
+      });
+  },
+
+  updateStavRezervacieZdrPomocky: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await rezervacia.updateStavRezervacieZdrPomocky(req.body);
       res.status(200).json("success");
     })().catch((err) => {
       console.error(err);

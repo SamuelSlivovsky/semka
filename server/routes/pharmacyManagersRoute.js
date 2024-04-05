@@ -159,15 +159,39 @@ router.delete(
 );
 
 router.post(
-  "/updateStavRezervacie/:id",
+  "/updateStavRezervacieLieku/:id",
   verify.verifyRoles(0, 10),
-  controller.updateStavRezervacie
+  controller.updateStavRezervacieLieku
+);
+
+router.get(
+  "/getZoznamAktualnychRezervaciiZdrPomocky/:id",
+  verify.verifyRoles(0, 10),
+  controller.getZoznamAktualnychRezervaciiZdrPomocky
+);
+
+router.get(
+  "/getZoznamPrevzatychRezervaciiZdrPomocky/:id",
+  verify.verifyRoles(0, 10),
+  controller.getZoznamPrevzatychRezervaciiZdrPomocky
 );
 
 router.post(
   "/insertRezervaciaZdrPomocky",
   verify.verifyRoles(0, 10),
   controller.insertRezervaciaZdrPomocky
+);
+
+router.delete(
+  "/deleteRezervaciaZdrPomocky/:id",
+  verify.verifyRoles(0, 10),
+  controller.deleteRezervaciaZdrPomocky
+);
+
+router.post(
+  "/updateStavRezervacieZdrPomocky/:id",
+  verify.verifyRoles(0, 10),
+  controller.updateStavRezervacieZdrPomocky
 );
 
 module.exports = router;

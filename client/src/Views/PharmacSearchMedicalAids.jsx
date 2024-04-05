@@ -21,7 +21,7 @@ export default function PharmacSearchMedicalAids() {
     useState([]);
   const navigate = useNavigate();
   const [idSkladu, setIdSkladu] = useState([]);
-  const [idLZdrPomocky, setIdZdrPomocky] = useState([]);
+  const [idZdrPomocky, setIdZdrPomocky] = useState([]);
   const [datumTrvanlivosti, setDatumTrvanlivosti] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newReservation, setNewReservation] = useState({});
@@ -59,6 +59,7 @@ export default function PharmacSearchMedicalAids() {
       })
       .then((data) => {
         setSearchZdrPomockyLekarenskySklad(data);
+        console.log(data);
       })
       .finally(() => {
         setLoading(false);
@@ -69,7 +70,7 @@ export default function PharmacSearchMedicalAids() {
     const reservationData = {
       ...newReservation,
       id_sklad: idSkladu,
-      id_zdr_pomocky: idLZdrPomocky,
+      id_zdr_pomocky: idZdrPomocky,
       datum_trvanlivosti: datumTrvanlivosti,
     };
     console.log(reservationData);
@@ -94,7 +95,8 @@ export default function PharmacSearchMedicalAids() {
         toast.current.show({
           severity: "success",
           summary: "Rezervácia bola vytvorená",
-          detail: "Nová rezervácia lieku v lekárni bola úspešne vytvorená.",
+          detail:
+            "Nová rezervácia zdr. pomôcky v lekárni bola úspešne vytvorená.",
           life: 5000,
         });
         setShowAddDialog(false); // Zavrie dialogové okno po úspešnom pridaní

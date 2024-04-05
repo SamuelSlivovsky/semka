@@ -540,7 +540,7 @@ async function deleteRezervaciaLieku(idRezervacie) {
   }
 }
 
-async function updateStavRezervacie(body) {
+async function updateStavRezervacieLieku(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `update rezervacia_lieku set datum_prevzatia = :datum_prevzatia where id_rezervacie = :id_rezervacie`;
@@ -557,6 +557,56 @@ async function updateStavRezervacie(body) {
     console.log("Rows updated " + result.rowsAffected);
   } catch (err) {
     console.log("Err Model");
+    console.log(err);
+  }
+}
+
+async function getZoznamAktualnychRezervaciiZdrPomocky(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
+      zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
+      from rezervacia_zdr_pomocky rzp
+      join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = rzp.id_zdr_pomocky and tzp.datum_trvanlivosti = rzp.datum_trvanlivosti and tzp.id_sklad = rzp.id_sklad)
+      join os_udaje ou on (ou.rod_cislo = rzp.rod_cislo)
+      join zdravotna_pomocka zp on (zp.id_zdr_pomocky = tzp.id_zdr_pomocky)
+      join sklad s on (s.id_sklad = tzp.id_sklad)
+      join lekaren lek on (lek.id_lekarne = s.id_lekarne)
+      join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
+      where rzp.datum_prevzatia is NULL and cislo_zam = :id
+      order by rzp.id_rezervacie`,
+      [id]
+    );
+
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getZoznamPrevzatychRezervaciiZdrPomocky(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
+      zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
+      from rezervacia_zdr_pomocky rzp
+      join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = rzp.id_zdr_pomocky and tzp.datum_trvanlivosti = rzp.datum_trvanlivosti and tzp.id_sklad = rzp.id_sklad)
+      join os_udaje ou on (ou.rod_cislo = rzp.rod_cislo)
+      join zdravotna_pomocka zp on (zp.id_zdr_pomocky = tzp.id_zdr_pomocky)
+      join sklad s on (s.id_sklad = tzp.id_sklad)
+      join lekaren lek on (lek.id_lekarne = s.id_lekarne)
+      join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
+      where rzp.datum_prevzatia is NOT NULL and cislo_zam = :id
+      order by rzp.id_rezervacie`,
+      [id]
+    );
+
+    return result.rows;
+  } catch (err) {
     console.log(err);
   }
 }
@@ -585,7 +635,7 @@ async function insertRezervaciaZdrPomocky(body) {
       sqlStatement,
       {
         p_rod_cislo: body.rod_cislo,
-        p_id_zdr_pomocky: body.p_id_zdr_pomocky,
+        p_id_zdr_pomocky: body.id_zdr_pomocky,
         p_datum_trvanlivosti: body.datum_trvanlivosti,
         p_id_sklad: body.id_sklad,
         p_datum_rezervacie: body.datum_rezervacie || new Date(),
@@ -601,8 +651,47 @@ async function insertRezervaciaZdrPomocky(body) {
     );
 
     console.log("Rows inserted " + result.rowsAffected);
+    console.log(body);
   } catch (err) {
     console.log("Error Model");
+    console.log(err);
+    console.log(body);
+  }
+}
+
+async function deleteRezervaciaZdrPomocky(idRezervacie) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `delete from rezervacia_zdr_pomocky where id_rezervacie = :idRezervacie`;
+    console.log(idRezervacie);
+    let result = await conn.execute(sqlStatement, [idRezervacie], {
+      autoCommit: true,
+    });
+
+    console.log("Rows deleted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
+async function updateStavRezervacieZdrPomocky(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `update rezervacia_zdr_pomocky set datum_prevzatia = :datum_prevzatia where id_rezervacie = :id_rezervacie`;
+    console.log(body);
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        id_rezervacie: body.id_rezervacie,
+        datum_prevzatia: body.datum_prevzatia,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows updated " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
     console.log(err);
   }
 }
@@ -633,6 +722,10 @@ module.exports = {
   getZoznamPrevzatychRezervaciiLieku,
   insertRezervaciaLieku,
   deleteRezervaciaLieku,
-  updateStavRezervacie,
+  updateStavRezervacieLieku,
+  getZoznamAktualnychRezervaciiZdrPomocky,
+  getZoznamPrevzatychRezervaciiZdrPomocky,
   insertRezervaciaZdrPomocky,
+  deleteRezervaciaZdrPomocky,
+  updateStavRezervacieZdrPomocky,
 };

@@ -12,7 +12,7 @@ import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { TabView, TabPanel } from "primereact/tabview";
 
-export default function TabResevations() {
+export default function TabMedicamentsResevations() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
@@ -226,7 +226,7 @@ export default function TabResevations() {
 
     try {
       fetch(
-        `/pharmacyManagers/updateStavRezervacie/${selectedRow.ID_REZERVACIE}`,
+        `/pharmacyManagers/updateStavRezervacieLieku/${selectedRow.ID_REZERVACIE}`,
         {
           method: "POST", // Tu by sa zvyčajne použila metóda PUT pre aktualizácie, ale závisí to od backendu
           headers: headers,

@@ -69,10 +69,10 @@ async function getSearchZdrPomockaLekarenskySklad() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT zp.nazov as "NAZOV_ZDR_POMOCKY", tzp.id_sklad, lek.nazov as "NAZOV_LEKARNE", ls.id_lekarne, 
-      to_char(tzp.datum_trvanlivosti, 'DD.MM.YYYY') as "DATUM_TRVANLIVOSTI", tzp.pocet as "POCET"
-      from zdravotna_pomocka zp
-      join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = zp.id_zdr_pomocky)
+      `select DISTINCT tzp.id_zdr_pomocky, zp.nazov as "NAZOV_ZDR_POMOCKY", tzp.id_sklad, lek.nazov as "NAZOV_LEKARNE", lek.id_lekarne, 
+      to_char(tzp.datum_trvanlivosti, 'DD.MM.YYYY') as "DATUM_TRVANLIVOSTI", tzp.pocet
+      from trvanlivost_zdr_pomocky tzp
+      join zdravotna_pomocka zp on (zp.id_zdr_pomocky = tzp.id_zdr_pomocky)
       join sklad ls on (ls.id_sklad = tzp.id_sklad)
       join lekaren lek on (lek.id_lekarne = ls.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
