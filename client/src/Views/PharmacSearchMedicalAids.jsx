@@ -20,11 +20,21 @@ export default function PharmacSearchMedicalAids() {
   const [searchZdrPomockyLekarenskySklad, setSearchZdrPomockyLekarenskySklad] =
     useState([]);
   const navigate = useNavigate();
+  const [idSkladu, setIdSkladu] = useState([]);
+  const [idLZdrPomocky, setIdZdrPomocky] = useState([]);
+  const [datumTrvanlivosti, setDatumTrvanlivosti] = useState([]);
+  const [showAddDialog, setShowAddDialog] = useState(false);
+  const [newReservation, setNewReservation] = useState({});
+  const [submitted, setSubmitted] = useState(false); //sluzi na to, ze polia v addForm musia byt required
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
+    fetchGetZdrPomockyPodlaLekarne(headers, userDataHelper);
+  }, []);
+
+  const fetchGetZdrPomockyPodlaLekarne = (headers, userDataHelper) => {
     fetch(
       `/lekarenskySklad/lekarenskySkladVyhladavnieZdrPomocky/${userDataHelper.UserInfo.userid}`,
       {
@@ -53,7 +63,54 @@ export default function PharmacSearchMedicalAids() {
       .finally(() => {
         setLoading(false);
       });
-  }, []);
+  };
+
+  const fetchSubmitNewReservation = () => {
+    const reservationData = {
+      ...newReservation,
+      id_sklad: idSkladu,
+      id_zdr_pomocky: idLZdrPomocky,
+      datum_trvanlivosti: datumTrvanlivosti,
+    };
+    console.log(reservationData);
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+
+    fetch("/pharmacyManagers/insertRezervaciaZdrPomocky", {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(reservationData),
+    })
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+        throw new Error("Network response was not ok.");
+      })
+      .then((data) => {
+        toast.current.show({
+          severity: "success",
+          summary: "Rezervácia bola vytvorená",
+          detail: "Nová rezervácia lieku v lekárni bola úspešne vytvorená.",
+          life: 5000,
+        });
+        setShowAddDialog(false); // Zavrie dialogové okno po úspešnom pridaní
+        setNewReservation({}); // Resetuje stav formulára
+        fetchGetZdrPomockyPodlaLekarne(headers, GetUserData(token));
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri vytváraní rezervácie",
+          detail: "Nepodarilo sa vytvoriť rezerváciu.",
+          life: 5000,
+        });
+      });
+  };
 
   const onHide = () => {
     setShowDialog(false);
@@ -62,12 +119,15 @@ export default function PharmacSearchMedicalAids() {
 
   const onSubmit = () => {
     setShowDialog(false);
-    // navigate("/pharmacist", { state: selectedRow.CISLO_ZAM });
+    setShowAddDialog(true);
   };
 
   const handleClick = (value) => {
     setShowDialog(true);
     setSelectedRow(value);
+    setIdSkladu(value.ID_SKLAD);
+    setIdZdrPomocky(value.ID_ZDR_POMOCKY);
+    setDatumTrvanlivosti(value.DATUM_TRVANLIVOSTI);
   };
 
   const renderDialogFooter = () => {
@@ -95,10 +155,199 @@ export default function PharmacSearchMedicalAids() {
             />
           </span>
           <div className="ml-4">
-            <h2>Vyhľadávanie lekárne, ktorá má zdravotnú pomôcku skladom</h2>
+            <h2
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Vyhľadávanie lekárne, ktorá má zdravotnú pomôcku skladom
+            </h2>
           </div>
         </div>
       </div>
+    );
+  };
+
+  const formatRodneCislo = (value) => {
+    // Odstráňte všetky znaky okrem čísel a lomiek
+    let cislo = value.replace(/[^\d/]/g, "");
+
+    // Odstráňte všetky lomky, ktoré sú na zlom mieste
+    cislo = cislo.replace(/[/]/g, "");
+
+    // Uistite sa, že lomka je pridávaná iba raz
+    if (cislo.length > 6) {
+      cislo = `${cislo.slice(0, 6)}/${cislo.slice(6)}`;
+    }
+
+    // Orezanie akéhokoľvek nadbytočného textu
+    if (cislo.length > 11) {
+      cislo = cislo.slice(0, 11);
+    }
+
+    return cislo;
+  };
+
+  const handleSubmit = () => {
+    setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
+    // Pridáme kontrolu na počet
+    const requestedCount = parseInt(newReservation.pocet, 10); // získame počet ako číslo
+    const availableCount = parseInt(selectedRow.POCET, 10); // dostupný počet na sklade
+
+    if (
+      newReservation.rod_cislo &&
+      newReservation.meno &&
+      newReservation.priezvisko &&
+      requestedCount > 0
+    ) {
+      if (requestedCount > availableCount) {
+        // Ak je požadovaný počet väčší než dostupný
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: "Presiahli ste dostupný počet kusov na sklade.",
+          life: 5000,
+        });
+      } else {
+        // Ak je všetko v poriadku, pokračujeme v odoslaní
+        fetchSubmitNewReservation();
+      }
+    } else if (requestedCount <= 0) {
+      // Ak je zadaný záporný počet
+      toast.current.show({
+        severity: "error",
+        summary: "Neplatná hodnota",
+        detail: "Počet kusov musí byť kladné číslo.",
+        life: 5000,
+      });
+    } else {
+      // Ak nie sú vyplnené všetky povinné polia
+      toast.current.show({
+        severity: "warn",
+        summary: "Nevyplnené povinné polia",
+        detail: "Prosím, vyplňte všetky povinné polia.",
+        life: 5000,
+      });
+    }
+  };
+
+  const renderErrorMessage = (fieldName) => {
+    return (
+      submitted &&
+      !newReservation[fieldName] && (
+        <small className="p-error">Toto pole je povinné!</small>
+      )
+    );
+  };
+
+  // Form dialog for adding a new reservation
+  const renderAddReservationDialog = () => {
+    return (
+      <Dialog
+        visible={showAddDialog}
+        style={{ width: "450px" }}
+        header="Vytvoriť rezerváciu zdr. pomôcky v lekárni"
+        modal
+        className="p-fluid"
+        onHide={() => setShowAddDialog(false)}
+      >
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="rodneCislo">Rodné číslo</label>
+          <InputText
+            id="rodneCislo"
+            value={newReservation.rod_cislo}
+            onChange={(e) =>
+              setNewReservation({
+                ...newReservation,
+                rod_cislo: formatRodneCislo(e.target.value),
+              })
+            }
+            placeholder="______/____"
+            maxLength={11}
+            required
+          />
+          {renderErrorMessage("rod_cislo")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="meno">Meno</label>
+          <InputText
+            id="meno"
+            value={newReservation.meno}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, meno: e.target.value })
+            }
+            placeholder="Zadajte meno"
+            required
+          />
+          {renderErrorMessage("meno")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="priezvisko">Priezvisko</label>
+          <InputText
+            id="priezvisko"
+            value={newReservation.priezvisko}
+            onChange={(e) =>
+              setNewReservation({
+                ...newReservation,
+                priezvisko: e.target.value,
+              })
+            }
+            placeholder="Zadajte priezvisko"
+            required
+          />
+          {renderErrorMessage("priezvisko")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="ulica">Telefón</label>
+          <InputText
+            id="telefon"
+            value={newReservation.telefon}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, telefon: e.target.value })
+            }
+            placeholder="Zadajte telefónne číslo (Nepovinné)"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="ulica">E - mail</label>
+          <InputText
+            id="email"
+            value={newReservation.email}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, email: e.target.value })
+            }
+            placeholder="Zadajte e - mail (Nepovinné)"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "4rem" }}>
+          <label htmlFor="pocet">Počet</label>
+          <InputText
+            id="pocet"
+            value={newReservation.pocet}
+            onChange={(e) =>
+              setNewReservation({ ...newReservation, pocet: e.target.value })
+            }
+            placeholder="Zadajte počet kusov"
+            type="number"
+            required
+          />
+          {renderErrorMessage("pocet")}
+        </div>
+        <Button
+          style={{ marginTop: "50px" }}
+          label="Rezervovať"
+          icon="pi pi-check"
+          onClick={() => {
+            handleSubmit();
+          }}
+        />
+      </Dialog>
     );
   };
 
@@ -141,6 +390,7 @@ export default function PharmacSearchMedicalAids() {
   return (
     <div>
       <Toast ref={toast} position="top-center" />
+      {renderAddReservationDialog()}
       <div className="card">
         {loading ? (
           <div

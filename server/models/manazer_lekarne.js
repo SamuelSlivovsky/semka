@@ -561,6 +561,52 @@ async function updateStavRezervacie(body) {
   }
 }
 
+async function insertRezervaciaZdrPomocky(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+    insert_rezervacia_zdr_pomocky(
+        :p_rod_cislo, 
+        :p_id_zdr_pomocky, 
+        :p_datum_trvanlivosti, 
+        :p_id_sklad, 
+        :p_datum_rezervacie, 
+        :p_pocet, 
+        :p_datum_prevzatia, 
+        :p_meno, 
+        :p_priezvisko, 
+        :p_ulica, 
+        :p_telefon, 
+        :p_email
+      );
+    END;`;
+
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        p_rod_cislo: body.rod_cislo,
+        p_id_zdr_pomocky: body.p_id_zdr_pomocky,
+        p_datum_trvanlivosti: body.datum_trvanlivosti,
+        p_id_sklad: body.id_sklad,
+        p_datum_rezervacie: body.datum_rezervacie || new Date(),
+        p_pocet: body.pocet,
+        p_datum_prevzatia: body.datum_prevzatia || null,
+        p_meno: body.meno,
+        p_priezvisko: body.priezvisko,
+        p_ulica: body.ulica,
+        p_telefon: body.telefon,
+        p_email: body.email,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows inserted " + result.rowsAffected);
+  } catch (err) {
+    console.log("Error Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getManazeriLekarni,
   getLekarnici,
@@ -588,4 +634,5 @@ module.exports = {
   insertRezervaciaLieku,
   deleteRezervaciaLieku,
   updateStavRezervacie,
+  insertRezervaciaZdrPomocky,
 };

@@ -164,4 +164,10 @@ router.post(
   controller.updateStavRezervacie
 );
 
+router.post(
+  "/insertRezervaciaZdrPomocky",
+  verify.verifyRoles(0, 10),
+  controller.insertRezervaciaZdrPomocky
+);
+
 module.exports = router;

@@ -5,11 +5,10 @@ import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate } from "react-router";
 import GetUserData from "../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { Dropdown } from "primereact/dropdown";
 
 export default function PharmacySearchMedicaments(props) {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -18,12 +17,10 @@ export default function PharmacySearchMedicaments(props) {
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
-  const location = useLocation();
   const [searchLiekyLekarenskySklad, setSearchLiekyLekarenskySklad] = useState(
     []
   );
   const navigate = useNavigate();
-  // const [idLekarne, setIdLekarne] = useState([]);
   const [idSkladu, setIdSkladu] = useState([]);
   const [idLieku, setIdLieku] = useState([]);
   const [datumTrvanlivosti, setDatumTrvanlivosti] = useState([]);
@@ -72,7 +69,6 @@ export default function PharmacySearchMedicaments(props) {
   const fetchSubmitNewReservation = () => {
     const reservationData = {
       ...newReservation,
-      // id_lekarne: idLekarne,
       id_sklad: idSkladu,
       id_liek: idLieku,
       datum_trvanlivosti: datumTrvanlivosti,

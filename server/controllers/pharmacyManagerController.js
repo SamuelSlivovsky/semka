@@ -276,4 +276,15 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+
+  insertRezervaciaZdrPomocky: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await rezervacia.insertRezervaciaZdrPomocky(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
 };
