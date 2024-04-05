@@ -158,4 +158,10 @@ router.delete(
   controller.deleteRezervaciaLieku
 );
 
+router.post(
+  "/updateStavRezervacie/:id",
+  verify.verifyRoles(0, 10),
+  controller.updateStavRezervacie
+);
+
 module.exports = router;

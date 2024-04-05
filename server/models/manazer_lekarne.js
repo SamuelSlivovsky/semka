@@ -540,6 +540,27 @@ async function deleteRezervaciaLieku(idRezervacie) {
   }
 }
 
+async function updateStavRezervacie(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `update rezervacia_lieku set datum_prevzatia = :datum_prevzatia where id_rezervacie = :id_rezervacie`;
+    console.log(body);
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        id_rezervacie: body.id_rezervacie,
+        datum_prevzatia: body.datum_prevzatia,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows updated " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getManazeriLekarni,
   getLekarnici,
@@ -566,4 +587,5 @@ module.exports = {
   getZoznamPrevzatychRezervaciiLieku,
   insertRezervaciaLieku,
   deleteRezervaciaLieku,
+  updateStavRezervacie,
 };

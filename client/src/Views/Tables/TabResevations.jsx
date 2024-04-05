@@ -28,45 +28,43 @@ export default function TabResevations() {
   const [dialogContext, setDialogContext] = useState(""); // 'aktualne' alebo 'vydane'
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const token = localStorage.getItem("hospit-user");
-        const userDataHelper = GetUserData(token);
-        const headers = { authorization: "Bearer " + token };
-
-        const [aktualneLiekyResponse, prevzateLiekyResponse] =
-          await Promise.all([
-            fetch(
-              `/pharmacyManagers/getZoznamAktualnychRezervaciiLieku/${userDataHelper.UserInfo.userid}`,
-              { headers }
-            ),
-            fetch(
-              `/pharmacyManagers/getZoznamPrevzatychRezervaciiLieku/${userDataHelper.UserInfo.userid}`,
-              { headers }
-            ),
-          ]);
-
-        if (!aktualneLiekyResponse.ok || !prevzateLiekyResponse.ok) {
-          // Handle error (show toast or redirect)
-          return;
-        }
-
-        const aktualneLiekyData = await aktualneLiekyResponse.json();
-        const prevzateLiekyData = await prevzateLiekyResponse.json();
-
-        setAktualneRezervacieLiekov(aktualneLiekyData);
-        console.log(aktualneLiekyData);
-        setPrevzateRezervacieLiekov(prevzateLiekyData);
-        console.log(prevzateLiekyData);
-      } catch (error) {
-        // Handle error
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchData();
   }, []);
+
+  const fetchData = async () => {
+    try {
+      const token = localStorage.getItem("hospit-user");
+      const userDataHelper = GetUserData(token);
+      const headers = { authorization: "Bearer " + token };
+
+      const [aktualneLiekyResponse, prevzateLiekyResponse] = await Promise.all([
+        fetch(
+          `/pharmacyManagers/getZoznamAktualnychRezervaciiLieku/${userDataHelper.UserInfo.userid}`,
+          { headers }
+        ),
+        fetch(
+          `/pharmacyManagers/getZoznamPrevzatychRezervaciiLieku/${userDataHelper.UserInfo.userid}`,
+          { headers }
+        ),
+      ]);
+
+      if (!aktualneLiekyResponse.ok || !prevzateLiekyResponse.ok) {
+        // Handle error (show toast or redirect)
+        return;
+      }
+
+      const aktualneLiekyData = await aktualneLiekyResponse.json();
+      const prevzateLiekyData = await prevzateLiekyResponse.json();
+
+      setAktualneRezervacieLiekov(aktualneLiekyData);
+      console.log(aktualneLiekyData);
+      setPrevzateRezervacieLiekov(prevzateLiekyData);
+      console.log(prevzateLiekyData);
+    } catch (error) {
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const onHide = () => {
     setShowDialog(false);
@@ -98,7 +96,7 @@ export default function TabResevations() {
           <Button
             label="Vydať rezervovaný liek"
             icon="pi pi-check"
-            // onClick={() => setShowEditDialog(true)}
+            onClick={() => updateDateReservation()}
             autoFocus
           />
         </div>
@@ -202,6 +200,59 @@ export default function TabResevations() {
 
     // Zavrie potvrdzovací dialóg
     setShowConfirmDialog(false);
+  };
+
+  const updateDateReservation = () => {
+    // Získanie aktuálneho dátumu a času a formátovanie na 'DD.MM.YYYY HH24:MM:SS'
+    const now = new Date();
+    const formattedDate =
+      now.getDate().toString().padStart(2, "0") +
+      "." +
+      (now.getMonth() + 1).toString().padStart(2, "0") +
+      "." +
+      now.getFullYear() +
+      " " +
+      now.getHours().toString().padStart(2, "0") +
+      ":" +
+      now.getMinutes().toString().padStart(2, "0") +
+      ":" +
+      now.getSeconds().toString().padStart(2, "0");
+
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+
+    try {
+      fetch(
+        `/pharmacyManagers/updateStavRezervacie/${selectedRow.ID_REZERVACIE}`,
+        {
+          method: "POST", // Tu by sa zvyčajne použila metóda PUT pre aktualizácie, ale závisí to od backendu
+          headers: headers,
+          body: JSON.stringify({
+            id_rezervacie: selectedRow.ID_REZERVACIE, // Zdá sa, že na backend potrebujete poslať aj ID rezervácie v tele
+            datum_prevzatia: formattedDate,
+          }),
+        }
+      );
+      toast.current.show({
+        severity: "success",
+        summary: "Rezervácia úspešne vydaná",
+        detail: "Dátum prevzatia bol úspešne aktualizovaný.",
+        life: 3000,
+      });
+      setShowDialog(false);
+      fetchData();
+    } catch (error) {
+      console.error("Chyba pri aktualizácii dátumu prevzatia:", error);
+      toast.current.show({
+        severity: "error",
+        summary: "Chyba",
+        detail: "Nepodarilo sa aktualizovať dátum prevzatia. " + error.message,
+        life: 3000,
+      });
+    }
   };
 
   const requestDeleteReservation = (rowData) => {

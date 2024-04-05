@@ -265,4 +265,15 @@ module.exports = {
         res.status(500).send(err.message); // Odoslanie správy o chybe
       });
   },
+
+  updateStavRezervacie: (req, res) => {
+    const rezervacia = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await rezervacia.updateStavRezervacie(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
 };
