@@ -179,7 +179,7 @@ export default function PrescriptionCard(props) {
         <div className="col-2 m-0">
           <Button
             icon="pi pi-pencil"
-            className="p-button-rounded p-button-warning"
+            className="p-button-rounded p-button-outlined p-button-raised p-button-warning"
             onClick={() => tryEditDate()}
           />
         </div>

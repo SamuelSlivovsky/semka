@@ -87,7 +87,7 @@ export default function MedicamentCard(props) {
           <Button
             label="Spravovať účinnú látku"
             icon="pi pi-file-edit"
-            className="p-button-rounded p-button-warning"
+            className="p-button-rounded p-button-outlined p-button-raised p-button-warning"
             style={{ marginTop: "75px" }}
             onClick={() => setDisplayDialogForUpdate(true)} // Open dialog when Edit button is clicked
           />
@@ -99,7 +99,7 @@ export default function MedicamentCard(props) {
           <Button
             label="Pridať účinnú látku"
             icon="pi pi-plus"
-            className="p-button-rounded p-button-success"
+            className="p-button-rounded p-button-outlined p-button-raised p-button-success"
             style={{ marginTop: "75px" }}
             onClick={() => setDisplayDialogForInsert(true)} // Open dialog when Edit button is clicked
           />

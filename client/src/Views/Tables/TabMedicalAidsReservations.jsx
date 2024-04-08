@@ -155,7 +155,7 @@ export default function TabMedicalAidsReservations() {
       <React.Fragment>
         <Button
           icon="pi pi-minus-circle"
-          className="p-button-rounded p-button-raised"
+          className="p-button-rounded p-button-outlined p-button-raised"
           style={{
             backgroundColor: "#18dec8",
             color: "white",
