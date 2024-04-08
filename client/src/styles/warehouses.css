@@ -4,3 +4,11 @@
     padding-top: 20px;
 }
 
+.stats-view {
+    width: 98%;
+    height: auto;
+    min-height: 500px;
+    margin-left: 1%;
+    padding: 10px;
+    background-color: #E6E6E6;
+}

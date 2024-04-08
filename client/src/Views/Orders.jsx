@@ -621,15 +621,20 @@ return (
                         <div key={index}>
                             <p>ID Lieku: {item.id}</p>
                             <p>Názov: {item.name}</p>
-                            <p>Počet: <input
-                                type="text"
-                                value={updatedContent[index].amount}
-                                onChange={(e) => handleInputChange(e, item, index, updatedContent, setUpdatedContent)}
-                                pattern="[0-9]*" // Allow only numeric input
-                                inputMode="numeric"
-                            /></p>
-                            <p></p>
-                            <button onClick={() => handleItemRemoval(index)}>X</button>
+                            {confirmOrder ?
+                                <div>
+                                    <p>Počet: <input
+                                    type="text"
+                                    value={updatedContent[index].amount}
+                                    onChange={(e) => handleInputChange(e, item, index, updatedContent, setUpdatedContent)}
+                                    pattern="[0-9]*" // Allow only numeric input
+                                    inputMode="numeric"
+                                /></p>
+                                <p></p>
+                                <button onClick={() => handleItemRemoval(index)}>X</button>
+                                </div>
+                            : (<p>Počet: {item.amount}</p>) }
+
                         </div>
                     ))}
                 </div>
@@ -676,19 +681,27 @@ return (
             <label>Zoznam liekov</label>
             {selectedMedications.map((selectedMedication, index) => (
                 <div key={index} style={{paddingTop: "20px"}}>
-                    <div className="field col">
-                        <Dropdown
-                            style={{width: "auto"}}
-                            value={selectedMedication.selectedDrug}
-                            options={drugs}
-                            onChange={(e) => {
-                                const updatedMedications = [...selectedMedications];
-                                updatedMedications[index].selectedDrug = e.value;
-                                setSelectedMedications(updatedMedications);
-                            }}
-                            optionLabel="NAZOV"
-                            placeholder="Vyberte liek"
-                        />
+                    <div className="formgrid grid">
+                        <div className="field col">
+                            <Dropdown
+                                style={{width: "auto"}}
+                                value={selectedMedication.selectedDrug}
+                                options={drugs}
+                                onChange={(e) => {
+                                    const updatedMedications = [...selectedMedications];
+                                    updatedMedications[index].selectedDrug = e.value;
+                                    setSelectedMedications(updatedMedications);
+                                }}
+                                optionLabel="NAZOV"
+                                filter
+                                showClear
+                                filterBy="NAZOV"
+                                filterMatchMode="startsWith"
+                                placeholder="Vybrať liek"
+                                resetFilterOnHide
+                                required
+                            />
+                        </div>
                     </div>
                     <label style={{paddingLeft: "15px"}} htmlFor="quantity">Počet</label>
                     <div className="field col">

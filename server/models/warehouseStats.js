@@ -168,8 +168,61 @@ async function getMedAmount(id) {
     }
 }
 
+async function getMedications(id){
+    try {
+        let conn = await database.getConnection();
 
+        let result = null;
+
+        let sqlStatement = `select ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id`;
+        result = await conn.execute(sqlStatement, {
+            usr_id: id
+        });
+
+        if (result.rows[0].ID_ODDELENIA === null) {
+            sqlStatement = `select unique(LIEK.NAZOV) AS NAZOV, TRVANLIVOST_LIEKU.ID_LIEK AS ID_LIEK from LIEK
+                join TRVANLIVOST_LIEKU on LIEK.ID_LIEK = TRVANLIVOST_LIEKU.ID_LIEK
+                join SKLAD on TRVANLIVOST_LIEKU.ID_SKLAD = SKLAD.ID_SKLAD
+                join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
+                where CISLO_ZAM = :usr_id and SKLAD.ID_ODDELENIA is null and POCET > 0`;
+            result = await conn.execute(sqlStatement, {
+                usr_id: id
+            });
+        } else {
+            sqlStatement = `select unique(LIEK.NAZOV) AS NAZOV, TRVANLIVOST_LIEKU.ID_LIEK AS ID_LIEK from LIEK
+                join TRVANLIVOST_LIEKU on LIEK.ID_LIEK = TRVANLIVOST_LIEKU.ID_LIEK
+                join SKLAD on TRVANLIVOST_LIEKU.ID_SKLAD = SKLAD.ID_SKLAD
+                join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
+                where CISLO_ZAM = :usr_id and SKLAD.ID_ODDELENIA = (select ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id) and POCET > 0`;
+            result = await conn.execute(sqlStatement, {
+                usr_id: id
+            });
+        }
+
+        return result.rows;
+    } catch (err) {
+        throw new Error("Database error: " + err);
+    }
+}
+
+async function getMedStats(id) {
+    try {
+        let conn = await database.getConnection();
+
+        let result = null;
+
+        //@TODO add selects in here for stats of medication
+
+        return result.rows;
+    } catch (err) {
+        throw new Error("Database error: " + err);
+    }
+}
 
 module.exports = {
-    getMedAmount
+    getMedAmount,
+    getMedications,
+    getMedStats
 };
