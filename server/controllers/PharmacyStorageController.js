@@ -61,4 +61,12 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+
+  getOsoba: (req, res) => {
+    const osoba = require("../models/lekarensky_sklad");
+    (async () => {
+      result = await osoba.getOsoba(req.params.id);
+      res.status(200).json(result);
+    })();
+  },
 };

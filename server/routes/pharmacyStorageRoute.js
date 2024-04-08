@@ -44,4 +44,11 @@ router.post(
   controller.updatePocetVolnopredajnehoLieku
 );
 
+router.get(
+  "/getOsoba/:id",
+  verify.verifyRoles(0, 10),
+  // verify.checkForCorrectId(),
+  controller.getOsoba
+);
+
 module.exports = router;

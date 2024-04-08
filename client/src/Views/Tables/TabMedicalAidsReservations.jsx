@@ -186,10 +186,7 @@ export default function TabMedicalAidsReservations() {
             detail: "Rezervácia bola úspešne zrušená.",
             life: 3000,
           });
-          setAktualneRezervacieZdrPomocok(
-            { authorization: "Bearer " + token },
-            GetUserData(token)
-          );
+          fetchData(); // Refresh the data to reflect changes
         } else {
           throw new Error("Problém pri zrušení rezervácie");
         }

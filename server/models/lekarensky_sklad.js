@@ -136,6 +136,21 @@ async function updatePocetVolnopredajnehoLieku(body) {
   }
 }
 
+async function getOsoba(rod_cislo) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select rod_cislo, meno, priezvisko, telefon, email from os_udaje
+      where rod_cislo = :rod_cislo`,
+      [rod_cislo]
+    );
+    console.log(result.rows);
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getLiekyLekarenskySklad,
   getZdrPomockyLekarenskySklad,
@@ -143,4 +158,5 @@ module.exports = {
   getSearchZdrPomockaLekarenskySklad,
   getVolnyPredajLiekov,
   updatePocetVolnopredajnehoLieku,
+  getOsoba,
 };

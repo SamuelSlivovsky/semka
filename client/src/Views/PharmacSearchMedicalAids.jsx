@@ -24,8 +24,17 @@ export default function PharmacSearchMedicalAids() {
   const [idZdrPomocky, setIdZdrPomocky] = useState([]);
   const [datumTrvanlivosti, setDatumTrvanlivosti] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
-  const [newReservation, setNewReservation] = useState({});
+  // const [newReservation, setNewReservation] = useState({});
   const [submitted, setSubmitted] = useState(false); //sluzi na to, ze polia v addForm musia byt required
+  const [newReservation, setNewReservation] = useState({
+    rod_cislo: "",
+    meno: "",
+    priezvisko: "",
+    telefon: "",
+    email: "",
+    pocet: "",
+  });
+  const [isFetchingDetails, setIsFetchingDetails] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -113,6 +122,65 @@ export default function PharmacSearchMedicalAids() {
         });
       });
   };
+
+  useEffect(() => {
+    const fetchPersonDetails = async () => {
+      if (newReservation.rod_cislo.match(/^\d{6}\/\d{4}$/)) {
+        setIsFetchingDetails(true);
+        const token = localStorage.getItem("hospit-user");
+        const headers = { Authorization: "Bearer " + token };
+
+        try {
+          const rodneCisloEncoded = encodeURIComponent(
+            newReservation.rod_cislo
+          );
+          const response = await fetch(
+            `/lekarenskySklad/getOsoba/${rodneCisloEncoded}`,
+            { headers }
+          );
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          const data = await response.json();
+          if (data && data.length > 0) {
+            const personDetails = data[0];
+            setNewReservation((prev) => ({
+              ...prev,
+              meno: personDetails.MENO || "",
+              priezvisko: personDetails.PRIEZVISKO || "",
+              telefon: personDetails.TELEFON || "",
+              email: personDetails.EMAIL || "",
+            }));
+            console.log("Načítané údaje osoby:", personDetails); // Teraz by malo vypísať správne načítané údaje
+          } else {
+            console.log("Osoba nebola nájdená alebo je pole prázdne.");
+            setNewReservation((prev) => ({
+              ...prev,
+              meno: "",
+              priezvisko: "",
+              telefon: "",
+              email: "",
+            }));
+          }
+        } catch (error) {
+          console.error("Error fetching person details:", error);
+          toast.current.show({
+            severity: "error",
+            summary: "Chyba pri načítaní údajov",
+            detail: error.toString(),
+            life: 5000,
+          });
+        } finally {
+          setIsFetchingDetails(false);
+        }
+      }
+    };
+
+    if (newReservation.rod_cislo) {
+      fetchPersonDetails();
+    }
+    // Zabezpečte, aby ste pridali všetky použité premenné a funkcie do zoznamu závislostí useEffect hooku
+  }, [newReservation.rod_cislo, toast]);
 
   const onHide = () => {
     setShowDialog(false);

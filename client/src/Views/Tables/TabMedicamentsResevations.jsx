@@ -180,10 +180,7 @@ export default function TabMedicamentsResevations() {
             detail: "Rezervácia bola úspešne zrušená.",
             life: 3000,
           });
-          setAktualneRezervacieLiekov(
-            { authorization: "Bearer " + token },
-            GetUserData(token)
-          );
+          fetchData(); // Refresh the data to reflect changes
         } else {
           throw new Error("Problém pri zrušení rezervácie");
         }

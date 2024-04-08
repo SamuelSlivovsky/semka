@@ -317,7 +317,7 @@ async function getReportInfo(id) {
           left join rezervacia_lieku prevzata_rezervacia_lieku on (prevzata_rezervacia_lieku.id_liek = tl.id_liek and prevzata_rezervacia_lieku.id_sklad = tl.id_sklad and prevzata_rezervacia_lieku.datum_trvanlivosti = tl.datum_trvanlivosti and prevzata_rezervacia_lieku.datum_prevzatia IS NOT NULL)
           left join rezervacia_zdr_pomocky rzp on (rzp.id_zdr_pomocky = tzp.id_zdr_pomocky and rzp.id_sklad = tzp.id_sklad and rzp.datum_trvanlivosti = tzp.datum_trvanlivosti)
           left join rezervacia_zdr_pomocky aktualna_rezervacia_zdr_pomocky on (aktualna_rezervacia_zdr_pomocky.id_zdr_pomocky = tzp.id_zdr_pomocky and aktualna_rezervacia_zdr_pomocky.id_sklad = tzp.id_sklad and aktualna_rezervacia_zdr_pomocky.datum_trvanlivosti = tzp.datum_trvanlivosti and aktualna_rezervacia_zdr_pomocky.datum_prevzatia IS NULL)
-          left join rezervacia_zdr_pomocky prevzata_rezervacia_zdr_pomocky on (prevzata_rezervacia_zdr_pomocky.id_zdr_pomocky = tzp.id_zdr_pomocky and prevzata_rezervacia_zdr_pomocky.id_sklad = tzp.id_sklad and prevzata_rezervacia_zdr_pomocky.datum_trvanlivosti = tzp.datum_trvanlivosti and aktualna_rezervacia_zdr_pomocky.datum_prevzatia IS NOT NULL)
+          left join rezervacia_zdr_pomocky prevzata_rezervacia_zdr_pomocky on (prevzata_rezervacia_zdr_pomocky.id_zdr_pomocky = tzp.id_zdr_pomocky and prevzata_rezervacia_zdr_pomocky.id_sklad = tzp.id_sklad and prevzata_rezervacia_zdr_pomocky.datum_trvanlivosti = tzp.datum_trvanlivosti and prevzata_rezervacia_zdr_pomocky.datum_prevzatia IS NOT NULL)
           where manazer.cislo_zam = :id
           group by l.id_lekarne, l.nazov)`,
       [id]
@@ -518,7 +518,7 @@ async function insertRezervaciaLieku(body) {
         p_id_liek: body.id_liek,
         p_datum_trvanlivosti: body.datum_trvanlivosti,
         p_id_sklad: body.id_sklad,
-        p_datum_rezervacie: body.datum_rezervacie || new Date(),
+        p_datum_rezervacie: body.datum_rezervacie,
         p_pocet: body.pocet,
         p_datum_prevzatia: body.datum_prevzatia || null,
         p_meno: body.meno,
@@ -653,7 +653,7 @@ async function insertRezervaciaZdrPomocky(body) {
         p_id_zdr_pomocky: body.id_zdr_pomocky,
         p_datum_trvanlivosti: body.datum_trvanlivosti,
         p_id_sklad: body.id_sklad,
-        p_datum_rezervacie: body.datum_rezervacie || new Date(),
+        p_datum_rezervacie: body.datum_rezervacie,
         p_pocet: body.pocet,
         p_datum_prevzatia: body.datum_prevzatia || null,
         p_meno: body.meno,
