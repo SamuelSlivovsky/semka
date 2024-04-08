@@ -3,6 +3,8 @@ import AboutMeCard from "../Profile/AboutMeCard";
 import PharmacyReportCard from "../Details/PharmacyReportCard";
 import PharmacyEmployeeReportChartCard from "../Details/PharmacyEmployeeReportChartCard";
 import PharmacyMedicationReportChartCard from "../Details/PharmacyMedicationReportChartCard";
+import PharmacyMedicationReservationReportChartCard from "../Details/PharmacyMedicationReservationReportChartCard";
+import PharmacyMedAidReservationReportChartCard from "../Details/PharmacyMedAidReservationReportChartCard";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router";
 
@@ -32,6 +34,10 @@ function PharmacyManagersDashboard() {
       <div style={{ display: "flex", flexDirection: "row" }}>
         <PharmacyEmployeeReportChartCard />
         <PharmacyMedicationReportChartCard />
+      </div>
+      <div style={{ display: "flex", flexDirection: "row" }}>
+        <PharmacyMedicationReservationReportChartCard />
+        <PharmacyMedAidReservationReportChartCard />
       </div>
     </div>
   );

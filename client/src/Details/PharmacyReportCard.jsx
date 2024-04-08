@@ -22,23 +22,6 @@ export default function PharmacyReportCard(props) {
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  //   const redirect = () => {
-  //     navigate("/");
-  //   };
-
-  //   const renderCardFooter = () => {
-  //     return (
-  //       <div>
-  //         <Button
-  //           label="Späť"
-  //           icon="pi pi-replay"
-  //           style={{ marginTop: 0 }}
-  //           onClick={() => redirect()}
-  //         />
-  //       </div>
-  //     );
-  //   };
-
   const renderDetail = (label, value) => (
     <div className="flex w-100">
       <div className="col-6">
@@ -60,7 +43,7 @@ export default function PharmacyReportCard(props) {
           style={{ width: "45rem", height: "55rem" }}
           title={info.NAZOV_LEKARNE}
         >
-          <div className="card-body" style={{ marginBlock: "25%" }}>
+          <div className="card-body" style={{ marginBlock: "12%" }}>
             <div
               style={{
                 borderRadius: "30px",
@@ -74,9 +57,6 @@ export default function PharmacyReportCard(props) {
               )}
             </div>
             <br />
-            {/* {renderDetail("Počet manažérov: ", info.POCET_MANAZEROV)}
-          {renderDetail("Počet lekárnikov: ", info.POCET_LEKARNIKOV)}
-          {renderDetail("Počet laborantov: ", info.POCET_LABORANTOV)} */}
             <div
               style={{
                 borderRadius: "30px",
@@ -90,8 +70,6 @@ export default function PharmacyReportCard(props) {
               )}
             </div>
             <br />
-            {/* {renderDetail("Voľnopredajné: ", info.POCET_LIEKOV_VOLNY)}
-          {renderDetail("Na predpis: ", info.POCET_LIEKOV_PREDPIS)} */}
             <div
               style={{
                 borderRadius: "30px",
@@ -102,6 +80,32 @@ export default function PharmacyReportCard(props) {
               {renderDetail(
                 "Počet druhov zdravotníckych pomôcok v lekárenskom sklade: ",
                 info.POCET_ZDR_POMOCOK
+              )}
+            </div>
+            <br />
+            <div
+              style={{
+                borderRadius: "30px",
+                outlineStyle: "solid",
+                outlineColor: "#14b8a6",
+              }}
+            >
+              {renderDetail(
+                "Počet rezervácií lieku: ",
+                info.POCET_REZERVACII_LIEKU
+              )}
+            </div>
+            <br />
+            <div
+              style={{
+                borderRadius: "30px",
+                outlineStyle: "solid",
+                outlineColor: "#14b8a6",
+              }}
+            >
+              {renderDetail(
+                "Počet rezervácií zdravotníckej pomôcky: ",
+                info.POCET_REZERVACII_ZDR_POMOCKY
               )}
             </div>
           </div>
