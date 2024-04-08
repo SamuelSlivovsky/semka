@@ -227,11 +227,12 @@ export default function PharmacySearchMedicaments(props) {
       <div className="flex justify-content-between">
         <div className="table-header">
           <span className="p-input-icon-left">
-            <i className="pi pi-search" />
+          <i className="pi pi-search" style={{ color: "#00796b" }} />
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
               placeholder="Vyhľadať"
+              style={{ borderRadius: "20px", borderColor: "#00796b" }}
             />
           </span>
           <div className="ml-4">

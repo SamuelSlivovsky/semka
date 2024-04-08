@@ -202,11 +202,15 @@ export default function TabPrescriptions() {
                 <div className="flex justify-content-between">
                   <div className="table-header ml-5">
                     <span className="p-input-icon-left">
-                      <i className="pi pi-search" />
+                      <i
+                        className="pi pi-search"
+                        style={{ color: "#00796b" }}
+                      />
                       <InputText
                         value={globalFilterValue}
                         onChange={onGlobalFilterChange}
                         placeholder="Zadajte rodné číslo s /"
+                        style={{ borderRadius: "20px", borderColor: "#00796b" }}
                       />
                     </span>
                     <div className="ml-4">
@@ -282,11 +286,15 @@ export default function TabPrescriptions() {
                 <div className="flex justify-content-between">
                   <div className="table-header ml-5">
                     <span className="p-input-icon-left">
-                      <i className="pi pi-search" />
+                      <i
+                        className="pi pi-search"
+                        style={{ color: "#00796b" }}
+                      />
                       <InputText
                         value={globalFilterValue}
                         onChange={onGlobalFilterChange}
                         placeholder="Zadajte rodné číslo s /"
+                        style={{ borderRadius: "20px", borderColor: "#00796b" }}
                       />
                     </span>
                     <div className="ml-4">
