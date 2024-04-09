@@ -203,7 +203,7 @@ export default function PharmacySearchMedicaments(props) {
       toast.current.show({
         severity: "warn",
         summary: "Upozornenie",
-        detail: "Rezervácia je možné len pre voľnopredajné lieky.",
+        detail: "Rezervácia je možná len pre voľnopredajné lieky.",
         life: 5000,
       });
     }
@@ -227,7 +227,7 @@ export default function PharmacySearchMedicaments(props) {
       <div className="flex justify-content-between">
         <div className="table-header">
           <span className="p-input-icon-left">
-          <i className="pi pi-search" style={{ color: "#00796b" }} />
+            <i className="pi pi-search" style={{ color: "#00796b" }} />
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
