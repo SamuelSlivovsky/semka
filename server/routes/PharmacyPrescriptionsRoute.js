@@ -35,4 +35,10 @@ router.post(
   controller.updatePocetLiekuVydajReceptu
 );
 
+router.post(
+  "/sendSMS",
+  verify.verifyRoles(0, 10),
+  controller.sendSMS
+);
+
 module.exports = router;

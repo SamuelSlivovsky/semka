@@ -48,4 +48,15 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+
+  sendSMS: (req, res) => {
+    const SMS = require("../models/lekaren_recepty");
+    (async () => {
+      ret_val = await SMS.sendSMS(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
 };

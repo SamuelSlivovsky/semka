@@ -1,4 +1,5 @@
 const database = require("../database/Database");
+const client = require("twilio")(accountSid, authToken);
 
 async function getZoznamAktualnychReceptov() {
   try {
@@ -53,7 +54,7 @@ async function getDetailReceptu(id) {
       trvanlivost_lieku.id_liek as "ID_LIEKU", to_char(trvanlivost_lieku.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_TRVANLIVOSTI", 
       liek.nazov as "NAZOV_LIEKU", recept.poznamka, recept.opakujuci,
       typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA",
-      trvanlivost_lieku.pocet as "DOSTUPNY_POCET_NA_SKLADE", trvanlivost_lieku.id_sklad, lekaren.id_lekarne,
+      trvanlivost_lieku.pocet as "DOSTUPNY_POCET_NA_SKLADE", trvanlivost_lieku.id_sklad, lekaren.id_lekarne, lekaren.nazov as "NAZOV_LEKARNE",
       oupac.email as "EMAIL", oupac.telefon as "TELEFON"
       from recept
        left join pacient on (pacient.id_pacienta = recept.id_pacienta)
@@ -78,7 +79,7 @@ async function getDetailReceptu(id) {
 async function updateDatumZapisu(body) {
   try {
     let conn = await database.getConnection();
-    const sqlStatement = `UPDATE recept SET datum_prevzatia = to_date(:datum_prevzatia, 'YYYY-MM-DD')
+    const sqlStatement = `UPDATE recept SET datum_prevzatia = to_date(:datum_prevzatia, 'DD.MM.YY')
     where id_receptu = :id_receptu`;
     console.log(body);
     let result = await conn.execute(
@@ -125,10 +126,20 @@ async function updatePocetLiekuVydajReceptu(body) {
   }
 }
 
+async function sendSMS(body) {
+  console.log(body);
+  try {
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 module.exports = {
   getZoznamAktualnychReceptov,
   getZoznamVydanychReceptov,
   getDetailReceptu,
   updateDatumZapisu,
   updatePocetLiekuVydajReceptu,
+  sendSMS,
 };

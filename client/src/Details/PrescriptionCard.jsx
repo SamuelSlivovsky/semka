@@ -29,7 +29,11 @@ export default function PrescriptionCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        setDetail(...data); 
+        setDetail(...data);
+        console.log(data[0].MENO_PACIENTA);
+        console.log(data[0].PRIEZVISKO_PACIENTA);
+        console.log(data[0].NAZOV_LEKARNE);
+        console.log(data[0].MAZOV_LIEKU);
       });
   }, []); //
 
@@ -58,7 +62,7 @@ export default function PrescriptionCard(props) {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
-    return `${year}-${month}-${day}`;
+    return `${day}-${month}-${year}`;
   };
 
   const handleEditDate = () => {
@@ -107,6 +111,47 @@ export default function PrescriptionCard(props) {
       })
       .catch((error) => {
         // V prípade chyby v sieti alebo inej chyby
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: "Nepodarilo sa odoslať požiadavku.",
+          life: 6000,
+        });
+      });
+    fetch(`pharmacyPrescriptions/sendSMS`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        datum_prevzatia: formattedDate,
+        nazov_lekarne: detail.NAZOV_LEKARNE,
+        meno_pacienta: detail.MENO_PACIENTA,
+        priezvisko_pacienta: detail.PRIEZVISKO_PACIENTA,
+        nazov_lieku: detail.NAZOV_LIEKU,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "SMS notifikácia bola pacientovi úspeśne odoslaná!",
+            life: 6000,
+          });
+        } else {
+          // Handle error response
+          res.json().then((errorData) => {
+            toast.current.show({
+              severity: "error",
+              summary: "Chyba",
+              detail:
+                errorData.message ||
+                "Nastala chyba pri odosielaní SMS notifikácie.",
+              life: 6000,
+            });
+          });
+        }
+      })
+      .catch((error) => {
         toast.current.show({
           severity: "error",
           summary: "Chyba",
@@ -245,7 +290,7 @@ export default function PrescriptionCard(props) {
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.value)}
           showIcon
-          dateFormat="yy-mm-dd"
+          dateFormat="dd.mm.yy"
         />
       </Dialog>
       <Dialog
