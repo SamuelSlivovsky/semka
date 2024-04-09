@@ -129,6 +129,23 @@ async function updatePocetLiekuVydajReceptu(body) {
 async function sendSMS(body) {
   console.log(body);
   try {
+    client.messages
+      .create({
+        body:
+          "Vážený pán/Vážená pani: " +
+          body.meno_pacienta +
+          " " +
+          body.priezvisko_pacienta +
+          ", liek na recept " +
+          body.nazov_lieku +
+          " bol vybratý v lekárni " +
+          body.nazov_lekarne +
+          " dňa " +
+          body.datum_prevzatia,
+        to: body.telefon,
+        from: "+13344234063", // From a valid Twilio number
+      })
+      .then((message) => console.log(message.sid));
   } catch (err) {
     console.log("Err Model");
     console.log(err);

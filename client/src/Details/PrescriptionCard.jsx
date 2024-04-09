@@ -32,8 +32,9 @@ export default function PrescriptionCard(props) {
         setDetail(...data);
         console.log(data[0].MENO_PACIENTA);
         console.log(data[0].PRIEZVISKO_PACIENTA);
+        console.log(data[0].TELEFON);
         console.log(data[0].NAZOV_LEKARNE);
-        console.log(data[0].MAZOV_LIEKU);
+        console.log(data[0].NAZOV_LIEKU);
       });
   }, []); //
 
@@ -62,7 +63,7 @@ export default function PrescriptionCard(props) {
     const year = date.getFullYear();
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
     const day = date.getDate().toString().padStart(2, "0");
-    return `${day}-${month}-${year}`;
+    return `${day}.${month}.${year}`;
   };
 
   const handleEditDate = () => {
@@ -127,6 +128,7 @@ export default function PrescriptionCard(props) {
         meno_pacienta: detail.MENO_PACIENTA,
         priezvisko_pacienta: detail.PRIEZVISKO_PACIENTA,
         nazov_lieku: detail.NAZOV_LIEKU,
+        telefon: detail.TELEFON,
       }),
     })
       .then((res) => {
