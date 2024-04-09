@@ -53,7 +53,8 @@ async function getDetailReceptu(id) {
       trvanlivost_lieku.id_liek as "ID_LIEKU", to_char(trvanlivost_lieku.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_TRVANLIVOSTI", 
       liek.nazov as "NAZOV_LIEKU", recept.poznamka, recept.opakujuci,
       typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA",
-      trvanlivost_lieku.pocet as "DOSTUPNY_POCET_NA_SKLADE", trvanlivost_lieku.id_sklad, lekaren.id_lekarne
+      trvanlivost_lieku.pocet as "DOSTUPNY_POCET_NA_SKLADE", trvanlivost_lieku.id_sklad, lekaren.id_lekarne,
+      oupac.email as "EMAIL", oupac.telefon as "TELEFON"
       from recept
        left join pacient on (pacient.id_pacienta = recept.id_pacienta)
        left join zamestnanci on (zamestnanci.cislo_zam = recept.cislo_zam)

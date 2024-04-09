@@ -29,7 +29,7 @@ export default function PrescriptionCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
-        setDetail(...data);
+        setDetail(...data); 
       });
   }, []); //
 

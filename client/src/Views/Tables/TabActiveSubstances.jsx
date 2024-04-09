@@ -149,6 +149,14 @@ export default function TabMedicaments() {
     if (newActiveSubstance.nazov) {
       // Ak sú všetky polia vyplnené, pokračujeme v odoslaní
       fetchSubmitNewActiveSubstance();
+    } else {
+      // Ak nie sú vyplnené všetky povinné polia
+      toast.current.show({
+        severity: "warn",
+        summary: "Nevyplnené povinné polia",
+        detail: "Prosím, vyplňte všetky povinné polia.",
+        life: 5000,
+      });
     }
   };
 

@@ -174,7 +174,7 @@ export default function TabPharmacists(props) {
       <div className="flex justify-content-between">
         <div className="table-header">
           <span className="p-input-icon-left">
-          <i className="pi pi-search" style={{ color: "#00796b" }} />
+            <i className="pi pi-search" style={{ color: "#00796b" }} />
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
@@ -251,6 +251,14 @@ export default function TabPharmacists(props) {
     ) {
       // Ak sú všetky polia vyplnené, pokračujeme v odoslaní
       fetchSubmitNewPharmacist();
+    } else {
+      // Ak nie sú vyplnené všetky povinné polia
+      toast.current.show({
+        severity: "warn",
+        summary: "Nevyplnené povinné polia",
+        detail: "Prosím, vyplňte všetky povinné polia.",
+        life: 5000,
+      });
     }
   };
 

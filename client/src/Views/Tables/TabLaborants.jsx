@@ -251,6 +251,14 @@ export default function TabLaborants(props) {
     ) {
       // Ak sú všetky polia vyplnené, pokračujeme v odoslaní
       fetchSubmitNewLaborant();
+    } else {
+      // Ak nie sú vyplnené všetky povinné polia
+      toast.current.show({
+        severity: "warn",
+        summary: "Nevyplnené povinné polia",
+        detail: "Prosím, vyplňte všetky povinné polia.",
+        life: 5000,
+      });
     }
   };
 
