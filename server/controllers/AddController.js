@@ -37,9 +37,8 @@ module.exports = {
       ret_val = await zdravotny_zaznam.insertHospitalizacia(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
-      res.status(500).send(err);
+      console.error(err.message);
+      res.status(500).json({ error: err.message });
     });
   },
   insertOperacia: (req, res) => {
@@ -48,9 +47,8 @@ module.exports = {
       ret_val = await zdravotny_zaznam.insertOperacia(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
-      res.status(500).send(err);
+      console.error(err.message);
+      res.status(500).json({ error: err.message });
     });
   },
 

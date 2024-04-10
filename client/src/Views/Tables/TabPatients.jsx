@@ -9,12 +9,12 @@ import { useNavigate } from "react-router";
 import { Tag } from "primereact/tag";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
+import { InputMask } from "primereact/inputmask";
 
 export default function TabPatients() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
-  const [showDialog, setShowDialog] = useState(false);
-  const [selectedRow, setSelectedRow] = useState(null);
+  const [patientId, setPatientId] = useState(null);
   const toast = useRef(null);
   const [pacienti, setPacienti] = useState([]);
   const navigate = useNavigate();
@@ -51,6 +51,49 @@ export default function TabPatients() {
     navigate("/patient", { state: value.ID_PACIENTA });
   };
 
+  const findPatient = () => {
+    if (patientId.length == 11) {
+      const token = localStorage.getItem("hospit-user");
+      const headers = { authorization: "Bearer " + token };
+      const userDataHelper = GetUserData(token);
+      fetch(
+        `/lekar/pacient/${patientId.replace("/", "$")}/${
+          userDataHelper.UserInfo.userid
+        }`,
+        {
+          headers,
+        }
+      )
+        .then((response) => {
+          // Kontrola ci response je ok (status:200)
+          if (response.ok) {
+            return response.json();
+          } else if (response.status === 401) {
+            // Token expiroval redirect na logout
+            toast.current.show({
+              severity: "error",
+              summary: "Session timeout redirecting to login page",
+              life: 999999999,
+            });
+            setTimeout(() => {
+              navigate("/logout");
+            }, 3000);
+          }
+        })
+        .then((data) => {
+          if (data && data.ID_PACIENTA != null) {
+            navigate("/patient", { state: data.ID_PACIENTA });
+          } else {
+            toast.current.show({
+              severity: "error",
+              summary: "Neplatné rodné číslo",
+              life: 3000,
+            });
+          }
+        });
+    }
+  };
+
   const renderHeader = () => {
     return (
       <div className="flex justify-content-between">
@@ -61,7 +104,20 @@ export default function TabPatients() {
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
-              placeholder="Keyword Search"
+            />
+          </span>
+        </div>
+        <div className="table-header">
+          Vyhľadať pacienta
+          <span className="p-input-icon-left" style={{ marginLeft: "10px" }}>
+            <i className="pi pi-search" />
+            <InputText
+              value={patientId}
+              onKeyDown={(e) => {
+                if (e.code === "Enter") findPatient();
+              }}
+              onChange={(e) => setPatientId(e.target.value)}
+              placeholder="Rodné číslo"
             />
           </span>
         </div>

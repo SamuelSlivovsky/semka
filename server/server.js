@@ -80,21 +80,18 @@ app.use("/poistovna", poistovnaRoute);
 app.use("/objednavky", ordersRoute);
 app.use("/presuny", warehouseTransfersRoute);
 
-// Store user socket IDs and groups
 const users = {};
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
 
-  // When a user connects, store their socket ID
   socket.on("storeUserData", ({ userId, group }) => {
     users[userId] = {
       socketId: socket.id,
-      group: group, // Store user's groups, default to empty array
+      group: group,
     };
   });
 
-  // Send a private message to users in the same group
   socket.on("sendMessage", (message, params) => {
     const groupUsers = Object.values(users).filter(
       (user) => user.group == params.groupId
@@ -122,9 +119,7 @@ io.on("connection", (socket) => {
     });
   });
 
-  // Handle disconnection
   socket.on("disconnect", () => {
-    // Remove the disconnected user from the users object
     const userId = Object.keys(users).find(
       (key) => users[key].socketId === socket.id
     );

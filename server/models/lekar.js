@@ -69,7 +69,7 @@ FROM (
    WHERE zamestnanci.cislo_zam = :pid_lekara
 ) sub
 WHERE rn_hosp = 1
-ORDER BY id_pacienta
+ORDER BY je_hospit desc
 `,
       { pid_lekara }
     );
@@ -404,6 +404,21 @@ async function getZoznamVydanychReceptov(id, datum) {
   }
 }
 
+async function getPacient(rod_cislo, id) {
+  try {
+    let conn = await database.getConnection();
+    const info = await conn.execute(
+      `select id_pacienta from pacient where rod_cislo =:rod_cislo
+      AND id_nemocnice in (select id_nemocnice from zamestnanci where cislo_zam = :id)`,
+      [rod_cislo.replace("$", "/"), id]
+    );
+    console.log(info);
+    return info.rows[0];
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getLekari,
   getPacienti,
@@ -421,4 +436,5 @@ module.exports = {
   getOperacieAdmin,
   getHospitalizacieAdmin,
   getVysetreniaAdmin,
+  getPacient,
 };

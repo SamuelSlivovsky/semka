@@ -34,6 +34,7 @@ function EventCalendar(props) {
     { name: "Operácia", code: "OP" },
     { name: "Vyšetrenie", code: "EX" },
     { name: "Hospitalizácia", code: "HOSP" },
+    { name: "Konzílium", code: "KONZ" },
   ];
   const options = ["Detaily udalosti", "Zmeniť dátum udalosti"];
   const patientOptions = ["Detaily udalosti"];
@@ -92,7 +93,6 @@ function EventCalendar(props) {
               break;
           }
         });
-        console.log(data);
         setCurrentEvents(data);
         setCalendarVisible(true);
         setCalendarKey(Date.now());
@@ -131,7 +131,7 @@ function EventCalendar(props) {
         setEventType(eventTypes[2]);
         break;
       default:
-        setEventType(clickInfo.event._def.extendedProps.type);
+        setEventType(eventTypes[3]);
         break;
     }
     setCurrEventId(clickInfo.event._def.publicId);
@@ -141,9 +141,11 @@ function EventCalendar(props) {
     setCurrEventTitle(
       clickInfo.event._def.extendedProps.type +
         " - " +
-        clickInfo.event._def.extendedProps.MENO +
-        " " +
-        clickInfo.event._def.extendedProps.PRIEZVISKO
+        (clickInfo.event._def.extendedProps.MENO
+          ? clickInfo.event._def.extendedProps.MENO +
+            " " +
+            clickInfo.event._def.extendedProps.PRIEZVISKO
+          : clickInfo.event._def.extendedProps.DOVOD)
     );
   };
 
@@ -366,7 +368,10 @@ function EventCalendar(props) {
             <SelectButton
               value={selectButtonValue}
               options={
-                props.userData.UserInfo.role === 4 ? patientOptions : options
+                props.userData.UserInfo.role === 9999 ||
+                (eventType != null && eventType.code == "KONZ")
+                  ? patientOptions
+                  : options
               }
               onChange={(e) => setSelectButtonValue(e.value)}
               style={{

@@ -3,15 +3,17 @@ import { InputText } from "primereact/inputtext";
 import { FileUpload } from "primereact/fileupload";
 import { Button } from "primereact/button";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { Dialog } from "primereact/dialog";
+import { Toast } from "primereact/toast";
 import socketService from "../service/socketService.js";
 import GetUserData from "../Auth/GetUserData.jsx";
-import { Dialog } from "primereact/dialog";
 import AddUserForm from "../Forms/AddUserForm.jsx";
 import ChatSettings from "./ChatSettings.jsx";
 import "../styles/chat.css";
 
 const Messages = (props) => {
   const messagesEndRef = useRef([]);
+  const toast = useRef(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [image, setImage] = useState(null);
@@ -26,6 +28,7 @@ const Messages = (props) => {
   const [base64Data, setBase64Data] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
   const [settingsShow, setSettingsShow] = useState(false);
+  const [historyCheck, setHistoryCheck] = useState(false);
 
   useEffect(() => {
     setLoading(true);
@@ -302,9 +305,32 @@ const Messages = (props) => {
       body: JSON.stringify({
         userid: user.CISLO_ZAM,
         id_skupiny: props.group.ID_SKUPINY,
+        historia: historyCheck ? 1 : 0,
       }),
     };
-    fetch("/chat/insertUser", requestOptions).then(() => setShow(false));
+    fetch("/chat/insertUser", requestOptions)
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage.error);
+        } else {
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "Úspešné pridanie používateľa",
+            life: 3000,
+          });
+          setShow(false);
+        }
+      })
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: error.message,
+          life: 3000,
+        });
+      });
   };
 
   const headerTemplate = (options) => {
@@ -391,6 +417,7 @@ const Messages = (props) => {
 
   return (
     <div style={{ width: "100%" }}>
+      <Toast ref={toast} />
       <div
         style={{
           height: "40px",
@@ -679,7 +706,12 @@ const Messages = (props) => {
         style={{ minWidth: "50%" }}
       >
         {" "}
-        <AddUserForm onClick={addChatUser} />
+        <AddUserForm
+          onClick={addChatUser}
+          toast={toast}
+          historyCheck={historyCheck}
+          setHistoryCheck={setHistoryCheck}
+        />
       </Dialog>
       <Dialog
         visible={settingsShow}
