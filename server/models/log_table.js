@@ -30,18 +30,25 @@ async function getNumberOfWrongLogins(ip) {
 }
 
 
-async function insertLogFailedLogin(body) {
+async function insertLog(body) {
+    if (body.ip === undefined) {
+        body.ip = null;
+    }
+    if (body.riadok === undefined) {
+        body.riadok = null;
+    }
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
             `BEGIN
-            insert_log(:table,:status,:description,:ip);
+            insert_log(:table,:status,:description,:ip,:riadok);
             END;`,
             {
                 status: body.status,
-                description: "User with ip " + body.ip + " has failed to log in",
+                description: body.description,
                 ip: body.ip,
-                table: "USER_TAB"
+                table: body.table,
+                riadok: body.riadok,
             },
             {autoCommit: true}
         );
@@ -51,7 +58,7 @@ async function insertLogFailedLogin(body) {
 }
 
 module.exports = {
-    insertLogFailedLogin,
+    insertLog,
     getAllLogs,
     getNumberOfWrongLogins,
 };

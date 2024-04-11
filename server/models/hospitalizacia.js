@@ -10,6 +10,7 @@ async function getHospitalizacie() {
 
     return result.rows;
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }
@@ -28,6 +29,7 @@ async function endHospitalization(body) {
       { autoCommit: true }
     );
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }

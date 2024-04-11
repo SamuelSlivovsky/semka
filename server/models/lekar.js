@@ -58,6 +58,7 @@ async function getPacienti(pid_lekara) {
         );
         return result.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -78,6 +79,7 @@ async function getPriemernyVek() {
         );
         return result.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -110,6 +112,7 @@ async function getUdalosti(id) {
 
         return udalosti;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -132,6 +135,7 @@ async function getOperacie(id) {
 
         return operacie.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -153,6 +157,7 @@ async function getOperacieAdmin() {
 
         return operacie.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -177,6 +182,7 @@ async function getVysetrenia(id) {
 
         return vysetrenia.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -199,6 +205,7 @@ async function getVysetreniaAdmin() {
 
         return vysetrenia.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -231,11 +238,11 @@ async function getHospitalizacie(id) {
 
         return hospitalizacie.rows;
     } catch (err) {
+      throw new Error("Database error: " + err);
         console.log(err);
     }
 }
 
-//TODO spomenut obmedzenie na 10000 zaznamov z dovodu optimalizacie a rychlosti nacitavania
 async function getHospitalizacieAdmin() {
     try {
         let conn = await database.getConnection();
@@ -261,6 +268,7 @@ async function getHospitalizacieAdmin() {
 
         return hospitalizacie.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -281,6 +289,7 @@ async function getLekarInfo(id) {
 
         return info.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }
@@ -299,6 +308,7 @@ async function getNemocnicaOddelenia(id) {
 
         return info.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }

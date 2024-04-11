@@ -1,3 +1,4 @@
+const {insertLogs} = require("../utils/InsertLogs");
 module.exports = {
   insertRecept: (req, res) => {
     const recept = require("../models/recept");
@@ -5,7 +6,12 @@ module.exports = {
       ret_val = await recept.insertRecept(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      console.error(err);
+      insertLogs({
+        status: "failed insert recept",
+        table: "Recept",
+        description: "Failed to insert recept with body:" +
+          " " + "ID_LIEKU:" + req.body.id_lieku + " CISLO_ZAM:" + req.body.cislo_zam,
+      })
       res.status(500).send(err);
     });
   },
@@ -15,8 +21,11 @@ module.exports = {
       ret_val = await priloha.insertPriloha(req.body.image);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+      insertLogs({
+        status: "failed insert priloha",
+        table: "Priloha",
+        description: "Failed to insert priloha",
+      })
       res.status(500).send(err);
     });
   },
@@ -26,8 +35,12 @@ module.exports = {
       ret_val = await zdravotny_zaznam.insertVysetrenie(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+      insertLogs({
+        status: "failed insert vysetrenie",
+        table: "Vysetrenie",
+        description: "Failed to insert vysetrenie with body:" +
+          " " + "POPIS:" + req.body.popis + " DATUM:" + req.body.datum,
+      })
       res.status(500).send(err);
     });
   },
@@ -37,8 +50,12 @@ module.exports = {
       ret_val = await zdravotny_zaznam.insertHospitalizacia(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed insert hospitalizacia",
+            table: "Hospitalizacia",
+            description: "Failed to insert hospitalizacia with body:" +
+            " " + "NAZOV: " + req.body.nazov + "POPIS:" + req.body.popis + " DATUM:" + req.body.datum,
+        })
       res.status(500).send(err);
     });
   },
@@ -48,8 +65,12 @@ module.exports = {
       ret_val = await zdravotny_zaznam.insertOperacia(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed insert operacia",
+            table: "Operacia",
+            description: "Failed to insert operacia with body:" +
+            " " + "NAZOV: " + req.body.nazov + "POPIS:" + req.body.popis + " DATUM:" + req.body.datum,
+        })
       res.status(500).send(err);
     });
   },
@@ -60,8 +81,12 @@ module.exports = {
       ret_val = await ockovanie.insertOckovanie(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed insert ockovanie",
+            table: "Ockovanie",
+            description: "Failed to insert ockovanie with body:" +
+            " " + "ID_VAKCINY: " + req.body.id_vakciny +" DATUM:" + req.body.datum,
+        })
       res.status(500).send(err);
     });
   },
@@ -72,8 +97,12 @@ module.exports = {
       ret_val = await choroba.insertChoroba(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed insert choroba",
+            table: "Choroba",
+            description: "Failed to insert choroba with body:" +
+            " " + "NAZOV: " + req.body.nazov + "TYP:" + req.body.typ,
+        })
       res.status(500).send(err);
     });
   },
@@ -84,8 +113,12 @@ module.exports = {
       ret_val = await typZtp.insertTypZtp(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+    insertLogs({
+                status: "failed insert typ ztp",
+                table: "TypZtp",
+                description: "Failed to insert typ ztp with body:" +
+                " " + "TYP: " + req.body.id_typu_ztp,
+            })
       res.status(500).send(err);
     });
   },
@@ -96,8 +129,12 @@ module.exports = {
       ret_val = await pacient.insertPacient(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed insert pacient",
+            table: "Pacient",
+            description: "Failed to insert pacient with body:" +
+            " " + "ROD_CISLO: " + req.body.rod_cislo + "MENO:" + req.body.meno + "PRIEZVISKO:" + req.body.priezvisko,
+        })
       res.status(500).send(err);
     });
   },
@@ -108,8 +145,12 @@ module.exports = {
       ret_val = await konzilium.insertKonzilium(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed insert konzilium",
+            table: "Konzilium",
+            description: "Failed to insert konzilium with body:" +
+            " " + "POPIS: " + req.body.popis + "DATUM:" + req.body.datum,
+        })
       res.status(500).send(err);
     });
   },
@@ -120,8 +161,11 @@ module.exports = {
       ret_val = await konzilium.insertKonziliumUser(req.body);
       res.status(200).json("success");
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed insert konzilium user",
+            table: "Konzilium",
+            description: "Failed to insert konzilium user with body:"
+        })
       res.status(500).send(err);
     });
   },
@@ -132,7 +176,11 @@ module.exports = {
       ret_val = await obec.getObce();
       res.status(200).json(ret_val);
     })().catch((err) => {
-      console.error(err);
+      insertLogs({
+        status: "failed get obce",
+        table: "Obec",
+        description: "Failed to get obce"
+      })
       res.status(500).send(err);
     });
   },
@@ -146,8 +194,11 @@ module.exports = {
       );
       res.status(200).json(ret_val);
     })().catch((err) => {
-      // error handling logic 1
-      console.error(err); // logging error
+        insertLogs({
+            status: "failed get dostupne miestnosti",
+            table: "Miestnost",
+            description: "Failed to get dostupne miestnosti"
+        })
       res.status(500).send(err);
     });
   },

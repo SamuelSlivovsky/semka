@@ -203,6 +203,7 @@ WHERE
 
         return result.rows;
     } catch (err) {
+        throw new Error("Database error: " + err);
         console.log(err);
     }
 }

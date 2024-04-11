@@ -27,6 +27,7 @@ async function getPopisZaznamu(id) {
     console.log(zaznam);
     return zaznam.rows;
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }
@@ -42,6 +43,7 @@ async function getPriloha(id) {
     console.log(result);
     return result.rows[0].DATA;
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }
@@ -120,6 +122,7 @@ async function insertVysetrenie(body) {
       nazov: body.nazov,
     });
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }
@@ -139,6 +142,7 @@ async function getZaznamy(id) {
     });
     return result.rows;
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }
