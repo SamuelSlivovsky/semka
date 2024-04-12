@@ -52,7 +52,6 @@ export default function TabMedicalAidsReservations() {
         ]);
 
       if (!aktualneZdrPomockyResponse.ok || !prevzateZdrPomockyResponse.ok) {
-        // Handle error (show toast or redirect)
         return;
       }
 
@@ -232,10 +231,10 @@ export default function TabMedicalAidsReservations() {
       fetch(
         `/pharmacyManagers/updateStavRezervacieZdrPomocky/${selectedRow.ID_REZERVACIE}`,
         {
-          method: "POST", // Tu by sa zvyčajne použila metóda PUT pre aktualizácie, ale závisí to od backendu
+          method: "POST",
           headers: headers,
           body: JSON.stringify({
-            id_rezervacie: selectedRow.ID_REZERVACIE, // Zdá sa, že na backend potrebujete poslať aj ID rezervácie v tele
+            id_rezervacie: selectedRow.ID_REZERVACIE,
             datum_prevzatia: formattedDate,
           }),
         }

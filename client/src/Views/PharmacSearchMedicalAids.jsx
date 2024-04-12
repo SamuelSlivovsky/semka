@@ -179,7 +179,6 @@ export default function PharmacSearchMedicalAids() {
     if (newReservation.rod_cislo) {
       fetchPersonDetails();
     }
-    // Zabezpečte, aby ste pridali všetky použité premenné a funkcie do zoznamu závislostí useEffect hooku
   }, [newReservation.rod_cislo, toast]);
 
   const onHide = () => {
@@ -246,35 +245,27 @@ export default function PharmacSearchMedicalAids() {
   };
 
   const formatRodneCislo = (value) => {
-    // Odstráňte všetky znaky okrem čísel a lomiek
     let cislo = value.replace(/[^\d/]/g, "");
-
-    // Odstráňte všetky lomky, ktoré sú na zlom mieste
     cislo = cislo.replace(/[/]/g, "");
-
-    // Uistite sa, že lomka je pridávaná iba raz
     if (cislo.length > 6) {
       cislo = `${cislo.slice(0, 6)}/${cislo.slice(6)}`;
     }
-
-    // Orezanie akéhokoľvek nadbytočného textu
     if (cislo.length > 11) {
       cislo = cislo.slice(0, 11);
     }
-
     return cislo;
   };
 
   const handleSubmit = () => {
-    setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
-    // Pridáme kontrolu na počet
-    const requestedCount = parseInt(newReservation.pocet, 10); // získame počet ako číslo
-    const availableCount = parseInt(selectedRow.POCET, 10); // dostupný počet na sklade
+    setSubmitted(true);
+    const requestedCount = parseInt(newReservation.pocet, 10); // Počet ako číslo
+    const availableCount = parseInt(selectedRow.POCET, 10); // Dostupný počet na sklade
 
     if (
       newReservation.rod_cislo &&
       newReservation.meno &&
       newReservation.priezvisko &&
+      newReservation.telefon &&
       requestedCount > 0
     ) {
       if (requestedCount > availableCount) {
@@ -375,7 +366,7 @@ export default function PharmacSearchMedicalAids() {
           {renderErrorMessage("priezvisko")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
-          <label htmlFor="ulica">Telefón</label>
+          <label htmlFor="telefon">Telefón</label>
           <InputText
             id="telefon"
             value={newReservation.telefon}
@@ -383,10 +374,12 @@ export default function PharmacSearchMedicalAids() {
               setNewReservation({ ...newReservation, telefon: e.target.value })
             }
             placeholder="Zadajte telefónne číslo (Nepovinné)"
+            required
           />
+          {renderErrorMessage("telefon")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
-          <label htmlFor="ulica">E - mail</label>
+          <label htmlFor="email">E - mail</label>
           <InputText
             id="email"
             value={newReservation.email}

@@ -120,7 +120,7 @@ export default function TabMedicamentsResevations() {
       <div className="flex justify-content-between">
         <div className="table-header">
           <span className="p-input-icon-left">
-          <i className="pi pi-search" style={{ color: "#00796b" }} />
+            <i className="pi pi-search" style={{ color: "#00796b" }} />
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
@@ -226,10 +226,10 @@ export default function TabMedicamentsResevations() {
       fetch(
         `/pharmacyManagers/updateStavRezervacieLieku/${selectedRow.ID_REZERVACIE}`,
         {
-          method: "POST", // Tu by sa zvyčajne použila metóda PUT pre aktualizácie, ale závisí to od backendu
+          method: "POST",
           headers: headers,
           body: JSON.stringify({
-            id_rezervacie: selectedRow.ID_REZERVACIE, // Zdá sa, že na backend potrebujete poslať aj ID rezervácie v tele
+            id_rezervacie: selectedRow.ID_REZERVACIE,
             datum_prevzatia: formattedDate,
           }),
         }

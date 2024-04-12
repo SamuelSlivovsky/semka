@@ -150,7 +150,7 @@ export default function PharmacySearchMedicaments(props) {
               telefon: personDetails.TELEFON || "",
               email: personDetails.EMAIL || "",
             }));
-            console.log("Načítané údaje osoby:", personDetails); // Teraz by malo vypísať správne načítané údaje
+            console.log("Načítané údaje osoby:", personDetails);
           } else {
             console.log("Osoba nebola nájdená alebo je pole prázdne.");
             setNewReservation((prev) => ({
@@ -178,7 +178,6 @@ export default function PharmacySearchMedicaments(props) {
     if (newReservation.rod_cislo) {
       fetchPersonDetails();
     }
-    // Zabezpečte, aby ste pridali všetky použité premenné a funkcie do zoznamu závislostí useEffect hooku
   }, [newReservation.rod_cislo, toast]);
 
   const onHide = () => {
@@ -256,35 +255,28 @@ export default function PharmacySearchMedicaments(props) {
   };
 
   const formatRodneCislo = (value) => {
-    // Odstráňte všetky znaky okrem čísel a lomiek
     let cislo = value.replace(/[^\d/]/g, "");
-
-    // Odstráňte všetky lomky, ktoré sú na zlom mieste
     cislo = cislo.replace(/[/]/g, "");
-
-    // Uistite sa, že lomka je pridávaná iba raz
     if (cislo.length > 6) {
       cislo = `${cislo.slice(0, 6)}/${cislo.slice(6)}`;
     }
-
-    // Orezanie akéhokoľvek nadbytočného textu
     if (cislo.length > 11) {
       cislo = cislo.slice(0, 11);
     }
-
     return cislo;
   };
 
   const handleSubmit = () => {
-    setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
+    setSubmitted(true);
     // Pridáme kontrolu na počet
-    const requestedCount = parseInt(newReservation.pocet, 10); // získame počet ako číslo
-    const availableCount = parseInt(selectedRow.POCET, 10); // dostupný počet na sklade
+    const requestedCount = parseInt(newReservation.pocet, 10); // Počet ako číslo
+    const availableCount = parseInt(selectedRow.POCET, 10); // Dostupný počet na sklade
 
     if (
       newReservation.rod_cislo &&
       newReservation.meno &&
       newReservation.priezvisko &&
+      newReservation.telefon &&
       requestedCount > 0
     ) {
       if (requestedCount > availableCount) {
@@ -385,18 +377,20 @@ export default function PharmacySearchMedicaments(props) {
           {renderErrorMessage("priezvisko")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
-          <label htmlFor="ulica">Telefón</label>
+          <label htmlFor="telefon">Telefón</label>
           <InputText
             id="telefon"
             value={newReservation.telefon}
             onChange={(e) =>
               setNewReservation({ ...newReservation, telefon: e.target.value })
             }
-            placeholder="Zadajte telefónne číslo (Nepovinné)"
+            placeholder="Zadajte telefónne číslo"
+            required
           />
+          {renderErrorMessage("telefon")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
-          <label htmlFor="ulica">E - mail</label>
+          <label htmlFor="email">E - mail</label>
           <InputText
             id="email"
             value={newReservation.email}
