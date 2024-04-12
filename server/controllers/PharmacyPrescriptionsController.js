@@ -22,7 +22,10 @@ module.exports = {
   getDetailReceptu: (req, res) => {
     const detailReceptu = require("../models/lekaren_recepty");
     (async () => {
-      detailyReceptov = await detailReceptu.getDetailReceptu(req.params.id);
+      detailyReceptov = await detailReceptu.getDetailReceptu(
+        req.params.id,
+        req.params.cisloZam
+      );
       res.status(200).json(detailyReceptov);
     })();
   },

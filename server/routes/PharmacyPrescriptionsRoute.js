@@ -18,7 +18,7 @@ router.get(
 );
 
 router.get(
-  "/detailReceptu/:id",
+  "/detailReceptu/:id/:cisloZam",
   verify.verifyRoles(0, 10),
   controller.getDetailReceptu
 );
@@ -35,10 +35,6 @@ router.post(
   controller.updatePocetLiekuVydajReceptu
 );
 
-router.post(
-  "/sendSMS",
-  verify.verifyRoles(0, 10),
-  controller.sendSMS
-);
+router.post("/sendSMS", verify.verifyRoles(0, 10), controller.sendSMS);
 
 module.exports = router;

@@ -3,6 +3,7 @@ import { Card } from "primereact/card";
 import { Dialog } from "primereact/dialog";
 import { Calendar } from "primereact/calendar";
 import { useNavigate, useLocation } from "react-router";
+import GetUserData from "../Auth/GetUserData";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 
@@ -18,13 +19,14 @@ export default function PrescriptionCard(props) {
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
+    const userDataHelper = GetUserData(token);
     fetch(
       `pharmacyPrescriptions/detailReceptu/${
         typeof props.prescriptionId !== "undefined" &&
         props.prescriptionId !== null
           ? props.prescriptionId
           : location.state
-      }`,
+      }/${userDataHelper.UserInfo.userid}`,
       { headers }
     )
       .then((response) => response.json())
