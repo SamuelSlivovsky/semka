@@ -205,15 +205,18 @@ async function getInfo(id) {
     datum_umrtia,
     typ_krvi,
     PSC,
+    ulica,
+    id_poistenca,
     mesto.nazov AS nazov_obce,
-    poistovna.nazov AS nazov_poistovne
+    poistovna.nazov AS nazov_poistovne,
+    pacient.dat_od as datum_zapisu
 FROM
     os_udaje
 JOIN
     pacient USING(rod_cislo)
 LEFT JOIN
     zdravotna_karta USING(id_pacienta)
-JOIN
+LEFT JOIN
     mesto USING(PSC)
 LEFT JOIN
     poistenie USING(id_pacienta)
@@ -282,10 +285,12 @@ async function getOperacie(rod_cislo) {
   try {
     let conn = await database.getConnection();
     const operacie = await conn.execute(
-      `select to_char(datum,'YYYY-MM-DD') || 'T' || to_char(datum, 'HH24:MI:SS') as "start", to_char(id_zaznamu) as "id_zaz" from zdravotny_zaz
+      `select rod_cislo, meno, priezvisko, to_char(dat_operacie,'YYYY-MM-DD') || 'T' || to_char(dat_operacie, 'HH24:MI:SS') as 
+      "start",id_operacie as "id" ,id_zaznamu as "id_zaz", to_char(dat_operacie,'DD.MM.YYYY') datum from zdravotny_zaz
         join operacia using(id_zaznamu) 
         join zdravotna_karta using(id_karty)
         join pacient using(id_pacienta)
+        join os_udaje using(rod_cislo)
         where rod_cislo = :rod_cislo`,
       [rod_cislo]
     );
@@ -386,7 +391,7 @@ async function getRecepty(pid_pacienta) {
   try {
     let conn = await database.getConnection();
     const recepty = await conn.execute(
-      `select nazov, to_char(datum_zapisu, 'DD.MM.YYYY') as datum_zapisu, meno || ' ' || priezvisko as lekar
+      `select nazov, to_char(datum_zapisu, 'DD.MM.YYYY ') as datum_zapisu, to_char(datum_prevzatia, 'DD.MM.YYYY ') as datum_prevzatia,meno || ' ' || priezvisko as lekar
             from recept join liek using(id_liek)
                         join zamestnanci zc using(cislo_zam)
                         join os_udaje ou on(ou.rod_cislo = zc.rod_cislo) 
@@ -587,6 +592,57 @@ async function updateTimeOfDeath(body) {
   }
 }
 
+async function updatePacient(body) {
+  try {
+    let conn = await database.getConnection();
+    await conn.execute(
+      `UPDATE os_udaje SET 
+      rod_cislo = :rod_cislo,
+      meno = :meno,
+      priezvisko = :priezvisko,
+      PSC = :psc,
+      ulica = :ulica,
+      telefon = :telefon,
+      email = :email
+      WHERE rod_cislo = :rod_cislo`,
+      {
+        rod_cislo: body.rod_cislo,
+        meno: body.meno,
+        priezvisko: body.priezvisko,
+        PSC: body.psc,
+        ulica: body.ulica,
+        telefon: body.tel,
+        email: body.mail,
+      },
+      { autoCommit: true }
+    );
+    await conn.execute(
+      `UPDATE pacient SET 
+      rod_cislo = :rod_cislo,
+      dat_od = :dat_od
+      WHERE id_pacienta = :id_pacienta`,
+      {
+        rod_cislo: body.rod_cislo,
+        dat_od: body.dat_od,
+        id_pacienta: body.id_pacienta,
+      },
+      { autoCommit: true }
+    );
+    await conn.execute(
+      `UPDATE zdravotna_karta SET 
+      typ_krvi = :typ_krvi
+      WHERE id_pacienta = :id_pacienta`,
+      {
+        typ_krvi: body.typ_krvi,
+        id_pacienta: body.id_pacienta,
+      },
+      { autoCommit: true }
+    );
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getPacienti,
   getNajviacChoriPocet,
@@ -612,4 +668,5 @@ module.exports = {
   getReceptyAdmin,
   getDoctorsOfPatient,
   insertPacient,
+  updatePacient,
 };

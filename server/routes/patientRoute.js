@@ -43,5 +43,10 @@ router.post(
   verify.verifyRoles(1, 2, 3),
   controller.updateTimeOfDeath
 );
+router.post(
+  "/update",
+  verify.verifyRoles(1, 2, 3),
+  controller.updatePacient
+);
 
 module.exports = router;

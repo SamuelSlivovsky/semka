@@ -72,14 +72,18 @@ const HospitalRoom = () => {
           setSelectedBed(null);
         }}
         footer={
-          <Button
-            label="Karta pacienta"
-            onClick={() =>
-              selectedBed
-                ? navigate("/patient", { state: selectedBed.ID_PACIENTA })
-                : ""
-            }
-          ></Button>
+          selectedBed?.ID_PACIENTA ? (
+            <Button
+              label="Karta pacienta"
+              onClick={() =>
+                selectedBed
+                  ? navigate("/patient", { state: selectedBed.ID_PACIENTA })
+                  : ""
+              }
+            ></Button>
+          ) : (
+            ""
+          )
         }
       >
         <h3>Oddelenie: {selectedBed ? selectedBed.TYP_ODDELENIA : ""} </h3>

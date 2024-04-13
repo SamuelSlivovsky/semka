@@ -53,9 +53,9 @@ async function getPacienti(pid_lekara) {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `SELECT id_pacienta, meno, rod_cislo, priezvisko, psc, id_poistenca, nazov,
-      CASE WHEN id_hosp IS NULL THEN 0 ELSE 1 END AS je_hospit
+      CASE WHEN id_hosp IS NOT NULL and (dat_do is null or dat_do >= sysdate) and dat_od <= sysdate THEN  1 ELSE 0 END AS je_hospit
 FROM (
-   SELECT p.id_pacienta, o.meno, p.rod_cislo, o.priezvisko, o.psc, h.id_hosp, h.dat_do, id_poistenca, poistovna.nazov,
+   SELECT p.id_pacienta, o.meno, p.rod_cislo, o.priezvisko, o.psc, h.id_hosp, h.dat_do, h.dat_od, id_poistenca, poistovna.nazov,
           ROW_NUMBER() OVER (PARTITION BY p.id_pacienta ORDER BY h.dat_do DESC NULLS FIRST) AS rn_hosp
    FROM pacient p
    LEFT JOIN zdravotna_karta zk ON zk.id_pacienta = p.id_pacienta
@@ -70,6 +70,7 @@ FROM (
 ) sub
 WHERE rn_hosp = 1
 ORDER BY je_hospit desc
+
 `,
       { pid_lekara }
     );

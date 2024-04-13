@@ -97,6 +97,16 @@ module.exports = {
       res.status(403).send(err);
     });
   },
+  updatePacient: (req, res) => {
+    const pacient = require("../models/pacient");
+    (async () => {
+      ret_val = await pacient.updatePacient(req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
   getOckovania: (req, res) => {
     const pacient = require("../models/pacient");
     (async () => {

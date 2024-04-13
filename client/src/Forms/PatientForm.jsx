@@ -10,12 +10,12 @@ import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
-export default function PatientForm() {
+export default function PatientForm(props) {
   const [showMessage, setShowMessage] = useState(false);
   const [cities, setCities] = useState([]);
   const [filteredPsc, setFilteredPsc] = useState(null);
   const [insurances, setInsurances] = useState([]);
-
+  const profile = props.profile;
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
@@ -96,9 +96,15 @@ export default function PatientForm() {
         mail: data.mail,
       }),
     };
-    await fetch("/add/pacient", requestOptionsPatient).then(() =>
-      setShowMessage(true)
-    );
+    if (profile && profile != null) {
+      await fetch("/patient/update", requestOptionsPatient).then(() =>
+        setShowMessage(true)
+      );
+    } else {
+      await fetch("/add/pacient", requestOptionsPatient).then(() =>
+        setShowMessage(true)
+      );
+    }
 
     form.restart();
   };
@@ -162,20 +168,36 @@ export default function PatientForm() {
         <Form
           onSubmit={onSubmit}
           initialValues={{
-            rod_cislo: "",
-            email: "",
-            meno: "",
-            priezvisko: "",
-            psc: "",
-            telefon: "",
-            cudzinec: false,
-            dat_narodenia: null,
+            rod_cislo: profile && profile != null ? profile.ROD_CISLO : "",
+            mail: profile && profile != null ? profile.EMAIL : "",
+            meno: profile && profile != null ? profile.MENO : "",
+            priezvisko: profile && profile != null ? profile.PRIEZVISKO : "",
+            psc: profile && profile != null ? profile.PSC : "",
+            tel: profile && profile != null ? profile.TELEFON : "",
+            cudzinec:
+              profile && profile != null
+                ? profile.CUDZINEC == 0
+                  ? false
+                  : true
+                : false,
+            dat_narodenia:
+              profile && profile != null
+                ? new Date(profile.DATUM_NARODENIA)
+                : null,
             pohlavie: "M",
-            typ_krvi: "0-",
-            poistenec: 0,
-            poistovna: null,
-            tel: "",
-            mail: null,
+            typ_krvi: profile && profile != null ? profile.TYP_KRVI : "0-",
+            poistenec: profile && profile != null ? profile.ID_POISTENCA : 0,
+            poistovna:
+              profile && profile != null
+                ? insurances.find(
+                    (item) => item.NAZOV == profile.NAZOV_POISTOVNE
+                  )
+                : null,
+            ulica: profile && profile != null ? profile.ULICA : "",
+            dat_od:
+              profile && profile != null
+                ? new Date(profile.DATUM_ZAPISU)
+                : new Date(),
           }}
           validate={validate}
           render={({ handleSubmit, form, values }) => (
@@ -498,7 +520,6 @@ export default function PatientForm() {
                       dateFormat="dd.mm.yy"
                       mask="99.99.9999"
                       showIcon
-                      showTime
                       className={classNames({
                         "p-invalid": isFormFieldValid(meta),
                       })}

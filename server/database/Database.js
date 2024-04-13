@@ -5,7 +5,7 @@ const path = require("path");
 const instantClientPath = path.join(__dirname, "instantclient_21_7");
 try {
   // Initialize Oracle Client with the Instant Client libraries path
-  oracledb.initOracleClient({ libDir: "C:\\oracle\\instantclient_21_7" });
+  oracledb.initOracleClient({ libDir: instantClientPath });
 } catch (err) {
   console.error("Whoops!");
   console.error(err);

@@ -67,13 +67,7 @@ function Home() {
       icon={operationIcon}
       key="6"
     ></HomeCard>,
-    <HomeCard
-      title="Štatistiky"
-      isCalendar={false}
-      path="/statistics"
-      icon={statIcon}
-      key="7"
-    ></HomeCard>,
+
     <HomeCard
       title="Pridaj"
       isCalendar={false}
@@ -104,6 +98,13 @@ function Home() {
       path="/doctors"
       icon={doctorsIcon}
       key="3"
+    ></HomeCard>,
+    <HomeCard
+      title="Štatistiky"
+      isCalendar={false}
+      path="/statistics"
+      icon={statIcon}
+      key="7"
     ></HomeCard>,
   ];
 
@@ -171,7 +172,7 @@ function Home() {
       title="Karta pacienta"
       isCalendar={false}
       path="/patient"
-      icon={storageIcon}
+      icon={patientIcon}
       key="2"
     ></HomeCard>,
   ];

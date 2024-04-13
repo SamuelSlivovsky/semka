@@ -36,6 +36,7 @@ export default function TableMedic(props) {
     editor,
     eventType,
     tableLoading,
+    isPatient,
   } = props;
   const [popis, setPopis] = useState(null);
   const [nazov, setNazov] = useState(null);
@@ -76,6 +77,7 @@ export default function TableMedic(props) {
       .then((res) => res.blob())
       .then((result) => {
         setImgUrl(URL.createObjectURL(result));
+        setLoading(false);
       });
     fetch(`/zaznamy/popis/${value.id_zaz}`, { headers })
       .then((response) => {
@@ -98,7 +100,6 @@ export default function TableMedic(props) {
       .then((data) => {
         setPopis(data[0].POPIS);
         setNazov(data[0].NAZOV);
-        setLoading(false);
       });
   };
 
@@ -295,7 +296,7 @@ export default function TableMedic(props) {
           <div style={{ width: "100%", display: "flex" }}>
             <ProgressSpinner />
           </div>
-        ) : selectedRow !== null ? (
+        ) : selectedRow !== null && imgUrl ? (
           <div
             style={{
               maxWidth: "100%",
@@ -324,6 +325,7 @@ export default function TableMedic(props) {
                   doctor={userData}
                   desc={popis}
                   name={nazov}
+                  image={imgUrl}
                 />
               }
               fileName={`${selectedRow.PRIEZVISKO}${selectedRow.type}.pdf`}
@@ -355,8 +357,9 @@ export default function TableMedic(props) {
             <h5>{"Dátum: " + selectedRow.DATUM} </h5>
             <div>{popis}</div>
             <img src={imgUrl} alt="" width={"200"} height={"auto"} />
-            {selectedRow.type == "HOS" ||
-            selectedRow.TYP == "Hospitalizácia" ? (
+            {(selectedRow.type == "HOS" ||
+              selectedRow.TYP == "Hospitalizácia") &&
+            !isPatient ? (
               <div
                 style={{
                   display: "flex",

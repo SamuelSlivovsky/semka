@@ -249,13 +249,6 @@ function App() {
       icon="storage-icon"
     />,
     <SidebarButton
-      key="stats"
-      visibleLeft={visibleLeft}
-      path="/statistics"
-      label="Štatistiky"
-      icon="stat-icon"
-    />,
-    <SidebarButton
       key="12"
       visibleLeft={visibleLeft}
       path="/meetings"
@@ -279,6 +272,13 @@ function App() {
       path="/doctors"
       label="Lekári"
       icon="doctor-icon"
+    />,
+    <SidebarButton
+      key="stats"
+      visibleLeft={visibleLeft}
+      path="/statistics"
+      label="Štatistiky"
+      icon="stat-icon"
     />,
   ];
 
