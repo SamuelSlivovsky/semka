@@ -235,6 +235,8 @@ export default function WarehouseTransfers() {
 
     //Function for creating new Transfer from selected hospital
     async function createHospitalTransfer() {
+        //@TODO when creating Transfer Hospital and Department are not added into Array
+
         //Declaration of constants
         const _transfer = [...waitingTransfers];
         const _tr = {...emptyTransfer};
@@ -1333,12 +1335,26 @@ export default function WarehouseTransfers() {
                 />
                 {hospitalSearchOption ? <div>
                     <h2>Hladanie liekov podľa nemocnice</h2>
-                    <Dropdown
-                        value={selectedHospital}
-                        options={hospitals.map(hospital => ({ value: hospital, label: hospital.NAZOV }))}
-                        onChange={(selectedOption) => {
-                            setSelectedHospital(selectedOption.value);
-                        }}/>
+                    <div className="formgrid grid">
+                        <div className="field col">
+                            <Dropdown
+                                style={{width: "auto"}}
+                                value={selectedHospital}
+                                options={hospitals.map(hospital => ({ value: hospital, label: hospital.NAZOV }))}
+                                onChange={(selectedOption) => {
+                                    setSelectedHospital(selectedOption.value);
+                                }}
+                                optionLabel="label"
+                                filter
+                                showClear
+                                filterBy="label"
+                                filterMatchMode="startsWith"
+                                placeholder="Vyberte nemocnicu"
+                                resetFilterOnHide
+                                required
+                            />
+                        </div>
+                    </div>
                 </div> : null}
 
                 {medicineSearchOption ? <div>
@@ -1346,19 +1362,27 @@ export default function WarehouseTransfers() {
                     <div>
                         {selectedMedications.map((selectedMedication, index) => (
                             <div key={index} style={{paddingTop: "20px"}}>
-                                <div className="field col">
-                                    <Dropdown
-                                        style={{width: "auto"}}
-                                        value={selectedMedication.selectedDrug}
-                                        options={drugs}
-                                        onChange={(e) => {
-                                            const updatedMedications = [...selectedMedications];
-                                            updatedMedications[index].selectedDrug = e.value;
-                                            setSelectedMedications(updatedMedications);
-                                        }}
-                                        optionLabel="NAZOV"
-                                        placeholder="Vyberte liek"
-                                    />
+                                <div className="formgrid grid">
+                                    <div className="field col">
+                                        <Dropdown
+                                            style={{width: "auto"}}
+                                            value={selectedMedication.selectedDrug}
+                                            options={drugs}
+                                            onChange={(e) => {
+                                                const updatedMedications = [...selectedMedications];
+                                                updatedMedications[index].selectedDrug = e.value;
+                                                setSelectedMedications(updatedMedications);
+                                            }}
+                                            optionLabel="NAZOV"
+                                            filter
+                                            showClear
+                                            filterBy="NAZOV"
+                                            filterMatchMode="startsWith"
+                                            placeholder="Vyberte liek"
+                                            resetFilterOnHide
+                                            required
+                                        />
+                                    </div>
                                 </div>
                                 <div>
                                     <Button
@@ -1432,19 +1456,27 @@ export default function WarehouseTransfers() {
 
                     {selectedMedications.map((selectedMedication, index) => (
                         <div key={index} style={{paddingTop: "20px"}}>
-                            <div className="field col">
-                                <Dropdown
-                                    style={{width: "auto"}}
-                                    value={selectedMedication.selectedDrug}
-                                    options={drugs}
-                                    onChange={(e) => {
-                                        const updatedMedications = [...selectedMedications];
-                                        updatedMedications[index].selectedDrug = e.value;
-                                        setSelectedMedications(updatedMedications);
-                                    }}
-                                    optionLabel="NAZOV"
-                                    placeholder="Vyberte liek"
-                                />
+                            <div className="formgrid grid">
+                                <div className="field col">
+                                    <Dropdown
+                                        style={{width: "auto"}}
+                                        value={selectedMedication.selectedDrug}
+                                        options={drugs}
+                                        onChange={(e) => {
+                                            const updatedMedications = [...selectedMedications];
+                                            updatedMedications[index].selectedDrug = e.value;
+                                            setSelectedMedications(updatedMedications);
+                                        }}
+                                        optionLabel="NAZOV"
+                                        filter
+                                        showClear
+                                        filterBy="NAZOV"
+                                        filterMatchMode="startsWith"
+                                        placeholder="Vyberte liek"
+                                        resetFilterOnHide
+                                        required
+                                    />
+                                </div>
                             </div>
                             <label style={{paddingLeft: "15px"}} htmlFor="quantity">Počet</label>
                             <div className="field col">
@@ -1467,7 +1499,7 @@ export default function WarehouseTransfers() {
                         </div>
                     ))}
                     <div className={"submit-button"}>
-                        <Button style={{width: "50%"}} label="Pridať do zoznamu" onClick={addMedication} />
+                        <Button style={{width: "15%"}} label="+" onClick={addMedication} />
                     </div>
                 </div> : null}
                 {hospitalSearchOption || medicineSearchOption || showExpirityDateTransferDialog
