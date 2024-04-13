@@ -484,6 +484,51 @@ function App() {
     />,
   ];
 
+  const sidebarButtonsLaborant = [
+    <SidebarButton
+      key="1"
+      visibleLeft={visibleLeft}
+      path="/"
+      label="Domov"
+      icon="home-icon"
+    />,
+    <SidebarButton
+      key="20"
+      visibleLeft={visibleLeft}
+      path="/about_me"
+      label="Informácie o mne"
+      icon="aboutMe-icon"
+    />,
+    <SidebarButton
+      key="18"
+      visibleLeft={visibleLeft}
+      path="/medicaments"
+      label="Číselník liekov"
+      icon="medicaments-icon"
+    />,
+    <SidebarButton
+      key="25"
+      visibleLeft={visibleLeft}
+      path="/active_substances"
+      label="Zoznam účinných látok"
+      icon="active-substance-icon"
+    />,
+    <SidebarButton
+      key="19"
+      visibleLeft={visibleLeft}
+      path="/medical_aids"
+      label="Číselník zdravotníckych pomôcok"
+      icon="medical-aids-icon"
+    />,
+    <SidebarButton
+      key="14"
+      visibleLeft={visibleLeft}
+      path="/lekarensky_sklad"
+      label="Lekárenský sklad"
+      icon="pharmacy-storage-icon"
+    />,
+  ];
+
   const renderDoctorRoutes = () => {
     return (
       <>
@@ -703,6 +748,32 @@ function App() {
     );
   };
 
+  const renderLaborantRoutes = () => {
+    return (
+      <>
+        <Route path="/about_me" element={<PharmacyManagersDashboard />}></Route>
+        <Route path="/medicaments" element={<TabMedicaments />}></Route>
+        <Route path="/medicament_detail" element={<MedicamentCard />}></Route>
+        <Route
+          path="/active_substances"
+          element={<TabActiveSubstances />}
+        ></Route>
+        <Route path="/medical_aids" element={<TabMedicalAids />}></Route>
+        <Route path="/medicalAid_detail" element={<MedicalAidCard />}></Route>
+        <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
+        <Route
+          path="/lekarensky_sklad_lieky"
+          element={<PharmacyStorageMedicaments />}
+        ></Route>
+        <Route
+          path="/lekarensky_sklad_zdravotnickePomocky"
+          element={<PharmacyStorageMedicalAids />}
+        ></Route>
+        <Route path="*" element={<NotFoundPage404 />}></Route>
+      </>
+    );
+  };
+
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
@@ -737,6 +808,8 @@ function App() {
           sidebarButtonsPharmacyManager
         ) : userData !== null && userData.UserInfo.role === 9 ? (
           sidebarButtonsPharmacist
+        ) : userData !== null && userData.UserInfo.role === 8 ? (
+          sidebarButtonsLaborant
         ) : (
           ""
         )}
@@ -803,6 +876,10 @@ function App() {
             userData !== null &&
             userData.UserInfo.role === 9 ? (
             <>{renderPharmacistRoutes()}</>
+          ) : typeof userData !== "undefined" &&
+            userData !== null &&
+            userData.UserInfo.role === 8 ? (
+            <>{renderLaborantRoutes()}</>
           ) : (
             ""
           )}

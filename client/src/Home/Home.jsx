@@ -347,6 +347,44 @@ function Home() {
     ></HomeCard>,
   ];
 
+  const laborantCards = [
+    <HomeCard
+      title="Informácie o mne"
+      isCalendar={false}
+      path="/about_me"
+      icon={aboutMeIcon}
+      key="20"
+    ></HomeCard>,
+    <HomeCard
+      title="Číselník liekov"
+      isCalendar={false}
+      path="/medicaments"
+      icon={medicamentsIcon}
+      key="18"
+    ></HomeCard>,
+    <HomeCard
+      title="Zoznam účinných látok"
+      isCalendar={false}
+      path="/active_substances"
+      icon={activeSubstanceIcon}
+      key="25"
+    ></HomeCard>,
+    <HomeCard
+      title="Číselník zdravotníckych pomôcok"
+      isCalendar={false}
+      path="/medical_aids"
+      icon={medicalAidsIcon}
+      key="19"
+    ></HomeCard>,
+    <HomeCard
+      title="Lekárenský sklad"
+      isCalendar={false}
+      path="/lekarensky_sklad"
+      icon={pharmacyStorageIcon}
+      key="14"
+    ></HomeCard>,
+  ];
+
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
       if (userData.UserInfo.role === 0) return adminCards;
@@ -361,6 +399,7 @@ function Home() {
       else if (userData.UserInfo.role === 5) return warehouseCards;
       else if (userData.UserInfo.role === 10) return pharmacyManagerCards;
       else if (userData.UserInfo.role === 9) return pharmacistCards;
+      else if (userData.UserInfo.role === 8) return laborantCards;
     }
   };
 

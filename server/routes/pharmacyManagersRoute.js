@@ -44,14 +44,14 @@ router.delete(
 
 router.get(
   "/zoznamLiekov/:id",
-  verify.verifyRoles(0, 10, 9),
+  verify.verifyRoles(0, 10, 9, 8),
   verify.checkForCorrectId(),
   controller.getZoznamLiekov
 );
 
 router.get(
   "/zoznamZdravotnickychPomocok/:id",
-  verify.verifyRoles(0, 10, 9),
+  verify.verifyRoles(0, 10, 9, 8),
   verify.checkForCorrectId(),
   controller.getZoznamZdravotnickychPomocok
 );
@@ -76,19 +76,19 @@ router.get(
 
 router.get(
   "/pouzivatelInfo/:id",
-  verify.verifyRoles(0, 10, 9),
+  verify.verifyRoles(0, 10, 9, 8),
   controller.getPouzivatelInfo
 );
 
 router.get(
   "/detailLieku/:id",
-  verify.verifyRoles(0, 10, 9),
+  verify.verifyRoles(0, 10, 9, 8),
   controller.getDetailLieku
 );
 
 router.get(
   "/detailZdravotnickejPomocky/:id",
-  verify.verifyRoles(0, 10, 9),
+  verify.verifyRoles(0, 10, 9, 8),
   controller.getDetailZdravotnickejPomocky
 );
 
@@ -100,7 +100,7 @@ router.get(
 
 router.get(
   "/getUcinnaLatka/:id",
-  verify.verifyRoles(0, 10, 9),
+  verify.verifyRoles(0, 10, 9, 8),
   controller.getUcinnaLatka
 );
 
