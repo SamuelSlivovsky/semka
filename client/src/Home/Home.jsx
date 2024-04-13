@@ -295,6 +295,58 @@ function Home() {
     ></HomeCard>,
   ];
 
+  const pharmacistCards = [
+    <HomeCard
+      title="Informácie o mne"
+      isCalendar={false}
+      path="/about_me"
+      icon={aboutMeIcon}
+      key="20"
+    ></HomeCard>,
+    <HomeCard
+      title="Číselník liekov"
+      isCalendar={false}
+      path="/medicaments"
+      icon={medicamentsIcon}
+      key="18"
+    ></HomeCard>,
+    <HomeCard
+      title="Zoznam účinných látok"
+      isCalendar={false}
+      path="/active_substances"
+      icon={activeSubstanceIcon}
+      key="25"
+    ></HomeCard>,
+    <HomeCard
+      title="Číselník zdravotníckych pomôcok"
+      isCalendar={false}
+      path="/medical_aids"
+      icon={medicalAidsIcon}
+      key="19"
+    ></HomeCard>,
+    <HomeCard
+      title="Lekárenský sklad"
+      isCalendar={false}
+      path="/lekarensky_sklad"
+      icon={pharmacyStorageIcon}
+      key="14"
+    ></HomeCard>,
+    <HomeCard
+      title="Výdaj"
+      isCalendar={false}
+      path="/dispensing_medicines"
+      icon={dispensingMedicinesIcon}
+      key="23"
+    ></HomeCard>,
+    <HomeCard
+      title="Rezervácie"
+      isCalendar={false}
+      path="/reservations"
+      icon={reservationsIcon}
+      key="21"
+    ></HomeCard>,
+  ];
+
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
       if (userData.UserInfo.role === 0) return adminCards;
@@ -308,6 +360,7 @@ function Home() {
       else if (userData.UserInfo.role === 9999) return patientCards;
       else if (userData.UserInfo.role === 5) return warehouseCards;
       else if (userData.UserInfo.role === 10) return pharmacyManagerCards;
+      else if (userData.UserInfo.role === 9) return pharmacistCards;
     }
   };
 

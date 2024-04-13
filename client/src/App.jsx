@@ -425,6 +425,65 @@ function App() {
     />,
   ];
 
+  const sidebarButtonsPharmacist = [
+    <SidebarButton
+      key="1"
+      visibleLeft={visibleLeft}
+      path="/"
+      label="Domov"
+      icon="home-icon"
+    />,
+    <SidebarButton
+      key="20"
+      visibleLeft={visibleLeft}
+      path="/about_me"
+      label="Informácie o mne"
+      icon="aboutMe-icon"
+    />,
+    <SidebarButton
+      key="18"
+      visibleLeft={visibleLeft}
+      path="/medicaments"
+      label="Číselník liekov"
+      icon="medicaments-icon"
+    />,
+    <SidebarButton
+      key="25"
+      visibleLeft={visibleLeft}
+      path="/active_substances"
+      label="Zoznam účinných látok"
+      icon="active-substance-icon"
+    />,
+    <SidebarButton
+      key="19"
+      visibleLeft={visibleLeft}
+      path="/medical_aids"
+      label="Číselník zdravotníckych pomôcok"
+      icon="medical-aids-icon"
+    />,
+    <SidebarButton
+      key="14"
+      visibleLeft={visibleLeft}
+      path="/lekarensky_sklad"
+      label="Lekárenský sklad"
+      icon="pharmacy-storage-icon"
+    />,
+    <SidebarButton
+      key="23"
+      visibleLeft={visibleLeft}
+      path="/dispensing_medicines"
+      label="Výdaj"
+      icon="dispensing-medicines-icon"
+    />,
+    <SidebarButton
+      key="21"
+      visibleLeft={visibleLeft}
+      path="/reservations"
+      label="Rezervácie"
+      icon="reservations-icon"
+    />,
+  ];
+
   const renderDoctorRoutes = () => {
     return (
       <>
@@ -588,6 +647,62 @@ function App() {
     );
   };
 
+  const renderPharmacistRoutes = () => {
+    return (
+      <>
+        <Route path="/about_me" element={<PharmacyManagersDashboard />}></Route>
+        <Route path="/medicaments" element={<TabMedicaments />}></Route>
+        <Route path="/medicament_detail" element={<MedicamentCard />}></Route>
+        <Route
+          path="/active_substances"
+          element={<TabActiveSubstances />}
+        ></Route>
+        <Route path="/medical_aids" element={<TabMedicalAids />}></Route>
+        <Route path="/medicalAid_detail" element={<MedicalAidCard />}></Route>
+        <Route path="/lekarensky_sklad" element={<PharmacyStorage />}></Route>
+        <Route
+          path="/lekarensky_sklad_lieky"
+          element={<PharmacyStorageMedicaments />}
+        ></Route>
+        <Route
+          path="/lekarensky_sklad_zdravotnickePomocky"
+          element={<PharmacyStorageMedicalAids />}
+        ></Route>
+        <Route
+          path="/lekarensky_sklad_vyhladavanieLiecivaPodlaLekarni"
+          element={<PharmacySearchMedicaments />}
+        ></Route>
+        <Route
+          path="/lekarensky_sklad_vyhladavanieZdrPomockyPodlaLekarni"
+          element={<PharmacSearchMedicalAids />}
+        ></Route>
+        <Route
+          path="/dispensing_medicines"
+          element={<PharmacyDispensing />}
+        ></Route>
+        <Route path="/prescriptions" element={<TabPrescriptions />}></Route>
+        <Route
+          path="/prescription_detail"
+          element={<PrecsriptionCard />}
+        ></Route>
+        <Route
+          path="/free_sale_medicaments"
+          element={<TabFreeSaleMedicaments />}
+        ></Route>
+        <Route path="/reservations" element={<PharmacyReservations />}></Route>
+        <Route
+          path="/medicaments_reservations"
+          element={<TabMedicamentsResevations />}
+        ></Route>
+        <Route
+          path="/medical_aids_reservations"
+          element={<TabMedicalAidsReservations />}
+        ></Route>
+        <Route path="*" element={<NotFoundPage404 />}></Route>
+      </>
+    );
+  };
+
   return (
     <div>
       <div className={`side-box ${visibleLeft ? "side-box-opened" : ""}`}>
@@ -620,6 +735,8 @@ function App() {
           sidebarWarehouseManager
         ) : userData !== null && userData.UserInfo.role === 10 ? (
           sidebarButtonsPharmacyManager
+        ) : userData !== null && userData.UserInfo.role === 9 ? (
+          sidebarButtonsPharmacist
         ) : (
           ""
         )}
@@ -682,6 +799,10 @@ function App() {
             userData !== null &&
             userData.UserInfo.role === 10 ? (
             <>{renderPharmacyManagerRoutes()}</>
+          ) : typeof userData !== "undefined" &&
+            userData !== null &&
+            userData.UserInfo.role === 9 ? (
+            <>{renderPharmacistRoutes()}</>
           ) : (
             ""
           )}

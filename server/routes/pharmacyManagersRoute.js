@@ -76,19 +76,19 @@ router.get(
 
 router.get(
   "/pouzivatelInfo/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getPouzivatelInfo
 );
 
 router.get(
   "/detailLieku/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getDetailLieku
 );
 
 router.get(
   "/detailZdravotnickejPomocky/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getDetailZdravotnickejPomocky
 );
 
@@ -100,31 +100,31 @@ router.get(
 
 router.get(
   "/getUcinnaLatka/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getUcinnaLatka
 );
 
 router.post(
   "/insertUcinneLatky",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.insertUcinneLatky
 );
 
 router.post(
   "/updateUcinnaLatka",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.updateUcinnaLatka
 );
 
 router.post(
   "/insertUcinnaLatka",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.insertUcinnaLatka
 );
 
 router.delete(
   "/deleteUcinnaLatka/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.deleteUcinnaLatka
 );
 
@@ -136,61 +136,61 @@ router.get(
 
 router.get(
   "/getZoznamAktualnychRezervaciiLieku/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getZoznamAktualnychRezervaciiLieku
 );
 
 router.get(
   "/getZoznamPrevzatychRezervaciiLieku/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getZoznamPrevzatychRezervaciiLieku
 );
 
 router.post(
   "/insertRezervaciaLieku",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.insertRezervaciaLieku
 );
 
 router.delete(
   "/deleteRezervaciaLieku/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.deleteRezervaciaLieku
 );
 
 router.post(
   "/updateStavRezervacieLieku/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.updateStavRezervacieLieku
 );
 
 router.get(
   "/getZoznamAktualnychRezervaciiZdrPomocky/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getZoznamAktualnychRezervaciiZdrPomocky
 );
 
 router.get(
   "/getZoznamPrevzatychRezervaciiZdrPomocky/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.getZoznamPrevzatychRezervaciiZdrPomocky
 );
 
 router.post(
   "/insertRezervaciaZdrPomocky",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.insertRezervaciaZdrPomocky
 );
 
 router.delete(
   "/deleteRezervaciaZdrPomocky/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.deleteRezervaciaZdrPomocky
 );
 
 router.post(
   "/updateStavRezervacieZdrPomocky/:id",
-  verify.verifyRoles(0, 10),
+  verify.verifyRoles(0, 10, 9),
   controller.updateStavRezervacieZdrPomocky
 );
 
