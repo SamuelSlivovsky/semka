@@ -117,7 +117,7 @@
 }
 
 .storage-icon {
-  content: url("./images/drugs-black.png");
+  content: url("./images/warehouse.png");
   height: 44px;
   width: 44px;
 }
@@ -180,6 +180,17 @@
   width: 15px;
 }
 
+.warehouse-move-icon {
+  content: url("./images/warehouse-move.png");
+  height: 44px;
+  width: 44px;
+}
+
+.order-icon {
+  content: url("./images/order.png");
+  height: 44px;
+  width: 44px;
+}
 .vehicle-icon {
   content: url('./images/vehicle-icon.png');
   height: 44px;

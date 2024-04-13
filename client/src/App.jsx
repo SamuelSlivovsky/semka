@@ -16,7 +16,11 @@ import "../node_modules/primeflex/primeflex.css";
 import TabExaminations from "./Views/Tables/TabExaminations";
 import TabHospitalizations from "./Views/Tables/TabHospitalizations";
 import TabOperations from "./Views/Tables/TabOperations";
+
 import Storage from "./Views/Storage";
+import Orders from "./Views/Orders";
+import WarehouseTransfers from "./Views/WarehouseTransfers";
+
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
 import GetUserData from "./Auth/GetUserData";
 import Logout from "./Auth/Logout";
@@ -81,7 +85,6 @@ function App() {
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log(data);
           setNotifications(data.POCET);
         });
     });
@@ -257,6 +260,37 @@ function App() {
         />,
     ];
 
+  const sidebarWarehouseManager = [
+      <SidebarButton
+          key="1"
+          visibleLeft={visibleLeft}
+          path="/"
+          label="Domov"
+          icon="home-icon"
+      />,
+      <SidebarButton
+          key="10"
+          visibleLeft={visibleLeft}
+          path="/sklad"
+          label="Sklad"
+          icon="storage-icon"
+      />,
+      <SidebarButton
+          key="14"
+          visibleLeft={visibleLeft}
+          path="/objednavky"
+          label="Objednavky"
+          icon="order-icon"
+      />,
+      <SidebarButton
+          key="15"
+          visibleLeft={visibleLeft}
+          path="/presuny"
+          label="Presuny"
+          icon="warehouse-move-icon"
+      />,
+  ]
+
   const sidebarButtonsRescuer = [
     <SidebarButton
       key="1"
@@ -346,21 +380,31 @@ function App() {
     );
   };
 
-  const renderPatientRoutes = () => {
-    return (
-      <>
-        <Route
-          path="/calendar"
-          element={<EventCalendar userData={userData}></EventCalendar>}
-        ></Route>
-        <Route
-          path="/patient"
-          element={
-            <Patient userData={userData} patientId={patientId}></Patient>
-          }
-        ></Route>
-      </>
-    );
+    const renderPatientRoutes = () => {
+        return (
+            <>
+                <Route
+                    path="/calendar"
+                    element={<EventCalendar userData={userData}></EventCalendar>}
+                ></Route>
+                <Route
+                    path="/patient"
+                    element={
+                        <Patient userData={userData} patientId={patientId}></Patient>
+                    }
+                ></Route>
+            </>
+        );
+    };
+
+  const renderWarehouseManagerRoutes = () => {
+      return (
+          <>
+              <Route path="/sklad" element={<Storage />}></Route>
+              <Route path="/objednavky" element={<Orders />}></Route>
+              <Route path="/presuny" element={<WarehouseTransfers />}></Route>
+          </>
+      )
   };
 
   const renderRescuerRoutes = () => {
@@ -408,6 +452,10 @@ function App() {
           <>
             {sidebarButtonsDoctor} {sidebarButtonsChief}
           </>
+        ) : userData !== null && userData.UserInfo.role === 9999 ? (
+          sidebarButtonsPatient
+        ) : userData !== null && userData.UserInfo.role === 5 ? (
+            sidebarWarehouseManager
         ) : userData !== null && userData.UserInfo.role === 4 ? (
           //sidebarButtonsPatient
           sidebarButtonsRescuer
@@ -457,14 +505,19 @@ function App() {
             userData !== null &&
             userData.UserInfo.role === 2 ? (
             renderDoctorRoutes()
-          ) : typeof userData !== "undefined" &&
-            userData !== null &&
-            userData.UserInfo.role === 3 ? (
+          ) : userData && userData.UserInfo.role === 3 ? (
             <>
               {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
+          ) : userData && userData.UserInfo.role === 9999 ? (
+            renderPatientRoutes()
           ) : typeof userData !== "undefined" &&
-            userData !== null &&
+          userData !== null &&
+          userData.UserInfo.role === 5 ? (
+              <>
+                  {renderWarehouseManagerRoutes()} {renderChiefRoutes()}
+              </>
+          ) : userData !== null &&
             userData.UserInfo.role === 4 ? (
             //renderPatientRoutes()
             renderRescuerRoutes()

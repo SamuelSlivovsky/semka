@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
 import { useLocation } from "react-router";
@@ -12,8 +12,12 @@ import "../icons.css";
 import DiseaseForm from "../Forms/DiseaseForm";
 import DisablesForm from "../Forms/DisablesForm";
 import VacForm from "../Forms/VacForm";
+import { Tag } from "primereact/tag";
+import { Calendar } from "primereact/calendar";
+import { Toast } from "primereact/toast";
 
 export default function ProfileCard(props) {
+  const toast = useRef(null);
   const [profile, setProfile] = useState("");
   const [show, setShow] = useState(false);
   const location = useLocation();
@@ -26,6 +30,7 @@ export default function ProfileCard(props) {
   const [patientDiseases, setPatientDiseases] = useState("");
   const [patientZTPTypes, setPatientZTPTypes] = useState([]);
   const [patientVac, setPatientVac] = useState([]);
+  const [allowUpdateTimeOfDeath, setAllowUpdateTimeOfDeath] = useState(false);
   const token = localStorage.getItem("hospit-user");
   const headers = { authorization: "Bearer " + token };
 
@@ -36,6 +41,7 @@ export default function ProfileCard(props) {
     titles: [
       { field: "DATUM", header: "Dátum" },
       { field: "TYP", header: "Typ záznamu" },
+      { field: "DAT_DO", header: "Dátum do" },
     ],
     allowFilters: false,
     dialog: true,
@@ -163,6 +169,7 @@ export default function ProfileCard(props) {
       .then((response) => response.json())
       .then((data) => {
         setProfile(...data);
+        console.log(data);
       });
   };
 
@@ -343,23 +350,117 @@ export default function ProfileCard(props) {
     }
   };
 
+  const updateTimeOfDeath = (e) => {
+    if (e.value <= new Date()) {
+      setProfile({ ...profile, DATUM_UMRTIA: e.value });
+      const token = localStorage.getItem("hospit-user");
+      const requestOptions = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          authorization: "Bearer " + token,
+        },
+        body: JSON.stringify({
+          datum_umrtia: e.value.toLocaleString("en-GB").replace(",", ""),
+          id_pacienta:
+            typeof props.patientId !== "undefined" && props.patientId !== null
+              ? props.patientId
+              : location.state,
+        }),
+      };
+      fetch("/patient/update/umrtie", requestOptions);
+    } else {
+      toast.current.show({
+        severity: "error",
+        summary: "Dátum úmrtia nemôže byť v budúcnosti",
+        life: 3000,
+      });
+    }
+  };
+
   return (
     <div>
+      <Toast ref={toast} />
       <div className="flex col-12 ">
         <Card
           className="col-5 shadow-4 "
           style={{ width: "50rem", height: "40rem" }}
-          title={profile.MENO + " " + profile.PRIEZVISKO}
+          title={
+            <div style={{ display: "flex", gap: "10px" }}>
+              {profile.MENO + " " + profile.PRIEZVISKO}{" "}
+              {profile.CUDZINEC == 1 ? (
+                <Tag
+                  style={{ fontSize: "16px" }}
+                  severity={"info"}
+                  value={"Cudzinec"}
+                />
+              ) : (
+                ""
+              )}
+            </div>
+          }
         >
           <div className="flex ">
             <div className="col-6 text-center m-0">
               <h4>Rok narodenia</h4>
               <div>{profile.DATUM_NARODENIA}</div>
             </div>
-
             <div className="col-6 text-center m-0">
-              <h4>Mobil</h4>
-              <div>{profile.TEL}</div>
+              <h4>Dátum úmrtia</h4>
+              <div>
+                {profile.DATUM_UMRTIA ? (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    {" "}
+                    <Calendar
+                      style={{ width: "170px" }}
+                      showTime
+                      value={new Date(profile.DATUM_UMRTIA)}
+                      onChange={(e) => {
+                        updateTimeOfDeath(e);
+                      }}
+                      disabled={!allowUpdateTimeOfDeath}
+                    />
+                    <Button
+                      label="Uprav"
+                      onClick={() => setAllowUpdateTimeOfDeath(true)}
+                    />
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: "10px",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <Calendar
+                      value={
+                        profile.DATUM_UMRTIA
+                          ? new Date(profile.DATUM_UMRTIA)
+                          : ""
+                      }
+                      onChange={(e) => {
+                        updateTimeOfDeath(e);
+                      }}
+                      style={{
+                        width: "170px",
+                        display: allowUpdateTimeOfDeath ? "" : "none",
+                      }}
+                      showTime
+                    />
+                    <Button
+                      label="Pridaj"
+                      onClick={() => setAllowUpdateTimeOfDeath(true)}
+                    />
+                  </div>
+                )}
+              </div>
             </div>
           </div>
 
@@ -369,8 +470,8 @@ export default function ProfileCard(props) {
               <div>{profile.VEK}</div>
             </div>
             <div className="col-6 text-center m-0">
-              <h4>Email</h4>
-              <div>{profile.MAIL}</div>
+              <h4>Mobil</h4>
+              <div>{profile.TEL}</div>
             </div>
           </div>
 
@@ -402,7 +503,11 @@ export default function ProfileCard(props) {
                       gap: "20px",
                     }}
                   >
-                    Áno{" "}
+                    {patientZTPTypes.find(
+                      (item) => item.DAT_DO === "Súčasnosť"
+                    ) !== null
+                      ? "Áno"
+                      : "Nie "}
                     <Button
                       label="Zoznam"
                       onClick={() => setShowDisables(true)}

@@ -12,6 +12,8 @@ import GetUserData from "../../Auth/GetUserData";
 import {useNavigate} from "react-router";
 import {Toast} from "primereact/toast";
 
+import { InputTextarea } from "primereact/inputtextarea";
+import { Button } from "primereact/button";
 
 export default function TableMedic(props) {
     const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -20,84 +22,93 @@ export default function TableMedic(props) {
     const [selectedRow, setSelectedRow] = useState(null);
     const [imgUrl, setImgUrl] = useState("");
     const [loading, setLoading] = useState(false);
-    const userData = GetUserData(localStorage.getItem("hospit-user"));
+    const [leaveMessage, setLeaveMessage] = useState("");
+  const [canAdd, setCanAdd] = useState(false);
+  const [endDate, setEndDate] = useState(new Date());
+  const userData = GetUserData(localStorage.getItem("hospit-user"));
     const {
         tableName,
         cellData,
+    fetchData,
         titles,
         allowFilters,
         dialog,
         tableScrollHeight,
         editor,
         eventType,
+    tableLoading,
     } = props;
     const [popis, setPopis] = useState(null);
     const [nazov, setNazov] = useState(null);
     const toast = useRef(null);
     const navigate = useNavigate();
 
-    const onHide = () => {
-        setImgUrl(null);
-        setShowDialog(false);
-        setPopis(null);
-        setNazov(null);
-        setSelectedRow(null);
-    };
+  const onHide = () => {
+    setImgUrl(null);
+    setShowDialog(false);
+    setPopis(null);
+    setNazov(null);
+    setSelectedRow(null);
+    setCanAdd(false);
+    setLeaveMessage("");
+    setEndDate(new Date());
+    if (fetchData) fetchData();
+  };
 
-    const handleClick = (value) => {
-        setShowDialog(true);
-        setLoading(true);
-        const token = localStorage.getItem("hospit-user");
-        const headers = {authorization: "Bearer " + token};
-        setSelectedRow(value);
-        fetch(`/zaznamy/priloha/${value.id_zaz}`, {headers})
-            .then((res) => res.blob())
-            .then((result) => {
-                setImgUrl(URL.createObjectURL(result));
-            });
-        fetch(`/zaznamy/popis/${value.id_zaz}`, {headers})
-            .then((response) => {
-                // Kontrola ci response je ok (status:200)
-                if (response.ok) {
-                    return response.json();
-                    // Kontrola ci je token expirovany (status:410)
-                } else if (response.status === 410) {
-                    // Token expiroval redirect na logout
-                    toast.current.show({
-                        severity: 'error',
-                        summary: "Session timeout redirecting to login page",
-                        life: 999999999
-                    });
-                    setTimeout(() => {
-                        navigate("/logout")
-                    }, 3000)
-                }
-            })
-            .then((data) => {
-                setPopis(data[0].POPIS);
-                setNazov(data[0].NAZOV);
-                setLoading(false);
-            });
-    };
+  const handleClick = (value) => {
+    setShowDialog(true);
+    setLoading(true);
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    setSelectedRow(value);
+    setEndDate(value.DAT_DO ? new Date(value.DAT_DO) : new Date());
+    fetch(`/zaznamy/priloha/${value.id_zaz}`, { headers })
+      .then((res) => res.blob())
+      .then((result) => {
+        setImgUrl(URL.createObjectURL(result));
+      });
+      fetch(`/zaznamy/popis/${value.id_zaz}`, {headers})
+          .then((response) => {
+              // Kontrola ci response je ok (status:200)
+              if (response.ok) {
+                  return response.json();
+                  // Kontrola ci je token expirovany (status:410)
+              } else if (response.status === 410) {
+                  // Token expiroval redirect na logout
+                  toast.current.show({
+                      severity: 'error',
+                      summary: "Session timeout redirecting to login page",
+                      life: 999999999
+                  });
+                  setTimeout(() => {
+                      navigate("/logout")
+                  }, 3000)
+              }
+          })
+      .then((data) => {
+        setPopis(data[0].POPIS);
+        setNazov(data[0].NAZOV);
+        setLoading(false);
+      });
+  };
 
-    const getRecordDetails = () => {
-        let popis;
-        console.log(cellData);
-        cellData.map((data) => {
-            if (data.id === selectedRow.id) {
-                data.LEKAR === data.ODDELENIE
-                    ? (popis = <h5>{data.LEKAR} </h5>)
-                    : (popis = (
-                        <div>
-                            <h5>{data.LEKAR}</h5>
-                            <h5>{data.ODDELENIE}</h5>
-                        </div>
-                    ));
-            }
-            return "";
-        });
-        return popis;
-    };
+  const getRecordDetails = () => {
+    let popis;
+    cellData.map((data) => {
+      if (data.id === selectedRow.id) {
+        data.LEKAR === data.ODDELENIE
+          ? (popis = <h5>{data.LEKAR} </h5>)
+          : (popis = (
+              <div>
+                <h5>{data.LEKAR}</h5>
+                <h5>{data.ODDELENIE}</h5>
+              </div>
+            ));
+      }
+      return "";
+    });
+    return popis;
+  };
 
     const renderHeader = () => {
         return (
@@ -188,14 +199,34 @@ export default function TableMedic(props) {
         return new Date(formattedDateString);
     };
 
-    const header = allowFilters ? renderHeader() : "";
+    const endHospitalization = async () => {
+    setSelectedRow({
+      ...selectedRow,
+      DAT_DO: endDate,
+      PREPUSTACIA_SPRAVA: leaveMessage,
+    });
+    setCanAdd(false);
+    const requestOptions = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        authorization: "Bearer " + localStorage.getItem("hospit-user"),
+      },
+      body: JSON.stringify({
+        dat_do: endDate.toLocaleString("en-GB").replace(",", ""),
+        sprava: leaveMessage,
+        id_hosp: selectedRow.ID_HOSP,
+      }),
+    };
+    await fetch("/hospitalizacia/ukoncit", requestOptions);
+  };const header = allowFilters ? renderHeader() : "";
     return (
         <div>
             <Toast ref={toast} position="top-center"/>
             <div className="card">
                 <DataTable
                     editMode={editor ? "row" : ""}
-                    value={cellData}
+                    loading={tableLoading}value={cellData}
                     scrollable
                     paginator
                     rows={15}
@@ -217,7 +248,7 @@ export default function TableMedic(props) {
                             header={title.header}
                             filter
                             editor={
-                                title.field === "DAT_DO" ? (options) => dateEditor(options) : ""
+                                editor &&title.field === "DAT_DO" ? (options) => dateEditor(options) : ""
                             }
                         ></Column>
                     ))}
@@ -250,31 +281,112 @@ export default function TableMedic(props) {
                         <ProgressSpinner/>
                     </div>
                 ) : selectedRow !== null ? (
-                    <div style={{maxWidth: "100%", overflowWrap: "break-word"}}>
+                    <div style={{maxWidth: "100%", overflowWrap: "break-word",
+              display: "flex",
+              flexDirection: "column",
+            }}>
                         <PDFDownloadLink
-                            document={
+                            style={{
+                height: "40px",
+                backgroundColor: "red",
+                width: "120px",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                borderRadius: "5px",
+                textDecoration: "none",
+                marginBottom: "10px",
+                backgroundColor: "#14B8A6",
+              }}document={
                                 <Pdf
                                     eventType={eventType}
                                     data={selectedRow}
-                                    doctor={userData}
+                                    doctor={userData}desc={popis}
+                  name={nazov}
                                 />
                             }
                             fileName={`${selectedRow.PRIEZVISKO}${selectedRow.type}.pdf`}
                         >
                             {({blob, url, loading, error}) =>
-                                loading ? "Loading document..." : "Download now!"
-                            }
+                                loading ? (
+                            "Načítavam"
+                        ) : (
+                        <span
+                            style={{
+                            fontWeight: "bold",
+                      color: "white",
+                      display: "flex",
+                      gap: "10px",
+                    }}
+                  >
+                    {" "}
+                    <i
+                      className="pi pi-file-pdf"
+                            style={{fontSize: "20px" }}
+                    ></i>
+                    Stiahnuť
+                  </span>
+                )}
                         </PDFDownloadLink>
-                        <img
-                            src={imgUrl}
-                            alt=""
-                            style={{maxWidth: 400, maxHeight: 400}}
-                        />
-
+            <img src={imgUrl} alt="" width={"400"} height={"auto"} />
                         {selectedRow.type != null ? getRecordDetails() : ""}
                         <h2>{nazov} </h2>
                         <h5>{"Dátum: " + selectedRow.DATUM} </h5>
-                        <div>{popis}</div>
+                        <div>{popis}</div>{selectedRow.type == "HOS" ||
+            selectedRow.TYP == "Hospitalizácia" ? (
+              <div
+                style={{
+                  display: "flex",
+                  flexDirection: "column",
+                  marginTop: "10px",
+                }}
+              >
+                {canAdd ? (
+                  ""
+                ) : (
+                  <Button
+                    label={
+                      selectedRow.DAT_DO == null
+                        ? "Ukončiť hospitalizáciu?"
+                        : "Zmeniť dátum ukončenia?"
+                    }
+                    icon="pi pi-plus"
+                    onClick={() => setCanAdd(true)}
+                  />
+                )}
+                {canAdd ? (
+                  <div
+                    style={{
+                      width: "100%",
+                      marginTop: "10px",
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "10px",
+                    }}
+                  >
+                    <InputTextarea
+                      style={{ width: "100%" }}
+                      rows={5}
+                      value={leaveMessage}
+                      onChange={(e) => setLeaveMessage(e.target.value)}
+                    />
+                    <Calendar
+                      showTime
+                      value={endDate}
+                      onChange={(e) => setEndDate(e.value)}
+                    />
+                    <Button
+                      label="Pridaj"
+                      onClick={() => endHospitalization()}
+                    />
+                  </div>
+                ) : (
+                  ""
+                )}
+              </div>
+            ) : (
+              ""
+            )}
                     </div>
                 ) : (
                     ""

@@ -1,5 +1,5 @@
 const lekar = require("../models/lekar");
-const {hashPacienti, hashMedical} = require("../utils/hashData");
+const {hashPacienti} = require("../utils/hashData");
 module.exports = {
     getPacienti: (req, res) => {
         const lekar = require("../models/lekar");
@@ -26,7 +26,7 @@ module.exports = {
             if (req.role === 0) {
                 operacie = await lekar.getOperacieAdmin();
                 // operacie = await lekar.getOperacie(req.params.id);
-                operacie = hashMedical(operacie);
+                operacie = hashPacienti(operacie);
             } else {
                 operacie = await lekar.getOperacie(req.params.id);
             }
@@ -39,7 +39,7 @@ module.exports = {
         (async () => {
             if (req.role === 0) {
                 vysetrenia = await lekar.getVysetreniaAdmin();
-                vysetrenia = hashMedical(vysetrenia);
+                vysetrenia = hashPacienti(vysetrenia);
             } else {
                 vysetrenia = await lekar.getVysetrenia(req.params.id);
             }
@@ -53,7 +53,7 @@ module.exports = {
             if (req.role === 0) {
                 hospitalizacie = await lekar.getHospitalizacieAdmin();
                 // hospitalizacie = await lekar.getHospitalizacie(req.params.id);
-                hospitalizacie = hashMedical(hospitalizacie);
+                hospitalizacie = hashPacienti(hospitalizacie);
             } else {
                 hospitalizacie = await lekar.getHospitalizacie(req.params.id);
             }
@@ -82,6 +82,38 @@ module.exports = {
     (async () => {
       info = await konzilium.getKonzilia(req.params.id);
       res.status(200).json(info);
+    })();
+  },
+
+  getZaznamy: (req, res) => {
+    const zaznam = require("../models/zdravotny_zaznam");
+    (async () => {
+      info = await zaznam.getZaznamy(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
+  getMiestnosti: (req, res) => {
+    const miestnost = require("../models/miestnost");
+    (async () => {
+      info = await miestnost.getMiestnosti(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
+  getNeobsadeneLozka: (req, res) => {
+    const lozko = require("../models/lozko");
+    (async () => {
+      info = await lozko.getNeobsadeneLozka(req.params.id);
+      res.status(200).json(info);
+    })();
+  },
+
+  updateKonzilium: (req, res) => {
+    const konzilium = require("../models/konzilium");
+    (async () => {
+      info = await konzilium.updateKonzilium(req.body);
+      res.status(200);
     })();
   },
 };

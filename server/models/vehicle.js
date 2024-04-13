@@ -12,9 +12,7 @@ async function getVehicles() {
           FROM nemocnica
             JOIN vozidla using (id_nemocnice)
             LEFT JOIN vyjazdy using (ecv)
-            LEFT JOIN plan_vyjazdov using (id_plan_vyjazdu)
-          ORDER BY id_nemocnice ASC`
-        );
+            LEFT JOIN plan_vyjazdov using (id_plan_vyjazdu)`);
     
         return result.rows;
       } catch (err) {

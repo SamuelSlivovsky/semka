@@ -6,6 +6,7 @@ import {Button} from "primereact/button";
 import {InputText} from "primereact/inputtext";
 import {FilterMatchMode, FilterOperator} from "primereact/api";
 import {useNavigate} from "react-router";
+import { Tag } from "primereact/tag";
 import GetUserData from "../../Auth/GetUserData";
 import {Toast} from "primereact/toast";
 
@@ -52,11 +53,9 @@ export default function TabPatients() {
         navigate("/patient", {state: selectedRow.ID_PACIENTA});
     };
 
-    const handleClick = (value) => {
-        navigate("/patient", {state: value.ID_PACIENTA});
-        // setShowDialog(true);
-        // setSelectedRow(value);
-    };
+  const handleClick = (value) => {
+    navigate("/patient", { state: value.ID_PACIENTA });
+  };
 
     const renderDialogFooter = () => {
         return (

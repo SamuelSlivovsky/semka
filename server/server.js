@@ -11,6 +11,7 @@ const verifyJWT = require("./middleware/verifyJWT");
 const credentials = require("./middleware/credentials");
 // ROUTES
 const lekarRoute = require("./routes/lekarRoute");
+const logRoute = require("./routes/logRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
 const patientRoute = require("./routes/patientRoute");
@@ -23,6 +24,9 @@ const lozkoRoute = require("./routes/lozkoRoute");
 const equipmentRoute = require("./routes/equipmentRoute");
 const updateRoute = require("./routes/updateRoute");
 const chatRoute = require("./routes/chatRoute");
+const ordersRoute = require("./routes/ordersRoute");
+const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
+const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
 const vehicleRoute = require("./routes/vehicleRoute");
 const departureRoute = require("./routes/vyjazdyRoute")
 
@@ -37,9 +41,9 @@ app.use(
 );
 
 app.use(cookieParser()); // Middleware for cookies
-
 app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
+app.use("/logs", logRoute);
 app.use("/sklad", storageRoute);
 app.use("/lekar", lekarRoute);
 app.use("/selects", selectsRoute);
@@ -53,28 +57,30 @@ app.use("/lozko", lozkoRoute);
 app.use("/vybavenie", equipmentRoute);
 app.use("/update", updateRoute);
 app.use("/chat", chatRoute);
+app.use("/objednavky", ordersRoute);
+app.use("/presuny", warehouseTransfersRoute);
+app.use("/hospitalizacia", hospitalizaciaRoute);
 app.use("/vozidla", vehicleRoute);
 app.use("/vyjazdy", departureRoute)
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
   socket.on("sendMessage", (message, params) => {
-
-    
     io.emit("newMessage", {
       content: message,
+      image: params.image,
       sender: params.userId,
       type: "text",
     });
   });
 
-  socket.on("sendImage", (image, params) => {
-    io.emit("newMessage", {
-      content: image,
-      sender: params.userId,
-      type: "image",
-    });
-  });
+  // socket.on("sendImage", (image, params) => {
+  //   io.emit("newMessage", {
+  //     content: image,
+  //     sender: params.userId,
+  //     type: "image",
+  //   });
+  // });
 
   socket.on("disconnect", () => {});
   socket.on("typing", (params) => {

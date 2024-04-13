@@ -1,9 +1,16 @@
-const database = require('../database/Database');
+const database = require("../database/Database");
 
-async function getMiestnosti() {
+async function getMiestnosti(id) {
   try {
     let conn = await database.getConnection();
-    const result = await conn.execute(`SELECT * FROM miestnost`);
+    const result = await conn.execute(
+      `SELECT distinct id_miestnosti FROM miestnost join oddelenie using (id_oddelenia)
+    join zamestnanci using (id_oddelenia)
+    join lozko on (lozko.id_miestnost = miestnost.id_miestnosti)
+    where
+     zamestnanci.cislo_zam = :id`,
+      { id }
+    );
 
     return result.rows;
   } catch (err) {
@@ -30,7 +37,7 @@ async function getDostupneMiestnosti(id_oddelenia, trv, dat_od) {
     );
     return result.rows;
   } catch (err) {
-    throw new Error('Database error: ' + err);
+    throw new Error("Database error: " + err);
   }
 }
 
