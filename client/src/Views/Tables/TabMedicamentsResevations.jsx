@@ -431,7 +431,16 @@ export default function TabMedicamentsResevations() {
             )}
           </div>
           <Dialog
-            header="Detail rezervácie"
+            header=<h3
+              style={{
+                color: "#00796b",
+                fontWeight: "600",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Detail rezervácie
+            </h3>
             visible={showDialog}
             style={{ textAlign: "center", width: "950px" }}
             modal
@@ -566,7 +575,16 @@ export default function TabMedicamentsResevations() {
             )}
           </div>
           <Dialog
-            header="Detail rezervácie"
+            header=<h3
+              style={{
+                color: "#00796b",
+                fontWeight: "600",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Detail rezervácie
+            </h3>
             visible={showDialog}
             style={{ textAlign: "center", width: "950px" }}
             modal

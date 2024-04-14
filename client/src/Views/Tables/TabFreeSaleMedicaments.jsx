@@ -310,6 +310,19 @@ export default function TabFreeSaleMedicaments() {
                 alignItems: "center",
               }}
             >
+              <h3
+                style={{
+                  color: "#00796b",
+                  borderBottom: "2px solid #004d40",
+                  paddingBottom: "5px",
+                  marginBottom: "10px",
+                  fontWeight: "normal",
+                  textTransform: "uppercase",
+                  letterSpacing: "1px",
+                }}
+              >
+                Vydanie voľnopredajného lieku v lekárni
+              </h3>
               {selectedRow.NAZOV_LEKARNE}
               <br />
               <h5>{selectedRow.NAZOV_LIEKU}</h5>
