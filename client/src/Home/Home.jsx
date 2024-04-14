@@ -265,13 +265,13 @@ function Home() {
       icon={orderIcon}
       key="10"
     ></HomeCard>,
-    // <HomeCard
-    //   title="Presuny"
-    //   isCalendar={false}
-    //   path="/presuny"
-    //   icon={moveIcon}
-    //   key="11"
-    // ></HomeCard>,
+    <HomeCard
+      title="Presuny"
+      isCalendar={false}
+      path="/presuny"
+      icon={moveIcon}
+      key="11"
+    ></HomeCard>,
     <HomeCard
       title="Lekárenský sklad"
       isCalendar={false}

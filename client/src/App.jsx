@@ -395,13 +395,13 @@ function App() {
       label="Objednavky"
       icon="order-icon"
     />,
-    // <SidebarButton
-    //   key="15"
-    //   visibleLeft={visibleLeft}
-    //   path="/presuny"
-    //   label="Presuny"
-    //   icon="warehouse-move-icon"
-    // />,
+    <SidebarButton
+      key="15"
+      visibleLeft={visibleLeft}
+      path="/presuny"
+      label="Presuny"
+      icon="warehouse-move-icon"
+    />,
     <SidebarButton
       key="14"
       visibleLeft={visibleLeft}
@@ -686,7 +686,7 @@ function App() {
         ></Route>
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/objednavky" element={<Orders />}></Route>
-        {/* <Route path="/presuny" element={<WarehouseTransfers />}></Route> */}
+        <Route path="/presuny" element={<WarehouseTransfers />}></Route>
         <Route path="*" element={<NotFoundPage404 />}></Route>
       </>
     );
