@@ -122,6 +122,9 @@ export default function PharmacyStorageMedicaments() {
     const expiringSoonMeds = medications.filter((med) =>
       isExpiringSoon(med.DATUM_TRVANLIVOSTI)
     );
+    const expiredMeds = medications.filter((med) =>
+      isExpired(med.DATUM_TRVANLIVOSTI)
+    );
 
     if (lowQuantityMeds.length > 0) {
       const lowStockDetails = lowQuantityMeds.map((med) => (
@@ -170,16 +173,31 @@ export default function PharmacyStorageMedicaments() {
         sticky: true, // if you want it to remain until manually closed
       });
     }
-  };
 
-  //Expiracia lieku nastane za 14 dni alebo menej
-  function isSameOrBeforeToday(date1, date2) {
-    return (
-      date1.getFullYear() <= date2.getFullYear() &&
-      date1.getMonth() <= date2.getMonth() &&
-      date1.getDate() <= date2.getDate()
-    );
-  }
+    if (expiredMeds.length > 0) {
+      const expiredDetails = expiredMeds.map((med) => (
+        <React.Fragment key={med.ID}>
+          {med.NAZOV_LIEKU}: (Expirácia: {med.DATUM_TRVANLIVOSTI})
+          <br />
+          <br />
+        </React.Fragment>
+      ));
+
+      toast.current.show({
+        severity: "error",
+        summary: "Lieky s prekročenou expiráciou!",
+        detail: (
+          <div>
+            <strong>Tieto lieky už majú prekročenú dobu použiteľnosti:</strong>
+            <br />
+            <br />
+            {expiredDetails}
+          </div>
+        ),
+        sticky: true,
+      });
+    }
+  };
 
   function parseDate(str) {
     const [day, month, year] = str.split(".");
@@ -195,7 +213,16 @@ export default function PharmacyStorageMedicaments() {
     const expiryDate = parseDate(expiryDateStr);
     expiryDate.setHours(0, 0, 0, 0);
 
-    return isSameOrBeforeToday(expiryDate, twoWeeksFromNow);
+    return expiryDate >= today && expiryDate <= twoWeeksFromNow;
+  };
+
+  const isExpired = (expiryDateStr) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiryDate = parseDate(expiryDateStr);
+    expiryDate.setHours(0, 0, 0, 0);
+
+    return expiryDate < today;
   };
 
   const quantityBodyTemplate = (rowData) => {
@@ -215,13 +242,26 @@ export default function PharmacyStorageMedicaments() {
   const expirationBodyTemplate = (rowData) => {
     return (
       <React.Fragment>
-        {rowData.DATUM_TRVANLIVOSTI}
-        {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) && (
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ color: "red", marginLeft: "10px" }}
-          />
-        )}
+        <span
+          style={{
+            color: isExpired(rowData.DATUM_TRVANLIVOSTI) ? "red" : "inherit",
+          }}
+        >
+          {rowData.DATUM_TRVANLIVOSTI}
+          {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) &&
+            !isExpired(rowData.DATUM_TRVANLIVOSTI) && (
+              <i
+                className="pi pi-exclamation-triangle"
+                style={{ color: "red", marginLeft: "10px" }}
+              />
+            )}
+          {isExpired(rowData.DATUM_TRVANLIVOSTI) && (
+            <i
+              className="pi pi-times"
+              style={{ color: "red", marginLeft: "10px" }}
+            />
+          )}
+        </span>
       </React.Fragment>
     );
   };

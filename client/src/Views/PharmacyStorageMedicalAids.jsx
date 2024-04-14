@@ -118,6 +118,9 @@ export default function PharmacyStorageMedicalAids() {
     const expiringSoonAids = medicalAids.filter((aid) =>
       isExpiringSoon(aid.DATUM_TRVANLIVOSTI)
     );
+    const expiredAids = medicalAids.filter((med) =>
+      isExpired(med.DATUM_TRVANLIVOSTI)
+    );
 
     if (lowQuantityAids.length > 0) {
       const lowStockDetails = lowQuantityAids.map((aid) => (
@@ -170,16 +173,33 @@ export default function PharmacyStorageMedicalAids() {
         sticky: true, // if you want it to remain until manually closed
       });
     }
-  };
 
-  //Expiracia zdr. pomocky nastane za 14 dni alebo menej
-  function isSameOrBeforeToday(date1, date2) {
-    return (
-      date1.getFullYear() <= date2.getFullYear() &&
-      date1.getMonth() <= date2.getMonth() &&
-      date1.getDate() <= date2.getDate()
-    );
-  }
+    if (expiredAids.length > 0) {
+      const expiredDetails = expiredAids.map((aid) => (
+        <React.Fragment key={aid.ID}>
+          {aid.NAZOV_ZDR_POMOCKY}: (Expirácia: {aid.DATUM_TRVANLIVOSTI})
+          <br />
+          <br />
+        </React.Fragment>
+      ));
+
+      toast.current.show({
+        severity: "error",
+        summary: "Zdravotnícke pomôcky s prekročenou expiráciou!",
+        detail: (
+          <div>
+            <strong>
+              Tieto zdravotnícke pomôcky už majú prekročenú dobu použiteľnosti:
+            </strong>
+            <br />
+            <br />
+            {expiredDetails}
+          </div>
+        ),
+        sticky: true,
+      });
+    }
+  };
 
   function parseDate(str) {
     const [day, month, year] = str.split(".");
@@ -195,7 +215,16 @@ export default function PharmacyStorageMedicalAids() {
     const expiryDate = parseDate(expiryDateStr);
     expiryDate.setHours(0, 0, 0, 0);
 
-    return isSameOrBeforeToday(expiryDate, twoWeeksFromNow);
+    return expiryDate >= today && expiryDate <= twoWeeksFromNow;
+  };
+
+  const isExpired = (expiryDateStr) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const expiryDate = parseDate(expiryDateStr);
+    expiryDate.setHours(0, 0, 0, 0);
+
+    return expiryDate < today;
   };
 
   const quantityBodyTemplate = (rowData) => {
@@ -215,13 +244,26 @@ export default function PharmacyStorageMedicalAids() {
   const expirationBodyTemplate = (rowData) => {
     return (
       <React.Fragment>
-        {rowData.DATUM_TRVANLIVOSTI}
-        {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) && (
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ color: "red", marginLeft: "10px" }}
-          />
-        )}
+        <span
+          style={{
+            color: isExpired(rowData.DATUM_TRVANLIVOSTI) ? "red" : "inherit",
+          }}
+        >
+          {rowData.DATUM_TRVANLIVOSTI}
+          {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) &&
+            !isExpired(rowData.DATUM_TRVANLIVOSTI) && (
+              <i
+                className="pi pi-exclamation-triangle"
+                style={{ color: "red", marginLeft: "10px" }}
+              />
+            )}
+          {isExpired(rowData.DATUM_TRVANLIVOSTI) && (
+            <i
+              className="pi pi-times"
+              style={{ color: "red", marginLeft: "10px" }}
+            />
+          )}
+        </span>
       </React.Fragment>
     );
   };
