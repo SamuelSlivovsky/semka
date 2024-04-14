@@ -160,5 +160,16 @@ module.exports = {
       console.error(err);
       res.status(500).send(err);
     });
+  },
+
+  getNemocnicaNazvy: (req, res) => {
+    const nemocnica = require("../models/nemocnica");
+    (async () => {
+      ret_val = await nemocnica.getNemocnicaNazvy();
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
   }
 };

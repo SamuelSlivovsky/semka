@@ -10,20 +10,35 @@ import { Dropdown } from 'primereact/dropdown';
 import { classNames } from 'primereact/utils';
 import { useEffect } from "react";
 import { InputNumber } from 'primereact/inputnumber';
+import { Checkbox } from "primereact/checkbox";
 import "../styles/departurePlansForm.css";
 
 export default function DeparturePlansForm() {
   const [tyteOfPlans, setTypeOfPlans] = useState([]);
+  const [cities, setCities] = useState([]);
   const [visible, setVisible] = useState(false);
+  const [checkedOption, setCheckedOption] = useState("betweenHospitals");
+  const [isDisabled, setIsDisabled] = useState(false);
+  const [hospitals, setHospitals] = useState([]);
   const toast = useRef(null);
   const requiredMessage = "Toto pole je povinné.";
   let today = new Date();
 
+  const Direction = {
+    BETWEEN_HOSPITALS: 'betweenHospitals',
+    TO_HOSPITAL: 'toHospital',
+    FROM_HOSPITAL: 'fromHospital'
+  };
+
   const defaultValues = {
     plan_type: null,
     lasting: 0,
-    where_from: '',
-    where_to: '',
+    where_from: null,
+    where_to: null,
+    address_from: '',
+    address_to: '',
+    hospital_from: null,
+    hospital_to: null,
     start: null,
     start_time: null
   }
@@ -37,6 +52,12 @@ export default function DeparturePlansForm() {
     reset
   } = useForm({ defaultValues });
 
+  const handleCheckboxChange = (option) => {
+    if (checkedOption != option) {
+      setCheckedOption(option);
+    }
+  };
+
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
@@ -45,6 +66,18 @@ export default function DeparturePlansForm() {
       .then((response) => response.json())
       .then((data) => {
         setTypeOfPlans(data);
+      });
+
+    fetch(`/add/psc`, { headers })
+      .then((response) => response.json())
+      .then((data) => {
+        setCities(data);
+      });
+    
+    fetch(`/add/nemocniceNazvy/all`, { headers })
+      .then((response) => response.json())
+      .then((data) => {
+        setHospitals(data);
       });
   }, []);
 
@@ -76,12 +109,16 @@ export default function DeparturePlansForm() {
         body: JSON.stringify({
           start: data.start.toLocaleString("en-GB").split(",")[0] + data.start_time.toLocaleString("en-GB").split(",")[1],
           departure_type: data.plan_type.ID_TYPU_VYJAZDU,
-          where_from: data.where_from,
-          where_to: data.where_to,
+          where_from: data.where_from.psc,
+          where_to: data.where_to.psc,
+          address_from: data.address_from,
+          address_to: data.address_to,
+          hospital_from: data.hospital_from ? data.hospital_from.ID_NEMOCNICE : null,
+          hospital_to: data.hospital_to ? data.hospital_to.ID_NEMOCNICE : null,
           lasting: data.lasting
         }),
       };
-
+      
       fetch(
         "/vyjazdy/newPlan",
         requestDepPlan
@@ -99,6 +136,142 @@ export default function DeparturePlansForm() {
     return errors[name] ? <small className="p-error">{errors[name].message}</small> : <small className="p-error"></small>;
   };
 
+  const showCheckOptionLables = () => {
+    switch (checkedOption) {
+      case Direction.BETWEEN_HOSPITALS:
+        return (
+        <div className="departure-plan-hospital">
+          <div className="field">
+            <span className="p-float-label">
+            <Controller 
+              name="hospital_from" 
+              control={control} 
+              rules={{required: requiredMessage}}   
+              render={({ field, fieldState }) => (
+                <Dropdown  
+                  id={field.name} 
+                  {...field}
+                  filter
+                  onChange={(e) => field.onChange(e.value)} 
+                  options={hospitals}
+                  optionLabel="NAZOV"
+                />
+              )} />
+              <label htmlFor="hospital_from" className={classNames({ 'p-error': errors.hospital_from })}>Nemocnica začiatku výjazdu*</label>
+            </span>
+            {getFormErrorMessage('hospital_from')}
+          </div>
+          <div className="field">
+            <span className="p-float-label">
+            <Controller 
+              name="hospital_to" 
+              control={control} 
+              rules={{required: requiredMessage}}   
+              render={({ field, fieldState }) => (
+                <Dropdown  
+                  id={field.name} 
+                  {...field}
+                  filter
+                  onChange={(e) => field.onChange(e.value)} 
+                  options={hospitals}
+                  optionLabel="NAZOV"
+                />
+              )} />
+              <label htmlFor="hospital_to" className={classNames({ 'p-error': errors.hospital_to })}>Nemocnica konca výjazdu*</label>
+            </span>
+            {getFormErrorMessage('hospital_to')}
+          </div>
+        </div>
+        );
+        case Direction.TO_HOSPITAL:
+          return (    
+            <div className="departure-plan-hospital">
+              <div className="field">
+                <span className="p-float-label">
+                  <Controller 
+                    name="address_from" 
+                    control={control} 
+                    rules={{required: requiredMessage}} 
+                    render={({ field, fieldState }) => (
+                      <InputText 
+                        id={field.name} 
+                        {...field}
+                        disabled={isDisabled}
+                        className={classNames({ 'p-invalid': fieldState.invalid })}  
+                        />
+                    )} />
+                  <label htmlFor="address_from" className={classNames({ 'p-error': errors.address_from })}>Adresa začiatku výjazdu*</label>
+                </span>
+              {getFormErrorMessage('address_from')}
+              </div>
+              <div className="field">
+                <span className="p-float-label">
+                <Controller 
+                  name="hospital_to" 
+                  control={control} 
+                  rules={{required: requiredMessage}}   
+                  render={({ field, fieldState }) => (
+                    <Dropdown  
+                      id={field.name} 
+                      {...field}
+                      filter
+                      onChange={(e) => field.onChange(e.value)} 
+                      options={hospitals}
+                      optionLabel="NAZOV"
+                    />
+                  )} />
+                  <label htmlFor="hospital_to" className={classNames({ 'p-error': errors.hospital_to })}>Nemocnica konca výjazdu*</label>
+                </span>
+                {getFormErrorMessage('hospital_to')}
+              </div>
+            </div>
+            );
+      default:
+        return  (    
+          <div className="departure-plan-hospital">
+            <div className="field">
+              <span className="p-float-label">
+              <Controller 
+                name="hospital_from" 
+                control={control} 
+                rules={{required: requiredMessage}}   
+                render={({ field, fieldState }) => (
+                  <Dropdown  
+                    id={field.name} 
+                    {...field}
+                    filter
+                    onChange={(e) => field.onChange(e.value)} 
+                    options={hospitals}
+                    optionLabel="NAZOV"
+                  />
+                )} />
+                <label htmlFor="hospital_from" className={classNames({ 'p-error': errors.hospital_from })}>Nemocnica začiatku výjazdu*</label>
+              </span>
+              {getFormErrorMessage('hospital_from')}
+            </div>
+            <div className="field">
+              <span className="p-float-label">
+                <Controller 
+                  name="address_to" 
+                  control={control} 
+                  rules={{required: requiredMessage}} 
+                  render={({ field, fieldState }) => (
+                    <InputText 
+                      id={field.name} 
+                      {...field}
+                      disabled={isDisabled}
+                      className={classNames({ 'p-invalid': fieldState.invalid })}  
+                      />
+                  )} />
+                <label htmlFor="address_to" className={classNames({ 'p-error': errors.address_to })}>Adresa konca výjazdu*</label>
+              </span>
+            {getFormErrorMessage('address_to')}
+            </div>
+          </div>
+          );
+    }
+  }
+
   return (
     <div className="departure-plans-form-container">
       <Toast ref={toast} />
@@ -111,7 +284,6 @@ export default function DeparturePlansForm() {
       >
         <div className="card flex justify-content-center departure-plans-form">
           <form onSubmit={handleSubmit(onSubmit)} className="p-fluid">
-
             <div className="departure-plans-form-row departure-plans-form-row-first-row">
               <div className="field">
                 <span className="p-float-label">
@@ -162,12 +334,16 @@ export default function DeparturePlansForm() {
                   control={control} 
                   rules={{required: requiredMessage}}   
                   render={({ field, fieldState }) => (
-                    <InputText  
+                    <Dropdown  
                       id={field.name} 
                       {...field}
-                      className={classNames({ 'p-invalid': fieldState.invalid })} />
+                      filter
+                      onChange={(e) => field.onChange(e.value)} 
+                      options={cities}
+                      optionLabel="name"
+                    />
                   )} />
-                  <label htmlFor="where_from" className={classNames({ 'p-error': errors.where_from })}>Odkiaľ*</label>
+                  <label htmlFor="where_from" className={classNames({ 'p-error': errors.where_from })}>Mesto začiatku výjazdu*</label>
                 </span>
                 {getFormErrorMessage('where_from')}
               </div>
@@ -178,16 +354,22 @@ export default function DeparturePlansForm() {
                   control={control} 
                   rules={{required: requiredMessage}}   
                   render={({ field, fieldState }) => (
-                    <InputText 
+                    <Dropdown 
                       id={field.name} 
                       {...field}
-                      className={classNames({ 'p-invalid': fieldState.invalid })} />
+                      filter
+                      onChange={(e) => field.onChange(e.value)} 
+                      options={cities}
+                      optionLabel="name"
+                    />
                   )} />
-                  <label htmlFor="where_to" className={classNames({ 'p-error': errors.where_to })}>Kam*</label>
+                  <label htmlFor="where_to" className={classNames({ 'p-error': errors.where_to })}>Mesto konca výjazdu*</label>
                 </span>
                 {getFormErrorMessage('where_to')}
               </div>
             </div>
+
+            {showCheckOptionLables()}
 
             <div className="departure-plans-form-row departure-plans-form-row-third-row">
               <div className="field">
@@ -232,8 +414,15 @@ export default function DeparturePlansForm() {
                 {getFormErrorMessage('start_time')}
               </div>
             </div>
-            
-            <div className="departure-plan-form-submit-button">
+            <div className="check-box-type-of-departure-plan">
+              <Checkbox onChange={e => handleCheckboxChange(Direction.BETWEEN_HOSPITALS)} checked={checkedOption === Direction.BETWEEN_HOSPITALS}></Checkbox>
+              <span>&nbsp;&nbsp;Prevoz medzi nemocnicami</span>
+              <Checkbox className="check-box" onChange={e => handleCheckboxChange(Direction.TO_HOSPITAL)} checked={checkedOption === Direction.TO_HOSPITAL}></Checkbox>
+              <span>&nbsp;&nbsp;Prevoz do nemocnice</span>
+              <Checkbox className="check-box" onChange={e => handleCheckboxChange(Direction.FROM_HOSPITAL)} checked={checkedOption === Direction.FROM_HOSPITAL}></Checkbox>
+              <span>&nbsp;&nbsp;Prevoz z nemocnice</span>
+            </div>
+            <div className="departure-plan-form-submit-button">                        
               <Button label={"Naplánovať výjazd"} type="Submit"/>
             </div>
           </form>

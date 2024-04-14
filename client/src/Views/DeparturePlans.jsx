@@ -49,8 +49,8 @@ export default function DeparturePlans() {
         >
           <Column field="NAZOV" header={"Typ výjazdu"} filter className="field-type"></Column>
           <Column field="PLANOVANY_DATUM" header={"Dátum a čas výjazdu"} filter></Column>
-          <Column field="ODKIAL" header={"Odkiaľ"} filter></Column>
-          <Column field="KAM" header={"Kam"} filter></Column>
+          <Column field="ODKIAL_MESTO" header={"Odkiaľ"} filter></Column>
+          <Column field="KAM_MESTO" header={"Kam"} filter></Column>
           <Column field="TRVANIE" header={"Trvanie v minútach"} filter></Column>
           <Column field={ renderEditIcon }></Column>
           <Column field={ renderDeleteIcon }></Column>                

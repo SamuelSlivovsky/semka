@@ -20,6 +20,21 @@
     max-width: 45%;
   }
 
+  .check-box-type-of-departure-plan {
+    display: flex;
+    justify-content: left;
+    margin-top: 10px;
+    /*margin-bottom: 20px;*/
+    .check-box {
+      margin-left: 30px;
+    }
+  }
+
+  .departure-plan-hospital {
+    display: flex;
+    gap: 15px;
+  }
+  
   .departure-plan-form-submit-button {
     margin-top: 35px;
     text-align: right;

@@ -106,10 +106,22 @@ async function getVysetreniaNemocniceXML(id_nemocnice) {
   }
 }
 
+async function getNemocnicaNazvy() {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(`SELECT id_nemocnice, nazov FROM nemocnica ORDER BY nazov ASC`);
+    
+    return result.rows;
+  } catch (err) {
+    throw new Error('Database error: ' + err);
+  }
+}
+
 module.exports = {
   getNemocnice,
   getHospitalizacieNemocniceXML,
   getOperacieNemocniceXML,
   getOckovaniaNemocniceXML,
   getVysetreniaNemocniceXML,
+  getNemocnicaNazvy,
 };

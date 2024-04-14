@@ -50,4 +50,6 @@ router.get(
   controller.getDostupneMiestnosti
 );
 router.get('/nemocnica/all', verify.verifyRoles(0, 4), controller.getNemocnice);
+
+router.get('/nemocniceNazvy/all', verify.verifyRoles(0, 4), controller.getNemocnicaNazvy);
 module.exports = router;

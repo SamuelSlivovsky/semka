@@ -17,9 +17,11 @@ async function getDeparturePlans() {
   try {
       let conn = await database.getConnection();
       const result = await conn.execute(
-        `SELECT id_plan_vyjazdu, to_char(datum_od, 'DD.MM.YYYY HH24:MI') as planovany_datum, nazov, odkial, kam, trvanie 
-        FROM plan_vyjazdov
-          JOIN typ_ucelu_vyjazdu USING (id_typu_vyjazdu)
+        `SELECT id_plan_vyjazdu, to_char(pv.datum_od, 'DD.MM.YYYY HH24:MI') as planovany_datum, tuv.nazov, m.nazov  as odkial_mesto, me.nazov as kam_mesto, trvanie 
+        FROM plan_vyjazdov pv
+            JOIN mesto m ON (pv.odkial_mesto  = m.psc)
+            JOIN mesto me ON (pv.kam_mesto  = me.psc)
+            JOIN typ_ucelu_vyjazdu tuv ON (pv.id_typu_vyjazdu = tuv.id_typu_vyjazdu)
         WHERE id_plan_vyjazdu NOT IN (
             SELECT id_plan_vyjazdu FROM vyjazdy
           )
@@ -74,7 +76,7 @@ async function insertDeparturePlan(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-        plan_vyjazdov_insert(:start, :departure_type, :where_from, :where_to, :lasting);
+        plan_vyjazdov_insert(:start, :departure_type, :where_from, :where_to, :address_from, :address_to, :id_hospital_from, :id_hospital_to, :lasting);
       END;`;
 
     let result = await conn.execute(sqlStatement, {
@@ -82,6 +84,10 @@ async function insertDeparturePlan(body) {
       departure_type: body.departure_type,
       where_from: body.where_from,
       where_to: body.where_to,
+      address_from: body.address_from,
+      address_to: body.address_to,
+      id_hospital_from: body.hospital_from,
+      id_hospital_to: body.hospital_to,
       lasting: body.lasting
     });
 
