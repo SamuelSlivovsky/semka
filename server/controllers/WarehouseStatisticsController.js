@@ -41,7 +41,7 @@ module.exports = {
         }
 
         (async () => {
-            ret_val = await skladStats.getMedStats(req.params.id);
+            ret_val = await skladStats.getMedStats(req.params.id, req.params.emp);
             res.status(200).json(ret_val);
         })().catch((err) => {
             console.log("Error Kontroler");
