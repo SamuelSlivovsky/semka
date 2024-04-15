@@ -102,7 +102,7 @@ export default function PharmacyStorageMedicaments() {
         </div>
         <div className="flex flex-column">
           <Button
-            style={{ marginBottom: "10px" }} // add margin to separate the buttons
+            style={{ marginBottom: "10px" }} 
             label="Objednať lieky"
             icon="pi pi-upload"
             onClick={() => navigate("/objednavky")}

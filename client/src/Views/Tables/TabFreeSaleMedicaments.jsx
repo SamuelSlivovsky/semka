@@ -207,12 +207,21 @@ export default function TabFreeSaleMedicaments() {
             </h3>
           </div>
         </div>
-        <Button
-          style={{ height: "50px", top: "10px", right: "10px" }}
-          label="Dostupnosť skladu"
-          icon="pi pi-external-link"
-          onClick={() => navigate("/lekarensky_sklad_lieky")}
-        />
+        <div className="flex flex-column">
+          <Button
+            style={{ marginBottom: "10px" }}
+            label="Dostupnosť skladu"
+            icon="pi pi-external-link"
+            onClick={() => navigate("/lekarensky_sklad_lieky")}
+          />
+          <Button
+            label="Nájsť v inej lekárni"
+            icon="pi pi-compass"
+            onClick={() =>
+              navigate("/lekarensky_sklad_vyhladavanieLiecivaPodlaLekarni")
+            }
+          />
+        </div>
       </div>
     );
   };
@@ -326,6 +335,9 @@ export default function TabFreeSaleMedicaments() {
               {selectedRow.NAZOV_LEKARNE}
               <br />
               <h5>{selectedRow.NAZOV_LIEKU}</h5>
+              <div style={{ marginBottom: "5px", fontWeight: "lighter" }}>
+                Vydať počet
+              </div>
               {/* Pridanie vstupného poľa pre zadanie počtu liekov na výdaj */}
               <InputText
                 value={vydajPocet}
