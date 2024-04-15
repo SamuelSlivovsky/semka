@@ -135,34 +135,56 @@ async function getPacientiChorobaP13() {
   }
 }
 
-async function getPocetPacientiPodlaVeku(cislo_zam) {
+async function getPocetPacientiPodlaVeku(cislo_zam, rok) {
   try {
     let conn = await database.getConnection();
+    let dateSelection;
+    let args;
+    if (rok.includes("&")) {
+      dateSelection =
+        " and EXTRACT(YEAR FROM zaz.datum) = :rok and EXTRACT(MONTH FROM zaz.datum) = :mesiac";
+      args = {
+        cislo_zam: cislo_zam,
+        rok: rok.split("&")[0],
+        mesiac: Number(rok.split("&")[1]),
+      };
+    } else {
+      dateSelection = " and EXTRACT(YEAR FROM zaz.datum) = :rok";
+      args = [cislo_zam, rok];
+    }
     const result = await conn.execute(
-      `select count(distinct p.id_pacienta) as pocet,   CASE
-      WHEN substr(p.rod_cislo,3,1) = 2 OR substr(p.rod_cislo,3,1) = 3 THEN
-          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),20) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-      WHEN substr(p.rod_cislo,3,1) = 7 OR substr(p.rod_cislo,3,1) = 8 THEN
-          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),70) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-      ELSE
-          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),50) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-  END AS vek
-            from oddelenie o  
-             join zamestnanci z on (z.id_oddelenia = o.id_oddelenia)
-              join nemocnica n on (n.id_nemocnice = o.id_nemocnice)
-               join pacient p on (p.id_nemocnice = n.id_nemocnice)
-             join os_udaje os on(p.rod_cislo = os.rod_cislo)
-             where o.id_oddelenia = (select id_oddelenia from zamestnanci where cislo_zam =:cislo_zam)
-             group by  CASE
-      WHEN substr(p.rod_cislo,3,1) = 2 OR substr(p.rod_cislo,3,1) = 3 THEN
-          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),20) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-      WHEN substr(p.rod_cislo,3,1) = 7 OR substr(p.rod_cislo,3,1) = 8 THEN
-          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),70) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-      ELSE
-          trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),50) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
-  END 
-              order by 2`,
-      [cislo_zam]
+      `SELECT count(distinct p.id_pacienta) as pocet,
+      CASE
+            WHEN substr(p.rod_cislo,3,1) = 2 OR substr(p.rod_cislo,3,1) = 3 THEN
+                trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),20) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+            WHEN substr(p.rod_cislo,3,1) = 7 OR substr(p.rod_cislo,3,1) = 8 THEN
+                trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),70) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+            ELSE
+                trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),50) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+        END AS vek
+                  
+      FROM zdravotna_karta k
+      JOIN zdravotny_zaz zaz USING(id_karty)
+      LEFT JOIN operacia o ON zaz.id_zaznamu = o.id_zaznamu
+      LEFT JOIN vysetrenie v ON zaz.id_zaznamu = v.id_zaznamu
+      LEFT JOIN hospitalizacia h ON zaz.id_zaznamu = h.id_zaznamu
+      LEFT JOIN zamestnanci zam ON zam.cislo_zam = v.cislo_zam OR zam.cislo_zam = o.cislo_zam
+      LEFT JOIN lozko l ON h.id_lozka = l.id_lozka
+      LEFT JOIN miestnost m ON l.id_miestnost = m.id_miestnosti
+      LEFT JOIN oddelenie od ON m.id_oddelenia = od.id_oddelenia OR zam.id_oddelenia = od.id_oddelenia
+      left join pacient p on (k.id_pacienta = p.id_pacienta)
+      WHERE od.id_oddelenia = (SELECT id_oddelenia FROM zamestnanci WHERE cislo_zam = :cislo_zam)
+      ${dateSelection}
+       group by  CASE
+            WHEN substr(p.rod_cislo,3,1) = 2 OR substr(p.rod_cislo,3,1) = 3 THEN
+                trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),20) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+            WHEN substr(p.rod_cislo,3,1) = 7 OR substr(p.rod_cislo,3,1) = 8 THEN
+                trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),70) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+            ELSE
+                trunc(months_between(sysdate, to_date('19' || substr(p.rod_cislo, 0, 2) || '.' || mod(substr(p.rod_cislo, 3, 2),50) || '.' || substr(p.rod_cislo, 5, 2), 'YYYY.MM.DD'))/12)
+        END 
+        order by 2`,
+      args
     );
 
     return result.rows;

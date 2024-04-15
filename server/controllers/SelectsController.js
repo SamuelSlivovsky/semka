@@ -270,7 +270,10 @@ module.exports = {
     const pacient = require("../models/pacient");
     console.log(req.params);
     (async () => {
-      ret_val = await pacient.getPocetPacientiPodlaVeku(req.params.cislo_zam);
+      ret_val = await pacient.getPocetPacientiPodlaVeku(
+        req.params.cislo_zam,
+        req.params.rok
+      );
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);
@@ -282,7 +285,10 @@ module.exports = {
     const os_udaje = require("../models/os_udaje");
     console.log(req.params);
     (async () => {
-      ret_val = await os_udaje.getPomerMuziZeny(req.params.cislo_zam);
+      ret_val = await os_udaje.getPomerMuziZeny(
+        req.params.cislo_zam,
+        req.params.rok
+      );
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);
@@ -383,7 +389,8 @@ module.exports = {
     console.log(req.params);
     (async () => {
       ret_val = await oddelenie.getPocetPacientovOddelenia(
-        req.params.cislo_zam
+        req.params.cislo_zam,
+        req.params.rok
       );
       res.status(200).json(ret_val);
     })().catch((err) => {
@@ -480,7 +487,10 @@ module.exports = {
     const oddelenie = require("../models/oddelenie");
     console.log(req.params);
     (async () => {
-      ret_val = await oddelenie.getKrvneSkupinyOddelenia(req.params.cislo_zam);
+      ret_val = await oddelenie.getKrvneSkupinyOddelenia(
+        req.params.cislo_zam,
+        req.params.rok
+      );
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);
@@ -505,6 +515,20 @@ module.exports = {
 
     (async () => {
       ret_val = await lekar.getZoznamLekarov(req.params.id);
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+  getUdalostiOddelenia: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+
+    (async () => {
+      ret_val = await oddelenie.getUdalostiOddelenia(
+        req.params.cislo_zam,
+        req.params.rok
+      );
       res.status(200).json(ret_val);
     })().catch((err) => {
       console.error(err);

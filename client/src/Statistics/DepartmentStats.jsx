@@ -1,5 +1,7 @@
 import React from "react";
 import { Chart } from "primereact/chart";
+import { DataTable } from "primereact/datatable";
+import { Column } from "primereact/column";
 function DepartmentStats(props) {
   const {
     pocetPac,
@@ -11,6 +13,7 @@ function DepartmentStats(props) {
     pacientiVekOptions,
     muziZeny,
     krv,
+    departmentEvents,
   } = props;
   return (
     <div>
@@ -39,13 +42,22 @@ function DepartmentStats(props) {
           </div>
         </div>
       </div>
-      <div className="xl:col-12 justify-content-center align-content-center flex">
+      <div style={{ display: "flex", gap: "10px" }}>
         <Chart
           type="bar"
           data={pacientiVek}
           options={pacientiVekOptions}
-          style={{ width: "35%" }}
+          style={{ width: "50%" }}
         />
+        <DataTable
+          value={departmentEvents}
+          style={{ width: "49%" }}
+          scrollHeight="400px"
+        >
+          <Column field="MENO" header="Zamestnanec" />
+          <Column field="POCETOPE" header="Počet operácíí" />
+          <Column field="POCETVYS" header="Počet vyšetrení" />
+        </DataTable>
       </div>
       <div className="xl:col-12 justify-content-center align-content-center flex h-auto">
         <Chart

@@ -24,6 +24,7 @@ export default function Statistics() {
   const [pocetHosp, setPocetHosp] = useState(null);
   const [pocetVys, setPocetVys] = useState(null);
   const [doctors, setDoctors] = useState([]);
+  const [departmentEvents, setDepartmentEvents] = useState([]);
   const [krv, setKrv] = useState(null);
   const [date, setDate] = useState("");
   const [pacientiVek, setPacientiVek] = useState(null);
@@ -60,13 +61,14 @@ export default function Statistics() {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     let selectType = "Zamestnanca";
-    if (wholeDepartmentCheck)
+    if (wholeDepartmentCheck) {
       setSelectedDoctor(
         doctors.find(
           (item) => item.CISLO_ZAM == GetUserData(token).UserInfo.userid
         )
       );
-    selectType = "Oddelenia";
+      selectType = "Oddelenia";
+    }
     if (date !== null && selectedDoctor !== null) {
       setRender(true);
       setLoading(true);
@@ -107,7 +109,9 @@ export default function Statistics() {
   };
 
   const fetchDepartmentStats = (headers, dateParam) => {
-    fetch(`/selects/pomerMuziZeny/${selectedDoctor.CISLO_ZAM}`, { headers })
+    fetch(`/selects/pomerMuziZeny/${selectedDoctor.CISLO_ZAM}/${dateParam}`, {
+      headers,
+    })
       .then((res) => res.json())
       .then((result) => {
         setMuziZeny({
@@ -123,9 +127,12 @@ export default function Statistics() {
         });
       });
 
-    fetch(`/selects/krvneSkupinyOddelenia/${selectedDoctor.CISLO_ZAM}`, {
-      headers,
-    })
+    fetch(
+      `/selects/krvneSkupinyOddelenia/${selectedDoctor.CISLO_ZAM}/${dateParam}`,
+      {
+        headers,
+      }
+    )
       .then((res) => res.json())
       .then((result) => {
         setKrv({
@@ -168,18 +175,15 @@ export default function Statistics() {
       .then((result) => {
         setPocetZam(result[0].POCET_ZAMESTNANCOV);
       });
-    fetch(`/selects/pocetPacOddelenia/${selectedDoctor.CISLO_ZAM}`, {
-      headers,
-    })
+    fetch(
+      `/selects/pocetPacientiPodlaVeku/${selectedDoctor.CISLO_ZAM}/${dateParam}`,
+      {
+        headers,
+      }
+    )
       .then((res) => res.json())
       .then((result) => {
-        setPocetPac(result[0].POCET_PACIENTOV);
-      });
-    fetch(`/selects/pocetPacientiPodlaVeku/${selectedDoctor.CISLO_ZAM}`, {
-      headers,
-    })
-      .then((res) => res.json())
-      .then((result) => {
+        setPocetPac(result.reduce((total, item) => total + item.POCET, 0));
         setPacientiVek({
           labels: result.map((item) => item.VEK),
           datasets: [
@@ -224,6 +228,16 @@ export default function Statistics() {
       .then((res) => res.json())
       .then((result) => {
         setPocetHosp(result[0].POC_HOSPITALIZACII);
+      });
+    fetch(
+      `/selects/udalostiOddelenia/${selectedDoctor.CISLO_ZAM}/${dateParam}`,
+      {
+        headers,
+      }
+    )
+      .then((res) => res.json())
+      .then((result) => {
+        setDepartmentEvents(result);
       });
   };
 
@@ -330,6 +344,7 @@ export default function Statistics() {
               pacientiVekOptions={pacientiVekOptions}
               muziZeny={muziZeny}
               krv={krv}
+              departmentEvents={departmentEvents}
             />
           ) : (
             <DoctorStats
