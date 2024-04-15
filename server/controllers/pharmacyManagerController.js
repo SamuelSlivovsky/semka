@@ -175,6 +175,17 @@ module.exports = {
     });
   },
 
+  updateUcinneLatky: async (req, res) => {
+    const ucinneLatky = require("../models/manazer_lekarne");
+    (async () => {
+      ret_val = await ucinneLatky.updateUcinneLatky(req.params.id, req.body);
+      res.status(200).json("success");
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+
   updateUcinnaLatka: (req, res) => {
     const ucinnaLatka = require("../models/manazer_lekarne");
     (async () => {
@@ -199,7 +210,7 @@ module.exports = {
 
   deleteUcinnaLatka: (req, res) => {
     const ucinnaLatka = require("../models/manazer_lekarne");
-    const idUcinnaLatka = req.params.id; // Získanie idUcinnaLatka z URL parametra
+    const idUcinnaLatka = req.params.id;
     ucinnaLatka
       .deleteUcinnaLatka(idUcinnaLatka)
       .then(() => {
@@ -280,9 +291,8 @@ module.exports = {
   getZoznamAktualnychRezervaciiZdrPomocky: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
-      zoznamRezervacii = await rezervacia.getZoznamAktualnychRezervaciiZdrPomocky(
-        req.params.id
-      );
+      zoznamRezervacii =
+        await rezervacia.getZoznamAktualnychRezervaciiZdrPomocky(req.params.id);
       res.status(200).json(zoznamRezervacii);
     })();
   },
@@ -290,9 +300,8 @@ module.exports = {
   getZoznamPrevzatychRezervaciiZdrPomocky: (req, res) => {
     const rezervacia = require("../models/manazer_lekarne");
     (async () => {
-      zoznamRezervacii = await rezervacia.getZoznamPrevzatychRezervaciiZdrPomocky(
-        req.params.id
-      );
+      zoznamRezervacii =
+        await rezervacia.getZoznamPrevzatychRezervaciiZdrPomocky(req.params.id);
       res.status(200).json(zoznamRezervacii);
     })();
   },

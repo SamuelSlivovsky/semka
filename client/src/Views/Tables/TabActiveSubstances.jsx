@@ -17,6 +17,8 @@ export default function TabMedicaments() {
   const [selectedRow, setSelectedRow] = useState(null);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newActiveSubstance, setNewActiveSubstance] = useState({});
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editActiveSubstance, setEditActiveSubstance] = useState({});
   const toast = useRef(null);
   const [loading, setLoading] = useState(true);
   const [zoznamUcinnychLatok, setZoznamUcinnychLatok] = useState([]);
@@ -92,7 +94,7 @@ export default function TabMedicaments() {
         });
         setShowAddDialog(false); // Zavrie dialogové okno po úspešnom pridaní
         setNewActiveSubstance({}); // Resetuje stav formulára
-        fetchGetZoznamUcinnychLatok(headers, GetUserData(token)); // Znovu načíta zoznam lekárnikov po pridaní nového
+        fetchGetZoznamUcinnychLatok(headers, GetUserData(token));
       })
       .catch((error) => {
         console.error("There was a problem with the fetch operation:", error);
@@ -229,7 +231,7 @@ export default function TabMedicaments() {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-outlined p-button-raised p-button-warning mr-2"
-          onClick={() => editActiveSubstance(rowData)}
+          onClick={() => onEdit(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -241,8 +243,101 @@ export default function TabMedicaments() {
   };
 
   //@TODO Add these functions to handle edit and delete actions
-  const editActiveSubstance = () => {
-    // Implementation for editing Active Substances
+  const updateUcinnaLatka = () => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = {
+      "Content-Type": "application/json",
+      Authorization: "Bearer " + token,
+    };
+
+    fetch(`/pharmacyManagers/updateUcinneLatky/${editActiveSubstance.id}`, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify({
+        nazov: editActiveSubstance.nazov,
+        latinsky_nazov: editActiveSubstance.latinsky_nazov,
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          toast.current.show({
+            severity: "success",
+            summary: "Účinná látka aktualizovaná",
+            detail: "Údaje o účinnej látke boli úspešne aktualizované.",
+            life: 3000,
+          });
+          setShowEditDialog(false);
+          fetchGetZoznamUcinnychLatok(headers, GetUserData(token));
+        } else {
+          throw new Error("Network response was not ok.");
+        }
+      })
+      .catch((error) => {
+        console.error("There was a problem with the fetch operation:", error);
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba pri aktualizácii",
+          detail: "Nepodarilo sa aktualizovať účinnú látku.",
+          life: 3000,
+        });
+      });
+  };
+
+  const onEdit = (rowData) => {
+    setEditActiveSubstance({
+      id: rowData.ID_UCINNA_LATKA,
+      nazov: rowData.NAZOV,
+      latinsky_nazov: rowData.LATINSKY_NAZOV,
+    });
+    setShowEditDialog(true);
+  };
+
+  const renderEditActiveSubstanceDialog = () => {
+    return (
+      <Dialog
+        visible={showEditDialog}
+        style={{ width: "450px" }}
+        header="Editovať účinnú látku"
+        modal
+        className="p-fluid"
+        onHide={() => setShowEditDialog(false)}
+      >
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="nazov">Názov účinnej látky</label>
+          <InputText
+            id="nazov"
+            value={editActiveSubstance.nazov}
+            onChange={(e) =>
+              setEditActiveSubstance((prevState) => ({
+                ...prevState,
+                nazov: e.target.value,
+              }))
+            }
+            required
+          />
+          {renderErrorMessage("nazov")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="latinskyNazov">Latinský názov</label>
+          <InputText
+            id="latinskyNazov"
+            value={editActiveSubstance.latinsky_nazov}
+            onChange={(e) =>
+              setEditActiveSubstance((prevState) => ({
+                ...prevState,
+                latinsky_nazov: e.target.value,
+              }))
+            }
+          />
+        </div>
+        <Button
+          style={{ marginTop: "50px" }}
+          label="Uložiť zmeny"
+          icon="pi pi-check"
+          onClick={updateUcinnaLatka}
+        />
+      </Dialog>
+    );
   };
 
   const deleteUcinnaLatka = (rowData) => {
@@ -374,6 +469,7 @@ export default function TabMedicaments() {
       {renderConfirmDialog()}
       <Toast ref={toast} position="top-center" />
       {renderAddActiveSubstanceDialog()}
+      {renderEditActiveSubstanceDialog()}
       <div className="card">
         {loading ? (
           <div

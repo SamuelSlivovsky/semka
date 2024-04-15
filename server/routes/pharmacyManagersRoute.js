@@ -111,6 +111,12 @@ router.post(
 );
 
 router.post(
+  "/updateUcinneLatky/:id",
+  verify.verifyRoles(0, 10, 9),
+  controller.updateUcinneLatky
+);
+
+router.post(
   "/updateUcinnaLatka",
   verify.verifyRoles(0, 10, 9),
   controller.updateUcinnaLatka

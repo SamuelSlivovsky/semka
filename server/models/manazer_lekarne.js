@@ -365,6 +365,31 @@ async function insertUcinneLatky(body) {
   }
 }
 
+async function updateUcinneLatky(id, body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+      update_ucinna_latka(:p_id_ucinna_latka, :p_nazov, :p_latinsky_nazov);
+    END;`;
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        p_id_ucinna_latka: id,
+        p_nazov: body.nazov,
+        p_latinsky_nazov: body.latinsky_nazov,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows updated " + result.rowsAffected);
+    return result.rowsAffected > 0;
+  } catch (err) {
+    console.log("Error in Model");
+    console.log(err);
+    throw err;
+  }
+}
+
 async function updateUcinnaLatka(body) {
   try {
     let conn = await database.getConnection();
@@ -381,7 +406,7 @@ async function updateUcinnaLatka(body) {
       { autoCommit: true }
     );
 
-    console.log("Rows inserted " + result.rowsAffected);
+    console.log("Rows updated " + result.rowsAffected);
   } catch (err) {
     console.log("Err Model");
     console.log(err);
@@ -731,6 +756,7 @@ module.exports = {
   getReportInfo,
   getUcinnaLatka,
   insertUcinneLatky,
+  updateUcinneLatky,
   updateUcinnaLatka,
   insertUcinnaLatka,
   deleteUcinnaLatka,
