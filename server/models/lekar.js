@@ -259,7 +259,7 @@ async function getHospitalizacieAdmin() {
                   join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
                   join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
                     where zamestnanci.cislo_zam is not null
-                    fetch first 10000 rows only`
+                    fetch first 20000 rows only`
         );
 
         hospitalizacie.rows.forEach((element) => {

@@ -81,7 +81,6 @@ module.exports = {
         (async () => {
             if (req.role === 0) {
                 hospitalizacie = await lekar.getHospitalizacieAdmin();
-                // hospitalizacie = await lekar.getHospitalizacie(req.params.id);
                 hospitalizacie = hashPacienti(hospitalizacie);
             } else {
                 hospitalizacie = await lekar.getHospitalizacie(req.params.id);

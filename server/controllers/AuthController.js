@@ -76,12 +76,6 @@ const handleRegister = async (req, res) => {
 };
 
 const handleLogin = async (req, res) => {
-
-    if (await logy.getNumberOfWrongLogins(req.body.ip)) {
-        return res
-            .status(401)
-            .json({message: "Príliš veľa neúspešných pokusov o prihlásenie z tejto IP adresy. Skúste to prosím neskôr."});
-    }
     const logbodyFailed = {
         ip: req.body.ip,
         table: "USER_TAB",
@@ -94,7 +88,23 @@ const handleLogin = async (req, res) => {
         status: "Wrong parameters",
         description: "User with ip " + req.body.ip + " has used wrong parameters to log in",
     }
+    function checkIP(ip) {
+        const ipFormat = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        return ipFormat.test(ip);
+    }
+    const numberOfWrongLogins = await logy.getNumberOfWrongLogins(req.body.ip);
 
+    if (!checkIP(req.body.ip) || numberOfWrongLogins) {
+        if (numberOfWrongLogins) {
+            return res
+                .status(401)
+                .json({message: "Príliš veľa neúspešných pokusov o prihlásenie z tejto IP adresy. Skúste to prosím neskôr."});
+        }
+        insertLogs(logbodyFailed);
+        return res
+            .status(400)
+            .json({message: "Neplatna IP adresa."});
+    }
     const {userid, pwd} = req.body;
     if (!userid || !pwd) {
         insertLogs(logbodyWrongParam)
@@ -103,10 +113,10 @@ const handleLogin = async (req, res) => {
             .json({message: "Vyžaduje sa používateľské meno a heslo."});
     }
     if (!(await userModel.userExists(userid))) {
-        insertLogs(logbodyWrongParam)
+        insertLogs(logbodyFailed)
         return res
             .status(400)
-            .json({message: "Používateľ s týmto prihlasovacím menom neexistuje"}); //Does not exist
+            .json({message: "Používateľ s týmto prihlasovacím menom neexistuje"});
     }
 
     const foundUser = await userModel.getUserByUserId(userid);

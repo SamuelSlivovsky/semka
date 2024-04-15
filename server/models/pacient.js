@@ -417,7 +417,6 @@ async function getZdravZaznamy(pid_pacienta) {
     }
 }
 
-//TODO Spomenut v diplomovej praci obmedzenie na 1000 zaznamov z dovodu optimalizacie rychlosti.
 async function getZdravZaznamyAdmin() {
     try {
         let conn = await database.getConnection();

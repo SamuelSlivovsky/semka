@@ -9,7 +9,7 @@ const insertLogs = async (body) => {
         logy.insertLog({
             ...body,
             description: "Failed to insert log with body:" +
-                " " + "IP:" + body.ip + " Status:" + body.status + " Description:" + body.description + " Riadok:" + body.riadok,
+                " " + " Status:" + body.status + " Description:" + body.description + " Riadok:" + body.riadok,
             riadok: null,
         });
         return 500;

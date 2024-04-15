@@ -1,6 +1,8 @@
 const oracledb = require("oracledb");
+const path = require("path");
+const instantClientPath = path.join(__dirname, "instantclient_21_7");
 try {
-  oracledb.initOracleClient({ libDir: "C:\\oracle\\instantclient_21_7" });
+  oracledb.initOracleClient({ libDir: instantClientPath });
 } catch (err) {
   console.error("Whoops!");
   console.error(err);
@@ -8,7 +10,6 @@ try {
 }
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
 const fs = require("fs");
-const path = require("path");
 
 const configFilePath = path.join(__dirname, "../config/dbConfig.json");
 

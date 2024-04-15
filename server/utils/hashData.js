@@ -11,10 +11,9 @@ function generujRodneCislo(pohlavie, rodnecislo) {
     // prekonvertovanie roku na posledne dve cislice
     rok = rok.toString().substring(2, 4);
     const mesiac = Math.floor(Math.random() * 12) + 1;
-    const den = Math.floor(Math.random() * 28) + 1;
     // Kód pohlavia (muž: 0-1, žena: 5-6) z tretiej číslice pre cudzinca 2-3 muz 7-8 zena
     let formatovanyMesiac;
-    // Ak ide o muža, mesiac sa neupravuje, inak sa k nemu pridá 50 pre cudincov u muzov pridavam 20 a 30 a u zien 70 a 80
+    // Ak ide o muža, mesiac sa neupravuje, inak sa k nemu pridá 50 pre zenu. Pre cudincov u muzov pridavam 20 a 30 a u zien 70 a 80
     switch (pohlavie) {
         case "muz":
             formatovanyMesiac = mesiac < 10 ? "0" + mesiac : mesiac;
@@ -29,24 +28,20 @@ function generujRodneCislo(pohlavie, rodnecislo) {
             formatovanyMesiac = 70 + mesiac;
             break;
     }
-
+    const den = Math.floor(Math.random() * 28) + 1;
     // Pridanie nuly pred číslice menšie ako 10
     const formatovanyDen = den < 10 ? "0" + den : den;
-
     // Generovanie kontrolného kódu (4-miestne číslo)
     const kontrolnyKod = Math.floor(Math.random() * 10000)
         .toString()
         .padStart(4, "0");
-
     // Spojenie všetkých častí do rodného čísla
     const rodneCislo = `${rok}${formatovanyMesiac}${formatovanyDen}/${kontrolnyKod}`;
     return rodneCislo;
 }
-
 //TODO zistit zlozitost analyza hashovania dat kolko trvaju a aky maju dopad
 //Zamysliet sa nad moznostou nahradenia a zasifrovania aby nebolo mozne spojit napriklad vzacne ochorenia s osobou
 //Ale toto vedie k tomu ze musim identifikovat skrite vazby medzi chorobami a pacientami
-
 function zistiPohlavie(rodneCislo) {
     const pohlavieKod = parseInt(rodneCislo.charAt(2));
     // Kód pohlavia (muž: 0-1, žena: 5-6) z tretiej číslice pre cudzinca 2-3 muzCudzinec 7-8 zenaCudzinec
@@ -64,19 +59,16 @@ function zistiPohlavie(rodneCislo) {
         case 8:
             return "zenaCudzinec";
     }
-
 }
-
-
-function calkulaciaDatumuAVeku(rod_cislo) {
-    let thirdDigit = parseInt(rod_cislo.substring(2, 3));
+function kalkulaciaDatumuAVeku(rod_cislo) {
+    let tretiZnak = parseInt(rod_cislo.substring(2, 3));
     let rok, mesiac, den, datumNarodenia, vek;
 
-    if (thirdDigit === 2 || thirdDigit === 3) {
+    if (tretiZnak === 2 || tretiZnak === 3) {
         rok = '19' + rod_cislo.substring(0, 2);
         mesiac = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 20)).slice(-2);
         den = rod_cislo.substring(4, 6);
-    } else if (thirdDigit === 7 || thirdDigit === 8) {
+    } else if (tretiZnak === 7 || tretiZnak === 8) {
         rok = '19' + rod_cislo.substring(0, 2);
         mesiac = ('0' + (parseInt(rod_cislo.substring(2, 4)) % 70)).slice(-2);
         den = rod_cislo.substring(4, 6);
@@ -153,7 +145,7 @@ function hashPacienti(pacienti) {
             rodneCislo = generujRodneCislo(pohlavie, pacient.ROD_CISLO);
         }
 
-        const podrobnosti = calkulaciaDatumuAVeku(rodneCislo);
+        const podrobnosti = kalkulaciaDatumuAVeku(rodneCislo);
 
         return {
             ...pacient,
@@ -170,25 +162,24 @@ function hashPacienti(pacienti) {
 //Hash dat zdravotnej karty + nahodny pocet dat
 function hashZdravotnaKarta(data) {
     if (data.length === 0) {
-        console.error("Nepodarilo sa načítať recepty.");
+        console.error("Nepodarilo sa načítať data.");
         return data;
     }
     //Nahodny pocet dat
     let randomPocetDat = Math.floor(Math.random() * 10);
     const orezaneData = data.slice(0, randomPocetDat);
     const hashovaneData = orezaneData.map((singlerow) => {
-        let novyRecept;
+        let novyZaznam;
         let indexReceptu = Math.floor(Math.random() * orezaneData.length);
-        novyRecept = orezaneData[indexReceptu];
+        novyZaznam = orezaneData[indexReceptu];
 
         return {
             ...singlerow,
-            RECEPT: novyRecept,
+            RECEPT: novyZaznam,
         };
     });
     return hashovaneData;
 }
-
 module.exports = {
     hashZdravotnaKarta,
     hashPacienti,

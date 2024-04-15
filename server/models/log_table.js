@@ -5,7 +5,7 @@ async function getAllLogs() {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
-            `select id_logu, to_char(datum,'DD.MM.YYYY HH:MM:SS') datum, tabulka, typ, popis, ip, riadok from log_table order by id_logu`,
+            `select id_logu, to_char(datum,'YYYY-MM-DD HH24:MI:SS') datum, tabulka, typ, popis, ip, riadok from log_table order by id_logu`,
         );
         return result.rows;
     } catch (err) {
