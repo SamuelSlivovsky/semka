@@ -28,10 +28,42 @@ export default function TabMedicalAidsReservations() {
   const [prevzateRezervacieZdrPomocok, setPrevzateRezervacieZdrPomocok] =
     useState([]);
   const [dialogContext, setDialogContext] = useState(""); // 'aktualne' alebo 'vydane'
+  const [previousAktualne, setPreviousAktualne] = useState([]);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (
+      previousAktualne &&
+      aktualneRezervacieZdrPomocok.length > previousAktualne.length
+    ) {
+      const newReservations = aktualneRezervacieZdrPomocok.filter(
+        (ar) =>
+          !previousAktualne.some((pr) => pr.ID_REZERVACIE === ar.ID_REZERVACIE)
+      );
+
+      if (newReservations.length > 0) {
+        toast.current.show({
+          severity: "info",
+          summary: "Čakajúce rezervácie",
+          detail: (
+            <div>
+              V lekárni máte čakajúce rezervácie zdr. pomôcok.
+              <br />
+              <br />
+              Celkový počet čakajúcich rezervácií:{" "}
+              <strong>{aktualneRezervacieZdrPomocok.length}</strong>
+            </div>
+          ),
+          life: 8000,
+        });
+      }
+    }
+
+    setPreviousAktualne(aktualneRezervacieZdrPomocok);
+  }, [aktualneRezervacieZdrPomocok]);
 
   const fetchData = async () => {
     try {
@@ -365,7 +397,9 @@ export default function TabMedicalAidsReservations() {
   const header = renderHeader();
   return (
     <TabView>
-      <TabPanel header="Aktuálne rezervácie zdr. pomôcok">
+      <TabPanel
+        header={`Aktuálne rezervácie zdr.pomôcok (${aktualneRezervacieZdrPomocok.length})`}
+      >
         <div>
           {renderConfirmDialog()}
           <Toast ref={toast} position="top-center" />
@@ -477,7 +511,9 @@ export default function TabMedicalAidsReservations() {
           </Dialog>
         </div>
       </TabPanel>
-      <TabPanel header="Prevzaté rezervácie zdr. pomôcok">
+      <TabPanel
+        header={`Prevzaté rezervácie zdr.pomôcok (${prevzateRezervacieZdrPomocok.length})`}
+      >
         <div>
           {renderConfirmDialog()}
           <Toast ref={toast} position="top-center" />

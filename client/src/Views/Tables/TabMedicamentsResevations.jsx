@@ -26,10 +26,42 @@ export default function TabMedicamentsResevations() {
   const [aktualneRezervacieLiekov, setAktualneRezervacieLiekov] = useState([]);
   const [prevzateRezervacieLiekov, setPrevzateRezervacieLiekov] = useState([]);
   const [dialogContext, setDialogContext] = useState(""); // 'aktualne' alebo 'vydane'
+  const [previousAktualne, setPreviousAktualne] = useState([]);
 
   useEffect(() => {
     fetchData();
   }, []);
+
+  useEffect(() => {
+    if (
+      previousAktualne &&
+      aktualneRezervacieLiekov.length > previousAktualne.length
+    ) {
+      const newReservations = aktualneRezervacieLiekov.filter(
+        (ar) =>
+          !previousAktualne.some((pr) => pr.ID_REZERVACIE === ar.ID_REZERVACIE)
+      );
+
+      if (newReservations.length > 0) {
+        toast.current.show({
+          severity: "info",
+          summary: "Čakajúce rezervácie",
+          detail: (
+            <div>
+              V lekárni máte čakajúce rezervácie liekov.
+              <br />
+              <br />
+              Celkový počet čakajúcich rezervácií:{" "}
+              <strong>{aktualneRezervacieLiekov.length}</strong>
+            </div>
+          ),
+          life: 8000,
+        });
+      }
+    }
+
+    setPreviousAktualne(aktualneRezervacieLiekov);
+  }, [aktualneRezervacieLiekov]);
 
   const fetchData = async () => {
     try {
@@ -360,7 +392,9 @@ export default function TabMedicamentsResevations() {
   const header = renderHeader();
   return (
     <TabView>
-      <TabPanel header="Aktuálne rezervácie liekov">
+      <TabPanel
+        header={`Aktuálne rezervácie liekov (${aktualneRezervacieLiekov.length})`}
+      >
         <div>
           {renderConfirmDialog()}
           <Toast ref={toast} position="top-center" />
@@ -499,7 +533,9 @@ export default function TabMedicamentsResevations() {
           </Dialog> */}
         </div>
       </TabPanel>
-      <TabPanel header="Prevzaté rezervácie liekov">
+      <TabPanel
+        header={`Prevzaté rezervácie liekov (${prevzateRezervacieLiekov.length})`}
+      >
         <div>
           {renderConfirmDialog()}
           <Toast ref={toast} position="top-center" />
