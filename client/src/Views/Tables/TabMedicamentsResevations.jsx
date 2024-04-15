@@ -55,7 +55,7 @@ export default function TabMedicamentsResevations() {
               <strong>{aktualneRezervacieLiekov.length}</strong>
             </div>
           ),
-          life: 8000,
+          life: 6000,
         });
       }
     }

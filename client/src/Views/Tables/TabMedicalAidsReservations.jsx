@@ -57,7 +57,7 @@ export default function TabMedicalAidsReservations() {
               <strong>{aktualneRezervacieZdrPomocok.length}</strong>
             </div>
           ),
-          life: 8000,
+          life: 6000,
         });
       }
     }
