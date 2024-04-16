@@ -351,6 +351,36 @@ export default function TabMedicalAidsReservations() {
     </div>
   );
 
+  const parseDate = (dateString) => {
+    const [day, month, year] = dateString.split(".");
+    return new Date(year, month - 1, day);
+  };
+
+  const isOlderThanThreeDays = (dateString) => {
+    const reservationDate = parseDate(dateString);
+    const threeDaysAgo = new Date();
+    threeDaysAgo.setDate(threeDaysAgo.getDate() - 3);
+    return reservationDate < threeDaysAgo;
+  };
+
+  const dateBodyTemplate = (rowData) => {
+    if (isOlderThanThreeDays(rowData.DATUM_REZERVACIE)) {
+      return (
+        <React.Fragment>
+          <i
+            className="pi pi-exclamation-triangle"
+            style={{ color: "red", marginRight: "5px" }}
+          ></i>
+          <span>{rowData.DATUM_REZERVACIE}</span>
+          <div style={{ color: "red", fontSize: "0.9em", marginTop: "5px" }}>
+            Čakajúca viac ako 3 dni!
+          </div>
+        </React.Fragment>
+      );
+    }
+    return <span>{rowData.DATUM_REZERVACIE}</span>;
+  };
+
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
@@ -452,6 +482,7 @@ export default function TabMedicalAidsReservations() {
                 <Column
                   field="DATUM_REZERVACIE"
                   header={"Dátum rezervácie"}
+                  body={dateBodyTemplate}
                   filter
                 ></Column>
                 <Column

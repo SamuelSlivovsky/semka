@@ -470,8 +470,8 @@ async function getZoznamAktualnychRezervaciiLieku(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
-      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
+      `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
+      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
       lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
       from rezervacia_lieku rl
       join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
@@ -495,8 +495,8 @@ async function getZoznamPrevzatychRezervaciiLieku(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
-      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
+      `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
+      l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
       lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
       from rezervacia_lieku rl
       join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
@@ -543,7 +543,7 @@ async function insertRezervaciaLieku(body) {
         p_id_liek: body.id_liek,
         p_datum_trvanlivosti: body.datum_trvanlivosti,
         p_id_sklad: body.id_sklad,
-        p_datum_rezervacie: body.datum_rezervacie,
+        p_datum_rezervacie: new Date(),
         p_pocet: body.pocet,
         p_datum_prevzatia: body.datum_prevzatia || null,
         p_meno: body.meno,
@@ -605,8 +605,8 @@ async function getZoznamAktualnychRezervaciiZdrPomocky(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
-      zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
+      `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
+      zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
       lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
       from rezervacia_zdr_pomocky rzp
       join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = rzp.id_zdr_pomocky and tzp.datum_trvanlivosti = rzp.datum_trvanlivosti and tzp.id_sklad = rzp.id_sklad)
@@ -630,8 +630,8 @@ async function getZoznamPrevzatychRezervaciiZdrPomocky(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_REZERVACIE", 
-      zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY HH24:MM:SS') as "DATUM_PREVZATIA",
+      `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
+      zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
       lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
       from rezervacia_zdr_pomocky rzp
       join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = rzp.id_zdr_pomocky and tzp.datum_trvanlivosti = rzp.datum_trvanlivosti and tzp.id_sklad = rzp.id_sklad)

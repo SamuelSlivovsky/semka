@@ -257,13 +257,21 @@ export default function PrescriptionCard(props) {
               detail.PRIEZVISKO_LEKARA
           )}
           {renderDetail("Opakujúci recept: ", detail.OPAKUJUCI)}
-          {!detail.DATUM_PREVZATIA &&
-            renderDetail(
-              "Aktuálny počet " + detail.NAZOV_LIEKU + " na sklade: ",
-              detail.DOSTUPNY_POCET_NA_SKLADE === null
-                ? "Momentálne nedostupné"
-                : detail.DOSTUPNY_POCET_NA_SKLADE
-            )}
+          <div
+            style={{
+              fontStyle: "italic",
+              backgroundColor: "#d4ffec",
+              borderRadius: "15px",
+            }}
+          >
+            {!detail.DATUM_PREVZATIA &&
+              renderDetail(
+                "Aktuálny počet " + detail.NAZOV_LIEKU + " na sklade: ",
+                detail.DOSTUPNY_POCET_NA_SKLADE === null
+                  ? "Momentálne nedostupné"
+                  : detail.DOSTUPNY_POCET_NA_SKLADE
+              )}
+          </div>
           {renderDetail("Dátum prevzatia: ", detail.DATUM_PREVZATIA, true)}
         </Card>
       </div>
