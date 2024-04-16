@@ -171,7 +171,7 @@ export default function TabMedicaments() {
     );
   };
 
-  // Form dialog for adding a new pharmacist
+  // Form dialog for adding a new acative substance
   const renderAddActiveSubstanceDialog = () => {
     return (
       <Dialog

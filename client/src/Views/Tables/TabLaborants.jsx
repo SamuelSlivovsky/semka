@@ -26,6 +26,8 @@ export default function TabLaborants(props) {
   const [idLekarne, setIdLekarne] = useState([]);
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newLaborant, setNewLaborant] = useState({});
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [editLaborant, setEditLaborant] = useState({});
   const [cities, setCities] = useState([]);
   const [submitted, setSubmitted] = useState(false); //sluzi na to, ze polia v addForm musia byt required
 
@@ -221,27 +223,19 @@ export default function TabLaborants(props) {
   };
 
   const formatRodneCislo = (value) => {
-    // Odstráňte všetky znaky okrem čísel a lomiek
     let cislo = value.replace(/[^\d/]/g, "");
-
-    // Odstráňte všetky lomky, ktoré sú na zlom mieste
     cislo = cislo.replace(/[/]/g, "");
-
-    // Uistite sa, že lomka je pridávaná iba raz
     if (cislo.length > 6) {
       cislo = `${cislo.slice(0, 6)}/${cislo.slice(6)}`;
     }
-
-    // Orezanie akéhokoľvek nadbytočného textu
     if (cislo.length > 11) {
       cislo = cislo.slice(0, 11);
     }
-
     return cislo;
   };
 
   const handleSubmit = () => {
-    setSubmitted(true); // Nastavíme, že bol formulár pokusom odoslaný
+    setSubmitted(true);
     if (
       newLaborant.rod_cislo &&
       newLaborant.meno &&
@@ -370,7 +364,7 @@ export default function TabLaborants(props) {
         <Button
           icon="pi pi-pencil"
           className="p-button-rounded p-button-outlined p-button-raised p-button-warning mr-2"
-          onClick={() => editLaborant(rowData)}
+          onClick={() => onEdit(rowData)}
         />
         <Button
           icon="pi pi-trash"
@@ -382,8 +376,82 @@ export default function TabLaborants(props) {
   };
 
   // Add these functions to handle edit and delete actions
-  const editLaborant = (pharmacist) => {
+  const updateLaborant = (pharmacist) => {
     // Implementation for editing pharmacist
+  };
+
+  const onEdit = (rowData) => {
+    setEditLaborant({
+      rod_cislo: rowData.ROD_CISLO,
+      meno: rowData.MENO,
+      priezvisko: rowData.PRIEZVISKO,
+    });
+    setShowEditDialog(true);
+  };
+
+  const renderEditLaborantDialog = () => {
+    return (
+      <Dialog
+        visible={showEditDialog}
+        style={{ width: "450px" }}
+        header="Editovať laboranta"
+        modal
+        className="p-fluid"
+        onHide={() => setShowEditDialog(false)}
+      >
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="rodneCislo">Rodné číslo</label>
+          <InputText
+            id="rodneCislo"
+            value={editLaborant.rod_cislo}
+            onChange={(e) =>
+              setEditLaborant((prevState) => ({
+                ...prevState,
+                rod_cislo: e.target.value,
+              }))
+            }
+            required
+          />
+          {renderErrorMessage("rod_cislo")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="meno">Meno</label>
+          <InputText
+            id="meno"
+            value={editLaborant.meno}
+            onChange={(e) =>
+              setEditLaborant((prevState) => ({
+                ...prevState,
+                meno: e.target.value,
+              }))
+            }
+            required
+          />
+          {renderErrorMessage("meno")}
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="priezvisko">Priezvisko</label>
+          <InputText
+            id="priezvisko"
+            value={editLaborant.priezvisko}
+            onChange={(e) =>
+              setEditLaborant((prevState) => ({
+                ...prevState,
+                priezvisko: e.target.value,
+              }))
+            }
+            required
+          />
+          {renderErrorMessage("priezvisko")}
+        </div>
+        <Button
+          style={{ marginTop: "50px" }}
+          label="Uložiť zmeny"
+          icon="pi pi-check"
+          onClick={updateLaborant}
+        />
+      </Dialog>
+    );
   };
 
   const deleteLaborant = (rowData) => {
@@ -527,6 +595,7 @@ export default function TabLaborants(props) {
       {renderConfirmDialog()}
       <Toast ref={toast} position="top-center" />
       {renderAddLaborantDialog()}
+      {renderEditLaborantDialog()}
       <div className="card">
         {loading ? (
           <div
