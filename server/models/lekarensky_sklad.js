@@ -57,7 +57,7 @@ async function getSearchLiecivoLekarenskySklad() {
       join sklad ls on (ls.id_sklad = tl.id_sklad)
       join lekaren lek on (lek.id_lekarne = ls.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
-      order by NAZOV_LEKARNE`
+      order by NAZOV_LEKARNE, NAZOV_LIEKU, tl.pocet`
     );
     return result.rows;
   } catch (err) {
@@ -76,7 +76,7 @@ async function getSearchZdrPomockaLekarenskySklad() {
       join sklad ls on (ls.id_sklad = tzp.id_sklad)
       join lekaren lek on (lek.id_lekarne = ls.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
-      order by NAZOV_LEKARNE`
+      order by NAZOV_LEKARNE, NAZOV_ZDR_POMOCKY, tzp.pocet`
     );
     return result.rows;
   } catch (err) {
