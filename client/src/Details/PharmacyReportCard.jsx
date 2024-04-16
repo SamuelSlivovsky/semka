@@ -1,12 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { Card } from "primereact/card";
-// import { Button } from "primereact/button";
 import GetUserData from "../Auth/GetUserData";
-// import { useNavigate } from "react-router";
 
 export default function PharmacyReportCard(props) {
   const [info, setInfo] = useState("");
-  // const navigate = useNavigate();
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
@@ -22,15 +19,17 @@ export default function PharmacyReportCard(props) {
       });
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const renderDetail = (label, value) => (
-    <div className="flex w-100">
-      <div className="col-6">
-        <h3>{label}</h3>
-      </div>
-      <div className="col-6">
-        <h3 style={{ color: "gray", fontWeight: "600", fontStyle: "italic" }}>
-          {value}
-        </h3>
+  const renderDetail = (label, value, icon, color) => (
+    <div className="flex align-items-center justify-content-between p-3 border-1 border-50 border-round surface-0 shadow-2 mb-3">
+      <span
+        style={{ fontSize: "18px" }}
+        className="block text-700 font-medium mb-4"
+      >
+        {label}
+      </span>
+      <div className="flex align-items-center">
+        <i className={`pi ${icon} text-${color}-500 text-xl mr-3`}></i>
+        <div className="text-900 font-medium text-xl">{value}</div>
       </div>
     </div>
   );
@@ -43,71 +42,37 @@ export default function PharmacyReportCard(props) {
           style={{ width: "45rem", height: "55rem" }}
           title={info.NAZOV_LEKARNE}
         >
-          <div className="card-body" style={{ marginBlock: "12%" }}>
-            <div
-              style={{
-                borderRadius: "30px",
-                outlineStyle: "solid",
-                outlineColor: "#14b8a6",
-              }}
-            >
-              {renderDetail(
-                "Celkový počet zamestnancov: ",
-                info.CELKOVY_POCET_ZAMESTNANCOV
-              )}
-            </div>
-            <br />
-            <div
-              style={{
-                borderRadius: "30px",
-                outlineStyle: "solid",
-                outlineColor: "#14b8a6",
-              }}
-            >
-              {renderDetail(
-                "Počet druhov liekov v lekárenskom sklade: ",
-                info.POCET_LIEKOV
-              )}
-            </div>
-            <br />
-            <div
-              style={{
-                borderRadius: "30px",
-                outlineStyle: "solid",
-                outlineColor: "#14b8a6",
-              }}
-            >
-              {renderDetail(
-                "Počet druhov zdravotníckych pomôcok v lekárenskom sklade: ",
-                info.POCET_ZDR_POMOCOK
-              )}
-            </div>
-            <br />
-            <div
-              style={{
-                borderRadius: "30px",
-                outlineStyle: "solid",
-                outlineColor: "#14b8a6",
-              }}
-            >
-              {renderDetail(
-                "Počet rezervácií lieku: ",
-                info.POCET_REZERVACII_LIEKU
-              )}
-            </div>
-            <br />
-            <div
-              style={{
-                borderRadius: "30px",
-                outlineStyle: "solid",
-                outlineColor: "#14b8a6",
-              }}
-            >
-              {renderDetail(
-                "Počet rezervácií zdravotníckej pomôcky: ",
-                info.POCET_REZERVACII_ZDR_POMOCKY
-              )}
-            </div>
+          <div className="card-body" style={{ marginBlock: "20%" }}>
+            {renderDetail(
+              "Celkový počet zamestnancov v lekárni",
+              info.CELKOVY_POCET_ZAMESTNANCOV,
+              "pi-users",
+              "blue"
+            )}
+            {renderDetail(
+              "Počet druhov liekov v lekárenskom sklade",
+              info.POCET_LIEKOV,
+              "pi-align-justify",
+              "green"
+            )}
+            {renderDetail(
+              "Počet druhov zdravotníckych pomôcok v lekárenskom sklade",
+              info.POCET_ZDR_POMOCOK,
+              "pi-align-justify",
+              "green"
+            )}
+            {renderDetail(
+              "Počet rezervácií lieku v lekárni",
+              info.POCET_REZERVACII_LIEKU,
+              "pi-calendar-plus",
+              "yellow"
+            )}
+            {renderDetail(
+              "Počet rezervácií zdravotníckej pomôcky v lekárni",
+              info.POCET_REZERVACII_ZDR_POMOCKY,
+              "pi-calendar-plus",
+              "yellow"
+            )}
           </div>
         </Card>
       </div>
