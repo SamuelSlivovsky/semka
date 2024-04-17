@@ -48,6 +48,10 @@ export default function PrescriptionCard(props) {
     navigate("/objednavky");
   };
 
+  const redirectToSearchLiekSklady = () => {
+    navigate("/lekarensky_sklad_vyhladavanieLiecivaPodlaLekarni");
+  };
+
   const renderBackButton = () => {
     return (
       <div>
@@ -306,11 +310,18 @@ export default function PrescriptionCard(props) {
         />
       </Dialog>
       <Dialog
+        style={{ width: "900px" }}
         visible={showOrderDialog}
         onHide={() => setShowOrderDialog(false)}
-        header={"Chcete objednať liek " + detail.NAZOV_LIEKU + " ?"}
+        header={"Chcete objednať liek " + detail.NAZOV_LIEKU + "?"}
         footer={
           <div>
+            <Button
+              style={{ position: "absolute", display: "block" }}
+              label="Zistiť dostupnosť v inej lekárni"
+              icon="pi pi-verified"
+              onClick={() => redirectToSearchLiekSklady()}
+            />
             <Button
               label="Zrušiť"
               icon="pi pi-times"
@@ -318,7 +329,7 @@ export default function PrescriptionCard(props) {
               className="p-button-text"
             />
             <Button
-              label="Potvrdiť"
+              label="Objednať v tejto lekárni"
               icon="pi pi-check"
               onClick={() => redirectToObjednavky()}
             />
