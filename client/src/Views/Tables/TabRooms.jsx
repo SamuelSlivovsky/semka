@@ -25,7 +25,9 @@ export default function TabRooms() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleClick = (value) => {
-    navigate("/room", { state: value.ID_MIESTNOSTI });
+    navigate("/room", {
+      state: { id: value.ID_MIESTNOSTI, door: value.DVERE },
+    });
   };
 
   const renderHeader = () => {

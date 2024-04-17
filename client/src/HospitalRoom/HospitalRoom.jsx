@@ -3,6 +3,7 @@ import Bed from "./Bed";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { useLocation, useNavigate } from "react-router";
+import "../styles/room.css";
 
 const HospitalRoom = () => {
   const location = useLocation();
@@ -24,7 +25,7 @@ const HospitalRoom = () => {
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
-    fetch(`lekar/lozka/${location.state}`, { headers })
+    fetch(`lekar/lozka/${location.state.id}`, { headers })
       .then((res) => res.json())
       .then((data) => {
         setBeds(
@@ -45,7 +46,7 @@ const HospitalRoom = () => {
     <div
       style={{ display: "flex", flexDirection: "column", alignItems: "center" }}
     >
-      <h2 style={{ textAlign: "center" }}>Miestnosť {location.state}</h2>
+      <h2 style={{ textAlign: "center" }}>Miestnosť {location.state.id}</h2>
       <div
         style={{
           display: "grid",
@@ -58,8 +59,29 @@ const HospitalRoom = () => {
           height: "fit-content",
           paddingBottom: "20px",
           marginBottom: "20px",
+          position: "relative",
         }}
       >
+        <div
+          style={{
+            zIndex: "9999",
+            position: "absolute",
+            left: location.state.door == "vpravo" ? "100%" : "-100px",
+            top: "35%",
+            width: "20px",
+            height: "200px",
+            backgroundColor: "white",
+          }}
+        >
+          <div class="door">
+            <div
+              class="handle"
+              style={{
+                left: location.state.door == "vpravo" ? "80px" : "10px",
+              }}
+            ></div>
+          </div>
+        </div>
         {beds}
       </div>
       <Dialog
