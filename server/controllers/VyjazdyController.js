@@ -51,6 +51,19 @@ module.exports = {
     });
   },
 
+  getDepartureNoVehicle: (req, res) => {
+    const dep = require('../models/vyjazdy');
+
+    (async () => {
+        ret_val = await dep.getDepartureNoVehicle();
+        res.status(200).json(ret_val);
+      })()
+      .catch((err) => {
+        console.error(err);
+        es.status(500).send(err);
+    });
+  },
+
   insertDeparturePlan: (req, res) => {
     const dep_plan = require("../models/vyjazdy");
     (async () => {
@@ -61,4 +74,15 @@ module.exports = {
       res.status(500).send(err);
     });
   },
+
+  insertVehicleToDeparture: (req, res) => {
+    const dep_plan = require("../models/vyjazdy");
+    (async () => {
+      ret_val = await dep_plan.insertVehicleToDeparture(req.body);
+      res.status(201);
+    })().catch((err) => {
+      console.error(err);
+      res.status(500).send(err);
+    });
+  }
 }

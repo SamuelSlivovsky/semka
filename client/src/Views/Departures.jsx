@@ -1,8 +1,8 @@
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Card } from "primereact/card";
-import { Button } from "primereact/button";
 import { useEffect, useState } from "react";
+import DepartureForm from "../Forms/DepartureForm";
 import 'primeicons/primeicons.css';
 import "../styles/departure.css"
 
@@ -46,7 +46,7 @@ export default function Departures() {
   }
 
   const renderLeftCardHead = () => {
-    return <div className="left-card-header"><h1>Výjazdy</h1><Button label={<i className="pi pi-plus"></i>}></Button></div>
+    return <div className="left-card-header"><h1>Výjazdy</h1> <DepartureForm></DepartureForm></div>
   }
 
   return (

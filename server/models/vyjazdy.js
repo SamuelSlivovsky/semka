@@ -72,6 +72,31 @@ async function getDeparturesHistory() {
   }  
 }
 
+async function getDepartureNoVehicle() {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `SELECT id_plan_vyjazdu, to_char(datum_od, 'DD.MM.YYYY') as DATUM_OD, to_char(datum_od, 'HH24:MI') as CAS_ODCHODU, 
+        tuv.nazov as TYP, trvanie, m_od.nazov as MESTO_ODKIAL, m_kam.nazov as MESTO_KAM, adresa_odkial, adresa_kam, 
+        n_od.nazov as NEMOCNICA_ODKIAL, n_kam.nazov as NEMOCNICA_KAM
+      FROM plan_vyjazdov pv
+        JOIN typ_ucelu_vyjazdu tuv on (tuv.id_typu_vyjazdu = pv.id_typu_vyjazdu)
+        LEFT JOIN nemocnica n_od on (n_od.id_nemocnice = pv.id_nemocnice_odkial)
+        LEFT JOIN nemocnica n_kam on (n_kam.id_nemocnice = pv.id_nemocnice_kam)
+        LEFT JOIN mesto m_od on (m_od.psc = pv.odkial_mesto)
+        LEFT JOIN mesto m_kam on (m_kam.psc = pv.kam_mesto)
+      WHERE id_plan_vyjazdu NOT IN (
+        SELECT id_plan_vyjazdu FROM vyjazdy
+      ) 
+      ORDER BY datum_od ASC`
+    );
+
+    return result.rows;
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 async function insertDeparturePlan(body) {
   try {
     let conn = await database.getConnection();
@@ -96,11 +121,30 @@ async function insertDeparturePlan(body) {
   }
 }
 
+async function insertVehicleToDeparture(body) {
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `BEGIN
+        vyjazd_insert(:ecv, :id_departure_plan);
+      END;`;
+
+    let result = await conn.execute(sqlStatement, {
+      id_departure_plan: body.id_departure_plan,
+      ecv: body.ecv
+    });
+
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 
 module.exports = {
   getDepartureTypes,
   getDeparturePlans,
   getDepartures,
   getDeparturesHistory,
+  getDepartureNoVehicle,
   insertDeparturePlan,
+  insertVehicleToDeparture
 }

@@ -51,6 +51,32 @@ module.exports = {
     });
   },
 
+  getVehicleByHospital: (req, res) => {
+    const vehicles = require('../models/vehicle');
+    
+    (async () => {
+        ret_val = await vehicles.getVehicleByHospital(req.params.id_hospital);
+        res.status(200).json(ret_val);
+      })()
+      .catch((err) => {
+        console.error(err);
+        es.status(500).send(err);
+    });
+  },
+
+  getFreeVehicles: (req, res) => {
+    const vehicles = require('../models/vehicle');
+    
+    (async () => {
+        ret_val = await vehicles.getFreeVehicles();
+        res.status(200).json(ret_val);
+      })()
+      .catch((err) => {
+        console.error(err);
+        es.status(500).send(err);
+    });
+  },
+
   insertVehicle: (req, res) => {
     const veh = require("../models/vehicle");
     (async () => {

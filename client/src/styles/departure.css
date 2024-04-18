@@ -43,3 +43,43 @@
     font-size: 1rem;
   }
 }
+
+.departure-form-content {
+  .departure-form-row {
+    margin-top: 30px;
+    gap: 20px;
+    display: flex;
+    .field {
+      min-width: 17rem;
+    }
+  }
+
+  .p-fluid .p-dropdown {
+    height: 45px;
+  }
+
+  .first-field {
+    width: 65%;
+  }
+
+  .departure-form-submit-button {
+    margin-top: 35px;
+    text-align: right;
+    button {
+      width: 15rem;
+    }
+  }
+}
+
+.departure-plan-hospital-details {
+  display: flex;
+  gap: 15px;
+  margin-top: 5px;
+  .field {
+    width: 45%;
+  }
+}
+
+.departure-details-first-row {
+  margin-top: 40px;
+}

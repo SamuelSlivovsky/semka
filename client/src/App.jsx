@@ -452,13 +452,12 @@ function App() {
           <>
             {sidebarButtonsDoctor} {sidebarButtonsChief}
           </>
+        )  : userData !== null && userData.UserInfo.role === 4 ? (
+          sidebarButtonsRescuer
         ) : userData !== null && userData.UserInfo.role === 9999 ? (
           sidebarButtonsPatient
         ) : userData !== null && userData.UserInfo.role === 5 ? (
             sidebarWarehouseManager
-        ) : userData !== null && userData.UserInfo.role === 4 ? (
-          //sidebarButtonsPatient
-          sidebarButtonsRescuer
         ) : (
           ""
         )}
@@ -509,7 +508,9 @@ function App() {
             <>
               {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
-          ) : userData && userData.UserInfo.role === 9999 ? (
+          ) : userData !== null && userData.UserInfo.role === 4 ? (
+            renderRescuerRoutes()
+        ) : userData && userData.UserInfo.role === 9999 ? (
             renderPatientRoutes()
           ) : typeof userData !== "undefined" &&
           userData !== null &&
@@ -517,10 +518,6 @@ function App() {
               <>
                   {renderWarehouseManagerRoutes()} {renderChiefRoutes()}
               </>
-          ) : userData !== null &&
-            userData.UserInfo.role === 4 ? (
-            //renderPatientRoutes()
-            renderRescuerRoutes()
           ) : (
             ""
           )}
