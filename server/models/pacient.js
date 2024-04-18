@@ -450,6 +450,7 @@ async function getZdravZaznamy(pid_pacienta) {
     let conn = await database.getConnection();
     const zdravZaznamy = await conn.execute(
       `select id_zaznamu as "id_zaz", to_char(datum, 'DD.MM.YYYY') DATUM,prepustacia_sprava, 
+       o.meno, o.priezvisko,
        case when id_hosp is not null then 
        nvl(to_char(hospitalizacia.dat_do,'DD.MM.YYYY HH24:MI:SS'),'Neukončená') 
        else null end
@@ -459,6 +460,8 @@ async function getZdravZaznamy(pid_pacienta) {
           from zdravotny_zaz 
           left join hospitalizacia using (id_zaznamu)   
           join zdravotna_karta using(id_karty)
+          join pacient p using(id_pacienta)
+          join os_udaje o on (p.rod_cislo = o.rod_cislo)
             where id_pacienta = :pid_pacienta
                   order by zdravotny_zaz.datum desc`,
       { pid_pacienta }

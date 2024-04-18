@@ -320,7 +320,7 @@ export default function TableMedic(props) {
               }}
               document={
                 <Pdf
-                  eventType={eventType}
+                  eventType={eventType ? eventType : selectedRow.TYP}
                   data={selectedRow}
                   doctor={userData}
                   desc={popis}
@@ -328,7 +328,9 @@ export default function TableMedic(props) {
                   image={imgUrl}
                 />
               }
-              fileName={`${selectedRow.PRIEZVISKO}${selectedRow.type}.pdf`}
+              fileName={`${selectedRow.PRIEZVISKO}${
+                selectedRow.type ? selectedRow.type : selectedRow.TYP
+              }.pdf`}
             >
               {({ blob, url, loading, error }) =>
                 loading ? (

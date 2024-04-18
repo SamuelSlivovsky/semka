@@ -26,7 +26,15 @@ async function insertOckovanie(body) {
     });
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    throw new Error("Database error: " + err);
+    if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else if (err.errorNum && err.errorNum === 20000) {
+      console.error("Pacient už má toto očkovanie");
+      throw new Error("Pacient už má toto očkovanie");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
