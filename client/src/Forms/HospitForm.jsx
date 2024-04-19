@@ -30,6 +30,7 @@ export default function HospitForm(props) {
     if (!data.datum_do) {
       errors.datum_do = "Dátum ukončenia je povinný";
     }
+
     return errors;
   };
 
@@ -79,6 +80,7 @@ export default function HospitForm(props) {
             detail: "Úspešné vytvorenie novej hospitalizácie",
             life: 6000,
           });
+          form.restart();
           fileUploader.current.clear();
           setBase64Data(null);
         }
@@ -91,8 +93,6 @@ export default function HospitForm(props) {
           life: 6000,
         });
       });
-
-    form.restart();
   };
 
   const isFormFieldValid = (meta) => !!(meta.touched && meta.error);

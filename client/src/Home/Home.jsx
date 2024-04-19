@@ -39,13 +39,7 @@ function Home() {
       icon={patientIcon}
       key="2"
     ></HomeCard>,
-    <HomeCard
-      title="Lôžka"
-      isCalendar={false}
-      path="/rooms"
-      icon={bedIcon}
-      key="beds"
-    ></HomeCard>,
+
     <HomeCard
       title="Vyšetrenia"
       isCalendar={false}
@@ -92,6 +86,13 @@ function Home() {
   ];
 
   const chiefCards = [
+    <HomeCard
+      title="Lôžka"
+      isCalendar={false}
+      path="/rooms"
+      icon={bedIcon}
+      key="beds"
+    ></HomeCard>,
     <HomeCard
       title="Lekári"
       isCalendar={false}

@@ -45,8 +45,15 @@ export default function Basic() {
         _filtered = [...patients];
       } else {
         _filtered = patients.filter((patient) => {
-          return patient.ROD_CISLO.toLowerCase().startsWith(
-            event.query.toLowerCase()
+          console.log(patient);
+          return (
+            patient.ROD_CISLO.toLowerCase().startsWith(
+              event.query.toLowerCase()
+            ) ||
+            patient.MENO.toLowerCase().startsWith(event.query.toLowerCase()) ||
+            patient.PRIEZVISKO.toLowerCase().startsWith(
+              event.query.toLowerCase()
+            )
           );
         });
       }
@@ -70,6 +77,14 @@ export default function Basic() {
     window.open(`/add/basicPdf?${queryString}`, "_blank");
   };
 
+  const itemTemplate = (rowData) => {
+    return (
+      <span>
+        {rowData.ROD_CISLO} - {rowData.MENO}, {rowData.PRIEZVISKO}
+      </span>
+    );
+  };
+
   return (
     <div
       style={{ width: "100%", marginTop: "2rem", marginLeft: "10px" }}
@@ -81,7 +96,8 @@ export default function Basic() {
           <AutoComplete
             value={patient}
             onChange={(e) => setPatient(e.value)}
-            field="ROD_CISLO"
+            itemTemplate={itemTemplate}
+            field="REQUESTNAME"
             suggestions={filteredPatients}
             completeMethod={searchPatient}
             dropdown

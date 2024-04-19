@@ -52,7 +52,8 @@ async function getPacienti(pid_lekara) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT id_pacienta, meno, rod_cislo, priezvisko, psc, id_poistenca, nazov,
+      `SELECT id_pacienta, meno, rod_cislo, priezvisko, rod_cislo || ' - ' || meno || ', ' || priezvisko as requestName,
+       psc, id_poistenca, nazov,
       CASE WHEN id_hosp IS NOT NULL and (dat_do is null or dat_do >= sysdate) and dat_od <= sysdate THEN  1 ELSE 0 END AS je_hospit
 FROM (
    SELECT p.id_pacienta, o.meno, p.rod_cislo, o.priezvisko, o.psc, h.id_hosp, h.dat_do, h.dat_od, id_poistenca, poistovna.nazov,
@@ -235,10 +236,9 @@ async function getHospitalizacie(id) {
                   join os_udaje on(os_udaje.rod_cislo = pacient.rod_cislo) 
                   join lozko using(id_lozka)
                   join miestnost on (lozko.id_miestnost = miestnost.id_miestnosti)
-                  join nemocnica on(miestnost.id_nemocnice = nemocnica.id_nemocnice)
-                  join zamestnanci on(nemocnica.id_nemocnice = zamestnanci.id_nemocnice)
-                    where zamestnanci.cislo_zam = :id
-                    order by hospitalizacia.dat_do desc, hospitalizacia.dat_od desc`,
+                    where miestnost.id_oddelenia in (select id_oddelenia from zamestnanci where cislo_zam =:id)
+                    order by hospitalizacia.dat_do desc, hospitalizacia.dat_od desc
+                   `,
       [id]
     );
 

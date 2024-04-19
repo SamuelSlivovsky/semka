@@ -45,14 +45,29 @@ export default function Mandate() {
         _filtered = [...patients];
       } else {
         _filtered = patients.filter((patient) => {
-          return patient.ROD_CISLO.toLowerCase().startsWith(
-            event.query.toLowerCase()
+          console.log(patient);
+          return (
+            patient.ROD_CISLO.toLowerCase().startsWith(
+              event.query.toLowerCase()
+            ) ||
+            patient.MENO.toLowerCase().startsWith(event.query.toLowerCase()) ||
+            patient.PRIEZVISKO.toLowerCase().startsWith(
+              event.query.toLowerCase()
+            )
           );
         });
       }
 
       setFilteredPatients(_filtered);
     }, 250);
+  };
+
+  const itemTemplate = (rowData) => {
+    return (
+      <span>
+        {rowData.ROD_CISLO} - {rowData.MENO}, {rowData.PRIEZVISKO}
+      </span>
+    );
   };
 
   const handleDownload = () => {
@@ -81,7 +96,8 @@ export default function Mandate() {
           <AutoComplete
             value={patient}
             onChange={(e) => setPatient(e.value)}
-            field="ROD_CISLO"
+            itemTemplate={itemTemplate}
+            field="REQUESTNAME"
             suggestions={filteredPatients}
             completeMethod={searchPatient}
             dropdown
