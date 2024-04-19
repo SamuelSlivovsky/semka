@@ -39,9 +39,6 @@ function generujRodneCislo(pohlavie, rodnecislo) {
     const rodneCislo = `${rok}${formatovanyMesiac}${formatovanyDen}/${kontrolnyKod}`;
     return rodneCislo;
 }
-//TODO zistit zlozitost analyza hashovania dat kolko trvaju a aky maju dopad
-//Zamysliet sa nad moznostou nahradenia a zasifrovania aby nebolo mozne spojit napriklad vzacne ochorenia s osobou
-//Ale toto vedie k tomu ze musim identifikovat skrite vazby medzi chorobami a pacientami
 function zistiPohlavie(rodneCislo) {
     const pohlavieKod = parseInt(rodneCislo.charAt(2));
     // Kód pohlavia (muž: 0-1, žena: 5-6) z tretiej číslice pre cudzinca 2-3 muzCudzinec 7-8 zenaCudzinec
