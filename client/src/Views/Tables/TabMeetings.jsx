@@ -79,7 +79,7 @@ function TabMeetings() {
     return (
       <div className="flex justify-content-between">
         <div className="table-header" style={{ gap: "10px" }}>
-          Pacienti
+          Konzíliá
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText

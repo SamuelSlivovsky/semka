@@ -16,6 +16,7 @@ import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
 import bedIcon from "../images/bed.png";
+import chatIcon from "../images/chat.png";
 import "../styles/homepage.css";
 
 function Home() {
@@ -88,6 +89,13 @@ function Home() {
       path="/meetings"
       icon={meetingIcon}
       key="10"
+    ></HomeCard>,
+    <HomeCard
+      title="Správy"
+      isCalendar={false}
+      path="/chat"
+      icon={chatIcon}
+      key="11"
     ></HomeCard>,
   ];
 
