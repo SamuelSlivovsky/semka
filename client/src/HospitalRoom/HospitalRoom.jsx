@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useRef} from "react";
 import Bed from "./Bed";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
@@ -7,8 +7,8 @@ import "../styles/room.css";
 import {Toast} from "primereact/toast";
 
 
-const toast = useRef(null);
 const HospitalRoom = () => {
+    const toast = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const [show, setShow] = useState(false);

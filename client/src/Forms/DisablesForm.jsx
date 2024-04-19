@@ -6,7 +6,9 @@ import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
+import {useNavigate} from "react-router";
 export default function DisablesForm(props) {
+    const navigate = useNavigate();
   const toast = useRef(null);
   const [types, setTypes] = useState([]);
   useEffect(() => {

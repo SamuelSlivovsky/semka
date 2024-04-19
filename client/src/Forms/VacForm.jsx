@@ -6,8 +6,10 @@ import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
+import {useNavigate} from "react-router";
 export default function VacForm(props) {
-  const toast = useRef(null);
+    const toast = useRef(null);
+    const navigate = useNavigate();
   const [vaccines, setVaccines] = useState([]);
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");

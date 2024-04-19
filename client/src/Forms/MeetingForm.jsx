@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Form, Field } from "react-final-form";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -9,11 +9,14 @@ import GetUserData from "../Auth/GetUserData";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputText } from "primereact/inputtext";
 import {Toast} from "primereact/toast";
+import {useNavigate} from "react-router";
 
-const toast = useRef(null);
+
 export default function MeetingForm() {
+    const toast = useRef(null);
   const [showMessage, setShowMessage] = useState(false);
   const [zaznamy, setZaznamy] = useState([]);
+    const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [filteredZaznamy, setFilteredZaznamy] = useState([]);
   const [filteredDoctors, setFilteredDoctors] = useState([]);

@@ -1,14 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, {useState, useEffect, useRef} from "react";
 import { InputText } from "primereact/inputtext";
 import { AutoComplete } from "primereact/autocomplete";
 import GetUserData from "../../Auth/GetUserData";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
 import {Toast} from "primereact/toast";
+import {useNavigate} from "react-router";
 
 
-const toast = useRef(null);
 export default function Basic() {
+  const navigate = useNavigate();
+  const toast = useRef(null);
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
   const [reason, setReason] = useState(null);

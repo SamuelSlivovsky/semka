@@ -10,9 +10,11 @@ import GetUserData from "../Auth/GetUserData";
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
+import {useNavigate} from "react-router";
 export default function RecipeForm(props) {
   const toast = useRef(null);
   const [drugs, setDrugs] = useState([]);
+    const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");

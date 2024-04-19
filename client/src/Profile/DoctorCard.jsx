@@ -1,11 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { useLocation } from "react-router";
+import {useLocation, useNavigate} from "react-router";
 import {Toast} from "primereact/toast";
 
-const toast = useRef(null);
+
 export default function DoctorCard(props) {
+  const toast = useRef(null);
+  const navigate = useNavigate();
   const [profile, setProfile] = useState("");
   const location = useLocation();
 

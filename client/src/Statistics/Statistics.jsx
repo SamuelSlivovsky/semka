@@ -13,8 +13,10 @@ import sk from "../locales/sk.json";
 import "../styles/stat.css";
 import DepartmentStats from "./DepartmentStats.jsx";
 import DoctorStats from "./DoctorStats.jsx";
+import {useNavigate} from "react-router";
 export default function Statistics() {
   const toast = useRef(null);
+  const navigate = useNavigate();
   const [render, setRender] = useState(false);
   const [muziZeny, setMuziZeny] = useState(null);
   const [wholeYearCheck, setWholeYearCheck] = useState(false);

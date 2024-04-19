@@ -10,6 +10,7 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import { Toast } from "primereact/toast";
 import GetUserData from "../Auth/GetUserData";
+import {useNavigate} from "react-router";
 export default function HospitForm(props) {
   const toast = useRef(null);
   const [showMessage, setShowMessage] = useState(false);
@@ -17,6 +18,7 @@ export default function HospitForm(props) {
   const [rooms, setRooms] = useState([]);
   const [beds, setBeds] = useState([]);
   const fileUploader = useRef(null);
+    const navigate = useNavigate();
   const validate = (data) => {
     let errors = {};
 

@@ -12,6 +12,7 @@ import {ProgressSpinner} from "primereact/progressspinner";
 import {Dialog} from "primereact/dialog";
 import {Dropdown} from "primereact/dropdown";
 import "../styles/warehouses.css";
+import {useNavigate} from "react-router";
 
 export default function WarehouseTransfers() {
     let emptyTransfer = {
@@ -34,6 +35,7 @@ export default function WarehouseTransfers() {
 
     //Constants
     const toast = useRef(null);
+    const navigate = useNavigate();
     const [inputValues, setInputValues] = useState({});
     const [hospitalSearchOption, setHospitalSearchOption] = useState(false);
     const [medicineSearchOption, setMedicineSearchOption] = useState(false);

@@ -13,6 +13,7 @@ import GetUserData from "../Auth/GetUserData";
 import {ProgressSpinner} from "primereact/progressspinner";
 import {Dropdown} from "primereact/dropdown";
 import {InputNumber} from "primereact/inputnumber";
+import {useNavigate} from "react-router";
 
 export default function Orders() {
 
@@ -47,6 +48,7 @@ export default function Orders() {
     const [selectedRow, setSelectedRow] = useState(null);
     const [xmlContent, setXmlContent] = useState("");
     const toast = useRef(null);
+    const navigate = useNavigate();
     const [selectedMedications, setSelectedMedications] = useState([]);
 
     /*

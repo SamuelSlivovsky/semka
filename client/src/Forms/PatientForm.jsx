@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Form, Field } from "react-final-form";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
@@ -11,10 +11,13 @@ import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
 import {Toast} from "primereact/toast";
+import {useNavigate} from "react-router";
 
-const toast = useRef(null);
+
 export default function PatientForm(props) {
   const [showMessage, setShowMessage] = useState(false);
+    const toast = useRef(null);
+    const navigate = useNavigate();
   const [cities, setCities] = useState([]);
   const [filteredPsc, setFilteredPsc] = useState(null);
   const [insurances, setInsurances] = useState([]);

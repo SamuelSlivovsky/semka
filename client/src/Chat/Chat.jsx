@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Dialog } from "primereact/dialog";
 import Messages from "./Messages.jsx";
@@ -6,12 +6,15 @@ import GetUserData from "../Auth/GetUserData.jsx";
 import "../styles/chat.css";
 import CreateNewGroup from "./CreateNewGroup.jsx";
 import {Toast} from "primereact/toast";
+import {useNavigate} from "react-router";
 const Chat = () => {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState(null);
   const [groups, setGroups] = useState([]);
 
+
+    const navigate = useNavigate();
   const toast = useRef(null);
   const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
   const addGroup = (

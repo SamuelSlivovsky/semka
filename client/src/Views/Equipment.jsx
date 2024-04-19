@@ -11,6 +11,7 @@ import { Dropdown } from "primereact/dropdown";
 import { FilterMatchMode } from "primereact/api";
 import GetUserData from "../Auth/GetUserData";
 import "../App.css";
+import {useNavigate} from "react-router";
 
 export default function Equipment() {
   let emptyProduct = {
@@ -33,6 +34,7 @@ export default function Equipment() {
   const [department, setDepartment] = useState(null);
   const [departments, setDepartments] = useState([]);
   const toast = useRef(null);
+  const navigate = useNavigate();
   const token = localStorage.getItem("hospit-user");
   const userDataHelper = GetUserData(token);
   useEffect(() => {

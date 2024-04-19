@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import { useLocation } from "react-router";
+import {useLocation, useNavigate} from "react-router";
 import { Dialog } from "primereact/dialog";
 import HospitForm from "../Forms/HospitForm";
 import RecipeForm from "../Forms/RecipeForm";
@@ -20,6 +20,7 @@ import PatientForm from "../Forms/PatientForm";
 
 export default function ProfileCard(props) {
   const toast = useRef(null);
+  const navigate = useNavigate();
   const [profile, setProfile] = useState("");
   const [show, setShow] = useState(false);
   const location = useLocation();

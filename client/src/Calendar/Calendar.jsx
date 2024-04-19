@@ -13,6 +13,9 @@ import { ProgressBar } from "primereact/progressbar";
 import { Dropdown } from "primereact/dropdown";
 import "../styles/calendar.css";
 import {Toast} from "primereact/toast";
+import {useNavigate} from "react-router";
+
+
 
 function EventCalendar(props) {
   const [currentEvents, setCurrentEvents] = useState(null);
@@ -31,6 +34,7 @@ function EventCalendar(props) {
   const [calendarKey, setCalendarKey] = useState(Date.now());
   const [currentEvent, setCurrentEvent] = useState(null);
 
+  const navigate = useNavigate();
   const toast = useRef(null);
   const calendarRef = useRef(null);
   const eventTypes = [
