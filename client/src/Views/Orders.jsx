@@ -1,5 +1,4 @@
-//@TODO add ordering on critical stock in warehouse for all medications that are in hospital
-//@TODO also add ordering when medicine will expire in X days
+
 
 //Imports
 import React, { useState, useEffect, useRef } from "react";
@@ -69,7 +68,6 @@ export default function Orders() {
     }, []);
 
     //Async function for inserting new data into DB
-    //@TODO add ID_SKLAD
     async function insertData() {
         const token = localStorage.getItem("hospit-user");
 

@@ -54,7 +54,6 @@ async function getWarehouses() {
 async function getHospitalMedication(id) {
     try {
         let conn = await database.getConnection();
-        //@TODO change select
         const sqlStatement = `SELECT LIEK.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
            (SKLAD.CELKOVY_POCET - SKLAD.MINIMALNY_POCET) AS POCET FROM SKLAD
             JOIN LIEK ON SKLAD.ID_LIEK = LIEK.ID_LIEK

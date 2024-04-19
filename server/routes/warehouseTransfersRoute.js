@@ -34,7 +34,6 @@ router.get(
     controller.getHospitalMedication
 );
 
-//@TODO add this router and function so new transfers could be added under pharmacy (will be called at same time with addTransfer)
 router.get(
     "/addPharmacyTransfer/:id",
     verify.verifyRoles(0, 2, 3, 10),
