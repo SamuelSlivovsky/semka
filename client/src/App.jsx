@@ -84,21 +84,23 @@ function App() {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     if (userDataHelper?.UserInfo.role !== 9999) {
-      const headers = { authorization: "Bearer " + token };
-      socketService.connect();
-      socketService.on("newMessage", (message) => {
-        fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
-          headers,
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            setNotifications(data.POCET);
-          });
-      });
+        const headers = {authorization: "Bearer " + token};
+        socketService.connect();
+        socketService.on("newMessage", (message) => {
+            fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
+                headers,
+            })
+                .then((res) => res.json())
+                .then((data) => {
+                    setNotifications(data.POCET);
+                });
+        });
 
-    return () => {
-      socketService.disconnect();
-    }};
+        return () => {
+            socketService.disconnect();
+        }
+    }
+      ;
   }, [location.pathname]);
 
   const sidebarButtonsAdmin = [
@@ -482,7 +484,9 @@ function App() {
           <Route path="/logout" element={<Logout></Logout>}></Route>
           <Route path="/chat" element={<Chat />}></Route>
           {userData && userData.UserInfo.role === 0 ? (
-            renderAdminRoutes()
+              <>
+                  {renderAdminRoutes()} {renderChiefRoutes()} {renderDoctorRoutes()}
+              </>
           ) : userData && userData.UserInfo.role === 1 ? (
             renderDoctorRoutes()
           ) : userData && userData.UserInfo.role === 3 ? (

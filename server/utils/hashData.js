@@ -123,6 +123,7 @@ function hashPacienti(pacienti) {
         let indexPriezviska;
         let novepriezvisko;
         let rodneCislo;
+        let novyEmail;
         let zoznamRodnychCisel = [];
         if (pohlavie.includes("muz")) {
             indexMena = Math.floor(Math.random() * menaMuzy.length);
@@ -146,6 +147,7 @@ function hashPacienti(pacienti) {
 
         return {
             ...pacient,
+            EMAIL: `${noveMeno}.${novepriezvisko}${Math.floor(Math.random() * (9999 - 1000)+ 1000)}@gmail.com`,
             MENO: noveMeno,
             ROD_CISLO: rodneCislo,
             PRIEZVISKO: novepriezvisko,

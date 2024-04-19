@@ -14,9 +14,6 @@ import { Button } from "primereact/button";
 import { useNavigate } from "react-router";
 import { Toast } from "primereact/toast";
 
-import { InputTextarea } from "primereact/inputtextarea";
-import { Button } from "primereact/button";
-
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
   const [filters, setFilters] = useState(null);

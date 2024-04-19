@@ -156,6 +156,57 @@ module.exports = {
         });
     },
 
+    getKolegovia: (req, res) => {
+        const lekar = require("../models/lekar");
+        (async () => {
+            info = await lekar.getKolegovia(req.params.id);
+            res.status(200).json(info);
+        })();
+    },
+
+    getZoznamVydanychReceptov: (req, res) => {
+        const lekar = require("../models/lekar");
+        (async () => {
+            info = await lekar.getZoznamVydanychReceptov(
+                req.params.id,
+                req.params.datum
+            );
+            res.status(200).json(info);
+        })();
+    },
+
+    getOddeleniePrimara: (req, res) => {
+        const lekar = require("../models/lekar");
+        (async () => {
+            info = await lekar.getOddeleniePrimara(req.params.id);
+            res.status(200).json(info);
+        })();
+    },
+
+    getPacient: (req, res) => {
+        const lekar = require("../models/lekar");
+        (async () => {
+            pacient = await lekar.getPacient(req.params.rod_cislo, req.params.id);
+            res.status(200).json(pacient);
+        })();
+    },
+
+    getLozka: (req, res) => {
+        const lozko = require("../models/lozko");
+        (async () => {
+            info = await lozko.getLozka(req.params.id);
+            res.status(200).json(info);
+        })();
+    },
+
+    getZamestnanci: (req, res) => {
+        const zamestnanec = require("../models/zamestnanec");
+        (async () => {
+            const lekari = await zamestnanec.getZamestnanci(req.params.id);
+            res.status(200).json(lekari);
+        })();
+    },
+
     getMiestnosti: (req, res) => {
         const miestnost = require("../models/miestnost");
         (async () => {
