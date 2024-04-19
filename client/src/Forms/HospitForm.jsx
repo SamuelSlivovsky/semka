@@ -39,7 +39,22 @@ export default function HospitForm(props) {
     const headers = { authorization: "Bearer " + token };
     const userData = GetUserData(token);
     fetch(`lekar/miestnosti/${userData.UserInfo.userid}`, { headers })
-      .then((res) => res.json())
+      .then((res) => {
+          if (res.ok) {
+              return res.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (res.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      })
       .then((data) => {
         setRooms(data);
       });
@@ -148,7 +163,22 @@ export default function HospitForm(props) {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     fetch(`lekar/lozka/${e.value.ID_MIESTNOSTI}`, { headers })
-      .then((res) => res.json())
+      .then((res) => {
+          if (res.ok) {
+              return res.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (res.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      })
       .then((data) => {
         setBeds(data);
       });

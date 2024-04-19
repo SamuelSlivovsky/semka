@@ -5,12 +5,14 @@ import Messages from "./Messages.jsx";
 import GetUserData from "../Auth/GetUserData.jsx";
 import "../styles/chat.css";
 import CreateNewGroup from "./CreateNewGroup.jsx";
+import {Toast} from "primereact/toast";
 const Chat = () => {
   const [show, setShow] = useState(false);
   const [loading, setLoading] = useState(true);
   const [group, setGroup] = useState(null);
   const [groups, setGroups] = useState([]);
 
+  const toast = useRef(null);
   const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
   const addGroup = (
     <div
@@ -57,7 +59,22 @@ const Chat = () => {
       },
     };
     fetch(`/chat/groups/${userDataHelper.UserInfo.userid}`, requestOptions)
-      .then((response) => response.json())
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      })
       .then((data) => {
         setGroups([
           addGroup,
@@ -93,6 +110,7 @@ const Chat = () => {
                     position: "relative",
                   }}
                 >
+                    <div><Toast ref={toast} position="top-center"/></div>
                   <p>{item.NAZOV[0]}</p>
                   {item.POCET > 0 ? (
                     <div

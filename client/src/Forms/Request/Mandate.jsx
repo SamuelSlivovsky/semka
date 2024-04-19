@@ -4,7 +4,10 @@ import { AutoComplete } from "primereact/autocomplete";
 import GetUserData from "../../Auth/GetUserData";
 import { Button } from "primereact/button";
 import { InputTextarea } from "primereact/inputtextarea";
+import {Toast} from "primereact/toast";
 
+
+const toast = useRef(null);
 export default function Mandate() {
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
@@ -18,7 +21,22 @@ export default function Mandate() {
     fetch(`/lekar/pacienti/${userDataHelper.UserInfo.userid}`, {
       headers,
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+          // Kontrola ci je token expirovany (status:410)
+        } else if (response.status === 410) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((data) => {
         setPatients(data);
       });
@@ -31,7 +49,22 @@ export default function Mandate() {
       fetch(`/patient/info/${patient.ID_PACIENTA}`, {
         headers,
       })
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+            // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+            // Token expiroval redirect na logout
+            toast.current.show({
+              severity: "error",
+              summary: "Session timeout redirecting to login page",
+              life: 999999999,
+            });
+            setTimeout(() => {
+              navigate("/logout");
+            }, 3000);
+          }
+        })
         .then((data) => {
           setPatientData(...data);
         });
@@ -86,25 +119,26 @@ export default function Mandate() {
   };
 
   return (
-    <div
-      style={{ width: "100%", marginTop: "2rem", marginLeft: "10px" }}
-      className="p-fluid grid formgrid"
-    >
-      <div className="field col-12">
+      <div
+          style={{width: "100%", marginTop: "2rem", marginLeft: "10px"}}
+          className="p-fluid grid formgrid"
+      >
+        <div><Toast ref={toast} position="top-center"/></div>
         <div className="field col-12">
-          <label htmlFor="rod_cislo">Rodné číslo*</label>
-          <AutoComplete
-            value={patient}
-            onChange={(e) => setPatient(e.value)}
-            itemTemplate={itemTemplate}
-            field="REQUESTNAME"
-            suggestions={filteredPatients}
-            completeMethod={searchPatient}
-            dropdown
-          />
+          <div className="field col-12">
+            <label htmlFor="rod_cislo">Rodné číslo*</label>
+            <AutoComplete
+                value={patient}
+                onChange={(e) => setPatient(e.value)}
+                itemTemplate={itemTemplate}
+                field="REQUESTNAME"
+                suggestions={filteredPatients}
+                completeMethod={searchPatient}
+                dropdown
+            />
+          </div>
         </div>
+        <Button label="Stiahnuť" onClick={() => handleDownload()}/>
       </div>
-      <Button label="Stiahnuť" onClick={() => handleDownload()} />
-    </div>
   );
 }

@@ -1,5 +1,4 @@
-//@TODO add automatic transfer for expiring medications + when they are expired or there is large amount in main warehouse
-//@TODO add new tab
+
 
 import {TabPanel, TabView} from "primereact/tabview";
 import {DataTable} from "primereact/datatable";
@@ -66,7 +65,22 @@ export default function WarehouseTransfers() {
 
         //Finished transfers
         fetch(`presuny/allFin`, { headers })
-            .then((response) => response.json())
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                    // Kontrola ci je token expirovany (status:410)
+                } else if (response.status === 410) {
+                    // Token expiroval redirect na logout
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Session timeout redirecting to login page",
+                        life: 999999999,
+                    });
+                    setTimeout(() => {
+                        navigate("/logout");
+                    }, 3000);
+                }
+            })
             .then((data) => {
                 setFinishedTransfers(data);
             });
@@ -145,7 +159,6 @@ export default function WarehouseTransfers() {
     }
 
     //Function for searching all medications that are in table medicine
-    //@TODO select needs to be checked, there is some error in searching by hospital
     const getMedicationList = () => {
         const token = localStorage.getItem("hospit-user");
         const headers = {authorization: "Bearer " + token};
@@ -170,7 +183,7 @@ export default function WarehouseTransfers() {
                 console.log(data);
                 setHospitalMedication(data);
             });
-        //@TODO change visibality of previoud DIALOG and show new table for this with all medications
+
     }
 
     //Function for updating
@@ -201,10 +214,10 @@ export default function WarehouseTransfers() {
                 setShowHospitalMedications(true);
                 hideDialog();
             } else {
-                //@TODO Add alert in here
+
             }
         } else {
-            //@TODO add check if array is atleast of size 1, if not alert
+
         }
     }
 
@@ -219,7 +232,6 @@ export default function WarehouseTransfers() {
         }));
     };
 
-    //@TODO needs to be changed to suit this site
     //New/Delete toolbar function
     const leftToolbarTemplate = () => {
         return (
