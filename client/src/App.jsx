@@ -207,13 +207,6 @@ function App() {
       icon="patient-icon"
     />,
     <SidebarButton
-      key="beds"
-      visibleLeft={visibleLeft}
-      path="/rooms"
-      label="Lôžka"
-      icon="bed-icon"
-    />,
-    <SidebarButton
       key="5"
       visibleLeft={visibleLeft}
       path="/examinations"
@@ -266,6 +259,13 @@ function App() {
   ];
 
   const sidebarButtonsChief = [
+    <SidebarButton
+      key="beds"
+      visibleLeft={visibleLeft}
+      path="/rooms"
+      label="Lôžka"
+      icon="bed-icon"
+    />,
     <SidebarButton
       key="4"
       visibleLeft={visibleLeft}

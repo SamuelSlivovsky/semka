@@ -109,26 +109,32 @@ const HospitalRoom = () => {
         }
       >
         <h3>Oddelenie: {selectedBed ? selectedBed.TYP_ODDELENIA : ""} </h3>
-        <h3>Miestnost: {location.state}</h3>
-        <h3>
-          Pacient:{" "}
-          {selectedBed?.MENO
-            ? `${selectedBed.MENO} ${selectedBed.PRIEZVISKO}`
-            : ""}
-        </h3>
-        <h3>
-          Rodné číslo: {selectedBed?.ROD_CISLO ? selectedBed.ROD_CISLO : ""}
-        </h3>
-        <h3>
-          Dátum do:{" "}
-          {selectedBed?.DAT_DO
-            ? new Date(selectedBed.DAT_DO).toLocaleDateString("de", {
-                day: "2-digit",
-                month: "2-digit",
-                year: "numeric",
-              })
-            : "Neuvedený"}
-        </h3>
+        <h3>Miestnost: {location.state.id}</h3>
+        {selectedBed?.MENO ? (
+          <>
+            <h3>
+              Pacient:{" "}
+              {selectedBed?.MENO
+                ? `${selectedBed.MENO} ${selectedBed.PRIEZVISKO}`
+                : ""}
+            </h3>
+            <h3>
+              Rodné číslo: {selectedBed?.ROD_CISLO ? selectedBed.ROD_CISLO : ""}
+            </h3>
+            <h3>
+              Dátum do:{" "}
+              {selectedBed?.DAT_DO
+                ? new Date(selectedBed.DAT_DO).toLocaleDateString("de", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                : "Neuvedený"}
+            </h3>
+          </>
+        ) : (
+          ""
+        )}
       </Dialog>
     </div>
   );

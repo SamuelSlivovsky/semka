@@ -8,7 +8,6 @@ import { InputTextarea } from "primereact/inputtextarea";
 export default function Results() {
   const [patients, setPatients] = useState([]);
   const [filteredPatients, setFilteredPatients] = useState([]);
-  const [reason, setReason] = useState(null);
   const [patient, setPatient] = useState(null);
   const [patientData, setPatientData] = useState(null);
   useEffect(() => {
@@ -45,14 +44,28 @@ export default function Results() {
         _filtered = [...patients];
       } else {
         _filtered = patients.filter((patient) => {
-          return patient.ROD_CISLO.toLowerCase().startsWith(
-            event.query.toLowerCase()
+          console.log(patient);
+          return (
+            patient.ROD_CISLO.toLowerCase().startsWith(
+              event.query.toLowerCase()
+            ) ||
+            patient.MENO.toLowerCase().startsWith(event.query.toLowerCase()) ||
+            patient.PRIEZVISKO.toLowerCase().startsWith(
+              event.query.toLowerCase()
+            )
           );
         });
       }
 
       setFilteredPatients(_filtered);
     }, 250);
+  };
+  const itemTemplate = (rowData) => {
+    return (
+      <span>
+        {rowData.ROD_CISLO} - {rowData.MENO}, {rowData.PRIEZVISKO}
+      </span>
+    );
   };
 
   const handleDownload = () => {
@@ -74,8 +87,11 @@ export default function Results() {
           <label htmlFor="rod_cislo">Rodné číslo*</label>
           <AutoComplete
             value={patient}
-            onChange={(e) => setPatient(e.value)}
-            field="ROD_CISLO"
+            onChange={(e) => {
+              setPatient(e.value);
+            }}
+            itemTemplate={itemTemplate}
+            field="REQUESTNAME"
             suggestions={filteredPatients}
             completeMethod={searchPatient}
             dropdown

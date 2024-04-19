@@ -28,6 +28,7 @@ function EventCalendar(props) {
   const [doctors, setDoctors] = useState([]);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [calendarKey, setCalendarKey] = useState(Date.now());
+  const [currentEvent, setCurrentEvent] = useState(null);
 
   const calendarRef = useRef(null);
   const eventTypes = [
@@ -138,6 +139,7 @@ function EventCalendar(props) {
     const startDate = new Date(clickInfo.event._instance.range.start);
     startDate.setHours(startDate.getHours() - 1);
     setEventDateStart(startDate);
+    setCurrentEvent(clickInfo.event);
     setCurrEventTitle(
       clickInfo.event._def.extendedProps.type +
         " - " +
@@ -264,6 +266,7 @@ function EventCalendar(props) {
       </>
     ) : !showAddEvent ? (
       <>
+        {console.log(currentEvent)}
         <div className="field col-12">
           <h3 htmlFor="basic">Názov udalosti</h3>
           <p>{currEventTitle}</p>
@@ -276,6 +279,28 @@ function EventCalendar(props) {
               : ""}
           </p>
         </div>
+        {currentEvent &&
+        currentEvent != null &&
+        currentEvent._def.extendedProps.DAT_DO ? (
+          <div className="field col-12 ">
+            <h3 htmlFor="basic">Koniec udalosti</h3>
+            <p>
+              {new Date(
+                currentEvent._def.extendedProps.DAT_DO
+              ).toLocaleDateString("de", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+              {" " +
+                new Date(
+                  currentEvent._def.extendedProps.DAT_DO
+                ).toLocaleTimeString()}
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="field col-12 ">
           <h3 htmlFor="basic">Typ udalosti</h3>
           <p>{eventType !== null ? eventType.name : ""}</p>

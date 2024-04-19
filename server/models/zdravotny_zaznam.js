@@ -69,7 +69,10 @@ async function insertHospitalizacia(body) {
       id_lozka: body.id_lozka,
     });
   } catch (err) {
-    if (err.errorNum && err.errorNum === 20001) {
+    if (err.errorNum && err.errorNum === 20002) {
+      console.error("Dátum ukončenia nesmie byť pred dátumom začiatku");
+      throw new Error("Dátum ukončenia nesmie byť pred dátumom začiatku");
+    } else if (err.errorNum && err.errorNum === 20001) {
       console.error("Pacient s týmto rodným číslom neexistuje");
       throw new Error("Pacient s týmto rodným číslom neexistuje");
     } else if (err.errorNum && err.errorNum === 20000) {
