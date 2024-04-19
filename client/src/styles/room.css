@@ -1,0 +1,16 @@
+.door {
+  width: 100px;
+  height: 200px;
+  background-color: #8b4513;
+  position: relative;
+}
+
+.handle {
+  width: 10px;
+  height: 10px;
+  background-color: #c0c0c0;
+  position: absolute;
+  right: 20px;
+  top: calc(50% - 20px);
+  border-radius: 5px;
+}

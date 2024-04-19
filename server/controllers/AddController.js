@@ -12,7 +12,7 @@ module.exports = {
         description: "Failed to insert recept with body:" +
           " " + "ID_LIEKU:" + req.body.id_lieku + " CISLO_ZAM:" + req.body.cislo_zam,
       })
-      res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     });
   },
   insertPriloha: (req, res) => {
@@ -26,24 +26,25 @@ module.exports = {
         table: "Priloha",
         description: "Failed to insert priloha",
       })
-      res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     });
   },
-  insertVysetrenie: (req, res) => {
+  insertVysetrenie: async (req, res) => {
     const zdravotny_zaznam = require("../models/zdravotny_zaznam");
-    (async () => {
-      ret_val = await zdravotny_zaznam.insertVysetrenie(req.body);
+    try {
+      await zdravotny_zaznam.insertVysetrenie(req.body);
       res.status(200).json("success");
-    })().catch((err) => {
-      insertLogs({
-        status: "failed insert vysetrenie",
-        table: "Vysetrenie",
-        description: "Failed to insert vysetrenie with body:" +
-          " " + "POPIS:" + req.body.popis + " DATUM:" + req.body.datum,
-      })
-      res.status(500).send(err);
-    });
+    }catch (err) {
+        insertLogs({
+            status: "failed insert vysetrenie",
+            table: "Vysetrenie",
+            description: "Failed to insert vysetrenie with body:" +
+                " " + "POPIS:" + req.body.popis + " DATUM:" + req.body.datum,
+        })
+        res.status(500).json({ error: err.message });
+    }
   },
+
   insertHospitalizacia: (req, res) => {
     const zdravotny_zaznam = require("../models/zdravotny_zaznam");
     (async () => {
@@ -56,7 +57,7 @@ module.exports = {
             description: "Failed to insert hospitalizacia with body:" +
             " " + "NAZOV: " + req.body.nazov + "POPIS:" + req.body.popis + " DATUM:" + req.body.datum,
         })
-      res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     });
   },
   insertOperacia: (req, res) => {
@@ -71,7 +72,7 @@ module.exports = {
             description: "Failed to insert operacia with body:" +
             " " + "NAZOV: " + req.body.nazov + "POPIS:" + req.body.popis + " DATUM:" + req.body.datum,
         })
-      res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     });
   },
 
@@ -87,7 +88,7 @@ module.exports = {
             description: "Failed to insert ockovanie with body:" +
             " " + "ID_VAKCINY: " + req.body.id_vakciny +" DATUM:" + req.body.datum,
         })
-      res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     });
   },
 
@@ -103,7 +104,7 @@ module.exports = {
             description: "Failed to insert choroba with body:" +
             " " + "NAZOV: " + req.body.nazov + "TYP:" + req.body.typ,
         })
-      res.status(500).send(err);
+        res.status(500).json({ error: err.message });
     });
   },
 
@@ -119,7 +120,7 @@ module.exports = {
                 description: "Failed to insert typ ztp with body:" +
                 " " + "TYP: " + req.body.id_typu_ztp,
             })
-      res.status(500).send(err);
+        res.status(500).json({ error: err.message });;
     });
   },
 

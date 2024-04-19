@@ -53,7 +53,7 @@ export default function TabDoctors(props) {
     return (
       <div className="flex justify-content-between">
         <div className="table-header">
-          Doktori
+          Zamestnanci
           <span className="p-input-icon-left">
             <i className="pi pi-search" />
             <InputText
@@ -129,6 +129,7 @@ export default function TabDoctors(props) {
           <Column field="ODDELENIE_NAZOV" header={"Oddelenie"} filter></Column>
           <Column field="MENO" header={"Meno"} filter></Column>
           <Column field="PRIEZVISKO" header={"Priezvisko"} filter></Column>
+          <Column field="PROFESIA" header={"Profesia"} filter></Column>
         </DataTable>
       </div>
       <Dialog

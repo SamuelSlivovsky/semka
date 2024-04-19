@@ -15,6 +15,8 @@ import VacForm from "../Forms/VacForm";
 import { Tag } from "primereact/tag";
 import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
+import GetUserData from "../Auth/GetUserData";
+import PatientForm from "../Forms/PatientForm";
 
 export default function ProfileCard(props) {
   const toast = useRef(null);
@@ -31,6 +33,8 @@ export default function ProfileCard(props) {
   const [patientZTPTypes, setPatientZTPTypes] = useState([]);
   const [patientVac, setPatientVac] = useState([]);
   const [allowUpdateTimeOfDeath, setAllowUpdateTimeOfDeath] = useState(false);
+  const [showPatientForm, setShowPatientForm] = useState(false);
+  const userDataHelper = GetUserData(localStorage.getItem("hospit-user"));
   const token = localStorage.getItem("hospit-user");
   const headers = { authorization: "Bearer " + token };
 
@@ -38,6 +42,7 @@ export default function ProfileCard(props) {
     tableName: "Zdravotné záznamy",
     route: "/pacient",
     cellData: patientMedicalRecords,
+    fetchData: () => fetchMedRecords(),
     titles: [
       { field: "DATUM", header: "Dátum" },
       { field: "TYP", header: "Typ záznamu" },
@@ -47,6 +52,7 @@ export default function ProfileCard(props) {
     dialog: true,
     tableScrollHeight: "480px",
     editor: false,
+    isPatient: userDataHelper.UserInfo.role == 9999,
   };
 
   const recipesTable = {
@@ -58,6 +64,7 @@ export default function ProfileCard(props) {
       { field: "NAZOV", header: "Názov" },
       { field: "LEKAR", header: "Lekár" },
       { field: "DATUM_ZAPISU", header: "Dátum zápisu" },
+      { field: "DATUM_PREVZATIA", header: "Dátum prevzatia" },
     ],
     allowFilters: false,
     dialog: false,
@@ -121,7 +128,7 @@ export default function ProfileCard(props) {
     allowFilters: false,
     dialog: false,
     tableScrollHeight: "480px",
-    editor: true,
+    editor: userDataHelper.UserInfo.role != 9999,
   };
 
   const disablesTable = {
@@ -138,7 +145,7 @@ export default function ProfileCard(props) {
     allowFilters: false,
     dialog: false,
     tableScrollHeight: "480px",
-    editor: true,
+    editor: userDataHelper.UserInfo.role != 9999,
   };
 
   const vacTable = {
@@ -168,6 +175,7 @@ export default function ProfileCard(props) {
     )
       .then((response) => response.json())
       .then((data) => {
+        console.log(data);
         setProfile(...data);
         console.log(data);
       });
@@ -342,7 +350,7 @@ export default function ProfileCard(props) {
             }
             rod_cislo={profile.ROD_CISLO}
             hideDialog={() => onHide()}
-            onInsert={() => fetchDisables()}
+            onInsert={() => fetchRecipies()}
           />
         );
       default:
@@ -387,6 +395,21 @@ export default function ProfileCard(props) {
           style={{ width: "50rem", height: "40rem" }}
           title={
             <div style={{ display: "flex", gap: "10px" }}>
+              {userDataHelper.UserInfo.role != 9999 ? (
+                <i
+                  className="pi pi-user-edit"
+                  style={{
+                    fontSize: "25px",
+                    backgroundColor: "#14B8A6",
+                    padding: "5px",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                  }}
+                  onClick={() => setShowPatientForm(true)}
+                ></i>
+              ) : (
+                ""
+              )}
               {profile.MENO + " " + profile.PRIEZVISKO}{" "}
               {profile.CUDZINEC == 1 ? (
                 <Tag
@@ -405,63 +428,67 @@ export default function ProfileCard(props) {
               <h4>Rok narodenia</h4>
               <div>{profile.DATUM_NARODENIA}</div>
             </div>
-            <div className="col-6 text-center m-0">
-              <h4>Dátum úmrtia</h4>
-              <div>
-                {profile.DATUM_UMRTIA ? (
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "10px",
-                      justifyContent: "center",
-                    }}
-                  >
-                    {" "}
-                    <Calendar
-                      style={{ width: "170px" }}
-                      showTime
-                      value={new Date(profile.DATUM_UMRTIA)}
-                      onChange={(e) => {
-                        updateTimeOfDeath(e);
-                      }}
-                      disabled={!allowUpdateTimeOfDeath}
-                    />
-                    <Button
-                      label="Uprav"
-                      onClick={() => setAllowUpdateTimeOfDeath(true)}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: "10px",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Calendar
-                      value={
-                        profile.DATUM_UMRTIA
-                          ? new Date(profile.DATUM_UMRTIA)
-                          : ""
-                      }
-                      onChange={(e) => {
-                        updateTimeOfDeath(e);
-                      }}
+            {userDataHelper.UserInfo.role != 9999 ? (
+              <div className="col-6 text-center m-0">
+                <h4>Dátum úmrtia</h4>
+                <div>
+                  {profile.DATUM_UMRTIA ? (
+                    <div
                       style={{
-                        width: "170px",
-                        display: allowUpdateTimeOfDeath ? "" : "none",
+                        display: "flex",
+                        gap: "10px",
+                        justifyContent: "center",
                       }}
-                      showTime
-                    />
-                    <Button
-                      label="Pridaj"
-                      onClick={() => setAllowUpdateTimeOfDeath(true)}
-                    />
-                  </div>
-                )}
+                    >
+                      {" "}
+                      <Calendar
+                        style={{ width: "170px" }}
+                        showTime
+                        value={new Date(profile.DATUM_UMRTIA)}
+                        onChange={(e) => {
+                          updateTimeOfDeath(e);
+                        }}
+                        disabled={!allowUpdateTimeOfDeath}
+                      />
+                      <Button
+                        label="Uprav"
+                        onClick={() => setAllowUpdateTimeOfDeath(true)}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      style={{
+                        display: "flex",
+                        gap: "10px",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <Calendar
+                        value={
+                          profile.DATUM_UMRTIA
+                            ? new Date(profile.DATUM_UMRTIA)
+                            : ""
+                        }
+                        onChange={(e) => {
+                          updateTimeOfDeath(e);
+                        }}
+                        style={{
+                          width: "170px",
+                          display: allowUpdateTimeOfDeath ? "" : "none",
+                        }}
+                        showTime
+                      />
+                      <Button
+                        label="Pridaj"
+                        onClick={() => setAllowUpdateTimeOfDeath(true)}
+                      />
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            ) : (
+              ""
+            )}
           </div>
 
           <div className="flex w-100">
@@ -471,7 +498,7 @@ export default function ProfileCard(props) {
             </div>
             <div className="col-6 text-center m-0">
               <h4>Mobil</h4>
-              <div>{profile.TEL}</div>
+              <div>{profile.TELEFON}</div>
             </div>
           </div>
 
@@ -510,7 +537,9 @@ export default function ProfileCard(props) {
                       : "Nie "}
                     <Button
                       label="Zoznam"
-                      onClick={() => setShowDisables(true)}
+                      onClick={() => {
+                        setShowDisables(true);
+                      }}
                     ></Button>
                   </div>
                 ) : (
@@ -520,8 +549,9 @@ export default function ProfileCard(props) {
             </div>
           </div>
           <div className="flex">
-            <div className="mt-5 text-center col-6 text-center m-0">
-              <Button label="Poslať správu" icon="pi pi-send" />
+            <div className="col-6 text-center m-0">
+              <h4>Email</h4>
+              <div>{profile.EMAIL}</div>
             </div>
             <div className="mt-5 text-center col-6 text-center m-0">
               <Button
@@ -621,7 +651,6 @@ export default function ProfileCard(props) {
                 />
               </div>
             </div>
-
             <div className="col-2 m-4">
               <div className="p-3">
                 <Button
@@ -642,26 +671,36 @@ export default function ProfileCard(props) {
           >
             {renderDialog()}
           </Dialog>
-          <Dialog
-            visible={showDisables}
-            onHide={() => setShowDisables(false)}
-            style={{ width: "1000px" }}
-          >
-            {" "}
-            <TableMedicalRecords {...disablesTable} />
-          </Dialog>
-          <Dialog
-            visible={showVac}
-            onHide={() => setShowVac(false)}
-            style={{ width: "1000px" }}
-          >
-            {" "}
-            <TableMedicalRecords {...vacTable} />
-          </Dialog>
         </>
       ) : (
         ""
       )}
+      <Dialog
+        visible={showDisables}
+        onHide={() => setShowDisables(false)}
+        style={{ width: "1000px" }}
+      >
+        <TableMedicalRecords {...disablesTable} />
+      </Dialog>
+      <Dialog
+        visible={showVac}
+        onHide={() => setShowVac(false)}
+        style={{ width: "1000px" }}
+      >
+        {" "}
+        <TableMedicalRecords {...vacTable} />
+      </Dialog>
+      <Dialog
+        visible={showPatientForm}
+        onHide={() => {
+          setShowPatientForm(false);
+          fetchPatientInfo();
+        }}
+        style={{ width: "1000px" }}
+      >
+        {" "}
+        <PatientForm profile={profile} />
+      </Dialog>
     </div>
   );
 }

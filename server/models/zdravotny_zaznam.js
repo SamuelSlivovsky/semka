@@ -71,7 +71,18 @@ async function insertHospitalizacia(body) {
       id_lozka: body.id_lozka,
     });
   } catch (err) {
-    throw new Error("Database error: " + err);
+    if (err.errorNum && err.errorNum === 20002) {
+      console.error("Dátum ukončenia nesmie byť pred dátumom začiatku");
+      throw new Error("Dátum ukončenia nesmie byť pred dátumom začiatku");
+    } else if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else if (err.errorNum && err.errorNum === 20000) {
+      console.error("Pacient už je priradený na hospitalizáciu v danom čase");
+      throw new Error("Pacient už je priradený na hospitalizáciu v danom čase");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
@@ -97,7 +108,15 @@ async function insertOperacia(body) {
       nazov: body.nazov,
     });
   } catch (err) {
-    throw new Error("Database error: " + err);
+    if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else if (err.errorNum && err.errorNum === 20000) {
+      console.error("Pacient už je priradený na operáciu v danom čase");
+      throw new Error("Pacient už je priradený na operáciu v danom čase");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
@@ -122,8 +141,12 @@ async function insertVysetrenie(body) {
       nazov: body.nazov,
     });
   } catch (err) {
-    throw new Error("Database error: " + err);
-    console.log(err);
+    if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 

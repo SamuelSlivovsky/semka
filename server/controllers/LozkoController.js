@@ -14,4 +14,12 @@ module.exports = {
         res.status(500).send(err);
     });
   },
+
+  getPacient: (req, res) => {
+    const lozko = require("../models/lozko");
+    (async () => {
+      lozka = await lozko.getPacient(req.params.id);
+      res.status(200).json(lozka);
+    })();
+  },
 };

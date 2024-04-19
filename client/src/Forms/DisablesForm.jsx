@@ -1,12 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Form, Field } from "react-final-form";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
+import { Toast } from "primereact/toast";
 export default function DisablesForm(props) {
-  const [showMessage, setShowMessage] = useState(false);
+  const toast = useRef(null);
   const [types, setTypes] = useState([]);
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -38,28 +39,32 @@ export default function DisablesForm(props) {
             : null,
       }),
     };
-    const responsePatient = await fetch(
-      "/add/typ_ztp",
-      requestOptionsPatient
-    ).then(() => setShowMessage(true));
+    await fetch("/add/typ_ztp", requestOptionsPatient)
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage.error);
+        } else {
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "Úspešné pridanie postihnutia",
+            life: 6000,
+          });
+        }
+      })
+      .then(() => (props.onInsert ? props.onInsert() : ""))
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: error.message,
+          life: 6000,
+        });
+      });
 
     form.restart();
   };
-
-  const dialogFooter = (
-    <div className="flex justify-content-center">
-      <Button
-        label="OK"
-        className="p-button-text"
-        autoFocus
-        onClick={() => {
-          setShowMessage(false);
-          props.hideDialog();
-          props.onInsert();
-        }}
-      />
-    </div>
-  );
 
   const validate = (data) => {
     let errors = {};
@@ -79,25 +84,7 @@ export default function DisablesForm(props) {
       style={{ width: "100%", marginTop: "2rem" }}
       className="p-fluid grid formgrid"
     >
-      <Dialog
-        visible={showMessage}
-        onHide={() => {
-          setShowMessage(false);
-        }}
-        position="top"
-        footer={dialogFooter}
-        showHeader={false}
-        breakpoints={{ "960px": "80vw" }}
-        style={{ width: "30vw" }}
-      >
-        <div className="flex align-items-center flex-column pt-6 px-3">
-          <i
-            className="pi pi-check-circle"
-            style={{ fontSize: "5rem", color: "var(--green-500)" }}
-          ></i>
-          <h5>Úspešné pridanie postihnutia</h5>
-        </div>
-      </Dialog>
+      <Toast ref={toast} />
 
       <div className="field col-12">
         <Form

@@ -367,27 +367,33 @@ module.exports = {
         });
     },
 
-    getPocetPacientiPodlaVeku: (req, res) => {
-        const pacient = require("../models/pacient");
-        console.log(req.params);
-        (async () => {
-            ret_val = await pacient.getPocetPacientiPodlaVeku();
-            res.status(200).json(ret_val);
-        })().catch((err) => {
-            insertLogs({
-                status: "failed to get number of patients by age",
-                description: "Failed to get number of patients by age",
-                table: "pacient",
-            })
-            res.status(403).send(err);
-        });
-    },
+  getPocetPacientiPodlaVeku: (req, res) => {
+    const pacient = require("../models/pacient");
+    console.log(req.params);
+    (async () => {
+      ret_val = await pacient.getPocetPacientiPodlaVeku(
+        req.params.cislo_zam,
+        req.params.rok
+      );
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+        insertLogs({
+            status: "failed to get number of patients by age",
+            description: "Failed to get number of patients by age",
+            table: "pacient",
+        })
+      res.status(403).send(err);
+    });
+  },
 
     getPomerMuziZeny: (req, res) => {
         const os_udaje = require("../models/os_udaje");
         console.log(req.params);
         (async () => {
-            ret_val = await os_udaje.getPomerMuziZeny(req.params.cislo_zam);
+            ret_val = await os_udaje.getPomerMuziZeny(
+        req.params.cislo_zam,
+        req.params.rok
+      );
             res.status(200).json(ret_val);
         })().catch((err) => {
             insertLogs({
@@ -516,8 +522,8 @@ module.exports = {
         console.log(req.params);
         (async () => {
             ret_val = await oddelenie.getPocetPacientovOddelenia(
-                req.params.cislo_zam
-            );
+                req.params.cislo_zam,
+            req.params.rok);
             res.status(200).json(ret_val);
         })().catch((err) => {
             insertLogs({
@@ -532,7 +538,20 @@ module.exports = {
         const oddelenie = require("../models/oddelenie");
         console.log(req.params);
         (async () => {
-            ret_val = await oddelenie.getPocetOperaciiOddelenia(
+            ret_val = await oddelenie.getPocetOperaciiOddelenia(req.params.cislo_zam,
+        req.params.rok
+      );
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+  getPocetOperaciiZamestnanca: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+    console.log(req.params);
+    (async () => {
+      ret_val = await oddelenie.getPocetOperaciiZamestnanca(
                 req.params.cislo_zam,
                 req.params.rok
             );
@@ -568,7 +587,20 @@ module.exports = {
         const oddelenie = require("../models/oddelenie");
         console.log(req.params);
         (async () => {
-            ret_val = await oddelenie.getPocetVysetreniOddelenia(
+            ret_val = await oddelenie.getPocetVysetreniOddelenia(req.params.cislo_zam,
+        req.params.rok
+      );
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+  getPocetVysetreniZamestnanca: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+    console.log(req.params);
+    (async () => {
+      ret_val = await oddelenie.getPocetVysetreniZamestnanca(
                 req.params.cislo_zam,
                 req.params.rok
             );
@@ -605,7 +637,10 @@ module.exports = {
         const oddelenie = require("../models/oddelenie");
         console.log(req.params);
         (async () => {
-            ret_val = await oddelenie.getKrvneSkupinyOddelenia(req.params.cislo_zam);
+            ret_val = await oddelenie.getKrvneSkupinyOddelenia(
+        req.params.cislo_zam,
+        req.params.rok
+      );
             res.status(200).json(ret_val);
         })().catch((err) => {
             insertLogs({
@@ -637,7 +672,21 @@ module.exports = {
         const lekar = require("../models/lekar");
 
         (async () => {
-            ret_val = await lekar.getZoznamLekarov();
+            ret_val = await lekar.getZoznamLekarov(req.params.id);
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      console.error(err);
+      res.status(403).send(err);
+    });
+  },
+  getUdalostiOddelenia: (req, res) => {
+    const oddelenie = require("../models/oddelenie");
+
+    (async () => {
+      ret_val = await oddelenie.getUdalostiOddelenia(
+        req.params.cislo_zam,
+        req.params.rok
+      );
             res.status(200).json(ret_val);
         })().catch((err) => {
             insertLogs({
