@@ -12,6 +12,7 @@ import { SelectButton } from "primereact/selectbutton";
 import { ProgressBar } from "primereact/progressbar";
 import { Dropdown } from "primereact/dropdown";
 import "../styles/calendar.css";
+import {Toast} from "primereact/toast";
 
 function EventCalendar(props) {
   const [currentEvents, setCurrentEvents] = useState(null);
@@ -30,6 +31,7 @@ function EventCalendar(props) {
   const [calendarKey, setCalendarKey] = useState(Date.now());
   const [currentEvent, setCurrentEvent] = useState(null);
 
+  const toast = useRef(null);
   const calendarRef = useRef(null);
   const eventTypes = [
     { name: "Operácia", code: "OP" },
@@ -68,8 +70,22 @@ function EventCalendar(props) {
       }`,
       { headers }
     )
-      .then((response) => response.json())
-      .then((data) => {
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      }).then((data) => {
         data.forEach((element) => {
           switch (element.type) {
             case "OPE":
@@ -200,7 +216,9 @@ function EventCalendar(props) {
 
   const renderDialogFooter = () => {
     return (
+
       <div>
+          <div><Toast ref={toast} position="top-center"/></div>
         <Button
           label="Nie"
           icon="pi pi-times"

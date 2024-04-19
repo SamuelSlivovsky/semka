@@ -188,7 +188,22 @@ export default function ProfileCard(props) {
       }`,
       { headers }
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+          // Kontrola ci je token expirovany (status:410)
+        } else if (response.status === 410) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((data) => {
         setPatientRecipes(data);
       });

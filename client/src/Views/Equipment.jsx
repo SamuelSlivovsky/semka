@@ -38,7 +38,22 @@ export default function Equipment() {
   useEffect(() => {
     const headers = { authorization: "Bearer " + token };
     fetch(`vybavenie/all/${userDataHelper.UserInfo.userid}`, { headers })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+          // Kontrola ci je token expirovany (status:410)
+        } else if (response.status === 410) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((data) => {
         setProducts(data);
       });
@@ -247,7 +262,22 @@ export default function Equipment() {
     if (departments.length < 1) {
       const headers = { authorization: "Bearer " + token };
       fetch(`lekar/oddelenia/${userDataHelper.UserInfo.userid}`, { headers })
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+            // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+            // Token expiroval redirect na logout
+            toast.current.show({
+              severity: "error",
+              summary: "Session timeout redirecting to login page",
+              life: 999999999,
+            });
+            setTimeout(() => {
+              navigate("/logout");
+            }, 3000);
+          }
+        })
         .then((data) => {
           //setDepartments(data);
           let array = data.map((item) => {
