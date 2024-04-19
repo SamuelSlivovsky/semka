@@ -113,8 +113,9 @@ export default function MeetingForm() {
 
   const getDoctors = () => {
     const token = localStorage.getItem("hospit-user");
+    const userData = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
-    fetch("/selects/zoznamLekarov", { headers })
+    fetch(`/selects/zoznamLekarov/${userData.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setDoctors(data);

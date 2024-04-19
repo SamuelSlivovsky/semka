@@ -27,6 +27,7 @@ async function getPopisZaznamu(id) {
     console.log(zaznam);
     return zaznam.rows;
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }
@@ -42,6 +43,7 @@ async function getPriloha(id) {
     console.log(result);
     return result.rows[0].DATA;
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }
@@ -69,7 +71,18 @@ async function insertHospitalizacia(body) {
       id_lozka: body.id_lozka,
     });
   } catch (err) {
-    throw new Error("Database error: " + err);
+    if (err.errorNum && err.errorNum === 20002) {
+      console.error("Dátum ukončenia nesmie byť pred dátumom začiatku");
+      throw new Error("Dátum ukončenia nesmie byť pred dátumom začiatku");
+    } else if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else if (err.errorNum && err.errorNum === 20000) {
+      console.error("Pacient už je priradený na hospitalizáciu v danom čase");
+      throw new Error("Pacient už je priradený na hospitalizáciu v danom čase");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
@@ -95,7 +108,15 @@ async function insertOperacia(body) {
       nazov: body.nazov,
     });
   } catch (err) {
-    throw new Error("Database error: " + err);
+    if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else if (err.errorNum && err.errorNum === 20000) {
+      console.error("Pacient už je priradený na operáciu v danom čase");
+      throw new Error("Pacient už je priradený na operáciu v danom čase");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
@@ -120,7 +141,12 @@ async function insertVysetrenie(body) {
       nazov: body.nazov,
     });
   } catch (err) {
-    console.log(err);
+    if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
@@ -139,6 +165,7 @@ async function getZaznamy(id) {
     });
     return result.rows;
   } catch (err) {
+    throw new Error("Database error: " + err);
     console.log(err);
   }
 }

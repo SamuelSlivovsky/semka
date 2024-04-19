@@ -10,11 +10,12 @@ import { Checkbox } from "primereact/checkbox";
 import { Calendar } from "primereact/calendar";
 import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
-export default function PatientForm() {
+export default function PatientForm(props) {
   const [showMessage, setShowMessage] = useState(false);
   const [cities, setCities] = useState([]);
   const [filteredPsc, setFilteredPsc] = useState(null);
-
+  const [insurances, setInsurances] = useState([]);
+  const profile = props.profile;
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
@@ -25,10 +26,14 @@ export default function PatientForm() {
         array = res.map((item) => item);
         setCities(array);
       });
+    fetch("/poistovna/all", { headers })
+      .then((response) => response.json())
+      .then((res) => {
+        setInsurances(res);
+      });
   }, []); // eslint-disable-line;
   const validate = (data) => {
     let errors = {};
-
     if (!data.meno) {
       errors.meno = "Meno je povinné";
     }
@@ -38,13 +43,22 @@ export default function PatientForm() {
     if (!data.cudzinec && !data.rod_cislo) {
       errors.rod_cislo = "Rodné číslo je povinné";
     }
+    if (!data.cudzinec && !data.poistovna) {
+      errors.poistovna = "Poisťovňa je povinná";
+    }
+    if (!data.cudzinec && !data.poistenec) {
+      errors.poistenec = "Číslo poistenca je povinné";
+    }
     if (!data.psc) {
       errors.psc = "PSČ je povinné";
+    }
+    if (!data.tel) {
+      errors.tel = "Telefón je povinný";
     }
     if (!data.dat_od) {
       errors.dat_od = "Dátum zápisu je povinný";
     }
-    console.log(errors);
+
     return errors;
   };
 
@@ -76,11 +90,21 @@ export default function PatientForm() {
             : null,
         pohlavie: data.pohlavie,
         typ_krvi: data.typ_krvi,
+        poistenec: data.poistenec,
+        poistovna: data.poistovna?.ICO,
+        tel: data.tel,
+        mail: data.mail,
       }),
     };
-    await fetch("/add/pacient", requestOptionsPatient).then(() =>
-      setShowMessage(true)
-    );
+    if (profile && profile != null) {
+      await fetch("/patient/update", requestOptionsPatient).then(() =>
+        setShowMessage(true)
+      );
+    } else {
+      await fetch("/add/pacient", requestOptionsPatient).then(() =>
+        setShowMessage(true)
+      );
+    }
 
     form.restart();
   };
@@ -144,16 +168,36 @@ export default function PatientForm() {
         <Form
           onSubmit={onSubmit}
           initialValues={{
-            rod_cislo: "",
-            email: "",
-            meno: "",
-            priezvisko: "",
-            psc: "",
-            telefon: "",
-            cudzinec: false,
-            dat_narodenia: null,
+            rod_cislo: profile && profile != null ? profile.ROD_CISLO : "",
+            mail: profile && profile != null ? profile.EMAIL : "",
+            meno: profile && profile != null ? profile.MENO : "",
+            priezvisko: profile && profile != null ? profile.PRIEZVISKO : "",
+            psc: profile && profile != null ? profile.PSC : "",
+            tel: profile && profile != null ? profile.TELEFON : "",
+            cudzinec:
+              profile && profile != null
+                ? profile.CUDZINEC == 0
+                  ? false
+                  : true
+                : false,
+            dat_narodenia:
+              profile && profile != null
+                ? new Date(profile.DATUM_NARODENIA)
+                : null,
             pohlavie: "M",
-            typ_krvi: "0-",
+            typ_krvi: profile && profile != null ? profile.TYP_KRVI : "0-",
+            poistenec: profile && profile != null ? profile.ID_POISTENCA : 0,
+            poistovna:
+              profile && profile != null
+                ? insurances.find(
+                    (item) => item.NAZOV == profile.NAZOV_POISTOVNE
+                  )
+                : null,
+            ulica: profile && profile != null ? profile.ULICA : "",
+            dat_od:
+              profile && profile != null
+                ? new Date(profile.DATUM_ZAPISU)
+                : new Date(),
           }}
           validate={validate}
           render={({ handleSubmit, form, values }) => (
@@ -356,6 +400,108 @@ export default function PatientForm() {
                   </div>
                 )}
               />
+              {!values.cudzinec ? (
+                <>
+                  <Field
+                    name="poistenec"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label
+                          htmlFor="poistenec"
+                          className={classNames({
+                            "p-error": isFormFieldValid(meta),
+                          })}
+                        >
+                          Číslo poistenca*
+                        </label>
+                        <InputMask
+                          mask="99999999"
+                          {...input}
+                          id="poistenec"
+                          className={classNames({
+                            "p-invalid": isFormFieldValid(meta),
+                          })}
+                        />
+                        {getFormErrorMessage(meta)}
+                      </div>
+                    )}
+                  />
+                  <Field
+                    name="poistovna"
+                    render={({ input, meta }) => (
+                      <div className="field col-12">
+                        <label
+                          htmlFor="poistovna"
+                          className={classNames({
+                            "p-error": isFormFieldValid(meta),
+                          })}
+                        >
+                          Poisťovňa*
+                        </label>
+                        <Dropdown
+                          id="poistovna"
+                          options={insurances}
+                          optionLabel="NAZOV"
+                          {...input}
+                          className={classNames({
+                            "p-invalid": isFormFieldValid(meta),
+                          })}
+                        />
+                        {getFormErrorMessage(meta)}
+                      </div>
+                    )}
+                  />
+                </>
+              ) : (
+                ""
+              )}
+              <Field
+                name="tel"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label
+                      htmlFor="tel"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Telefónne číslo*
+                    </label>
+                    <InputText
+                      id="basic"
+                      {...input}
+                      placeholder="+4210912345678"
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
+              <Field
+                name="mail"
+                render={({ input, meta }) => (
+                  <div className="field col-12">
+                    <label
+                      htmlFor="mail"
+                      className={classNames({
+                        "p-error": isFormFieldValid(meta),
+                      })}
+                    >
+                      Email
+                    </label>
+                    <InputText
+                      id="basic"
+                      {...input}
+                      className={classNames({
+                        "p-invalid": isFormFieldValid(meta),
+                      })}
+                    />
+                    {getFormErrorMessage(meta)}
+                  </div>
+                )}
+              />
               <Field
                 name="dat_od"
                 render={({ input, meta }) => (
@@ -374,7 +520,6 @@ export default function PatientForm() {
                       dateFormat="dd.mm.yy"
                       mask="99.99.9999"
                       showIcon
-                      showTime
                       className={classNames({
                         "p-invalid": isFormFieldValid(meta),
                       })}

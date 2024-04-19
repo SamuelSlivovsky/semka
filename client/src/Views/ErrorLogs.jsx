@@ -20,7 +20,6 @@ export default function ErrorLogs() {
 
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
-        const userDataHelper = GetUserData(token);
         const headers = {authorization: "Bearer " + token};
         fetch(`logs/getLogs`, {headers})
             .then((response) => {
@@ -37,6 +36,13 @@ export default function ErrorLogs() {
                     setTimeout(() => {
                         navigate("/logout")
                     }, 3000)
+                } else {
+                    // Inak iny problem
+                    toast.current.show({
+                        severity: 'error',
+                        summary: "Nastal problém s načítaním dát",
+                        life: 999999999
+                    });
                 }
             })
             .then((data) => {

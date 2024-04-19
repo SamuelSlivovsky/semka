@@ -9,7 +9,9 @@ import { Calendar } from "primereact/calendar";
 import { FileUpload } from "primereact/fileupload";
 import GetUserData from "../Auth/GetUserData";
 import { InputText } from "primereact/inputtext";
+import { Toast } from "primereact/toast";
 export default function ExaminationForm(props) {
+  const toast = useRef(null);
   const [showMessage, setShowMessage] = useState(false);
   const [base64Data, setBase64Data] = useState(null);
   const fileUploader = useRef(null);
@@ -45,10 +47,30 @@ export default function ExaminationForm(props) {
         nazov: data.nazov,
       }),
     };
-    const responsePatient = await fetch(
-      "/add/vysetrenie",
-      requestOptionsPatient
-    ).then(() => setShowMessage(true));
+    await fetch("/add/vysetrenie", requestOptionsPatient)
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage.error);
+        } else {
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "Úspešné vytvorenie nového vyšetrenia",
+            life: 6000,
+          });
+          fileUploader.current.clear();
+          setBase64Data(null);
+        }
+      })
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: error.message,
+          life: 6000,
+        });
+      });
 
     form.restart();
   };
@@ -106,6 +128,7 @@ export default function ExaminationForm(props) {
       style={{ width: "100%", marginTop: "2rem" }}
       className="p-fluid grid formgrid"
     >
+      <Toast ref={toast} />
       <Dialog
         visible={showMessage}
         onHide={() => setShowMessage(false)}
@@ -260,11 +283,7 @@ export default function ExaminationForm(props) {
                   maxFileSize={5000000000}
                   onSelect={customBase64Uploader}
                   uploadHandler={customBase64Uploader}
-                  emptyTemplate={
-                    <p className="m-0">
-                      Drag and drop files to here to upload.
-                    </p>
-                  }
+                  emptyTemplate={<p className="m-0">Sem pridajte obrázok.</p>}
                 />
               </div>
 

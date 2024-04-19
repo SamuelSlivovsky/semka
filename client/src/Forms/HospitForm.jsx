@@ -2,15 +2,16 @@ import React, { useState, useRef, useEffect } from "react";
 import { Form, Field } from "react-final-form";
 import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
 import { InputMask } from "primereact/inputmask";
 import { classNames } from "primereact/utils";
 import { Calendar } from "primereact/calendar";
 import { FileUpload } from "primereact/fileupload";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
+import { Toast } from "primereact/toast";
 import GetUserData from "../Auth/GetUserData";
 export default function HospitForm(props) {
+  const toast = useRef(null);
   const [showMessage, setShowMessage] = useState(false);
   const [base64Data, setBase64Data] = useState(null);
   const [rooms, setRooms] = useState([]);
@@ -29,6 +30,7 @@ export default function HospitForm(props) {
     if (!data.datum_do) {
       errors.datum_do = "Dátum ukončenia je povinný";
     }
+
     return errors;
   };
 
@@ -66,11 +68,31 @@ export default function HospitForm(props) {
         id_lozka: data.lozko.ID_LOZKA,
       }),
     };
-    await fetch("/add/hospitalizacia", requestOptionsPatient).then(() =>
-      setShowMessage(true)
-    );
-
-    form.restart();
+    await fetch("/add/hospitalizacia", requestOptionsPatient)
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage.error);
+        } else {
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "Úspešné vytvorenie novej hospitalizácie",
+            life: 6000,
+          });
+          form.restart();
+          fileUploader.current.clear();
+          setBase64Data(null);
+        }
+      })
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: error.message,
+          life: 6000,
+        });
+      });
   };
 
   const isFormFieldValid = (meta) => !!(meta.touched && meta.error);
@@ -125,7 +147,7 @@ export default function HospitForm(props) {
   const getLozka = (e) => {
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
-    fetch(`lekar/neobsadeneLozka/${e.value.ID_MIESTNOSTI}`, { headers })
+    fetch(`lekar/lozka/${e.value.ID_MIESTNOSTI}`, { headers })
       .then((res) => res.json())
       .then((data) => {
         setBeds(data);
@@ -137,23 +159,7 @@ export default function HospitForm(props) {
       style={{ width: "100%", marginTop: "2rem" }}
       className="p-fluid grid formgrid"
     >
-      <Dialog
-        visible={showMessage}
-        onHide={() => setShowMessage(false)}
-        position="top"
-        footer={dialogFooter}
-        showHeader={false}
-        breakpoints={{ "960px": "80vw" }}
-        style={{ width: "30vw" }}
-      >
-        <div className="flex align-items-center flex-column pt-6 px-3">
-          <i
-            className="pi pi-check-circle"
-            style={{ fontSize: "5rem", color: "var(--green-500)" }}
-          ></i>
-          <h5>Úspešné vytvorenie hospitalizácie</h5>
-        </div>
-      </Dialog>
+      <Toast ref={toast} />
 
       <div className="field col-12">
         <Form

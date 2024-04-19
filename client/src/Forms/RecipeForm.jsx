@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Form, Field } from "react-final-form";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -9,8 +9,9 @@ import { Dropdown } from "primereact/dropdown";
 import GetUserData from "../Auth/GetUserData";
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
+import { Toast } from "primereact/toast";
 export default function RecipeForm(props) {
-  const [showMessage, setShowMessage] = useState(false);
+  const toast = useRef(null);
   const [drugs, setDrugs] = useState([]);
 
   useEffect(() => {
@@ -63,8 +64,28 @@ export default function RecipeForm(props) {
         opakujuci: data.check ? 1 : 0,
       }),
     };
-    await fetch("/add/recept", requestOptions).then(() => setShowMessage(true));
-
+    await fetch("/add/recept", requestOptions)
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage.error);
+        } else {
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "Úspešné zapísanie receptu",
+            life: 6000,
+          });
+        }
+      })
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: error.message,
+          life: 6000,
+        });
+      });
     form.restart();
   };
 
@@ -75,38 +96,12 @@ export default function RecipeForm(props) {
     );
   };
 
-  const dialogFooter = (
-    <div className="flex justify-content-center">
-      <Button
-        label="OK"
-        className="p-button-text"
-        autoFocus
-        onClick={() => setShowMessage(false)}
-      />
-    </div>
-  );
   return (
     <div
       style={{ width: "100%", marginTop: "2rem" }}
       className="p-fluid grid formgrid"
     >
-      <Dialog
-        visible={showMessage}
-        onHide={() => setShowMessage(false)}
-        position="top"
-        footer={dialogFooter}
-        showHeader={false}
-        breakpoints={{ "960px": "80vw" }}
-        style={{ width: "30vw" }}
-      >
-        <div className="flex align-items-center flex-column pt-6 px-3">
-          <i
-            className="pi pi-check-circle"
-            style={{ fontSize: "5rem", color: "var(--green-500)" }}
-          ></i>
-          <h5>Úspešné vytvorenie receptu</h5>
-        </div>
-      </Dialog>
+      <Toast ref={toast} />
 
       <div className="field col-12">
         <Form

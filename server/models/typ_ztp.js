@@ -25,7 +25,16 @@ async function insertTypZtp(body) {
     });
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    throw new Error("Database error: " + err);
+    console.log(err);
+    if (err.errorNum && err.errorNum === 20000) {
+      console.error("Pacient už má toto postihnutie v zadanom dátume");
+      throw new Error("Pacient už má toto postihnutie v zadanom dátume");
+    } else if (err.errorNum && err.errorNum === 20001) {
+      console.error("Pacient s týmto rodným číslom neexistuje");
+      throw new Error("Pacient s týmto rodným číslom neexistuje");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
