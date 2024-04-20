@@ -70,11 +70,36 @@ async function getListOrders(id) {
 async function confirmOrder(body) {
     try {
         let conn = await database.getConnection();
-
+        let sqlStatement = null;
         const selDate = new Date(body.sel_date);
         const formattedDate = `${selDate.getDate()}-${selDate.getMonth() + 1}-${selDate.getFullYear()}`;
 
-        const sqlStatement = `begin
+        sqlStatement = `select TO_CHAR(ZOZNAM_LIEKOV) AS ZOZNAM_LIEKOV from OBJEDNAVKA where ID_OBJEDNAVKY = :id_obj`;
+        console.log(body);
+        let jsonArray = await conn.execute(sqlStatement, {
+            id_obj: body.id_obj
+        });
+
+        let jsonData = JSON.parse(jsonArray.rows[0].ZOZNAM_LIEKOV);
+
+        const arrayJson = Array.isArray(jsonData) ? jsonData : [jsonData];
+        const index = arrayJson.findIndex(item => item.id === body.id);
+
+        if(index !== -1 && arrayJson[index].amount !== body.poc) {
+            arrayJson[index].amount = body.poc;
+            const jsonArray = JSON.stringify(arrayJson);
+
+            sqlStatement = `begin
+                        update_order_json(:order_id, :zoz);
+                    end;`;
+            console.log(body);
+            let array = await conn.execute(sqlStatement, {
+                order_id: body.id_obj,
+                zoz: jsonArray
+            });
+        }
+
+        sqlStatement = `begin
                         confirm_order(:id_l, :poc, :id_obj, :sel_date);
                     end;`;
         console.log(body);

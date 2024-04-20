@@ -243,10 +243,10 @@ export default function Orders() {
                     // If ZOZNAM_LIEKOV is a string, parse it as JSON
                     if (jsonData && jsonData[0] && jsonData[0].ZOZNAM_LIEKOV) {
                         const zoznamLiekovArray = JSON.parse(jsonData[0].ZOZNAM_LIEKOV);
-
+                        const xmlContentArray = Array.isArray(zoznamLiekovArray) ? zoznamLiekovArray : [zoznamLiekovArray];
                         setLoading(false);
-                        setXmlContent(zoznamLiekovArray);
-                        setUpdatedContent(zoznamLiekovArray);
+                        setXmlContent(xmlContentArray);
+                        setUpdatedContent(xmlContentArray);
                     } else {console.error('Invalid ZOZNAM_LIEKOV structure:', jsonData);
                     }
                 } catch (error) {
@@ -398,12 +398,6 @@ export default function Orders() {
         setProducts(_orders);
         setDeleteProductDialog(false);
         setOrder(emptyOrders);
-        toast.current.show({
-            severity: "success",
-            summary: "Successful",
-            detail: "Objednávka bola odstránená",
-            life: 3000,
-        });
     };
 
     //Function for checking input for medications in order while confirming arrival of order
