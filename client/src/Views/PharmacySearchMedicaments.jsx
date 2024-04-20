@@ -9,6 +9,7 @@ import { useNavigate } from "react-router";
 import GetUserData from "../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
+import { TabView, TabPanel } from "primereact/tabview";
 
 export default function PharmacySearchMedicaments(props) {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -470,6 +471,13 @@ export default function PharmacySearchMedicaments(props) {
   };
 
   const header = renderHeader();
+  const volnopredajne = searchLiekyLekarenskySklad.filter(
+    (med) => med.NA_PREDPIS === "N"
+  );
+  const naPredpis = searchLiekyLekarenskySklad.filter(
+    (med) => med.NA_PREDPIS === "A"
+  );
+
   return (
     <div>
       <Toast ref={toast} position="top-center" />
@@ -495,53 +503,114 @@ export default function PharmacySearchMedicaments(props) {
             />
           </div>
         ) : (
-          <DataTable
-            value={searchLiekyLekarenskySklad}
-            responsiveLayout="scroll"
-            selectionMode="single"
-            paginator
-            rows={15}
-            selection={selectedRow}
-            onSelectionChange={(e) => handleClick(e.value)}
-            header={header}
-            filters={filters}
-            filterDisplay="menu"
-            globalFilterFields={[
-              "NAZOV_LEKARNE",
-              "NAZOV_LIEKU",
-              "UCINNA_LATKA",
-              "NA_PREDPIS",
-              "DATUM_TRVANLIVOSTI",
-              "POCET",
-            ]}
-            emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
-          >
-            <Column
-              field="NAZOV_LEKARNE"
-              header={"Názov lekárne"}
-              filter
-            ></Column>
-            <Column field="NAZOV_LIEKU" header={"Názov lieku"} filter></Column>
-            <Column
-              field="UCINNA_LATKA"
-              header={"Účinná látka"}
-              filter
-            ></Column>
-            <Column
-              field="NA_PREDPIS"
-              header={"Výdaj"}
-              body={(rowData) =>
-                rowData.NA_PREDPIS === "A" ? "Na predpis" : "Voľnopredajný"
-              }
-              filter
-            ></Column>
-            <Column
-              field="DATUM_TRVANLIVOSTI"
-              header={"Dátum expirácie"}
-              filter
-            ></Column>
-            <Column field="POCET" header={"Ks na sklade"} filter></Column>
-          </DataTable>
+          <TabView>
+            <TabPanel header="Voľnopredajné lieky">
+              <DataTable
+                value={volnopredajne}
+                responsiveLayout="scroll"
+                selectionMode="single"
+                paginator
+                rows={15}
+                selection={selectedRow}
+                onSelectionChange={(e) => handleClick(e.value)}
+                header={header}
+                filters={filters}
+                filterDisplay="menu"
+                globalFilterFields={[
+                  "NAZOV_LEKARNE",
+                  "NAZOV_LIEKU",
+                  "UCINNA_LATKA",
+                  "NA_PREDPIS",
+                  "DATUM_TRVANLIVOSTI",
+                  "POCET",
+                ]}
+                emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+              >
+                <Column
+                  field="NAZOV_LEKARNE"
+                  header={"Názov lekárne"}
+                  filter
+                ></Column>
+                <Column
+                  field="NAZOV_LIEKU"
+                  header={"Názov lieku"}
+                  filter
+                ></Column>
+                <Column
+                  field="UCINNA_LATKA"
+                  header={"Účinná látka"}
+                  filter
+                ></Column>
+                <Column
+                  field="NA_PREDPIS"
+                  header={"Výdaj"}
+                  body={(rowData) =>
+                    rowData.NA_PREDPIS === "A" ? "Na predpis" : "Voľnopredajný"
+                  }
+                  filter
+                ></Column>
+                <Column
+                  field="DATUM_TRVANLIVOSTI"
+                  header={"Dátum expirácie"}
+                  filter
+                ></Column>
+                <Column field="POCET" header={"Ks na sklade"} filter></Column>
+              </DataTable>
+            </TabPanel>
+            <TabPanel header="Lieky na predpis">
+              <DataTable
+                value={naPredpis}
+                responsiveLayout="scroll"
+                selectionMode="single"
+                paginator
+                rows={15}
+                selection={selectedRow}
+                onSelectionChange={(e) => handleClick(e.value)}
+                header={header}
+                filters={filters}
+                filterDisplay="menu"
+                globalFilterFields={[
+                  "NAZOV_LEKARNE",
+                  "NAZOV_LIEKU",
+                  "UCINNA_LATKA",
+                  "NA_PREDPIS",
+                  "DATUM_TRVANLIVOSTI",
+                  "POCET",
+                ]}
+                emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+              >
+                <Column
+                  field="NAZOV_LEKARNE"
+                  header={"Názov lekárne"}
+                  filter
+                ></Column>
+                <Column
+                  field="NAZOV_LIEKU"
+                  header={"Názov lieku"}
+                  filter
+                ></Column>
+                <Column
+                  field="UCINNA_LATKA"
+                  header={"Účinná látka"}
+                  filter
+                ></Column>
+                <Column
+                  field="NA_PREDPIS"
+                  header={"Výdaj"}
+                  body={(rowData) =>
+                    rowData.NA_PREDPIS === "A" ? "Na predpis" : "Voľnopredajný"
+                  }
+                  filter
+                ></Column>
+                <Column
+                  field="DATUM_TRVANLIVOSTI"
+                  header={"Dátum expirácie"}
+                  filter
+                ></Column>
+                <Column field="POCET" header={"Ks na sklade"} filter></Column>
+              </DataTable>
+            </TabPanel>
+          </TabView>
         )}
       </div>
       <Dialog
