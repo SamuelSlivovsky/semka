@@ -13,13 +13,11 @@ import GetUserData from "../Auth/GetUserData";
 import {ProgressSpinner} from "primereact/progressspinner";
 import {Dropdown} from "primereact/dropdown";
 import {InputNumber} from "primereact/inputnumber";
+import {Calendar} from "primereact/calendar";
+import {json} from "react-router-dom";
 import {useNavigate} from "react-router";
 
 export default function Orders() {
-
-    //------------------------------------------------------------------------------------------------
-    let skladId = 30;
-    //------------------------------------------------------------------------------------------------
 
     let emptyOrders = {
         ID_OBJEDNAVKY: null,
@@ -40,13 +38,17 @@ export default function Orders() {
     const [selectedDrug, setSelectedDrug] = useState(null);
     const [order, setOrder] = useState(emptyOrders);
     const [drugs, setDrugs] = useState(null);
+    const [idOdd, setIdOdd] = useState(null);
+    const [nazov, setNazov] = useState(null);
     const [showDialog, setShowDialog] = useState(false);
     const [addOrderDialog, setAddOrderDialog] = useState(false);
     const [deleteProductDialog, setDeleteProductDialog] = useState(false);
+    const [confirmOrder, setConfirmOrder] = useState(false);
     const [changeProductDialog, setChangeProductDialog] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedRow, setSelectedRow] = useState(null);
     const [xmlContent, setXmlContent] = useState("");
+    const [updatedContent, setUpdatedContent] = useState(null);
     const toast = useRef(null);
     const navigate = useNavigate();
     const [selectedMedications, setSelectedMedications] = useState([]);
@@ -59,7 +61,6 @@ export default function Orders() {
 
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
-        const userDataHelper = GetUserData(token);
         const headers = { authorization: "Bearer " + token };
         fetch(`objednavky/all`, { headers })
             .then((response) => {
@@ -84,9 +85,29 @@ export default function Orders() {
         //initFilter();
     }, []);
 
+    useEffect(() => {
+        const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
+        const headers = { authorization: "Bearer " + token };
+        fetch(`sklad/getIdOdd/${userDataHelper.UserInfo.userid}`, { headers })
+            .then((response) => response.json())
+            .then((data) => {
+                setNazov(data[0].NAZOV_NEM);
+                if(data[0].ID_ODDELENIA !== null) {
+                    //Employee is from department
+                    setIdOdd(true);
+                } else if(data[0].ID_LEKARNE !== null) {
+                    //Employee is from pharmacy
+                    setIdOdd(true);
+                    setNazov(data[0].NAZOV_LEK);
+                }
+            });
+    }, []);
+
     //Async function for inserting new data into DB
     async function insertData() {
         const token = localStorage.getItem("hospit-user");
+        const userDataHelper = GetUserData(token);
 
         const requestOptions = {
             method: "POST",
@@ -96,13 +117,81 @@ export default function Orders() {
             },
             body: JSON.stringify({
                 zoznam_liekov: formattedString,
-                id_sklad: skladId
+                usr_id: userDataHelper.UserInfo.userid
             }),
         };
-        const response = await fetch("/objednavky/add", requestOptions).catch((err) =>
-            console.log(err)
-        );
 
+        fetch(`/objednavky/add`, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+
+                if(data.length > 0) {
+                    let _orders = [...products];
+                    let _order = { ... order};
+                    _order.ID_OBJEDNAVKY = data[0].ID_OBJEDNAVKY;
+                    _order.ID_SKLAD = data[0].ID_SKLAD;
+                    _order.ZOZNAM_LIEKOV = formattedString;
+
+                    let currentDate = new Date();
+                    let day = currentDate.getDate();
+                    let month = currentDate.getMonth() + 1;
+                    let year = currentDate.getFullYear();
+
+                    _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
+                    _orders.push(_order);
+
+                    console.log(_order);
+                    console.log(_orders);
+
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Successful",
+                        detail: "Objednávka vola vytvorená",
+                        life: 3000,
+                    });
+
+                    setSelectedDrug(null);
+                    setSelectedMedications([]);
+                    setAddOrderDialog(false);
+                    setProducts(_orders);
+                    setOrder(emptyOrders);
+                }
+
+            });
+
+    }
+
+    async function confirmOrderDB(medication) {
+        const token = localStorage.getItem("hospit-user");
+
+        const requestOptions = {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                authorization: "Bearer " + token,
+            },
+            body: JSON.stringify({
+                id: medication.id,
+                poc: medication.amount,
+                id_obj: order.ID_OBJEDNAVKY,
+                sel_date: order.DATUM_DODANIA
+            }),
+        };
+
+        fetch("/objednavky/confirmOrder", requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                    return false;
+                }
+            });
+        return true;
     }
 
     //Async function for removing order
@@ -115,10 +204,29 @@ export default function Orders() {
                 authorization: "Bearer " + token,
             },
             body: JSON.stringify({
-                id_obj: _order.ID_OBJEDNAVKY
+                id_obj: _order.ID_OBJEDNAVKY,
+                dat: _order.DATUM_DODANIA
             }),
         };
-        const response = await fetch("/objednavky/deleteOrder", requestOptions);
+        fetch(`/objednavky/deleteOrder`, requestOptions)
+            .then((response) => response.json())
+            .then((data) => {
+                if(data.message) {
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Error",
+                        detail: data.message,
+                        life: 3000,
+                    });
+                } else {
+                    toast.current.show({
+                        severity: "success",
+                        summary: "Successful",
+                        detail: "Objednávka bola odstránená",
+                        life: 3000,
+                    });
+                }
+            });
     }
 
     //Function that will be called after clicking on one of the rows
@@ -139,19 +247,22 @@ export default function Orders() {
             })
             .then((data) => {
                 try {
+
                     const jsonData = JSON.parse(data);
+
+                    if(jsonData[0].DATUM_DODANIA === null) {
+                        setConfirmOrder(true);
+                        order.ID_OBJEDNAVKY = value.ID_OBJEDNAVKY;
+                    }
 
                     // If ZOZNAM_LIEKOV is a string, parse it as JSON
                     if (jsonData && jsonData[0] && jsonData[0].ZOZNAM_LIEKOV) {
                         const zoznamLiekovArray = JSON.parse(jsonData[0].ZOZNAM_LIEKOV);
-
-                        // Now zoznamLiekovArray should be an array of objects
-                        //console.log('Parsed ZOZNAM_LIEKOV:', zoznamLiekovArray);
-
+                        const xmlContentArray = Array.isArray(zoznamLiekovArray) ? zoznamLiekovArray : [zoznamLiekovArray];
                         setLoading(false);
-                        setXmlContent(zoznamLiekovArray);
-                    } else {
-                        console.error('Invalid ZOZNAM_LIEKOV structure:', jsonData);
+                        setXmlContent(xmlContentArray);
+                        setUpdatedContent(xmlContentArray);
+                    } else {console.error('Invalid ZOZNAM_LIEKOV structure:', jsonData);
                     }
                 } catch (error) {
                     console.error('Error parsing data:', error);
@@ -180,10 +291,8 @@ export default function Orders() {
 
     //Add new order function
     const addOrder = () => {
-        //Checking if there are any values below 0
-        let _orders = [...products];
-        let _order = { ... order};
 
+        //Checking if there are any values below 0
         let checkPocet = true;
         if(selectedMedications.some((medication) => medication.quantity <= 0)) {
             toast.current.show({
@@ -216,6 +325,7 @@ export default function Orders() {
         //Add whole list and create new order
         if(unique && checkPocet && selectedMedications.length > 0) {
             const transformedData = selectedMedications.map((item) => ({
+                id: item.selectedDrug.ID_LIEK,
                 name: item.selectedDrug.NAZOV,
                 amount: item.quantity
             }));
@@ -223,36 +333,78 @@ export default function Orders() {
 
             insertData();
 
-            const lastOrder = _orders[_orders.length - 1];
-            _order.ID_OBJEDNAVKY = lastOrder ? lastOrder.ID_OBJEDNAVKY + 1 : 1;
-            _order.ID_SKLAD = skladId;
-            _order.ZOZNAM_LIEKOV = formattedString;
-
-            var currentDate = new Date();
-            var day = currentDate.getDate();
-            var month = currentDate.getMonth() + 1;
-            var year = currentDate.getFullYear();
-
-            _order.DATUM_OBJEDNAVKY = day + "." + month + "." + year;
-            _orders.push(_order);
-
-            console.log(_order);
-            console.log(_orders);
-
-            toast.current.show({
-                severity: "success",
-                summary: "Successful",
-                detail: "Objednávka vola vytvorená",
-                life: 3000,
-            });
-
-            setSelectedDrug(null);
-            setSelectedMedications([]);
-            setAddOrderDialog(false);
-            setProducts(_orders);
-            setOrder(emptyOrders);
         }
+
         hideDialog();
+    }
+
+    //Function for confirming orders
+    const confirmOrderDelivery = () => {
+
+        const selectedDate = new Date(order.DATUM_DODANIA);
+        const currentDate = new Date();
+        let finish = true;
+
+        if(selectedDate > currentDate) {
+            finish = false;
+        } else {
+            for (let index = 0; index < updatedContent.length; index++) {
+                const medication = updatedContent[index];
+
+                if(!confirmOrderDB(medication)) {
+                    //There was an error while performing confirmation
+                    finish = false;
+                    break;
+                }
+
+            }
+
+        }
+
+        if(xmlContent.length === 0) {
+            //Remove order because there are no medications that arrived
+            order.DATUM_DODANIA = null;
+            deleteProduct();
+        } else {
+            if(finish) {
+                toast.current.show({
+                    severity: "success",
+                    summary: "Successful",
+                    detail: "Objednávka bola potvrdená a lieky boli pridané do skladu",
+                    life: 3000,
+                });
+
+                console.log(order);
+
+                const _products = products.filter(product => product.ID_OBJEDNAVKY !== order.ID_OBJEDNAVKY);
+                const index = products.findIndex(product => product.ID_OBJEDNAVKY === order.ID_OBJEDNAVKY);
+
+                const date = new Date(order.DATUM_DODANIA);
+                const formattedDate = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
+
+                console.log(formattedDate);
+
+                order.ID_SKLAD = products[index].ID_SKLAD;
+                order.DATUM_OBJEDNAVKY = products[index].DATUM_OBJEDNAVKY;
+                order.DATUM_DODANIA = formattedDate;
+
+                _products.push(order);
+
+                setProducts(_products);
+
+            } else {
+                toast.current.show({
+                    severity: "error",
+                    summary: "Error",
+                    detail: "Zadaný dátum je väčší ako aktuálny dátum",
+                    life: 3000,
+                });
+            }
+        }
+
+        setOrder(emptyOrders);
+        onHide();
+
     }
 
     const deleteProduct = () => {
@@ -261,12 +413,36 @@ export default function Orders() {
         setProducts(_orders);
         setDeleteProductDialog(false);
         setOrder(emptyOrders);
-        toast.current.show({
-            severity: "success",
-            summary: "Successful",
-            detail: "Objednávka bola odstránená",
-            life: 3000,
-        });
+    };
+
+    //Function for checking input for medications in order while confirming arrival of order
+    const handleInputChange = (event, item, index, updatedContent, setUpdatedContent) => {
+        const { value } = event.target;
+        let inputValue = value === '' ? '' : Math.min(parseInt(value.replace(/\D/g, ''), 10), item.amount);
+
+        if (inputValue < 1) {
+            inputValue = 1;
+        }
+
+        const updatedItem = { ...item, amount: inputValue };
+
+        const newUpdatedContent = [...updatedContent];
+        newUpdatedContent[index] = updatedItem;
+
+        setUpdatedContent(newUpdatedContent);
+    };
+
+    //Function for removing medication from order
+    const handleItemRemoval = (index) => {
+        // Remove the item from xmlContent
+        const newXmlContent = [...xmlContent];
+        newXmlContent.splice(index, 1);
+        setXmlContent(newXmlContent);
+
+        // Remove the item from updatedContent
+        const newUpdatedContent = [...updatedContent];
+        newUpdatedContent.splice(index, 1);
+        setUpdatedContent(newUpdatedContent);
     };
 
     const confirmDeleteProduct = (product) => {
@@ -276,7 +452,7 @@ export default function Orders() {
 
     // Function to add selected medication to the list
     const addMedication = () => {
-        setSelectedMedications([...selectedMedications, { medication: "", quantity: 0 }]);
+        setSelectedMedications([...selectedMedications, { NAZOV: "", ID_LIEK: 0, quantity: 0}]);
     };
 
     // Function to remove medication from the list
@@ -295,8 +471,9 @@ export default function Orders() {
     //Selected Order hide
     const onHide = () => {
         setXmlContent(null);
-        setShowDialog(false);
         setSelectedRow(null);
+        setShowDialog(false);
+        setConfirmOrder(false);
     };
 
     //New order hide
@@ -343,15 +520,20 @@ const leftToolbarTemplate = () => {
     );
 
     const actionBodyTemplate = (rowData) => {
-        return (
-            <React.Fragment>
-                <Button
-                    icon="pi pi-trash"
-                    className="p-button-rounded p-button-warning"
-                    onClick={() => confirmDeleteProduct(rowData)}
-                />
-            </React.Fragment>
-        );
+        if (!rowData.DATUM_DODANIA) {
+            return (
+                <React.Fragment>
+                    <Button
+                        icon="pi pi-trash"
+                        className="p-button-rounded p-button-warning"
+                        onClick={() => confirmDeleteProduct(rowData)}
+                    />
+                </React.Fragment>
+            );
+        } else {
+            //If DATUM_DODANIA is null return nothing, It cannot be deleted
+            return null;
+        }
     };
 
     const deleteProductDialogFooter = (
@@ -384,9 +566,17 @@ return (
 
         <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
 
+        {idOdd !== null ? <div style={{marginLeft: "20px"}}>
+                <h2>{nazov}</h2>
+            </div> :
+            <div style={{marginLeft: "20px"}}>
+                <h2>Centrálny sklad {nazov}</h2>
+            </div>
+        }
+
         <DataTable
-            value={products} //products
-            selection={selectedRow} //selectedProducts
+            value={products}
+            selection={selectedRow}
             selectionMode="single"
             onSelectionChange={(e) => (dialog ? handleClick(e.value) : "")}
             dataKey="ID_OBJEDNAVKY"
@@ -425,23 +615,62 @@ return (
 
         <Dialog
             visible={showDialog && dialog}
-            style={{ width: "50vw" }}
+            style={{ maxWidth: "50vw" }}
             footer={NaN} //productDialogFooter
             onHide={() => onHide()}
         >
             {loading ? (
-                <div style={{ width: "100%", display: "flex" }}>
+                <div style={{ width: "500px", display: "flex" }}>
                     <ProgressSpinner />
                 </div>
             ) : selectedRow !== null ? (
-                <div style={{ maxWidth: "100%", overflowWrap: "break-word" }}>
+                <div style={{ maxWidth: "500px", overflowWrap: "break-word" }}>
                     <h3>Zoznam objednaných liekov</h3>
                     {xmlContent.map((item, index) => (
                         <div key={index}>
+                            <p>ID Lieku: {item.id}</p>
                             <p>Názov: {item.name}</p>
-                            <p>Počet: {item.amount}</p>
+                            {confirmOrder ?
+                                <div>
+                                    <p>Počet: <input
+                                    type="text"
+                                    value={updatedContent[index].amount}
+                                    onChange={(e) => handleInputChange(e, item, index, updatedContent, setUpdatedContent)}
+                                    pattern="[0-9]*" // Allow only numeric input
+                                    inputMode="numeric"
+                                /></p>
+                                <p></p>
+                                <button onClick={() => handleItemRemoval(index)}>X</button>
+                                </div>
+                            : (<p>Počet: {item.amount}</p>) }
+
                         </div>
                     ))}
+                </div>
+            ) : (
+                ""
+            )}
+            {confirmOrder  ? (
+                <div>
+                    <h2>Potvrdenie príchodu objednávky</h2>
+                    <div className="formgird grid">
+                        <div className="field col">
+                            <label htmlFor="DATUM_DODANIA">Dátum dodania objednávky</label>
+                            <div>
+
+                                <Calendar
+                                    value={order.DATUM_DODANIA}
+                                    dateFormat="dd.mm.yy"
+                                    onChange={(e) =>
+                                        setOrder({ ...order, DATUM_DODANIA: e.value })
+                                    }
+                                ></Calendar>
+                            </div>
+                        </div>
+                    </div>
+                    <div className={"submit-button"}>
+                        <Button style={{width: "50%"}} label="Potvrdiť doručenie" onClick={confirmOrderDelivery} />
+                    </div>
                 </div>
             ) : (
                 ""
@@ -461,19 +690,27 @@ return (
             <label>Zoznam liekov</label>
             {selectedMedications.map((selectedMedication, index) => (
                 <div key={index} style={{paddingTop: "20px"}}>
-                    <div className="field col">
-                        <Dropdown
-                            style={{width: "auto"}}
-                            value={selectedMedication.selectedDrug}
-                            options={drugs}
-                            onChange={(e) => {
-                                const updatedMedications = [...selectedMedications];
-                                updatedMedications[index].selectedDrug = e.value;
-                                setSelectedMedications(updatedMedications);
-                            }}
-                            optionLabel="NAZOV"
-                            placeholder="Vyberte liek"
-                        />
+                    <div className="formgrid grid">
+                        <div className="field col">
+                            <Dropdown
+                                style={{width: "auto"}}
+                                value={selectedMedication.selectedDrug}
+                                options={drugs}
+                                onChange={(e) => {
+                                    const updatedMedications = [...selectedMedications];
+                                    updatedMedications[index].selectedDrug = e.value;
+                                    setSelectedMedications(updatedMedications);
+                                }}
+                                optionLabel="NAZOV"
+                                filter
+                                showClear
+                                filterBy="NAZOV"
+                                filterMatchMode="startsWith"
+                                placeholder="Vybrať liek"
+                                resetFilterOnHide
+                                required
+                            />
+                        </div>
                     </div>
                     <label style={{paddingLeft: "15px"}} htmlFor="quantity">Počet</label>
                     <div className="field col">

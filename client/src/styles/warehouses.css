@@ -1,5 +1,14 @@
 .submit-button {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     padding-top: 20px;
+}
+
+.stats-view {
+    width: 98%;
+    height: auto;
+    min-height: 500px;
+    margin-left: 1%;
+    padding: 10px;
+
 }

@@ -12,19 +12,22 @@ function HomeCard(props) {
       <div
         style={{
           backgroundImage: `url(${props.icon})`,
+          position: "relative", // Ensure the badge can be positioned absolutely within
         }}
         className="card-content"
       >
-        {props.isCalendar ? (
-          <>
-            <p className="m-0 calendar-card-day">
-              {new Date().toLocaleString("en-US", { day: "2-digit" })}
-            </p>
-          </>
-        ) : (
-          ""
+        {props.isCalendar && (
+          <p className="m-0 calendar-card-day">
+            {new Date().toLocaleString("en-US", { day: "2-digit" })}
+          </p>
         )}
       </div>
+      {props.countMed >= 0 && (
+        <div className="card-badge-medicament">{props.countMed}</div>
+      )}
+      {props.countAid >= 0 && (
+        <div className="card-badge-medicalAid">{props.countAid}</div>
+      )}
     </Card>
   );
 }

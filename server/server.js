@@ -12,6 +12,9 @@ const credentials = require("./middleware/credentials");
 // ROUTES
 const lekarRoute = require("./routes/lekarRoute");
 const logRoute = require("./routes/logRoute");
+const pharmacyManagersRoute = require("./routes/pharmacyManagersRoute");
+const pharmacyStorageRoute = require("./routes/pharmacyStorageRoute");
+const pharmacyPrescriptionsRoute = require("./routes/PharmacyPrescriptionsRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
 const patientRoute = require("./routes/patientRoute");
@@ -28,6 +31,7 @@ const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
 const poistovnaRoute = require("./routes/poistovnaRoute");
 const ordersRoute = require("./routes/ordersRoute");
 const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
+const warehouseStatistics = require("./routes/warehouseStatisticsRoute");
 // Set session date format
 async function setSessionDateFormat() {
   const database = require("./database/Database");
@@ -63,7 +67,10 @@ app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
 app.use("/logs", logRoute);
 app.use("/sklad", storageRoute);
+app.use("/lekarenskySklad", pharmacyStorageRoute);
 app.use("/lekar", lekarRoute);
+app.use("/pharmacyManagers", pharmacyManagersRoute);
+app.use("/pharmacyPrescriptions", pharmacyPrescriptionsRoute);
 app.use("/selects", selectsRoute);
 app.use("/calendar", calendarRoute);
 app.use("/patient", patientRoute);
@@ -79,6 +86,7 @@ app.use("/hospitalizacia", hospitalizaciaRoute);
 app.use("/poistovna", poistovnaRoute);
 app.use("/objednavky", ordersRoute);
 app.use("/presuny", warehouseTransfersRoute);
+app.use("/skladStatistiky", warehouseStatistics);
 
 const users = {};
 
