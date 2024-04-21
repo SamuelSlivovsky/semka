@@ -1,6 +1,9 @@
 const database = require("../database/Database");
 
-const client = require("twilio")(accountSid, authToken);
+const client = require("twilio")(
+  process.env.ACCOUNT_SID,
+  process.env.AUTH_TOKEN_NOTIFICATION
+);
 
 async function getZoznamAktualnychReceptov() {
   try {

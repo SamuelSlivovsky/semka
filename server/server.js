@@ -32,7 +32,6 @@ const poistovnaRoute = require("./routes/poistovnaRoute");
 const ordersRoute = require("./routes/ordersRoute");
 const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
 const warehouseStatistics = require("./routes/warehouseStatisticsRoute");
-const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
 // Set session date format
 async function setSessionDateFormat() {
   const database = require("./database/Database");
@@ -88,7 +87,6 @@ app.use("/poistovna", poistovnaRoute);
 app.use("/objednavky", ordersRoute);
 app.use("/presuny", warehouseTransfersRoute);
 app.use("/skladStatistiky", warehouseStatistics);
-app.use("/hospitalizacia", hospitalizaciaRoute);
 
 const users = {};
 
