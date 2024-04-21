@@ -265,9 +265,6 @@ export default function Storage() {
             product.ID_LIEK
         ) {
           insertData();
-          if(idOdd) {
-            product.ID_ODDELENIA = idOdd[0].ID_ODDELENIA;
-          }
           _product.DAT_EXPIRACIE =
               product.DAT_EXPIRACIE.getDate() +
               "." +
@@ -354,9 +351,6 @@ export default function Storage() {
     setDeleteProductsDialog(true);
   };
 
-  //@TODO could be changed, when deleting multiple just send there array containing ID_S and EXPIRATION DATES
-  //@TODO then it could be faster (dont need to connect onto DB X times)
-  //@TODO currently it is just sending one by one
   const deleteSelectedProducts = () => {
     selectedProducts.map((selProduct) => deleteSarza(selProduct));
     let _products = products.filter((val) => !selectedProducts.includes(val));

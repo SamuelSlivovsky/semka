@@ -1,6 +1,3 @@
-//@TODO add ordering on critical stock in warehouse for all medications that are in hospital
-//@TODO also add ordering when medicine will expire in X days
-
 //Imports
 import React, { useState, useEffect, useRef } from "react";
 import { TabView, TabPanel } from 'primereact/tabview';

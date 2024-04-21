@@ -1,7 +1,5 @@
 const sklad = require("../models/sklad");
 
-//@TODO add checks for input params here
-
 module.exports = {
   //Function for selecting all medications of department
   getDrugsOfDeparment: (req, res) => {
@@ -64,7 +62,7 @@ module.exports = {
 
   getExpiredMedications: (req, res) => {
     const date = new Date(req.body.exp_date);
-    if(!isNaN(date.getTime())) {
+    if(isNaN(date.getTime()) || req.body.exp_date === "null") {
       return res.status(400).json({message: `Musíte zadať dátum expirácie`});
     }
     req.body.exp_date = `${date.getDate()}.${date.getMonth() + 1}.${date.getFullYear()}`;
