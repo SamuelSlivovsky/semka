@@ -210,7 +210,7 @@ async function getMedicationsByAmount(body) {
     const sqlStatement = `select unique(ID_LIEK) from TRVANLIVOST_LIEKU join SKLAD on TRVANLIVOST_LIEKU.ID_SKLAD = SKLAD.ID_SKLAD
             join NEMOCNICA on NEMOCNICA.ID_NEMOCNICE = SKLAD.ID_NEMOCNICE
             join ZAMESTNANCI on NEMOCNICA.ID_NEMOCNICE = ZAMESTNANCI.ID_NEMOCNICE
-            where POCET < :amount and CISLO_ZAM = :usr_id`;
+            where POCET < :amount and POCET != 0 and CISLO_ZAM = :usr_id`;
     console.log(body);
     let result = await conn.execute(sqlStatement, {
       usr_id: body.usr_id,

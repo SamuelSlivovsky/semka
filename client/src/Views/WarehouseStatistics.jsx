@@ -310,9 +310,14 @@ export default function WarehouseStatistics() {
         setFirstChartData(null);
         setSecondChartData(null);
         setChartOptions(null);
+        setShowStats(false);
         setMonths(null);
         setDays(null);
     };
+
+    const hide = () => {
+        setShowOrderDialog(false);
+    }
 
     const productDialogFooter = (
         <React.Fragment>
@@ -320,7 +325,7 @@ export default function WarehouseStatistics() {
                 label="Cancel"
                 icon="pi pi-times"
                 className="p-button-text"
-                onClick={hideDialog}
+                onClick={hide}
             />
             <Button
                 label="Save"
@@ -429,7 +434,7 @@ export default function WarehouseStatistics() {
                 modal
                 className="p-fluid"
                 footer={productDialogFooter}
-                onHide={hideDialog}
+                onHide={hide}
             >
                 <p>Objednávka sa vytvára pre liek:
                     <h4>{warehouseMedications.find(medication => medication.ID_LIEK === selectedMedication)?.NAZOV}</h4></p>

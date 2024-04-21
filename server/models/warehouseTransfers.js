@@ -1,4 +1,5 @@
 const database = require("../database/Database");
+const exp = require("constants");
 
 async function getFinishedTransfers(id) {
     try {
@@ -182,41 +183,86 @@ async function getHospitalMedication(id) {
     }
 }
 
-//@TODO there is issue when searching by exp_date, it will fetch nothing even when there are already expired medications
 async function getSelectedMedications(id, exp_date, usr_id) {
     try {
         let conn = await database.getConnection();
         let sqlStatement, result = null;
+
+        sqlStatement = `select ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id`;
+        result = await conn.execute(sqlStatement, {
+            usr_id: usr_id
+        });
+
         if(exp_date === "null") {
-            sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
-                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV as NEMOCNICA, POCET from SKLAD
+            if(result.rows[0].ID_ODDELENIA === null) {
+                sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
+                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV AS NEMOCNICA, POCET, TYP_ODDELENIA from SKLAD
                             join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
                             left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
                             join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
+                            join ODDELENIE on SKLAD.ID_ODDELENIA = ODDELENIE.ID_ODDELENIA
                             where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
-                            and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
-                            group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET
+                            and SKLAD.ID_ODDELENIA is not null
+                            and POCET > 0
+                            group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET, TYP_ODDELENIA
                             order by DATUM_TRVANLIVOSTI, POCET fetch first 1 row only`;
-            result = await conn.execute(sqlStatement, {
-                id_l: id,
-                usr_id: usr_id
-            });
+                result = await conn.execute(sqlStatement, {
+                    id_l: id
+                });
+            } else {
+                sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
+                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV AS NEMOCNICA, POCET, TYP_ODDELENIA from SKLAD
+                            join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                            left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
+                            join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
+                            join ODDELENIE on SKLAD.ID_ODDELENIA = ODDELENIE.ID_ODDELENIA
+                            where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
+                            and POCET > 0
+                            and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
+                            group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET, TYP_ODDELENIA
+                            order by DATUM_TRVANLIVOSTI, POCET fetch first 1 row only`;
+                result = await conn.execute(sqlStatement, {
+                    id_l: id,
+                    usr_id: usr_id
+                });
+            }
         } else {
-            sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
-                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV as NEMOCNICA, POCET from SKLAD
+            if(result.rows[0].ID_ODDELENIA === null) {
+                sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
+                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV AS NEMOCNICA, TYP_ODDELENIA, POCET from SKLAD
                         join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
                         left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
                         join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
+                        join ODDELENIE on SKLAD.ID_ODDELENIA = ODDELENIE.ID_ODDELENIA
                         where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
                         and DATUM_TRVANLIVOSTI > :exp_date
-                        and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
-                        group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET
+                        and POCET > 0
+                        and SKLAD.ID_ODDELENIA is not null
+                        group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET, TYP_ODDELENIA
                         order by DATUM_TRVANLIVOSTI, POCET fetch first 1 row only`;
-            result = await conn.execute(sqlStatement, {
-                id_l: id,
-                exp_date: exp_date,
-                usr_id: usr_id
-            });
+                result = await conn.execute(sqlStatement, {
+                    id_l: id,
+                    exp_date: exp_date
+                });
+            } else {
+                sqlStatement = `select TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, TO_CHAR(MIN(TRVANLIVOST_LIEKU.DATUM_TRVANLIVOSTI),'DD.MM.YYYY') AS DATUM_TRVANLIVOSTI,
+                            SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV AS NEMOCNICA, TYP_ODDELENIA, POCET from SKLAD
+                        join NEMOCNICA on SKLAD.ID_NEMOCNICE = NEMOCNICA.ID_NEMOCNICE
+                        left join TRVANLIVOST_LIEKU on SKLAD.ID_SKLAD = TRVANLIVOST_LIEKU.ID_SKLAD
+                        join LIEK on TRVANLIVOST_LIEKU.ID_LIEK = LIEK.ID_LIEK
+                        join ODDELENIE on SKLAD.ID_ODDELENIA = ODDELENIE.ID_ODDELENIA
+                        where TRVANLIVOST_LIEKU.ID_LIEK = :id_l
+                        and DATUM_TRVANLIVOSTI > :exp_date
+                        and POCET > 0
+                        and SKLAD.ID_ODDELENIA != (select ZAMESTNANCI.ID_ODDELENIA from ZAMESTNANCI where CISLO_ZAM = :usr_id)
+                        group by TRVANLIVOST_LIEKU.ID_LIEK, LIEK.NAZOV, SKLAD.ID_ODDELENIA, NEMOCNICA.NAZOV, POCET, TYP_ODDELENIA
+                        order by DATUM_TRVANLIVOSTI, POCET fetch first 1 row only`;
+                result = await conn.execute(sqlStatement, {
+                    id_l: id,
+                    exp_date: exp_date,
+                    usr_id: usr_id
+                });
+            }
         }
 
         return result.rows;
@@ -228,7 +274,8 @@ async function getSelectedMedications(id, exp_date, usr_id) {
 async function createTransfer(body) {
     try {
         let conn = await database.getConnection();
-        let sqlStatement = `begin
+        let sqlStatement = null;
+        sqlStatement = `begin
                     insert_medication_transfer(:zoz_liekov, :id_od, :usr_id);
                 end;`;
         console.log(body);
@@ -240,7 +287,8 @@ async function createTransfer(body) {
 
         console.log("Rows inserted " + result.rowsAffected);
 
-        sqlStatement = `SELECT ID_PRESUN, ID_SKLAD_OBJ, ID_ODDELENIA_LIEKU
+        sqlStatement = `SELECT ID_PRESUN, ID_SKLAD_OBJ, ID_ODDELENIA_LIEKU, (select TYP_ODDELENIA from ODDELENIE where ID_ODDELENIA = :id_odd) AS TYP_ODDELENIA, 
+       (select NAZOV from NEMOCNICA join ODDELENIE on NEMOCNICA.ID_NEMOCNICE = ODDELENIE.ID_NEMOCNICE where ID_ODDELENIA = :id_odd) AS NAZOV
             FROM PRESUN_LIEKOV WHERE ID_PRESUN = (select MAX(ID_PRESUN) from PRESUN_LIEKOV where ID_ODDELENIA_LIEKU = :id_odd)`;
         let finalResult = await conn.execute(sqlStatement, {
             id_odd: body.id_oddelenia
@@ -283,20 +331,35 @@ async function confirmTransfer(body) {
             pocet: body.poc
         });
 
-        sqlStatement = `select ID_SKLAD_OBJ, ZOZNAM_LIEKOV from PRESUN_LIEKOV where ID_PRESUN = :id`;
+        sqlStatement = `select TO_CHAR(ZOZNAM_LIEKOV) AS ZOZNAM_LIEKOV from PRESUN_LIEKOV where ID_PRESUN = :id`;
         console.log(body);
-        let transfers = await conn.execute(sqlStatement, {
-            id_lieku: body.id_l
+        let filter = await conn.execute(sqlStatement, {
+            id: body.id_pres
         });
 
-        sqlStatement = `begin
-                    delete_reocurring_transfers(:id, :zoz);
-                end;`;
+        sqlStatement = `select ID_PRESUN, TO_CHAR(ZOZNAM_LIEKOV) AS ZOZNAM_LIEKOV from PRESUN_LIEKOV 
+                    where ID_SKLAD_OBJ = (select ID_SKLAD_OBJ from PRESUN_LIEKOV where ID_PRESUN = :id) and ID_PRESUN != :id`;
         console.log(body);
-        let final = await conn.execute(sqlStatement, {
-            id: transfers.rows[0].ID_SKLAD_OBJ,
-            zoz: transfers.rows[0].ZOZNAM_LIEKOV
+        let transfers = await conn.execute(sqlStatement, {
+            id: body.id_pres
         });
+
+        const filteredRows = transfers.rows.filter(row => {
+            const zoznamLiekov = JSON.parse(row.ZOZNAM_LIEKOV);
+            const filterVal = JSON.parse(filter.rows[0].ZOZNAM_LIEKOV);
+            return zoznamLiekov.id === filterVal.id &&
+                zoznamLiekov.amount === filterVal.amount;
+        });
+
+        for(const row of filteredRows) {
+            sqlStatement = `begin
+                    delete_reocurring_transfers(:id);
+                end;`;
+            console.log(body);
+            let final = await conn.execute(sqlStatement, {
+                id: row.ID_PRESUN
+            });
+        }
 
         console.log("Rows inserted " + result.rowsAffected);
         return "OK";
@@ -352,7 +415,8 @@ async function createTransferSelMedAmount(body) {
             }
         }
 
-        const finalStatement = `select ID_PRESUN, ID_SKLAD_OBJ, ID_ODDELENIA_LIEKU, DATUM_PRESUNU, STATUS from PRESUN_LIEKOV
+        const finalStatement = `select ID_PRESUN, ID_SKLAD_OBJ, ID_ODDELENIA_LIEKU, DATUM_PRESUNU, STATUS, (select TYP_ODDELENIA from ODDELENIE where ID_ODDELENIA = :id_odd) AS TYP_ODDELENIA,
+       (select NAZOV from NEMOCNICA join ODDELENIE on NEMOCNICA.ID_NEMOCNICE = ODDELENIE.ID_NEMOCNICE where ID_ODDELENIA = :id_odd) AS NAZOV from PRESUN_LIEKOV
                             where ID_SKLAD_OBJ = :id_skl order by ID_PRESUN fetch first :inserted row only`;
         console.log(body);
         const insertedTransfersResult = await conn.execute(finalStatement, {

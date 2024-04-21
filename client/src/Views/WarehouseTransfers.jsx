@@ -252,7 +252,6 @@ export default function WarehouseTransfers() {
 
     //Function for creating new Transfer from selected hospital
     async function createHospitalTransfer() {
-        //@TODO when creating Transfer Hospital and Department are not added into Array
 
         //Declaration of constants
         const _transfer = [...waitingTransfers];
@@ -325,11 +324,15 @@ export default function WarehouseTransfers() {
                             _tr.ID_PRESUN = data[0].ID_PRESUN;
                             _tr.ID_SKLAD_OBJ = data[0].ID_SKLAD_OBJ;
                             _tr.ID_ODDELENIA_LIEKU = data[0].ID_ODDELENIA_LIEKU;
+                            _tr.TYP_ODDELENIA = data[0].TYP_ODDELENIA;
+                            _tr.NAZOV = data[0].NAZOV;
 
                             _transfer.push({..._tr});
 
                             if(finishedInserts === arrays.length) {
                                 setShowHospitalMedications(false);
+                                setShowSelectedMedicationsSearch(false);
+
                                 setWaitingTransfers(_transfer);
                                 toast.current.show({
                                     severity: "success",
@@ -415,7 +418,8 @@ export default function WarehouseTransfers() {
             .then((response) => response.json())
             .then(async (data) => {
                 //Data now should contain JSON with all required medications for transfer, now it needs to be separated
-                const zoznamLiekovArray = JSON.parse(data[0].ZOZNAM_LIEKOV);
+                const jsonData = JSON.parse(data[0].ZOZNAM_LIEKOV);
+                const zoznamLiekovArray = Array.isArray(jsonData) ? jsonData : [jsonData];
 
                 for (const medications of zoznamLiekovArray) {
                     console.log(medications);
@@ -516,20 +520,20 @@ export default function WarehouseTransfers() {
             }),
         };
 
-        fetch(`/sklad/getExpiredMedications`,  requestOptions)
+        fetch(`sklad/getExpiredMedications`,  requestOptions)
             .then((response) => response.json())
             .then((data) => {
-                if(data.length > 0) {
-                    searchSelectedMedications(data);
-                    setShowSelectedMedicationsSearch(true);
-                    setExpirityDate(emptyExpDate);
-                } else {
+                if(data.message > 0) {
                     toast.current.show({
                         severity: "error",
                         summary: "Error",
-                        detail: "Pre zadaný dátum neboli nájdené žiadne lieky",
+                        detail: data.message,
                         life: 3000,
                     });
+                } else {
+                    searchSelectedMedications(data);
+                    setShowSelectedMedicationsSearch(true);
+                    setExpirityDate(emptyExpDate);
                 }
             });
     }
@@ -614,6 +618,8 @@ export default function WarehouseTransfers() {
                         _transfer.ID_PRESUN = retData.ID_PRESUN;
                         _transfer.ID_SKLAD_OBJ = retData.ID_SKLAD_OBJ;
                         _transfer.ID_ODDELENIA_LIEKU = retData.ID_ODDELENIA_LIEKU;
+                        _transfer.TYP_ODDELENIA = data[0].TYP_ODDELENIA;
+                        _transfer.NAZOV = data[0].NAZOV;
                         _transfer.DATUM_PRESUNU = retData.DATUM_PRESUNU;
                         _transfer.STATUS = retData.STATUS;
                         _transfers.push({..._transfer});
@@ -1068,6 +1074,11 @@ export default function WarehouseTransfers() {
                     rowsPerPageOptions={[15, 20]}
                 >
                     <Column
+                        field="DATUM_TRVANLIVOSTI"
+                        header="Dátum trvanlivosti"
+                        style={{ minWidth: "12rem" }}
+                    ></Column>
+                    <Column
                         field="ID_LIEK"
                         header="Id lieku"
                         style={{ minWidth: "8rem" }}
@@ -1078,13 +1089,8 @@ export default function WarehouseTransfers() {
                         style={{ minWidth: "16rem" }}
                     ></Column>
                     <Column
-                        field="DATUM_TRVANLIVOSTI"
-                        header="Dátum trvanlivosti"
-                        style={{ minWidth: "12rem" }}
-                    ></Column>
-                    <Column
-                        field="ID_ODDELENIA"
-                        header="ID oddelenia"
+                        field="TYP_ODDELENIA"
+                        header="Názov oddelenia"
                         style={{ minWidth: "10rem" }}
                     ></Column>
                     <Column

@@ -74,18 +74,18 @@ export default function Storage() {
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`sklad/getIdOdd/${userDataHelper.UserInfo.userid}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setNazov(data[0].NAZOV_NEM);
-        if (data[0].ID_ODDELENIA !== null) {
-          //Employee is from department
-          setIdOdd(true);
-        } else if (data[0].ID_LEKARNE !== null) {
-          //Employee is from pharmacy
-          setIdOdd(true);
-          setNazov(data[0].NAZOV_LEK);
-        }
-      });
+        .then((response) => response.json())
+        .then((data) => {
+          setNazov(data[0].NAZOV_NEM);
+          if(data[0].ID_ODDELENIA !== null) {
+            //Employee is from department
+            setIdOdd(true);
+          } else if(data[0].ID_LEKARNE !== null) {
+            //Employee is from pharmacy
+            setIdOdd(true);
+            setNazov(data[0].NAZOV_LEK);
+          }
+        });
     initFilter();
   }, []);
 
@@ -132,44 +132,45 @@ export default function Storage() {
           med_id: products[i].ID_LIEK,
           exp_date: products[i].DAT_EXPIRACIE,
           poc_liekov: products[i].POCET,
-          min_poc: distNum,
+          min_poc: distNum
         }),
       };
 
-      fetch(`/sklad/distributeMedications`, requestOptions)
-        .then((response) => response.json())
-        .then((res) => {
-          if (res.message) {
-            message = res.message;
-          }
-          finished++;
-          if (finished === products.length && message !== null) {
-            toast.current.show({
-              severity: "error",
-              summary: "Error",
-              detail: message,
-              life: 3000,
-            });
-          } else if (finished === products.length) {
-            toast.current.show({
-              severity: "success",
-              summary: "Successful",
-              detail: "Lieky boli úspešne distribované do odelení",
-              life: 3000,
-            });
-            setTimeout(() => {
-              console.log("Paused");
-              window.location.reload();
-            }, 3000);
-          }
-        });
+      fetch(`/sklad/distributeMedications`,  requestOptions)
+          .then((response) => response.json())
+          .then((res) => {
+            if(res.message) {
+              message = res.message;
+            }
+            finished++;
+            if(finished === products.length && message !== null) {
+              toast.current.show({
+                severity: "error",
+                summary: "Error",
+                detail: message,
+                life: 3000,
+              });
+            } else if (finished === products.length){
+              toast.current.show({
+                severity: "success",
+                summary: "Successful",
+                detail: "Lieky boli úspešne distribované do odelení",
+                life: 3000,
+              });
+              setTimeout(() => {
+                console.log("Paused");
+                window.location.reload();
+              }, 3000);
+            }
+          });
+
     }
   };
 
   const onInputDistChange = (e) => {
     const inputValue = e.target.value;
 
-    if (inputValue === "" || /^\d+$/.test(inputValue)) {
+    if (inputValue === '' || /^\d+$/.test(inputValue)) {
       setDistNum(inputValue);
     }
   };
@@ -179,11 +180,11 @@ export default function Storage() {
       const token = localStorage.getItem("hospit-user");
       const headers = { authorization: "Bearer " + token };
       fetch(`lieky/all`, { headers })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log(data);
-          setDrugs(data);
-        });
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            setDrugs(data);
+          });
     }
 
     setProduct(emptyProduct);
@@ -278,9 +279,6 @@ export default function Storage() {
           product.ID_LIEK
         ) {
           insertData();
-          if (idOdd) {
-            product.ID_ODDELENIA = idOdd[0].ID_ODDELENIA;
-          }
           _product.DAT_EXPIRACIE =
             product.DAT_EXPIRACIE.getDate() +
             "." +
@@ -340,9 +338,7 @@ export default function Storage() {
   };
 
   const deleteProduct = () => {
-    let _products = products.filter(
-      (val) => val.DAT_EXPIRACIE !== product.DAT_EXPIRACIE
-    );
+    let _products = products.filter((val) => val.DAT_EXPIRACIE !== product.DAT_EXPIRACIE);
     deleteSarza(product);
     setProducts(_products);
     setDeleteProductDialog(false);
@@ -369,9 +365,6 @@ export default function Storage() {
     setDeleteProductsDialog(true);
   };
 
-  //@TODO could be changed, when deleting multiple just send there array containing ID_S and EXPIRATION DATES
-  //@TODO then it could be faster (dont need to connect onto DB X times)
-  //@TODO currently it is just sending one by one
   const deleteSelectedProducts = () => {
     selectedProducts.map((selProduct) => deleteSarza(selProduct));
     let _products = products.filter((val) => !selectedProducts.includes(val));
