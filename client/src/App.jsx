@@ -148,20 +148,6 @@ function App() {
       icon="patient-icon"
     />,
     <SidebarButton
-      key="8"
-      visibleLeft={visibleLeft}
-      path="/statistics"
-      label="Štatistiky"
-      icon="stat-icon"
-    />,
-    <SidebarButton
-      key="10"
-      visibleLeft={visibleLeft}
-      path="/sklad"
-      label="Sklad"
-      icon="storage-icon"
-    />,
-    <SidebarButton
       key="13"
       visibleLeft={visibleLeft}
       path="/adminPanel"
@@ -627,9 +613,7 @@ function App() {
   const renderAdminRoutes = () => {
     return (
       <>
-        <Route path="/statistics" element={<Statistics></Statistics>}></Route>
         <Route path="/patients" element={<TabPatients></TabPatients>}></Route>
-        <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/adminPanel" element={<AdminPanel />}></Route>
       </>
     );
