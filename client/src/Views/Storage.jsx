@@ -13,6 +13,7 @@ import { FilterMatchMode } from "primereact/api";
 import GetUserData from "../Auth/GetUserData";
 import "../App.css";
 import { wait } from "@testing-library/user-event/dist/utils";
+import {useNavigate} from "react-router";
 
 export default function Storage() {
   let emptyProduct = {
@@ -39,16 +40,32 @@ export default function Storage() {
   const [globalFilter, setGlobalFilter] = useState("");
   const [filter, setFilter] = useState(null);
   const toast = useRef(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`sklad/all/${userDataHelper.UserInfo.userid}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        setProducts(data);
-      });
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+            // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+            // Token expiroval redirect na logout
+            toast.current.show({
+              severity: "error",
+              summary: "Session timeout redirecting to login page",
+              life: 999999999,
+            });
+            setTimeout(() => {
+              navigate("/logout");
+            }, 3000);
+          }
+        })
+        .then((data) => {
+          setProducts(data);
+        });
     initFilter();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 

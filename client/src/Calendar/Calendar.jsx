@@ -4,12 +4,18 @@ import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import listPlugin from "@fullcalendar/list";
+import allLocales from "@fullcalendar/core/locales-all";
 import { Calendar } from "primereact/calendar";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
 import { SelectButton } from "primereact/selectbutton";
 import { ProgressBar } from "primereact/progressbar";
+import { Dropdown } from "primereact/dropdown";
 import "../styles/calendar.css";
+import {Toast} from "primereact/toast";
+import {useNavigate} from "react-router";
+
+
 
 function EventCalendar(props) {
   const [currentEvents, setCurrentEvents] = useState(null);
@@ -23,39 +29,83 @@ function EventCalendar(props) {
   const [eventType, setEventType] = useState(null);
   const [selectButtonValue, setSelectButtonValue] =
     useState("Detaily udalosti");
+  const [doctors, setDoctors] = useState([]);
+  const [selectedDoctor, setSelectedDoctor] = useState(null);
+  const [calendarKey, setCalendarKey] = useState(Date.now());
+  const [currentEvent, setCurrentEvent] = useState(null);
 
+  const navigate = useNavigate();
+  const toast = useRef(null);
   const calendarRef = useRef(null);
   const eventTypes = [
     { name: "Operácia", code: "OP" },
     { name: "Vyšetrenie", code: "EX" },
     { name: "Hospitalizácia", code: "HOSP" },
+    { name: "Konzílium", code: "KONZ" },
   ];
   const options = ["Detaily udalosti", "Zmeniť dátum udalosti"];
   const patientOptions = ["Detaily udalosti"];
 
   useEffect(() => {
+    fetchCalendar(props.userData.UserInfo.userid);
+    if (props.userData.UserInfo.role === 3) fetchDoctors();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const isAfterToday = (element) => {
+    return new Date(element.DAT_DO) > new Date();
+  };
+
+  const fetchCalendar = (userid) => {
+    setCalendarVisible(false);
+
     const token = localStorage.getItem("hospit-user");
     const headers = { authorization: "Bearer " + token };
     let route =
       props.userData.UserInfo.role === 2 || props.userData.UserInfo.role === 3
         ? "calendar/udalostiLekara/"
-        : props.userData.UserInfo.role === 4
+        : props.userData.UserInfo.role === 9999
         ? "calendar/udalostiPacienta/"
         : "calendar/udalostiLekara/";
-    fetch(`${route}${props.userData.UserInfo.userid}`, { headers })
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
+    fetch(
+      `${route}${
+        props.userData.UserInfo.role === 9999
+          ? userid.replace("/", "$")
+          : userid
+      }`,
+      { headers }
+    )
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      }).then((data) => {
         data.forEach((element) => {
           switch (element.type) {
             case "OPE":
               element.backgroundColor = "#00916E";
+
               break;
             case "VYS":
               element.backgroundColor = "#593F62";
+
               break;
             case "HOS":
               element.backgroundColor = "#8499B1";
+              element.end =
+                element.DAT_DO != null && isAfterToday(element)
+                  ? element.DAT_DO
+                  : null;
               break;
             case "KONZ":
               element.backgroundColor = "blue";
@@ -64,11 +114,29 @@ function EventCalendar(props) {
               break;
           }
         });
-        console.log(data);
         setCurrentEvents(data);
         setCalendarVisible(true);
+        setCalendarKey(Date.now());
       });
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  };
+
+  const fetchDoctors = () => {
+    const token = localStorage.getItem("hospit-user");
+    const headers = { authorization: "Bearer " + token };
+    fetch(`/lekar/lekari/${props.userData.UserInfo.userid}`, { headers })
+      .then((res) => res.json())
+      .then((result) => {
+        result = result.map((item) => {
+          return { ...item, name: `${item.MENO} ${item.PRIEZVISKO}` };
+        });
+        setSelectedDoctor(
+          result.find(
+            (item) => item.CISLO_ZAM == props.userData.UserInfo.userid
+          )
+        );
+        setDoctors(result);
+      });
+  };
 
   const handleEventClick = (clickInfo) => {
     setShowDialog(true);
@@ -84,19 +152,22 @@ function EventCalendar(props) {
         setEventType(eventTypes[2]);
         break;
       default:
-        setEventType(clickInfo.event._def.extendedProps.type);
+        setEventType(eventTypes[3]);
         break;
     }
     setCurrEventId(clickInfo.event._def.publicId);
     const startDate = new Date(clickInfo.event._instance.range.start);
     startDate.setHours(startDate.getHours() - 1);
     setEventDateStart(startDate);
+    setCurrentEvent(clickInfo.event);
     setCurrEventTitle(
       clickInfo.event._def.extendedProps.type +
         " - " +
-        clickInfo.event._def.extendedProps.MENO +
-        " " +
-        clickInfo.event._def.extendedProps.PRIEZVISKO
+        (clickInfo.event._def.extendedProps.MENO
+          ? clickInfo.event._def.extendedProps.MENO +
+            " " +
+            clickInfo.event._def.extendedProps.PRIEZVISKO
+          : clickInfo.event._def.extendedProps.DOVOD)
     );
   };
 
@@ -141,7 +212,6 @@ function EventCalendar(props) {
           currentEvent.setDates(startDate, endDate, {
             allDay: false,
           });
-          console.log("first");
           setShowConfirmChanges(false);
           setShowDialog(false);
         });
@@ -150,7 +220,9 @@ function EventCalendar(props) {
 
   const renderDialogFooter = () => {
     return (
+
       <div>
+          <div><Toast ref={toast} position="top-center"/></div>
         <Button
           label="Nie"
           icon="pi pi-times"
@@ -216,6 +288,7 @@ function EventCalendar(props) {
       </>
     ) : !showAddEvent ? (
       <>
+        {console.log(currentEvent)}
         <div className="field col-12">
           <h3 htmlFor="basic">Názov udalosti</h3>
           <p>{currEventTitle}</p>
@@ -223,12 +296,33 @@ function EventCalendar(props) {
         <div className="field col-12 ">
           <h3 htmlFor="basic">Začiatok udalosti</h3>
           <p>
-            {console.log(eventDateStart)}
             {eventDateStart !== null
               ? eventDateStart.toLocaleString("sk").replaceAll(". ", ".")
               : ""}
           </p>
         </div>
+        {currentEvent &&
+        currentEvent != null &&
+        currentEvent._def.extendedProps.DAT_DO ? (
+          <div className="field col-12 ">
+            <h3 htmlFor="basic">Koniec udalosti</h3>
+            <p>
+              {new Date(
+                currentEvent._def.extendedProps.DAT_DO
+              ).toLocaleDateString("de", {
+                day: "2-digit",
+                month: "2-digit",
+                year: "numeric",
+              })}
+              {" " +
+                new Date(
+                  currentEvent._def.extendedProps.DAT_DO
+                ).toLocaleTimeString()}
+            </p>
+          </div>
+        ) : (
+          ""
+        )}
         <div className="field col-12 ">
           <h3 htmlFor="basic">Typ udalosti</h3>
           <p>{eventType !== null ? eventType.name : ""}</p>
@@ -249,28 +343,59 @@ function EventCalendar(props) {
               style={{ height: "6px" }}
             ></ProgressBar>
           ) : (
-            <FullCalendar
-              plugins={[
-                dayGridPlugin,
-                timeGridPlugin,
-                interactionPlugin,
-                listPlugin,
-              ]}
-              ref={calendarRef}
-              headerToolbar={{
-                left: "prev,next today prevYear,nextYear",
-                center: "title",
-                right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
-              }}
-              initialView="dayGridMonth"
-              editable={true}
-              selectable={true}
-              weekends={true}
-              initialEvents={currentEvents}
-              eventClick={handleEventClick}
-              eventsSet={handleEvents}
-              locale="SK"
-            />
+            <div>
+              {props.userData.UserInfo.role === 3 ? (
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "10px",
+                    marginBottom: "10px",
+                    alignItems: "center",
+                  }}
+                >
+                  <label>
+                    <h2>Kalendár lekára</h2>
+                  </label>
+                  <Dropdown
+                    style={{ height: "50px" }}
+                    value={selectedDoctor}
+                    options={doctors}
+                    optionLabel="name"
+                    onChange={(e) => {
+                      setSelectedDoctor(e.value);
+                      fetchCalendar(e.value.CISLO_ZAM);
+                    }}
+                  />
+                </div>
+              ) : (
+                ""
+              )}
+
+              <FullCalendar
+                locales={allLocales}
+                key={calendarKey}
+                plugins={[
+                  dayGridPlugin,
+                  timeGridPlugin,
+                  interactionPlugin,
+                  listPlugin,
+                ]}
+                ref={calendarRef}
+                headerToolbar={{
+                  left: "prev,next today prevYear,nextYear",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+                }}
+                initialView="dayGridMonth"
+                editable={true}
+                selectable={true}
+                weekends={true}
+                initialEvents={currentEvents}
+                eventClick={handleEventClick}
+                eventsSet={handleEvents}
+                locale={"sk"}
+              />
+            </div>
           )}
         </Suspense>
       </div>
@@ -290,7 +415,10 @@ function EventCalendar(props) {
             <SelectButton
               value={selectButtonValue}
               options={
-                props.userData.UserInfo.role === 4 ? patientOptions : options
+                props.userData.UserInfo.role === 9999 ||
+                (eventType != null && eventType.code == "KONZ")
+                  ? patientOptions
+                  : options
               }
               onChange={(e) => setSelectButtonValue(e.value)}
               style={{

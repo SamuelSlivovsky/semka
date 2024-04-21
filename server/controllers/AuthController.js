@@ -3,6 +3,8 @@ const userModel = require("../models/user");
 var jwt = require("jsonwebtoken");
 const sklad = require("../models/sklad");
 const logy = require("../models/log_table");
+const {insertLog} = require("../models/log_table");
+const {insertLogs} = require("../utils/InsertLogs");
 require("dotenv").config();
 
 const handleRegister = async (req, res) => {
@@ -12,19 +14,19 @@ const handleRegister = async (req, res) => {
             .status(400)
             .json({message: "Vyžaduje sa používateľské meno a heslo."});
 
-    if (pwd.length < 8){
+    if (pwd.length < 8) {
         return res
             .status(400)
             .json({message: "Heslo musí mať aspoň 8 znakov."});
     }
-    if (!pwd.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)){
+    if (!pwd.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/)) {
         return res
             .status(400)
             .json({message: "Heslo musí obsahovať aspoň jedno veľké písmeno, jedno malé písmeno, jednu číslicu a jeden špeciálny znak."});
     }
 
-    // check for duplicate usernames in the db
     try {
+        // check for duplicate usernames in the db
         if (await userModel.userExists(userid)) {
             return res
                 .status(409)
@@ -33,7 +35,7 @@ const handleRegister = async (req, res) => {
         } else if (await userModel.userExistsInDB(userid)) {
             return res
                 .status(409)
-                .json({message: `Používateľ neexistuje v databáze`});
+                .json({message: `Používateľ neexistuje`});
         } else {
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
@@ -74,33 +76,47 @@ const handleRegister = async (req, res) => {
 };
 
 const handleLogin = async (req, res) => {
-
-    if (await logy.getNumberOfWrongLogins(req.body.ip)) {
-        return res
-            .status(401)
-            .json({message: "Príliš veľa neúspešných pokusov o prihlásenie z tejto IP adresy. Skúste to prosím neskôr."});
-    }
     const logbodyFailed = {
-        ...req.body,
+        ip: req.body.ip,
+        table: "USER_TAB",
         status: "failed login",
+        description: "User with ip " + req.body.ip + " has failed to log in",
     }
     const logbodyWrongParam = {
-        ...req.body,
+        ip: req.body.ip,
+        table: "USER_TAB",
         status: "Wrong parameters",
+        description: "User with ip " + req.body.ip + " has used wrong parameters to log in",
     }
+    function checkIP(ip) {
+        const ipFormat = /^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
+        return ipFormat.test(ip);
+    }
+    const numberOfWrongLogins = await logy.getNumberOfWrongLogins(req.body.ip);
 
+    if (!checkIP(req.body.ip) || numberOfWrongLogins) {
+        if (numberOfWrongLogins) {
+            return res
+                .status(401)
+                .json({message: "Príliš veľa neúspešných pokusov o prihlásenie z tejto IP adresy. Skúste to prosím neskôr."});
+        }
+        insertLogs(logbodyFailed);
+        return res
+            .status(400)
+            .json({message: "Neplatna IP adresa."});
+    }
     const {userid, pwd} = req.body;
     if (!userid || !pwd) {
-        insertLog(logbodyWrongParam)
+        insertLogs(logbodyWrongParam)
         return res
             .status(400)
             .json({message: "Vyžaduje sa používateľské meno a heslo."});
     }
     if (!(await userModel.userExists(userid))) {
-        insertLog(logbodyWrongParam)
+        insertLogs(logbodyFailed)
         return res
             .status(400)
-            .json({message: "Používateľ s týmto prihlasovacím menom neexistuje"}); //Does not exist
+            .json({message: "Používateľ s týmto prihlasovacím menom neexistuje"});
     }
 
     const foundUser = await userModel.getUserByUserId(userid);
@@ -133,7 +149,7 @@ const handleLogin = async (req, res) => {
         res.cookie("jwt", refreshToken, {httpOnly: true}); //1 day httponly cookie is not available to javascript
         res.status(200).json({accessToken}); //store in memory not in local storage
     } else {
-        insertLog(logbodyFailed)
+        insertLogs(logbodyFailed)
         res.status(409).json({message: "Používateľské meno alebo heslo je neplatné"});
     }
 };
@@ -187,23 +203,9 @@ const handleRefreshToken = async (req, res) => {
     });
 };
 
-const insertLog = async (body) => {
-    const logy = require("../models/log_table");
-    (async () => {
-        ret_val = await logy.insertLogFailedLogin(body);
-        return 200;
-    })().catch((err) => {
-        console.log("Error Kontroler");
-        console.error(err);
-        return 500;
-    });
-};
-
-
 module.exports = {
     handleRegister,
     handleLogin,
     handleLogout,
     handleRefreshToken,
-    insertLog,
 };

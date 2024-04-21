@@ -7,7 +7,7 @@ import TabPatients from "./Views/Tables/TabPatients";
 import Patient from "./Views/Patient";
 import { Register } from "./Auth/Register";
 import { Login } from "./Auth/Login";
-import Statistics from "./Views/Statistics";
+import Statistics from "./Statistics/Statistics";
 import Add from "./Views/Add";
 import SidebarButton from "./Sidebar/SidebarButton";
 import "./App.css";
@@ -55,12 +55,16 @@ import { useNavigate, useLocation } from "react-router-dom";
 import AdminPanel from "./Views/AdminPanel";
 import DoctorCard from "./Profile/DoctorCard";
 import Equipment from "./Views/Equipment";
-import User from "./Views/User";
 import HospitalRoom from "./HospitalRoom/HospitalRoom";
 import TabMeetings from "./Views/Tables/TabMeetings";
 import socketService from "./service/socketService";
 
 import WarehouseStatistics from "./Views/WarehouseStatistics";
+import Chat from "./Chat/Chat";
+import TabRooms from "./Views/Tables/TabRooms";
+import { PdfBasic } from "./Forms/Request/PdfBasic";
+import { PdfMandate } from "./Forms/Request/PdfMandate";
+import { PdfResults } from "./Forms/Request/PdfResults";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -80,9 +84,15 @@ function App() {
     if (typeof userDataHelper !== "undefined" && userDataHelper !== null) {
       const headers = { authorization: "Bearer " + token };
       if (userDataHelper.UserInfo.role === 9999) {
-        fetch(`/patient/pacientId/${userDataHelper.UserInfo.userid}`, {
-          headers,
-        })
+        fetch(
+          `/patient/pacientId/${userDataHelper.UserInfo.userid.replace(
+            "/",
+            "$"
+          )}`,
+          {
+            headers,
+          }
+        )
           .then((response) => response.json())
           .then((data) => {
             setPatientId(data[0].ID_PACIENTA);
@@ -102,21 +112,23 @@ function App() {
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
     const userDataHelper = GetUserData(token);
-    const headers = { authorization: "Bearer " + token };
-    socketService.connect();
-    socketService.on("newMessage", (message) => {
-      fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
-        headers,
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setNotifications(data.POCET);
-        });
-    });
+    if (userDataHelper?.UserInfo.role !== 9999) {
+      const headers = { authorization: "Bearer " + token };
+      socketService.connect();
+      socketService.on("newMessage", (message) => {
+        fetch(`/chat/unread/${userDataHelper.UserInfo.userid}`, {
+          headers,
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            setNotifications(data.POCET);
+          });
+      });
 
-    return () => {
-      socketService.disconnect();
-    };
+      return () => {
+        socketService.disconnect();
+      };
+    }
   }, [location.pathname]);
 
   const sidebarButtonsAdmin = [
@@ -176,6 +188,29 @@ function App() {
       label="Operácie"
       icon="operation-icon"
     />,
+    <SidebarButton
+      key="8"
+      visibleLeft={visibleLeft}
+      path="/statistics"
+      label="Štatistiky"
+      icon="stat-icon"
+    />,
+
+    <SidebarButton
+      key="10"
+      visibleLeft={visibleLeft}
+      path="/sklad"
+      label="Sklad"
+      icon="storage-icon"
+    />,
+    <SidebarButton
+      key="11"
+      visibleLeft={visibleLeft}
+      path="/chat"
+      label="Správy"
+      icon="chat-icon"
+      notifications={notifications}
+    />,
   ];
 
   const sidebarButtonsDoctor = [
@@ -200,7 +235,6 @@ function App() {
       label="Pacienti"
       icon="patient-icon"
     />,
-
     <SidebarButton
       key="5"
       visibleLeft={visibleLeft}
@@ -237,35 +271,43 @@ function App() {
       icon="storage-icon"
     />,
     <SidebarButton
-      key="13"
-      visibleLeft={visibleLeft}
-      path="/statistics"
-      label="Štatistiky"
-      icon="stat-icon"
-    />,
-    <SidebarButton
-      key="11"
-      visibleLeft={visibleLeft}
-      path="/user"
-      label="Meno usera"
-      icon="user-icon"
-    />,
-    <SidebarButton
       key="12"
       visibleLeft={visibleLeft}
       path="/meetings"
       label="Konzíliá"
       icon="meeting-icon"
     />,
+    <SidebarButton
+      key="11"
+      visibleLeft={visibleLeft}
+      path="/chat"
+      label="Správy"
+      icon="chat-icon"
+      notifications={notifications}
+    />,
   ];
 
   const sidebarButtonsChief = [
+    <SidebarButton
+      key="beds"
+      visibleLeft={visibleLeft}
+      path="/rooms"
+      label="Lôžka"
+      icon="bed-icon"
+    />,
     <SidebarButton
       key="4"
       visibleLeft={visibleLeft}
       path="/doctors"
       label="Lekári"
       icon="doctor-icon"
+    />,
+    <SidebarButton
+      key="stats"
+      visibleLeft={visibleLeft}
+      path="/statistics"
+      label="Štatistiky"
+      icon="stat-icon"
     />,
   ];
 
@@ -559,6 +601,11 @@ function App() {
         <Route path="/add" element={<Add></Add>}></Route>
         <Route path="/sklad" element={<Storage />}></Route>
         <Route path="/meetings" element={<TabMeetings />}></Route>
+        <Route path="/room" element={<HospitalRoom />}></Route>
+        <Route path="/rooms" element={<TabRooms />}></Route>
+        <Route path="/add/basicPdf" element={<PdfBasic />}></Route>
+        <Route path="/add/mandatePdf" element={<PdfMandate />}></Route>
+        <Route path="/add/resultsPdf" element={<PdfResults />}></Route>
       </>
     );
   };
@@ -794,7 +841,7 @@ function App() {
         userData !== null &&
         userData.UserInfo.role === 0 ? (
           sidebarButtonsAdmin
-        ) : userData !== null && userData.UserInfo.role === 2 ? (
+        ) : userData !== null && userData.UserInfo.role === 1 ? (
           sidebarButtonsDoctor
         ) : userData !== null && userData.UserInfo.role === 3 ? (
           <>
@@ -815,15 +862,6 @@ function App() {
         )}
         {typeof userData !== "undefined" && userData !== null ? (
           <>
-            {" "}
-            <SidebarButton
-              key="11"
-              visibleLeft={visibleLeft}
-              path="/user"
-              label="Správy"
-              icon="chat-icon"
-              notifications={notifications}
-            />{" "}
             <SidebarButton
               key="12"
               visibleLeft={visibleLeft}
@@ -844,17 +882,12 @@ function App() {
           <Route path="/register" element={<Register></Register>}></Route>
           <Route path="/login" element={<Login></Login>}></Route>
           <Route path="/logout" element={<Logout></Logout>}></Route>
-          <Route path="/user" element={<User></User>}></Route>
-          <Route path="/room" element={<HospitalRoom />}></Route>
-          {typeof userData !== "undefined" &&
-          userData !== null &&
-          userData.UserInfo.role === 0 ? (
+          <Route path="/chat" element={<Chat />}></Route>
+          {userData && userData.UserInfo.role === 0 ? (
             <>
-              {renderChiefRoutes()} {renderDoctorRoutes()} {renderAdminRoutes()}
+              {renderAdminRoutes()} {renderChiefRoutes()} {renderDoctorRoutes()}
             </>
-          ) : typeof userData !== "undefined" &&
-            userData !== null &&
-            userData.UserInfo.role === 2 ? (
+          ) : userData && userData.UserInfo.role === 1 ? (
             renderDoctorRoutes()
           ) : userData && userData.UserInfo.role === 3 ? (
             <>

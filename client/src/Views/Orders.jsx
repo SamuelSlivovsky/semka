@@ -1,5 +1,4 @@
-//@TODO add ordering on critical stock in warehouse for all medications that are in hospital
-//@TODO also add ordering when medicine will expire in X days
+
 
 //Imports
 import React, { useState, useEffect, useRef } from "react";
@@ -16,6 +15,7 @@ import {Dropdown} from "primereact/dropdown";
 import {InputNumber} from "primereact/inputnumber";
 import {Calendar} from "primereact/calendar";
 import {json} from "react-router-dom";
+import {useNavigate} from "react-router";
 
 export default function Orders() {
 
@@ -50,6 +50,7 @@ export default function Orders() {
     const [xmlContent, setXmlContent] = useState("");
     const [updatedContent, setUpdatedContent] = useState(null);
     const toast = useRef(null);
+    const navigate = useNavigate();
     const [selectedMedications, setSelectedMedications] = useState([]);
 
     /*
@@ -61,9 +62,23 @@ export default function Orders() {
     useEffect(() => {
         const token = localStorage.getItem("hospit-user");
         const headers = { authorization: "Bearer " + token };
-        const userDataHelper = GetUserData(token);
-        fetch(`objednavky/all/${userDataHelper.UserInfo.userid}`, { headers })
-            .then((response) => response.json())
+        fetch(`objednavky/all`, { headers })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                    // Kontrola ci je token expirovany (status:410)
+                } else if (response.status === 410) {
+                    // Token expiroval redirect na logout
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Session timeout redirecting to login page",
+                        life: 999999999,
+                    });
+                    setTimeout(() => {
+                        navigate("/logout");
+                    }, 3000);
+                }
+            })
             .then((data) => {
                 setProducts(data);
             });

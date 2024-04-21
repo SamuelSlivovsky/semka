@@ -1,7 +1,6 @@
 import { Card } from "primereact/card";
 import { useNavigate } from "react-router-dom";
 import "../styles/homepage.css";
-
 function HomeCard(props) {
   const navigate = useNavigate();
   return (

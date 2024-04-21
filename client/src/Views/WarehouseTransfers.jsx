@@ -12,6 +12,7 @@ import {Dropdown} from "primereact/dropdown";
 import "../styles/warehouses.css";
 import {Calendar} from "primereact/calendar";
 import {InputNumber} from "primereact/inputnumber";
+import {useNavigate} from "react-router";
 
 export default function WarehouseTransfers() {
     let emptyTransfer = {
@@ -42,6 +43,7 @@ export default function WarehouseTransfers() {
 
     //Constants
     const toast = useRef(null);
+    const navigate = useNavigate();
     const [inputValues, setInputValues] = useState({});
     const [transfer, setTransfer] = useState(emptyTransfer);
     const [idOdd, setIdOdd] = useState(null);
@@ -90,8 +92,23 @@ export default function WarehouseTransfers() {
         const userDataHelper = GetUserData(token);
 
         //Finished transfers
-        fetch(`/presuny/allFin/${userDataHelper.UserInfo.userid}`, { headers })
-            .then((response) => response.json())
+        fetch(`presuny/allFin`, { headers })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                    // Kontrola ci je token expirovany (status:410)
+                } else if (response.status === 410) {
+                    // Token expiroval redirect na logout
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Session timeout redirecting to login page",
+                        life: 999999999,
+                    });
+                    setTimeout(() => {
+                        navigate("/logout");
+                    }, 3000);
+                }
+            })
             .then((data) => {
                 setFinishedTransfers(data);
             });

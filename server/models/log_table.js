@@ -5,7 +5,7 @@ async function getAllLogs() {
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
-            `select id_logu, to_char(datum,'DD.MM.YYYY HH:MM:SS') datum, tabulka, typ, popis, ip, riadok from log_table order by id_logu`,
+            `select id_logu, to_char(datum,'YYYY-MM-DD HH24:MI:SS') datum, tabulka, typ, popis, ip, riadok from log_table order by id_logu`,
         );
         return result.rows;
     } catch (err) {
@@ -30,18 +30,25 @@ async function getNumberOfWrongLogins(ip) {
 }
 
 
-async function insertLogFailedLogin(body) {
+async function insertLog(body) {
+    if (body.ip === undefined) {
+        body.ip = null;
+    }
+    if (body.riadok === undefined) {
+        body.riadok = null;
+    }
     try {
         let conn = await database.getConnection();
         const result = await conn.execute(
             `BEGIN
-            insert_log(:table,:status,:description,:ip);
+            insert_log(:table,:status,:description,:ip,:riadok);
             END;`,
             {
                 status: body.status,
-                description: "User with ip " + body.ip + " has tried to log into " + body.userid + " with password: " + body.pwd,
+                description: body.description,
                 ip: body.ip,
-                table: "USER_TAB"
+                table: body.table,
+                riadok: body.riadok,
             },
             {autoCommit: true}
         );
@@ -51,7 +58,7 @@ async function insertLogFailedLogin(body) {
 }
 
 module.exports = {
-    insertLogFailedLogin,
+    insertLog,
     getAllLogs,
     getNumberOfWrongLogins,
 };

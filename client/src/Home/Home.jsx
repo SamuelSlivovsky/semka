@@ -24,6 +24,8 @@ import reservationsIcon from "../images/reservations.png";
 import GetUserData from "../Auth/GetUserData";
 import comboboxIcon from "../images/database.png";
 import meetingIcon from "../images/meeting.png";
+import bedIcon from "../images/bed.png";
+import chatIcon from "../images/chat.png";
 import "../styles/homepage.css";
 
 function Home() {
@@ -47,6 +49,7 @@ function Home() {
       icon={patientIcon}
       key="2"
     ></HomeCard>,
+
     <HomeCard
       title="Vyšetrenia"
       isCalendar={false}
@@ -68,13 +71,7 @@ function Home() {
       icon={operationIcon}
       key="6"
     ></HomeCard>,
-    <HomeCard
-      title="Štatistiky"
-      isCalendar={false}
-      path="/statistics"
-      icon={statIcon}
-      key="7"
-    ></HomeCard>,
+
     <HomeCard
       title="Pridaj"
       isCalendar={false}
@@ -96,15 +93,36 @@ function Home() {
       icon={meetingIcon}
       key="10"
     ></HomeCard>,
+    <HomeCard
+      title="Správy"
+      isCalendar={false}
+      path="/chat"
+      icon={chatIcon}
+      key="11"
+    ></HomeCard>,
   ];
 
   const chiefCards = [
+    <HomeCard
+      title="Lôžka"
+      isCalendar={false}
+      path="/rooms"
+      icon={bedIcon}
+      key="beds"
+    ></HomeCard>,
     <HomeCard
       title="Lekári"
       isCalendar={false}
       path="/doctors"
       icon={doctorsIcon}
       key="3"
+    ></HomeCard>,
+    <HomeCard
+      title="Štatistiky"
+      isCalendar={false}
+      path="/statistics"
+      icon={statIcon}
+      key="7"
     ></HomeCard>,
   ];
 
@@ -172,7 +190,7 @@ function Home() {
       title="Karta pacienta"
       isCalendar={false}
       path="/patient"
-      icon={storageIcon}
+      icon={patientIcon}
       key="2"
     ></HomeCard>,
   ];
@@ -388,7 +406,7 @@ function Home() {
   const renderHomeCards = () => {
     if (userData !== null && typeof userData !== "undefined") {
       if (userData.UserInfo.role === 0) return adminCards;
-      else if (userData.UserInfo.role === 2) return doctorCards;
+      else if (userData.UserInfo.role === 1) return doctorCards;
       else if (userData.UserInfo.role === 3)
         return (
           <>
