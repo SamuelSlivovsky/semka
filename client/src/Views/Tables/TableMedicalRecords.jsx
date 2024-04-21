@@ -229,7 +229,30 @@ export default function TableMedic(props) {
         id_hosp: selectedRow.ID_HOSP,
       }),
     };
-    await fetch("/hospitalizacia/ukoncit", requestOptions);
+    await fetch("/hospitalizacia/ukoncit", requestOptions)
+      .then(async (response) => {
+        if (!response.ok) {
+          const errorMessage = await response.json();
+          throw new Error(errorMessage.error);
+        } else {
+          console.log("first");
+          toast.current.show({
+            severity: "success",
+            summary: "Úspech",
+            detail: "Úspešná zmena dátumu ukončenia",
+            life: 6000,
+          });
+        }
+      })
+      .then(() => (props.onInsert ? props.onInsert() : ""))
+      .catch((error) => {
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail: error.message,
+          life: 6000,
+        });
+      });
   };
 
   const header = allowFilters ? renderHeader() : "";
