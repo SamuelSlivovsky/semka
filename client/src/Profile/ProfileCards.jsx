@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Card } from "primereact/card";
 import { Button } from "primereact/button";
-import {useLocation, useNavigate} from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import { Dialog } from "primereact/dialog";
 import HospitForm from "../Forms/HospitForm";
 import RecipeForm from "../Forms/RecipeForm";
@@ -592,7 +592,7 @@ export default function ProfileCard(props) {
         <Card
           className="col-5 shadow-4"
           title="Zdravotné záznamy"
-          style={{ width: "50rem", height: "40rem" }}
+          style={{ width: "50rem", height: "40rem", maxWidth: "50rem" }}
         >
           <TableMedicalRecords {...medicalRecordsTable} />
         </Card>

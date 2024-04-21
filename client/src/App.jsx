@@ -65,6 +65,7 @@ import TabRooms from "./Views/Tables/TabRooms";
 import { PdfBasic } from "./Forms/Request/PdfBasic";
 import { PdfMandate } from "./Forms/Request/PdfMandate";
 import { PdfResults } from "./Forms/Request/PdfResults";
+import { LeavePdf } from "./Forms/LeavePdf";
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
   const [patientId, setPatientId] = useState(null);
@@ -606,6 +607,7 @@ function App() {
         <Route path="/add/basicPdf" element={<PdfBasic />}></Route>
         <Route path="/add/mandatePdf" element={<PdfMandate />}></Route>
         <Route path="/add/resultsPdf" element={<PdfResults />}></Route>
+        <Route path="/add/leavePdf" element={<LeavePdf />}></Route>
       </>
     );
   };

@@ -13,6 +13,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router";
 import { Toast } from "primereact/toast";
+import { Tag } from "primereact/tag";
 
 export default function TableMedic(props) {
   const [globalFilterValue1, setGlobalFilterValue1] = useState("");
@@ -235,7 +236,6 @@ export default function TableMedic(props) {
           const errorMessage = await response.json();
           throw new Error(errorMessage.error);
         } else {
-          console.log("first");
           toast.current.show({
             severity: "success",
             summary: "Úspech",
@@ -253,6 +253,37 @@ export default function TableMedic(props) {
           life: 6000,
         });
       });
+    if (leaveMessage != "" && leaveMessage != null) {
+      const queryString = new URLSearchParams({
+        name: selectedRow.MENO,
+        surname: selectedRow.PRIEZVISKO,
+        message: leaveMessage,
+        birthId: selectedRow.ROD_CISLO,
+        leaveDate: endDate.toLocaleString("en-GB").replace(",", ""),
+      }).toString();
+
+      window.open(`/add/leavePdf?${queryString}`, "_blank");
+    }
+  };
+
+  const leaveBody = (rowData) => {
+    return rowData.ID_HOSP != null ? (
+      <Tag
+        severity={
+          rowData?.PREPUSTACIA_SPRAVA != "" &&
+          rowData?.PREPUSTACIA_SPRAVA != null
+            ? "success"
+            : "danger"
+        }
+      >
+        {rowData?.PREPUSTACIA_SPRAVA != "" &&
+        rowData?.PREPUSTACIA_SPRAVA != null
+          ? "Áno"
+          : "Nie"}
+      </Tag>
+    ) : (
+      ""
+    );
   };
 
   const header = allowFilters ? renderHeader() : "";
@@ -291,6 +322,12 @@ export default function TableMedic(props) {
               }
             ></Column>
           ))}
+
+          {eventType == "Hospitalizácia" || tableName == "Zdravotné záznamy" ? (
+            <Column body={leaveBody} header="Prepúšťacia správa?"></Column>
+          ) : (
+            ""
+          )}
           {editor ? (
             <Column
               rowEditor
