@@ -1,5 +1,4 @@
-//@TODO add ordering on critical stock in warehouse for all medications that are in hospital
-//@TODO also add ordering when medicine will expire in X days
+
 
 //Imports
 import React, { useState, useEffect, useRef } from "react";
@@ -14,6 +13,7 @@ import GetUserData from "../Auth/GetUserData";
 import {ProgressSpinner} from "primereact/progressspinner";
 import {Dropdown} from "primereact/dropdown";
 import {InputNumber} from "primereact/inputnumber";
+import {useNavigate} from "react-router";
 
 export default function Orders() {
 
@@ -48,6 +48,7 @@ export default function Orders() {
     const [selectedRow, setSelectedRow] = useState(null);
     const [xmlContent, setXmlContent] = useState("");
     const toast = useRef(null);
+    const navigate = useNavigate();
     const [selectedMedications, setSelectedMedications] = useState([]);
 
     /*
@@ -61,7 +62,22 @@ export default function Orders() {
         const userDataHelper = GetUserData(token);
         const headers = { authorization: "Bearer " + token };
         fetch(`objednavky/all`, { headers })
-            .then((response) => response.json())
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                    // Kontrola ci je token expirovany (status:410)
+                } else if (response.status === 410) {
+                    // Token expiroval redirect na logout
+                    toast.current.show({
+                        severity: "error",
+                        summary: "Session timeout redirecting to login page",
+                        life: 999999999,
+                    });
+                    setTimeout(() => {
+                        navigate("/logout");
+                    }, 3000);
+                }
+            })
             .then((data) => {
                 setProducts(data);
             });
@@ -69,7 +85,6 @@ export default function Orders() {
     }, []);
 
     //Async function for inserting new data into DB
-    //@TODO add ID_SKLAD
     async function insertData() {
         const token = localStorage.getItem("hospit-user");
 

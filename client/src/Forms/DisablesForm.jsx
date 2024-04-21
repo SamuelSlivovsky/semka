@@ -6,7 +6,9 @@ import { InputMask } from "primereact/inputmask";
 import { Dropdown } from "primereact/dropdown";
 import { Calendar } from "primereact/calendar";
 import { Toast } from "primereact/toast";
+import {useNavigate} from "react-router";
 export default function DisablesForm(props) {
+    const navigate = useNavigate();
   const toast = useRef(null);
   const [types, setTypes] = useState([]);
   useEffect(() => {
@@ -14,7 +16,22 @@ export default function DisablesForm(props) {
     const headers = { authorization: "Bearer " + token };
 
     fetch(`selects/typyZTP`, { headers })
-      .then((response) => response.json())
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      })
       .then((data) => {
         console.log(data);
         setTypes(data);

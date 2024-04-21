@@ -13,8 +13,10 @@ import sk from "../locales/sk.json";
 import "../styles/stat.css";
 import DepartmentStats from "./DepartmentStats.jsx";
 import DoctorStats from "./DoctorStats.jsx";
+import {useNavigate} from "react-router";
 export default function Statistics() {
   const toast = useRef(null);
+  const navigate = useNavigate();
   const [render, setRender] = useState(false);
   const [muziZeny, setMuziZeny] = useState(null);
   const [wholeYearCheck, setWholeYearCheck] = useState(false);
@@ -40,13 +42,43 @@ export default function Statistics() {
     const userId = GetUserData(token).UserInfo.userid;
     const headers = { authorization: "Bearer " + token };
     fetch(`/lekar/oddeleniePrimara/${userId}`, { headers })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+          // Kontrola ci je token expirovany (status:410)
+        } else if (res.status === 410) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((result) => {
         setDepartment(result);
       });
 
     fetch(`/lekar/lekari/${userId}`, { headers })
-      .then((res) => res.json())
+      .then((res) => {
+        if (res.ok) {
+          return res.json();
+          // Kontrola ci je token expirovany (status:410)
+        } else if (res.status === 410) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((result) => {
         result = result.map((item) => {
           return { ...item, name: `${item.MENO} ${item.PRIEZVISKO}` };

@@ -10,9 +10,11 @@ import GetUserData from "../Auth/GetUserData";
 import { InputText } from "primereact/inputtext";
 import { Checkbox } from "primereact/checkbox";
 import { Toast } from "primereact/toast";
+import {useNavigate} from "react-router";
 export default function RecipeForm(props) {
   const toast = useRef(null);
   const [drugs, setDrugs] = useState([]);
+    const navigate = useNavigate();
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -24,7 +26,22 @@ export default function RecipeForm(props) {
       },
     };
     fetch("/lieky/all", requestOptions)
-      .then((response) => response.json())
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      })
       .then((data) => {
         setDrugs(data);
       });
