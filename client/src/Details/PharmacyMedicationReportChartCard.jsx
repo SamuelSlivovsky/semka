@@ -56,7 +56,10 @@ export default function PharmacyEmployeeReportChartCard(props) {
               style={{ width: "45rem", height: "auto" }} // Upravená výška na auto
               title="Typy liekov"
             >
-              <div className="card-body" style={{ display: "ruby-text" }}>
+              <div
+                className="card-body"
+                style={{ display: "flex", justifyContent: "center" }}
+              >
                 <Chart
                   type="pie"
                   data={medicationDistribution}

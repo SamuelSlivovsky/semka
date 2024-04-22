@@ -60,7 +60,10 @@ export default function PharmacyMedAidReservationReportChartCard(props) {
               style={{ width: "45rem", height: "auto" }} // Upravená výška na auto
               title="Celkové rezervácie zdr. pomôcok"
             >
-              <div className="card-body" style={{ display: "ruby-text" }}>
+              <div
+                className="card-body"
+                style={{ display: "flex", justifyContent: "center" }}
+              >
                 <Chart
                   type="doughnut"
                   data={medAidReservationDistribution}

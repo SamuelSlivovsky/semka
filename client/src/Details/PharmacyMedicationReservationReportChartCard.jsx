@@ -59,7 +59,10 @@ export default function PharmacyMedicationReservationReportChartCard(props) {
               style={{ width: "45rem", height: "auto" }} // Upravená výška na auto
               title=" Celkové rezervácie liekov"
             >
-              <div className="card-body" style={{ display: "ruby-text" }}>
+              <div
+                className="card-body"
+                style={{ display: "flex", justifyContent: "center" }}
+              >
                 <Chart
                   type="doughnut"
                   data={medicationReservationDistribution}
