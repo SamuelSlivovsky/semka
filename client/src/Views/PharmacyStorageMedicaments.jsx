@@ -10,6 +10,7 @@ import GetUserData from "../Auth/GetUserData";
 import { Toast } from "primereact/toast";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { TabView, TabPanel } from "primereact/tabview";
+import { Tooltip } from "primereact/tooltip";
 
 export default function PharmacyStorageMedicaments() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -231,36 +232,55 @@ export default function PharmacyStorageMedicaments() {
       <React.Fragment>
         {rowData.POCET}
         {rowData.POCET <= 10 && (
-          <i
-            className="pi pi-exclamation-triangle"
-            style={{ color: "red", marginLeft: "10px" }}
-          />
+          <span id={`lowStock-${rowData.ID}`}>
+            <i
+              className="pi pi-exclamation-triangle"
+              style={{ color: "red", marginLeft: "10px" }}
+            />
+            <Tooltip
+              target={`#lowStock-${rowData.ID}`}
+              content="Nízky počet lieku na sklade"
+              position="top"
+            />
+          </span>
         )}
       </React.Fragment>
     );
   };
 
   const expirationBodyTemplate = (rowData) => {
+    const expiringSoon = isExpiringSoon(rowData.DATUM_TRVANLIVOSTI);
+    const expired = isExpired(rowData.DATUM_TRVANLIVOSTI);
+
     return (
       <React.Fragment>
-        <span
-          style={{
-            color: isExpired(rowData.DATUM_TRVANLIVOSTI) ? "red" : "inherit",
-          }}
-        >
+        <span style={{ color: expired ? "red" : "inherit" }}>
           {rowData.DATUM_TRVANLIVOSTI}
-          {isExpiringSoon(rowData.DATUM_TRVANLIVOSTI) &&
-            !isExpired(rowData.DATUM_TRVANLIVOSTI) && (
+          {expiringSoon && !expired && (
+            <span id={`expiringSoon-${rowData.ID}`}>
               <i
                 className="pi pi-exclamation-triangle"
                 style={{ color: "red", marginLeft: "10px" }}
               />
-            )}
-          {isExpired(rowData.DATUM_TRVANLIVOSTI) && (
-            <i
-              className="pi pi-times"
-              style={{ color: "red", marginLeft: "10px" }}
-            />
+              <Tooltip
+                target={`#expiringSoon-${rowData.ID}`}
+                content="Blížiaca sa doba expirácie lieku"
+                position="top"
+              />
+            </span>
+          )}
+          {expired && (
+            <span id={`expired-${rowData.ID}`}>
+              <i
+                className="pi pi-times"
+                style={{ color: "red", marginLeft: "10px" }}
+              />
+              <Tooltip
+                target={`#expired-${rowData.ID}`}
+                content="Liek už prekročil dobu použiteľnosti"
+                position="top"
+              />
+            </span>
           )}
         </span>
       </React.Fragment>
