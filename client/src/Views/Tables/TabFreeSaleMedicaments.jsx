@@ -8,6 +8,9 @@ import { FilterMatchMode, FilterOperator } from "primereact/api";
 import { useNavigate } from "react-router";
 import GetUserData from "../../Auth/GetUserData";
 import { Toast } from "primereact/toast";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import customFont from "../../Fonts/Roboto/Roboto-Regular.ttf";
 
 export default function TabFreeSaleMedicaments() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
@@ -18,8 +21,10 @@ export default function TabFreeSaleMedicaments() {
   const [volnyPredajLiekov, setVolnyPredajLiekov] = useState([]);
   const navigate = useNavigate();
   const [nazovLekarne, setNazovLekarne] = useState([]);
+  const [jednotkovaCena, setJednotkovaCena] = useState([]);
   const [vydajPocet, setVydajPocet] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [celkovaSuma, setCelkovaSuma] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -51,6 +56,7 @@ export default function TabFreeSaleMedicaments() {
         setVolnyPredajLiekov(data);
         if (data.length > 0) {
           setNazovLekarne(data[0].NAZOV_LEKARNE);
+          setJednotkovaCena(data.JEDNOTKOVA_CENA);
         }
       });
   }, []);
@@ -102,6 +108,87 @@ export default function TabFreeSaleMedicaments() {
     }
   };
 
+  jsPDF.API.events.push([
+    "addFonts",
+    function () {
+      this.addFont(customFont, "Roboto", "normal");
+    },
+  ]);
+  require("jspdf-autotable");
+  const QRCode = require("qrcode");
+
+  const generatePDF = async () => {
+    const doc = new jsPDF();
+
+    doc.setFont("Roboto", "normal");
+    doc.setFontSize(16);
+    doc.text(
+      "Vydanie voľnopredajného lieku v lekárni",
+      doc.internal.pageSize.getWidth() / 2,
+      20,
+      { align: "center" }
+    );
+
+    const qrData = JSON.stringify({
+      lekaren: selectedRow.NAZOV_LEKARNE,
+      liek: selectedRow.NAZOV_LIEKU,
+      jednotkovaCena: `${parseFloat(selectedRow.JEDNOTKOVA_CENA).toFixed(2)} €`,
+      vydajPocet: vydajPocet,
+      celkovaSuma: `${celkovaSuma.toFixed(2)} €`,
+    });
+
+    const qrCodeDataURL = await QRCode.toDataURL(qrData, {
+      errorCorrectionLevel: "H",
+    });
+
+    doc.autoTable({
+      startY: 30,
+      head: [["Položka", "Informácia"]],
+      body: [
+        ["Lekáreň", selectedRow.NAZOV_LEKARNE],
+        ["Liek", selectedRow.NAZOV_LIEKU],
+        [
+          "Jednotková cena",
+          `${parseFloat(selectedRow.JEDNOTKOVA_CENA).toFixed(2)} €`,
+        ],
+        ["Vydať počet", vydajPocet],
+        ["Celková suma", `${celkovaSuma.toFixed(2)} €`],
+      ],
+      styles: {
+        font: "Roboto",
+        fontSize: 11,
+        halign: "center",
+      },
+      headStyles: {
+        fillColor: [22, 160, 133],
+        halign: "center",
+      },
+      margin: { left: 10, right: 10 },
+      columnStyles: {
+        0: { cellWidth: "auto" },
+        1: { cellWidth: "auto" },
+      },
+    });
+
+    const qrCodeWidth = 50;
+    const qrCodeHeight = 50;
+
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const qrCodeX = (doc.internal.pageSize.getWidth() - qrCodeWidth) / 2;
+    const qrCodeY = pageHeight - qrCodeHeight - 10;
+
+    doc.addImage(
+      qrCodeDataURL,
+      "PNG",
+      qrCodeX,
+      qrCodeY,
+      qrCodeWidth,
+      qrCodeHeight
+    );
+
+    doc.save("vydanie_volnopredajneho_lieku.pdf");
+  };
+
   const onSubmit = async () => {
     if (vydajPocet > 0 && vydajPocet <= selectedRow.POCET) {
       const success = await updatePocetLiekov(
@@ -114,6 +201,7 @@ export default function TabFreeSaleMedicaments() {
       if (success) {
         setShowDialog(false);
         setVydajPocet(1); // Reset počtu na výdaj
+        generatePDF();
 
         //@TODO Toto sa odstrani len z tabulky lokalne, ale vdatabaze zaznam stale ostane, treba riesit DELETE
         // Ak po vydaji bude pocet liekov 0, odstránime liek zo zoznamu
@@ -152,6 +240,20 @@ export default function TabFreeSaleMedicaments() {
     setShowDialog(true);
     setSelectedRow(value);
   };
+
+  // Funkcia na výpočet celkovej sumy
+  const calculateCelkovaSuma = () => {
+    if (selectedRow && vydajPocet) {
+      const cena = parseFloat(selectedRow.JEDNOTKOVA_CENA);
+      setCelkovaSuma(cena * parseFloat(vydajPocet));
+    } else {
+      setCelkovaSuma(0);
+    }
+  };
+
+  useEffect(() => {
+    calculateCelkovaSuma();
+  }, [vydajPocet, selectedRow]);
 
   const renderDialogFooter = () => {
     return (
@@ -335,6 +437,7 @@ export default function TabFreeSaleMedicaments() {
               {selectedRow.NAZOV_LEKARNE}
               <br />
               <h5>{selectedRow.NAZOV_LIEKU}</h5>
+              <h5>{parseFloat(selectedRow.JEDNOTKOVA_CENA).toFixed(2)} €</h5>
               <div style={{ marginBottom: "5px", fontWeight: "lighter" }}>
                 Vydať počet
               </div>
@@ -346,6 +449,10 @@ export default function TabFreeSaleMedicaments() {
                 type="number"
                 max={selectedRow.POCET}
               />
+              <div style={{ marginTop: "25px" }}>
+                <span style={{ fontWeight: "bold" }}>Celková suma:</span>{" "}
+                {celkovaSuma.toFixed(2)} €
+              </div>
             </div>
           ) : (
             ""

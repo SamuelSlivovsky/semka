@@ -88,7 +88,7 @@ async function getVolnyPredajLiekov(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select DISTINCT l.id_liek, l.nazov as "NAZOV_LIEKU", ul.nazov as "UCINNA_LATKA",
+      `select DISTINCT l.id_liek, l.nazov as "NAZOV_LIEKU", ROUND(l.jednotkova_cena, 2) as "JEDNOTKOVA_CENA", ul.nazov as "UCINNA_LATKA",
        tl.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE",
         to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET"
         from liek l
