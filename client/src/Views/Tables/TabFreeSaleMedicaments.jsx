@@ -450,7 +450,17 @@ export default function TabFreeSaleMedicaments() {
                 max={selectedRow.POCET}
               />
               <div style={{ marginTop: "25px" }}>
-                <span style={{ fontWeight: "bold" }}>Celková suma:</span>{" "}
+                <span
+                  style={{
+                    fontWeight: "lighter",
+                    // backgroundColor: "#cafaea",
+                    borderRadius: "15px",
+                    padding: "0.5rem",
+                    border: "#cafaea 5px solid",
+                  }}
+                >
+                  Celková suma:
+                </span>{" "}
                 {celkovaSuma.toFixed(2)} €
               </div>
             </div>
