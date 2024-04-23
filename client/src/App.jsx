@@ -852,7 +852,7 @@ function App() {
               key="12"
               visibleLeft={visibleLeft}
               path="/logout"
-              label="Odhlas"
+              label="Odhlásiť"
               icon="logout-icon"
             />
           </>
