@@ -42,7 +42,7 @@ async function insertZamestnanecLekarne(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-    insert_zamestnanec_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_id_lekarne);
+    insert_zamestnanec_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_telefon, :p_email, :p_id_lekarne);
   END;`;
     console.log(body);
     let result = await conn.execute(
@@ -53,6 +53,8 @@ async function insertZamestnanecLekarne(body) {
         p_priezvisko: body.priezvisko,
         p_psc: body.psc,
         p_ulica: body.ulica,
+        p_telefon: body.telefon,
+        p_email: body.email,
         p_id_lekarne: body.id_lekarne,
       },
       { autoCommit: true }
@@ -89,7 +91,7 @@ async function insertLaborantLekarne(body) {
   try {
     let conn = await database.getConnection();
     const sqlStatement = `BEGIN
-    insert_laborant_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_id_lekarne);
+    insert_laborant_lekarne(:p_rod_cislo, :p_meno, :p_priezvisko, :p_psc, :p_ulica, :p_telefon, :p_email, :p_id_lekarne);
   END;`;
     console.log(body);
     let result = await conn.execute(
@@ -100,6 +102,8 @@ async function insertLaborantLekarne(body) {
         p_priezvisko: body.priezvisko,
         p_psc: body.psc,
         p_ulica: body.ulica,
+        p_telefon: body.telefon,
+        p_email: body.email,
         p_id_lekarne: body.id_lekarne,
       },
       { autoCommit: true }

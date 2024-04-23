@@ -320,6 +320,28 @@ export default function TabLaborants(props) {
           {renderErrorMessage("priezvisko")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="telefon">Tel. číslo</label>
+          <InputText
+            id="telefon"
+            value={newLaborant.telefon}
+            onChange={(e) =>
+              setNewLaborant({ ...newLaborant, telefon: e.target.value })
+            }
+            placeholder="Zadajte tel. číslo laboranta"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="email">E - mail</label>
+          <InputText
+            id="email"
+            value={newLaborant.email}
+            onChange={(e) =>
+              setNewLaborant({ ...newLaborant, email: e.target.value })
+            }
+            placeholder="Zadajte e - mail laboranta"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="ulica">Ulica</label>
           <InputText
             id="ulica"

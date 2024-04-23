@@ -320,6 +320,28 @@ export default function TabPharmacists(props) {
           {renderErrorMessage("priezvisko")}
         </div>
         <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="telefon">Tel. číslo</label>
+          <InputText
+            id="telefon"
+            value={newPharmacist.telefon}
+            onChange={(e) =>
+              setNewPharmacist({ ...newPharmacist, telefon: e.target.value })
+            }
+            placeholder="Zadajte tel. číslo lekárnika"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
+          <label htmlFor="email">E - mail</label>
+          <InputText
+            id="email"
+            value={newPharmacist.email}
+            onChange={(e) =>
+              setNewPharmacist({ ...newPharmacist, email: e.target.value })
+            }
+            placeholder="Zadajte e - mail lekárnika"
+          />
+        </div>
+        <div className="p-field" style={{ marginTop: "1rem" }}>
           <label htmlFor="ulica">Ulica</label>
           <InputText
             id="ulica"
