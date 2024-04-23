@@ -154,6 +154,10 @@ export default function TabMedicaments() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
+      JEDNOTKOVA_CENA: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
     });
     setGlobalFilterValue("");
   };
@@ -200,6 +204,7 @@ export default function TabMedicaments() {
               "ATC",
               "NAZOV_UCINNEJ_LATKY",
               "NA_PREDPIS",
+              "JEDNOTKOVA_CENA",
             ]}
             emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
           >
@@ -218,6 +223,15 @@ export default function TabMedicaments() {
                 rowData.NA_PREDPIS === "A" ? "Na predpis" : "Voľnopredajný"
               }
               filter
+            ></Column>
+            <Column
+              field="JEDNOTKOVA_CENA"
+              header={"Doplatok pacienta"}
+              filter
+              body={
+                (rowData) =>
+                  `${parseFloat(rowData.JEDNOTKOVA_CENA).toFixed(2)} €` 
+              }
             ></Column>
           </DataTable>
         )}

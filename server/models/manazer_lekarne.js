@@ -225,7 +225,7 @@ async function getZoznamLiekov() {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis
+      `select l.nazov as "NAZOV_LIEKU", l.id_liek, l.ATC,ul.nazov as "NAZOV_UCINNEJ_LATKY", ul.latinsky_nazov, ul.id_ucinna_latka, l.na_predpis, l.jednotkova_cena
       from  liek l 
       left join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
       left join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
