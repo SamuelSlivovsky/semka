@@ -250,13 +250,13 @@
 }
 
 .warehouse-move-icon {
-  content: url("./images/warehouse-move.png");
+  content: url("./images/warehouse-move_black.png");
   height: 44px;
   width: 44px;
 }
 
 .order-icon {
-  content: url("./images/order.png");
+  content: url("./images/order_black.png");
   height: 44px;
   width: 44px;
 }
