@@ -7,14 +7,14 @@ import prescriptionsIcon from "../images/prescriptions.png";
 function PharmacyDispensing() {
   const pharmacyDispensingCards = [
     <HomeCard
-      title="Voľný predaj"
+      title="Voľný predaj liekov"
       isCalendar={false}
       path="/free_sale_medicaments"
       icon={freeSaleMedicamentsIcon}
       key="24"
     ></HomeCard>,
     <HomeCard
-      title="Na recept"
+      title="Lieky na recept"
       isCalendar={false}
       path="/prescriptions"
       icon={prescriptionsIcon}
