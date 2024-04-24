@@ -136,6 +136,56 @@ async function updatePocetVolnopredajnehoLieku(body) {
   }
 }
 
+async function getVolnyPredajZdrPomocok(id) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `select DISTINCT zp.id_zdr_pomocky, zp.nazov as "NAZOV_ZDR_POMOCKY", ROUND(zp.jednotkova_cena, 2) as "JEDNOTKOVA_CENA",
+      tzp.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE",
+       to_char(tzp.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tzp.pocet as "POCET"
+       from zdravotna_pomocka zp
+       join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = zp.id_zdr_pomocky)
+       join sklad ls on (ls.id_sklad = tzp.id_sklad)
+       right join lekaren lek on (lek.id_lekarne = ls.id_lekarne)
+       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
+       where zam.cislo_zam = :id
+       order by NAZOV_ZDR_POMOCKY`,
+      [id]
+    );
+    return result.rows;
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function updatePocetVolnopredajnejZdrPomocky(body) {
+  console.log(body);
+  try {
+    let conn = await database.getConnection();
+    const sqlStatement = `UPDATE trvanlivost_zdr_pomocky
+    SET pocet = pocet - :vydanyPocet
+    WHERE datum_trvanlivosti = TO_DATE(:datumTrvanlivosti, 'DD.MM.YYYY HH24:MI:SS')
+    AND id_zdr_pomocky = :idZdrPomocky
+    AND id_sklad IN (SELECT id_sklad FROM sklad WHERE id_lekarne = :idLekarne)
+    AND pocet >= :vydanyPocet`;
+    let result = await conn.execute(
+      sqlStatement,
+      {
+        datumTrvanlivosti: body.datumTrvanlivosti,
+        idZdrPomocky: body.idZdrPomocky,
+        idLekarne: body.idLekarne,
+        vydanyPocet: body.vydanyPocet,
+      },
+      { autoCommit: true }
+    );
+
+    console.log("Rows updated " + result.rowsAffected);
+  } catch (err) {
+    console.log("Err Model");
+    console.log(err);
+  }
+}
+
 async function getOsoba(rod_cislo) {
   try {
     let conn = await database.getConnection();
@@ -158,5 +208,7 @@ module.exports = {
   getSearchZdrPomockaLekarenskySklad,
   getVolnyPredajLiekov,
   updatePocetVolnopredajnehoLieku,
+  getVolnyPredajZdrPomocok,
+  updatePocetVolnopredajnejZdrPomocky,
   getOsoba,
 };

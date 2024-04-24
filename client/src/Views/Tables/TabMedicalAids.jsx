@@ -95,7 +95,7 @@ export default function TabMedicalAids() {
       <div className="flex justify-content-between">
         <div className="table-header">
           <span className="p-input-icon-left">
-          <i className="pi pi-search" style={{ color: "#00796b" }} />
+            <i className="pi pi-search" style={{ color: "#00796b" }} />
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
@@ -150,6 +150,10 @@ export default function TabMedicalAids() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
+      JEDNOTKOVA_CENA: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
     });
     setGlobalFilterValue("");
   };
@@ -190,7 +194,12 @@ export default function TabMedicalAids() {
             header={header}
             filters={filters}
             filterDisplay="menu"
-            globalFilterFields={["ID_ZDR_POMOCKY", "NAZOV", "TYP"]}
+            globalFilterFields={[
+              "ID_ZDR_POMOCKY",
+              "NAZOV",
+              "TYP",
+              "JEDNOTKOVA_CENA",
+            ]}
             emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
           >
             <Column
@@ -207,6 +216,14 @@ export default function TabMedicalAids() {
               field="TYP"
               header={"Typ zdravotníckej pomôcky"}
               filter
+            ></Column>
+            <Column
+              field="JEDNOTKOVA_CENA"
+              header={"Doplatok pacienta"}
+              filter
+              body={(rowData) =>
+                `${parseFloat(rowData.JEDNOTKOVA_CENA).toFixed(2)} €`
+              }
             ></Column>
           </DataTable>
         )}

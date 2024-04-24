@@ -46,6 +46,7 @@ import TabMedicalAidsReservations from "./Views/Tables/TabMedicalAidsReservation
 import PharmacyEmployees from "./Views/PharmacyEmployees";
 import PharmacyDispensing from "./Views/PharmacyDispensing";
 import TabFreeSaleMedicaments from "./Views/Tables/TabFreeSaleMedicaments";
+import TabFreeSaleMedicalAids from "./Views/Tables/TabFreeSaleMedicalAids";
 import NotFoundPage404 from "./Views/NotFound404Page";
 
 import TabDoctorsOfHospital from "./Views/Tables/TabDoctorsOfHospital";
@@ -708,6 +709,10 @@ function App() {
           path="/free_sale_medicaments"
           element={<TabFreeSaleMedicaments />}
         ></Route>
+        <Route
+          path="/free_sale_med_aids"
+          element={<TabFreeSaleMedicalAids />}
+        ></Route>
         <Route path="/reservations" element={<PharmacyReservations />}></Route>
         <Route
           path="/medicaments_reservations"
@@ -766,6 +771,10 @@ function App() {
         <Route
           path="/free_sale_medicaments"
           element={<TabFreeSaleMedicaments />}
+        ></Route>
+        <Route
+          path="/free_sale_med_aids"
+          element={<TabFreeSaleMedicalAids />}
         ></Route>
         <Route path="/reservations" element={<PharmacyReservations />}></Route>
         <Route

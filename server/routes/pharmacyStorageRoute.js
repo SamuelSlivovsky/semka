@@ -45,6 +45,19 @@ router.post(
 );
 
 router.get(
+  "/volnyPredajZdrPomocok/:id",
+  verify.verifyRoles(0, 10, 9),
+  verify.checkForCorrectId(),
+  controller.getVolnyPredajZdrPomocok
+);
+
+router.post(
+  "/updatePocetVolnopredajnejZdrPomocky",
+  verify.verifyRoles(0, 10, 9),
+  controller.updatePocetVolnopredajnejZdrPomocky
+);
+
+router.get(
   "/getOsoba/:id",
   verify.verifyRoles(0, 10, 9),
   // verify.checkForCorrectId(),

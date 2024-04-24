@@ -20,6 +20,13 @@ function PharmacyDispensing() {
       icon={prescriptionsIcon}
       key="17"
     ></HomeCard>,
+    <HomeCard
+      title="Predaj zdr. pomôcok"
+      isCalendar={false}
+      path="/free_sale_med_aids"
+      icon={freeSaleMedicamentsIcon}
+      key="25"
+    ></HomeCard>,
   ];
 
   const renderPharmacyDispensingCards = () => {
