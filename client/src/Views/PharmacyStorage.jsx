@@ -29,7 +29,7 @@ function PharmacyStorage() {
       key="20"
     ></HomeCard>,
     <HomeCard
-      title="Vyhľadávanie zdravotnej pomôcky podľa lekární"
+      title="Vyhľadávanie zdr. pomôcky podľa lekární"
       isCalendar={false}
       path="/lekarensky_sklad_vyhladavanieZdrPomockyPodlaLekarni"
       icon={searchIcon}
