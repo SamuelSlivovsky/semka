@@ -6,15 +6,21 @@ import { useNavigate, useLocation } from "react-router";
 import GetUserData from "../Auth/GetUserData";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
+import { InputText } from "primereact/inputtext";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable";
+import customFont from "../Fonts/Roboto/Roboto-Regular.ttf";
 
 export default function PrescriptionCard(props) {
   const [detail, setDetail] = useState("");
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [showOrderDialog, setShowOrderDialog] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [issuedCount, setIssuedCount] = useState(1);
   const toast = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+  const [celkovaSuma, setCelkovaSuma] = useState(0);
 
   useEffect(() => {
     const token = localStorage.getItem("hospit-user");
@@ -80,6 +86,19 @@ export default function PrescriptionCard(props) {
     };
     const formattedDate = formatDate(selectedDate);
 
+    if (issuedCount <= 0 || issuedCount > detail.DOSTUPNY_POCET_NA_SKLADE) {
+      toast.current.show({
+        severity: "error",
+        summary: "Neplatný počet lieku",
+        detail:
+          "Zadaný počet lieku je neplatný. Skontrolujte, či je v rozsahu 1 až " +
+          detail.DOSTUPNY_POCET_NA_SKLADE +
+          ".",
+        life: 6000,
+      });
+      return;
+    }
+
     fetch(`pharmacyPrescriptions/updateDatumZapisu`, {
       method: "POST",
       headers: headers,
@@ -98,6 +117,7 @@ export default function PrescriptionCard(props) {
           });
           decrementPocetNaSklade().then(() => {
             setShowEditDialog(false);
+            generatePDF();
             setTimeout(() => {
               redirectToTabPrescriptions();
             }, 6000);
@@ -183,7 +203,7 @@ export default function PrescriptionCard(props) {
           datum_trvanlivosti: detail.DATUM_TRVANLIVOSTI,
           id_liek: detail.ID_LIEKU,
           id_lekarne: detail.ID_LEKARNE,
-          vydanyPocet: 1,
+          vydanyPocet: issuedCount,
         }),
       });
       toast.current.show({
@@ -220,6 +240,109 @@ export default function PrescriptionCard(props) {
     }
   };
 
+  jsPDF.API.events.push([
+    "addFonts",
+    function () {
+      this.addFont(customFont, "Roboto", "normal");
+    },
+  ]);
+  require("jspdf-autotable");
+  const QRCode = require("qrcode");
+
+  const generatePDF = async () => {
+    const doc = new jsPDF();
+
+    doc.setFont("Roboto", "normal");
+    doc.setFontSize(16);
+    doc.text(
+      "Vydanie lieku na recept v lekárni",
+      doc.internal.pageSize.getWidth() / 2,
+      20,
+      { align: "center" }
+    );
+
+    const qrData = JSON.stringify({
+      idReceptu: detail.ID_RECEPTU,
+      lekaren: detail.NAZOV_LEKARNE,
+      liek: detail.NAZOV_LIEKU,
+      jednotkovaCena: `${parseFloat(detail.JEDNOTKOVA_CENA).toFixed(2)} €`,
+      vydajPocet: issuedCount,
+      celkovaSuma: `${celkovaSuma.toFixed(2)} €`,
+    });
+
+    const qrCodeDataURL = await QRCode.toDataURL(qrData, {
+      errorCorrectionLevel: "H",
+    });
+
+    doc.autoTable({
+      startY: 30,
+      head: [["Položka", "Informácia"]],
+      body: [
+        ["ID receptu", detail.ID_RECEPTU],
+        ["Rodné číslo pacienta", detail.ROD_CISLO],
+        [
+          "Meno, priezvisko pacienta",
+          detail.MENO_PACIENTA + " " + detail.PRIEZVISKO_PACIENTA,
+        ],
+        ["Lekáreň", detail.NAZOV_LEKARNE],
+        ["Liek na recept", detail.NAZOV_LIEKU],
+        ["Poznámka", detail.POZNAMKA],
+        [
+          "Jednotková cena",
+          `${parseFloat(detail.JEDNOTKOVA_CENA).toFixed(2)} €`,
+        ],
+        ["Vydaný počet", issuedCount],
+        ["Celková suma", `${celkovaSuma.toFixed(2)} €`],
+      ],
+      styles: {
+        font: "Roboto",
+        fontSize: 11,
+        halign: "center",
+      },
+      headStyles: {
+        fillColor: [22, 160, 133],
+        halign: "center",
+      },
+      margin: { left: 10, right: 10 },
+      columnStyles: {
+        0: { cellWidth: "auto" },
+        1: { cellWidth: "auto" },
+      },
+    });
+
+    const qrCodeWidth = 50;
+    const qrCodeHeight = 50;
+
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const qrCodeX = (doc.internal.pageSize.getWidth() - qrCodeWidth) / 2;
+    const qrCodeY = pageHeight - qrCodeHeight - 10;
+
+    doc.addImage(
+      qrCodeDataURL,
+      "PNG",
+      qrCodeX,
+      qrCodeY,
+      qrCodeWidth,
+      qrCodeHeight
+    );
+
+    doc.save("vydanie_lieku_na_recept.pdf");
+  };
+
+  // Funkcia na výpočet celkovej sumy
+  const calculateCelkovaSuma = () => {
+    if (detail && issuedCount) {
+      const cena = parseFloat(detail.JEDNOTKOVA_CENA);
+      setCelkovaSuma(cena * parseFloat(issuedCount));
+    } else {
+      setCelkovaSuma(0);
+    }
+  };
+
+  useEffect(() => {
+    calculateCelkovaSuma();
+  }, [issuedCount, detail]);
+
   const renderDetail = (label, value, isEditable = false) => (
     <div className="flex w-100">
       <div className="col-6 m-0">
@@ -231,6 +354,7 @@ export default function PrescriptionCard(props) {
       {isEditable && !detail.DATUM_PREVZATIA && (
         <div className="col-2 m-0">
           <Button
+            label="Vydať liek na recept"
             icon="pi pi-pencil"
             className="p-button-rounded p-button-outlined p-button-raised p-button-warning"
             onClick={() => tryEditDate()}
@@ -285,7 +409,49 @@ export default function PrescriptionCard(props) {
       <Dialog
         visible={showEditDialog}
         onHide={() => setShowEditDialog(false)}
-        header="Nastaviť dátum prevzatia"
+        header={
+          <div
+            style={{
+              margin: "auto",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+            }}
+          >
+            <h3
+              style={{
+                color: "#00796b",
+                borderBottom: "2px solid #004d40",
+                paddingBottom: "5px",
+                marginBottom: "10px",
+                fontWeight: "normal",
+                textTransform: "uppercase",
+                letterSpacing: "1px",
+              }}
+            >
+              Vydanie lieku na recept v lekárni
+            </h3>
+            {detail.NAZOV_LEKARNE}
+            <br />
+            <h5>{detail.NAZOV_LIEKU}</h5>
+            <h5>{parseFloat(detail.JEDNOTKOVA_CENA).toFixed(2)} €</h5>
+            <div style={{ marginTop: "25px" }}>
+              <span
+                style={{
+                  fontWeight: "lighter",
+                  // backgroundColor: "#cafaea",
+                  borderRadius: "15px",
+                  padding: "0.5rem",
+                  border: "#cafaea 5px solid",
+                }}
+              >
+                Celková suma:
+              </span>{" "}
+              {celkovaSuma.toFixed(2)} €
+            </div>
+          </div>
+        }
+        style={{ width: "50vw" }}
         footer={
           <div>
             <Button
@@ -302,11 +468,33 @@ export default function PrescriptionCard(props) {
           </div>
         }
       >
+        <div style={{ marginBottom: "1px", fontWeight: "normal" }}>
+          Vydať počet
+        </div>
+        <InputText
+          type="number"
+          value={issuedCount}
+          onChange={(e) => setIssuedCount(Number(e.target.value))}
+          min="1"
+          max={detail.DOSTUPNY_POCET_NA_SKLADE}
+          style={{ marginTop: "10px", width: "100%" }}
+          placeholder="Počet vydaných liekov"
+        />
+        <div
+          style={{
+            marginBottom: "1px",
+            fontWeight: "normal",
+            marginTop: "20px",
+          }}
+        >
+          Nastaviť dátum prevzatia
+        </div>
         <Calendar
           value={selectedDate}
           onChange={(e) => setSelectedDate(e.value)}
           showIcon
           dateFormat="dd.mm.yy"
+          style={{ marginTop: "5px", width: "100%" }}
         />
       </Dialog>
       <Dialog

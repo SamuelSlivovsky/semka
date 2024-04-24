@@ -11,7 +11,7 @@ async function getZoznamAktualnychReceptov() {
     const result =
       await conn.execute(`select oupac.rod_cislo, oupac.meno as "MENO_PACIENTA", oupac.priezvisko as "PRIEZVISKO_PACIENTA", recept.id_receptu as "ID_RECEPTU",
       to_char(recept.datum_zapisu, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_ZAPISU", to_char(recept.datum_prevzatia, 'DD.MM.YYYY') AS "DATUM_PREVZATIA", liek.nazov as "NAZOV_LIEKU", recept.poznamka, recept.opakujuci,
-    typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA"
+    typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA", liek.jednotkova_cena
     from recept
     join pacient on (pacient.id_pacienta = recept.id_pacienta)
     join zamestnanci on (zamestnanci.cislo_zam = recept.cislo_zam)
@@ -33,7 +33,7 @@ async function getZoznamVydanychReceptov() {
     const result =
       await conn.execute(`select oupac.rod_cislo, oupac.meno as "MENO_PACIENTA", oupac.priezvisko as "PRIEZVISKO_PACIENTA", recept.id_receptu as "ID_RECEPTU",
       to_char(recept.datum_zapisu, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_ZAPISU", to_char(recept.datum_prevzatia, 'DD.MM.YYYY') AS "DATUM_PREVZATIA", liek.nazov as "NAZOV_LIEKU", recept.poznamka, recept.opakujuci,
-    typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA"
+    typ_zam.nazov as "TYP_ZAMESTNANCA", ouzam.meno as "MENO_LEKARA", ouzam.priezvisko as "PRIEZVISKO_LEKARA", liek.jednotkova_cena
     from recept
     join pacient on (pacient.id_pacienta = recept.id_pacienta)
     join zamestnanci on (zamestnanci.cislo_zam = recept.cislo_zam)
@@ -63,6 +63,7 @@ async function getDetailReceptu(idReceptu, cisloZam) {
       liek.id_liek AS "ID_LIEKU", 
       TO_CHAR(trvanlivost_lieku.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') AS "DATUM_TRVANLIVOSTI", 
       liek.nazov AS "NAZOV_LIEKU", 
+      liek.jednotkova_cena,
       recept.poznamka, 
       recept.opakujuci,
       typ_zam.nazov AS "TYP_ZAMESTNANCA", 

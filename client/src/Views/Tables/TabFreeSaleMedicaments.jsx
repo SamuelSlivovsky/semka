@@ -151,7 +151,7 @@ export default function TabFreeSaleMedicaments() {
           "Jednotková cena",
           `${parseFloat(selectedRow.JEDNOTKOVA_CENA).toFixed(2)} €`,
         ],
-        ["Vydať počet", vydajPocet],
+        ["Vydaný počet", vydajPocet],
         ["Celková suma", `${celkovaSuma.toFixed(2)} €`],
       ],
       styles: {

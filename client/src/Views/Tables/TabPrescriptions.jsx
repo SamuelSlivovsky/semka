@@ -168,6 +168,10 @@ export default function TabPrescriptions() {
         operator: FilterOperator.AND,
         constraints: [{ value: null, matchMode: FilterMatchMode.STARTS_WITH }],
       },
+      JEDNOTKOVA_CENA: {
+        operator: FilterOperator.AND,
+        constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
+      },
     });
     setGlobalFilterValue("");
   };
@@ -236,6 +240,7 @@ export default function TabPrescriptions() {
                       "MENO_PACIENTA",
                       "PRIEZVISKO_PACIENTA",
                       "NAZOV_LIEKU",
+                      "JEDNOTKOVA_CENA",
                     ]}
                     emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
                   >
@@ -263,6 +268,14 @@ export default function TabPrescriptions() {
                       field="NAZOV_LIEKU"
                       header={"Liek na predpis"}
                       filter
+                    ></Column>
+                    <Column
+                      field="JEDNOTKOVA_CENA"
+                      header={"Doplatok pacienta"}
+                      filter
+                      body={(rowData) =>
+                        `${parseFloat(rowData.JEDNOTKOVA_CENA).toFixed(2)} €`
+                      }
                     ></Column>
                   </DataTable>
                 ) : (
@@ -320,6 +333,7 @@ export default function TabPrescriptions() {
                       "MENO_PACIENTA",
                       "PRIEZVISKO_PACIENTA",
                       "NAZOV_LIEKU",
+                      "JEDNOTKOVA_CENA",
                     ]}
                     emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
                   >
@@ -347,6 +361,14 @@ export default function TabPrescriptions() {
                       field="NAZOV_LIEKU"
                       header={"Vydaný liek"}
                       filter
+                    ></Column>
+                    <Column
+                      field="JEDNOTKOVA_CENA"
+                      header={"Doplatok pacienta"}
+                      filter
+                      body={(rowData) =>
+                        `${parseFloat(rowData.JEDNOTKOVA_CENA).toFixed(2)} €`
+                      }
                     ></Column>
                   </DataTable>
                 ) : (
