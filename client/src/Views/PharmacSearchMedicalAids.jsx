@@ -236,7 +236,7 @@ export default function PharmacSearchMedicalAids() {
                 letterSpacing: "1px",
               }}
             >
-              Vyhľadávanie lekárne, ktorá má zdravotnú pomôcku skladom
+              Vyhľadávanie lekárne, ktorá má zdr. pomôcku skladom
             </h2>
           </div>
         </div>
