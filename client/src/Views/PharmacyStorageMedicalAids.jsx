@@ -104,12 +104,19 @@ export default function PharmacyStorageMedicalAids() {
             </h3>
           </div>
         </div>
-        <Button
-          style={{ height: "50px", top: "10px", right: "10px" }}
-          label="Objednať zdr. pomôcky"
-          icon="pi pi-upload"
-          onClick={() => navigate("*")}
-        />
+        <div className="flex flex-column">
+          <Button
+            style={{ marginBottom: "10px" }}
+            label="Objednať zdr. pomôcky"
+            icon="pi pi-upload"
+            onClick={() => navigate("*")}
+          />
+          <Button
+            label="Spravovať sklad"
+            icon="pi pi-cog"
+            onClick={() => navigate("*")}
+          />
+        </div>
       </div>
     );
   };
