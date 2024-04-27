@@ -79,6 +79,15 @@ export default function PrescriptionCard(props) {
   };
 
   const handleEditDate = () => {
+    if (!selectedDate) {
+      toast.current.show({
+        severity: "warn",
+        summary: "Chýbajúci dátum prevzatia",
+        detail: "Prosím, nastavte dátum prevzatia lieku.",
+        life: 6000,
+      });
+      return;
+    }
     const token = localStorage.getItem("hospit-user");
     const headers = {
       Authorization: "Bearer " + token,
