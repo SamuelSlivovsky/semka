@@ -16,6 +16,7 @@ export default function TabMedicamentsResevations() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showCancelDialog, setShowCancelDialog] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   // const [showEditDialog, setShowEditDialog] = useState(false);
   // const [selectedDate, setSelectedDate] = useState(null);
@@ -27,6 +28,7 @@ export default function TabMedicamentsResevations() {
   const [prevzateRezervacieLiekov, setPrevzateRezervacieLiekov] = useState([]);
   const [dialogContext, setDialogContext] = useState(""); // 'aktualne' alebo 'vydane'
   const [previousAktualne, setPreviousAktualne] = useState([]);
+  const [celkovaSuma, setCelkovaSuma] = useState(0);
 
   useEffect(() => {
     fetchData();
@@ -128,7 +130,7 @@ export default function TabMedicamentsResevations() {
           <Button
             label="Vydať rezervovaný liek"
             icon="pi pi-check"
-            onClick={() => updateDateReservation()}
+            onClick={() => setShowConfirmDialog(true)}
             autoFocus
           />
         </div>
@@ -229,7 +231,7 @@ export default function TabMedicamentsResevations() {
       });
 
     // Zavrie potvrdzovací dialóg
-    setShowConfirmDialog(false);
+    setShowCancelDialog(false);
   };
 
   const updateDateReservation = () => {
@@ -287,18 +289,83 @@ export default function TabMedicamentsResevations() {
 
   const requestDeleteReservation = (rowData) => {
     setSelectedRow(rowData); // Uložíme si vybranu rezervaciu do stavu
-    setShowConfirmDialog(true); // Zobrazíme potvrdzovací dialog
+    setShowCancelDialog(true); // Zobrazíme potvrdzovací dialog
   };
+
+  // Funkcia na výpočet celkovej sumy
+  const calculateCelkovaSuma = () => {
+    if (selectedRow && selectedRow?.REZERVOVANY_POCET) {
+      const cena = parseFloat(selectedRow.JEDNOTKOVA_CENA);
+      setCelkovaSuma(cena * parseFloat(selectedRow?.REZERVOVANY_POCET));
+    } else {
+      setCelkovaSuma(0);
+    }
+  };
+
+  useEffect(() => {
+    calculateCelkovaSuma();
+  }, [selectedRow?.REZERVOVANY_POCET, selectedRow]);
 
   const renderConfirmDialog = () => {
     return (
       <Dialog
-        header="Zrušenie rezervácie v lekárni"
+        header=<h4
+          style={{
+            margin: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          Potvrdenie rezervácie
+        </h4>
         visible={showConfirmDialog}
+        style={{ width: "450px" }}
+        modal
+        footer={
+          <>
+            <Button
+              label="Nie"
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => {
+                setShowConfirmDialog(false);
+                setShowDialog(false);
+              }}
+            />
+            <Button
+              label="Áno"
+              icon="pi pi-check"
+              className="p-button-text"
+              onClick={() => {
+                updateDateReservation();
+                setShowConfirmDialog(false);
+                setShowDialog(false);
+              }}
+            />
+          </>
+        }
+        onHide={() => setShowConfirmDialog(false)}
+      >
+        <h4>Naozaj chcete vydať rezervovaný liek:</h4>
+        <p>{selectedRow?.NAZOV_LIEKU}</p>
+        <h4>v počte:</h4>
+        <p>{selectedRow?.REZERVOVANY_POCET} ks</p>
+        <h4>v celkovej sume:</h4>
+        <p>{celkovaSuma.toFixed(2)} €</p>
+      </Dialog>
+    );
+  };
+
+  const renderCancelDialog = () => {
+    return (
+      <Dialog
+        header="Zrušenie rezervácie v lekárni"
+        visible={showCancelDialog}
         style={{ width: "950px", textAlign: "center" }}
         modal
         footer={confirmDialogFooter}
-        onHide={() => setShowConfirmDialog(false)}
+        onHide={() => setShowCancelDialog(false)}
       >
         <div
           className="confirmation-content"
@@ -335,7 +402,7 @@ export default function TabMedicamentsResevations() {
         label="Nie"
         icon="pi pi-times"
         className="p-button-text"
-        onClick={() => setShowConfirmDialog(false)}
+        onClick={() => setShowCancelDialog(false)}
       />
       <Button
         label="Áno"
@@ -426,8 +493,9 @@ export default function TabMedicamentsResevations() {
         header={`Aktuálne rezervácie liekov (${aktualneRezervacieLiekov.length})`}
       >
         <div>
-          {renderConfirmDialog()}
+          {renderCancelDialog()}
           <Toast ref={toast} position="top-center" />
+          {renderConfirmDialog()}
           <div className="card">
             {loading ? (
               <div
@@ -529,6 +597,10 @@ export default function TabMedicamentsResevations() {
                 {selectedRow?.REZERVOVANY_POCET}
               </span>
               <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
+                <b>Jednotková cena lieku:</b>{" "}
+                {parseFloat(selectedRow?.JEDNOTKOVA_CENA).toFixed(2)} €
+              </span>
+              <span style={{ marginBottom: "1rem", justifySelf: "start" }}>
                 <b>Dostupné množstvo lieku na sklade:</b>{" "}
                 {selectedRow?.DOSTUPNY_POCET}
               </span>
@@ -568,8 +640,9 @@ export default function TabMedicamentsResevations() {
         header={`Prevzaté rezervácie liekov (${prevzateRezervacieLiekov.length})`}
       >
         <div>
-          {renderConfirmDialog()}
+          {renderCancelDialog()}
           <Toast ref={toast} position="top-center" />
+          {renderConfirmDialog()}
           <div className="card">
             {loading ? (
               <div

@@ -476,7 +476,7 @@ async function getZoznamAktualnychRezervaciiLieku(id) {
     const result = await conn.execute(
       `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
       l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
-      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE", l.jednotkova_cena
       from rezervacia_lieku rl
       join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
       join os_udaje ou on (ou.rod_cislo = rl.rod_cislo)
@@ -501,7 +501,7 @@ async function getZoznamPrevzatychRezervaciiLieku(id) {
     const result = await conn.execute(
       `select rl.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rl.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
       l.nazov as "NAZOV_LIEKU", rl.pocet as "REZERVOVANY_POCET", tl.pocet as "DOSTUPNY_POCET", to_char(rl.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
-      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE", l.jednotkova_cena
       from rezervacia_lieku rl
       join trvanlivost_lieku tl on (tl.id_liek = rl.id_liek and tl.datum_trvanlivosti = rl.datum_trvanlivosti and tl.id_sklad = rl.id_sklad)
       join os_udaje ou on (ou.rod_cislo = rl.rod_cislo)
@@ -510,7 +510,7 @@ async function getZoznamPrevzatychRezervaciiLieku(id) {
       join lekaren lek on (lek.id_lekarne = s.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
       where rl.datum_prevzatia is NOT NULL and cislo_zam = :id
-      order by rl.id_rezervacie`,
+      order by rl.datum_prevzatia`,
       [id]
     );
 
@@ -611,7 +611,7 @@ async function getZoznamAktualnychRezervaciiZdrPomocky(id) {
     const result = await conn.execute(
       `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
       zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
-      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE", zp.jednotkova_cena
       from rezervacia_zdr_pomocky rzp
       join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = rzp.id_zdr_pomocky and tzp.datum_trvanlivosti = rzp.datum_trvanlivosti and tzp.id_sklad = rzp.id_sklad)
       join os_udaje ou on (ou.rod_cislo = rzp.rod_cislo)
@@ -636,7 +636,7 @@ async function getZoznamPrevzatychRezervaciiZdrPomocky(id) {
     const result = await conn.execute(
       `select rzp.id_rezervacie, ou.rod_cislo, ou.meno, ou.priezvisko, to_char(rzp.datum_rezervacie, 'DD.MM.YYYY') as "DATUM_REZERVACIE", 
       zp.nazov as "NAZOV_ZDR_POMOCKY", rzp.pocet as "REZERVOVANY_POCET", tzp.pocet as "DOSTUPNY_POCET", to_char(rzp.datum_prevzatia, 'DD.MM.YYYY') as "DATUM_PREVZATIA",
-      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE"
+      lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE", zp.jednotkova_cena
       from rezervacia_zdr_pomocky rzp
       join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = rzp.id_zdr_pomocky and tzp.datum_trvanlivosti = rzp.datum_trvanlivosti and tzp.id_sklad = rzp.id_sklad)
       join os_udaje ou on (ou.rod_cislo = rzp.rod_cislo)
@@ -645,7 +645,7 @@ async function getZoznamPrevzatychRezervaciiZdrPomocky(id) {
       join lekaren lek on (lek.id_lekarne = s.id_lekarne)
       join zamestnanci zam on (zam.id_lekarne = lek.id_lekarne)
       where rzp.datum_prevzatia is NOT NULL and cislo_zam = :id
-      order by rzp.id_rezervacie`,
+      order by rzp.datum_prevzatia`,
       [id]
     );
 
