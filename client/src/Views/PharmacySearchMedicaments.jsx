@@ -409,6 +409,7 @@ export default function PharmacySearchMedicaments(props) {
             onChange={(e) =>
               setNewReservation({ ...newReservation, pocet: e.target.value })
             }
+            min="1"
             placeholder="Zadajte počet kusov"
             type="number"
             required

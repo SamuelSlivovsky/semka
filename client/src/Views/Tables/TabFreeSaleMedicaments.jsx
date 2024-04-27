@@ -498,6 +498,7 @@ export default function TabFreeSaleMedicaments() {
               <InputText
                 value={vydajPocet}
                 onChange={(e) => setVydajPocet(e.target.value)}
+                min="1"
                 placeholder="Zadajte počet na výdaj"
                 type="number"
                 max={selectedRow.POCET}

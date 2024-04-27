@@ -78,7 +78,12 @@ export default function PrescriptionCard(props) {
     return `${day}.${month}.${year}`;
   };
 
-  const handleEditDate = () => {
+  const allowedPhoneNumbers = ["+421907243074"];
+  const isPhoneNumberAllowed = (phoneNumber) => {
+    return allowedPhoneNumbers.includes(phoneNumber);
+  };
+
+  const handleEditDate = async () => {
     if (!selectedDate) {
       toast.current.show({
         severity: "warn",
@@ -88,114 +93,120 @@ export default function PrescriptionCard(props) {
       });
       return;
     }
+
     const token = localStorage.getItem("hospit-user");
     const headers = {
       Authorization: "Bearer " + token,
       "Content-Type": "application/json",
     };
-    const formattedDate = formatDate(selectedDate);
 
+    const formattedDate = formatDate(selectedDate);
     if (issuedCount <= 0 || issuedCount > detail.DOSTUPNY_POCET_NA_SKLADE) {
       toast.current.show({
         severity: "error",
         summary: "Neplatný počet lieku",
-        detail:
-          "Zadaný počet lieku je neplatný. Skontrolujte, či je v rozsahu 1 až " +
-          detail.DOSTUPNY_POCET_NA_SKLADE +
-          ".",
+        detail: `Zadaný počet lieku je neplatný. Skontrolujte, či je v rozsahu 1 až ${detail.DOSTUPNY_POCET_NA_SKLADE}.`,
         life: 6000,
       });
       return;
     }
 
-    fetch(`pharmacyPrescriptions/updateDatumZapisu`, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        id_receptu: detail.ID_RECEPTU,
-        datum_prevzatia: formattedDate,
-      }),
-    })
-      .then((res) => {
+    // Aktualizácia dátumu zápisu
+    try {
+      const res = await fetch("pharmacyPrescriptions/updateDatumZapisu", {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          id_receptu: detail.ID_RECEPTU,
+          datum_prevzatia: formattedDate,
+        }),
+      });
+
+      if (res.ok) {
+        toast.current.show({
+          severity: "success",
+          summary: "Úspech",
+          detail: "Dátum prevzatia bol úspešne aktualizovaný!",
+          life: 6000,
+        });
+        decrementPocetNaSklade().then(() => {
+          setShowEditDialog(false);
+          generatePDF();
+          setTimeout(() => {
+            redirectToTabPrescriptions();
+          }, 6000);
+        });
+      } else {
+        const errorData = await res.json();
+        toast.current.show({
+          severity: "error",
+          summary: "Chyba",
+          detail:
+            errorData.message ||
+            "Nastala chyba pri aktualizácii dátumu prevzatia.",
+          life: 6000,
+        });
+      }
+    } catch (error) {
+      toast.current.show({
+        severity: "error",
+        summary: "Chyba",
+        detail: "Nepodarilo sa odoslať požiadavku.",
+        life: 6000,
+      });
+    }
+
+    // Odoslanie SMS
+    if (isPhoneNumberAllowed(detail.TELEFON)) {
+      try {
+        const res = await fetch("pharmacyPrescriptions/sendSMS", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({
+            datum_prevzatia: formattedDate,
+            nazov_lekarne: detail.NAZOV_LEKARNE,
+            meno_pacienta: detail.MENO_PACIENTA,
+            priezvisko_pacienta: detail.PRIEZVISKO_PACIENTA,
+            nazov_lieku: detail.NAZOV_LIEKU,
+            telefon: detail.TELEFON,
+          }),
+        });
+
         if (res.ok) {
           toast.current.show({
             severity: "success",
             summary: "Úspech",
-            detail: "Dátum prevzatia bol úspešne aktualizovaný!",
+            detail: "SMS notifikácia bola pacientovi úspešne odoslaná!",
             life: 6000,
           });
-          decrementPocetNaSklade().then(() => {
-            setShowEditDialog(false);
-            generatePDF();
-            setTimeout(() => {
-              redirectToTabPrescriptions();
-            }, 6000);
-          });
         } else {
-          // Handle error response
-          res.json().then((errorData) => {
-            toast.current.show({
-              severity: "error",
-              summary: "Chyba",
-              detail:
-                errorData.message ||
-                "Nastala chyba pri aktualizácii dátumu prevzatia.",
-              life: 6000,
-            });
+          const errorData = await res.json();
+          toast.current.show({
+            severity: "error",
+            summary: "Chyba",
+            detail:
+              errorData.message ||
+              "Nastala chyba pri odosielaní SMS notifikácie.",
+            life: 6000,
           });
         }
-      })
-      .catch((error) => {
-        // V prípade chyby v sieti alebo inej chyby
+      } catch (error) {
         toast.current.show({
           severity: "error",
           summary: "Chyba",
           detail: "Nepodarilo sa odoslať požiadavku.",
           life: 6000,
         });
+      }
+    } else {
+      toast.current.show({
+        severity: "warn",
+        summary: "Varovanie",
+        detail:
+          "Pacientove telefónne číslo nie je zaregistrované na odosielanie SMS.",
+        life: 6000,
       });
-    fetch(`pharmacyPrescriptions/sendSMS`, {
-      method: "POST",
-      headers: headers,
-      body: JSON.stringify({
-        datum_prevzatia: formattedDate,
-        nazov_lekarne: detail.NAZOV_LEKARNE,
-        meno_pacienta: detail.MENO_PACIENTA,
-        priezvisko_pacienta: detail.PRIEZVISKO_PACIENTA,
-        nazov_lieku: detail.NAZOV_LIEKU,
-        telefon: detail.TELEFON,
-      }),
-    })
-      .then((res) => {
-        if (res.ok) {
-          toast.current.show({
-            severity: "success",
-            summary: "Úspech",
-            detail: "SMS notifikácia bola pacientovi úspeśne odoslaná!",
-            life: 6000,
-          });
-        } else {
-          // Handle error response
-          res.json().then((errorData) => {
-            toast.current.show({
-              severity: "error",
-              summary: "Chyba",
-              detail:
-                errorData.message ||
-                "Nastala chyba pri odosielaní SMS notifikácie.",
-              life: 6000,
-            });
-          });
-        }
-      })
-      .catch((error) => {
-        toast.current.show({
-          severity: "error",
-          summary: "Chyba",
-          detail: "Nepodarilo sa odoslať požiadavku.",
-          life: 6000,
-        });
-      });
+    }
   };
 
   const decrementPocetNaSklade = async () => {

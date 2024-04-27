@@ -397,6 +397,7 @@ export default function PharmacSearchMedicalAids() {
             onChange={(e) =>
               setNewReservation({ ...newReservation, pocet: e.target.value })
             }
+            min="1"
             placeholder="Zadajte počet kusov"
             type="number"
             required
