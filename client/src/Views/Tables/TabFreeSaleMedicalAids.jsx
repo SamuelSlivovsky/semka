@@ -16,6 +16,7 @@ export default function TabFreeSaleMedicalAids() {
   const [globalFilterValue, setGlobalFilterValue] = useState("");
   const [filters, setFilters] = useState(null);
   const [showDialog, setShowDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
   const toast = useRef(null);
   const [volnyPredajZdrPomocok, setVolnyPredajZdrPomocok] = useState([]);
@@ -263,10 +264,61 @@ export default function TabFreeSaleMedicalAids() {
         <Button
           label="Vydať"
           icon="pi pi-shopping-cart"
-          onClick={() => onSubmit()}
+          onClick={() => setShowConfirmDialog(true)}
           autoFocus
         />
       </div>
+    );
+  };
+
+  const renderConfirmDialog = () => {
+    return (
+      <Dialog
+        header=<h4
+          style={{
+            margin: "auto",
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+          }}
+        >
+          Potvrdenie výdaja zdr. pomôcky
+        </h4>
+        visible={showConfirmDialog}
+        style={{ width: "450px" }}
+        modal
+        footer={
+          <>
+            <Button
+              label="Nie"
+              icon="pi pi-times"
+              className="p-button-text"
+              onClick={() => {
+                setShowConfirmDialog(false);
+                setShowDialog(false);
+              }}
+            />
+            <Button
+              label="Áno"
+              icon="pi pi-check"
+              className="p-button-text"
+              onClick={() => {
+                onSubmit();
+                setShowConfirmDialog(false);
+                setShowDialog(false);
+              }}
+            />
+          </>
+        }
+        onHide={() => setShowConfirmDialog(false)}
+      >
+        <h4>Naozaj chcete vydať zdr. pomôcku:</h4>
+        <p>{selectedRow?.NAZOV_ZDR_POMOCKY}</p>
+        <h4>v počte:</h4>
+        <p>{vydajPocet} ks</p>
+        <h4>v celkovej sume:</h4>
+        <p>{celkovaSuma.toFixed(2)} €</p>
+      </Dialog>
     );
   };
 
@@ -365,6 +417,7 @@ export default function TabFreeSaleMedicalAids() {
   return (
     <div>
       <Toast ref={toast} position="top-center" />
+      {renderConfirmDialog()}
       <div className="card">
         <DataTable
           value={volnyPredajZdrPomocok}

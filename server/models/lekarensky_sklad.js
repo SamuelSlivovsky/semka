@@ -90,7 +90,7 @@ async function getVolnyPredajLiekov(id) {
     const result = await conn.execute(
       `select DISTINCT l.id_liek, l.nazov as "NAZOV_LIEKU", ROUND(l.jednotkova_cena, 2) as "JEDNOTKOVA_CENA", ul.nazov as "UCINNA_LATKA",
        tl.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE",
-        to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET"
+        to_char(tl.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tl.pocet as "POCET"
         from liek l
         join ucinne_latky_liekov ull on (ull.id_liek = l.id_liek)
         join ucinna_latka ul on (ul.id_ucinna_latka = ull.id_ucinna_latka)
@@ -114,7 +114,7 @@ async function updatePocetVolnopredajnehoLieku(body) {
     let conn = await database.getConnection();
     const sqlStatement = `UPDATE trvanlivost_lieku
     SET pocet = pocet - :vydanyPocet
-    WHERE datum_trvanlivosti = TO_DATE(:datumTrvanlivosti, 'DD.MM.YYYY')
+    WHERE datum_trvanlivosti = TO_DATE(:datumTrvanlivosti, 'DD.MM.YYYY HH24:MI:SS')
     AND id_liek = :idLiek
     AND id_sklad IN (SELECT id_sklad FROM sklad WHERE id_lekarne = :idLekarne)
     AND pocet >= :vydanyPocet`;
@@ -142,7 +142,7 @@ async function getVolnyPredajZdrPomocok(id) {
     const result = await conn.execute(
       `select DISTINCT zp.id_zdr_pomocky, zp.nazov as "NAZOV_ZDR_POMOCKY", ROUND(zp.jednotkova_cena, 2) as "JEDNOTKOVA_CENA",
       tzp.id_sklad, lek.id_lekarne, lek.nazov as "NAZOV_LEKARNE",
-       to_char(tzp.datum_trvanlivosti, 'DD.MM.YYYY') as "DATUM_TRVANLIVOSTI", tzp.pocet as "POCET"
+       to_char(tzp.datum_trvanlivosti, 'DD.MM.YYYY HH24:MI:SS') as "DATUM_TRVANLIVOSTI", tzp.pocet as "POCET"
        from zdravotna_pomocka zp
        join trvanlivost_zdr_pomocky tzp on (tzp.id_zdr_pomocky = zp.id_zdr_pomocky)
        join sklad ls on (ls.id_sklad = tzp.id_sklad)
@@ -164,7 +164,7 @@ async function updatePocetVolnopredajnejZdrPomocky(body) {
     let conn = await database.getConnection();
     const sqlStatement = `UPDATE trvanlivost_zdr_pomocky
     SET pocet = pocet - :vydanyPocet
-    WHERE datum_trvanlivosti = TO_DATE(:datumTrvanlivosti, 'DD.MM.YYYY')
+    WHERE datum_trvanlivosti = TO_DATE(:datumTrvanlivosti, 'DD.MM.YYYY HH24:MI:SS')
     AND id_zdr_pomocky = :idZdrPomocky
     AND id_sklad IN (SELECT id_sklad FROM sklad WHERE id_lekarne = :idLekarne)
     AND pocet >= :vydanyPocet`;
