@@ -9,7 +9,7 @@ router.get(
   controller.getRoomsByHospital
 );
 router.get(
-  '/bedAvailability',
+  '/bedAvailability/:hospitalId',
   verify.verifyRoles(0, 2, 3),
   controller.getWardRoomsAvailability
 );

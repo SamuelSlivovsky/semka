@@ -13,5 +13,10 @@ router.get(
   verify.verifyRoles(0, 2, 3),
   controller.getBedsForRoom
 );
+router.get(
+  '/room/patientBirthNumber/:bedId',
+  verify.verifyRoles(0, 2, 3),
+  controller.getPatientBirthNumberFromBed
+);
 
 module.exports = router;

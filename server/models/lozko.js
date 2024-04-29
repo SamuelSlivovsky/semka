@@ -11,6 +11,11 @@ async function getBedsForRoom(roomId) {
               WHEN pl.id_pacienta IS NULL THEN null
               ELSE ou.meno || ' ' || ou.priezvisko
           END meno,
+          CASE
+              WHEN pl.id_pacienta IS NULL THEN null
+              WHEN MOD(SUBSTR(ou.rod_cislo, 3, 2), 50) = 0 THEN 'F'
+              ELSE 'M'
+          END pohlavie,
           pl.pobyt_od,
           pl.pobyt_do
       FROM 
@@ -39,6 +44,31 @@ async function getBedsForRoom(roomId) {
   }
 }
 
+async function getPatientBirthNumberFromBed(bedId) {
+  try {
+    let conn = await database.getConnection();
+    const result = await conn.execute(
+      `
+      SELECT 
+          p.rod_cislo
+      FROM
+          lozko l
+      JOIN pacient_lozko pl ON pl.id_lozka = l.id_lozka
+      JOIN pacient p ON p.id_pacienta = pl.id_pacienta
+      WHERE 
+          l.id_lozka = :bedId
+    `,
+      {
+        bedId: bedId,
+      }
+    );
+
+    return result.rows[0];
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 async function getNeobsadeneLozka(id) {
   console.log(id);
   try {
@@ -51,11 +81,12 @@ async function getNeobsadeneLozka(id) {
 
     return result.rows;
   } catch (err) {
-    throw new Error("Database error: " + err);
+    throw new Error('Database error: ' + err);
   }
 }
 
 module.exports = {
   getNeobsadeneLozka,
   getBedsForRoom,
+  getPatientBirthNumberFromBed,
 };

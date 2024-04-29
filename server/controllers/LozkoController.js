@@ -17,4 +17,15 @@ module.exports = {
       res.status(500).send(err);
     });
   },
+  getPatientBirthNumberFromBed: (req, res) => {
+    const lozko = require('../models/lozko');
+    (async () => {
+      ret_val = await lozko.getPatientBirthNumberFromBed(req.params.bedId);
+      res.status(200).json(ret_val);
+    })().catch((err) => {
+      // error handling logic 1
+      console.error(err); // logging error
+      res.status(500).send(err);
+    });
+  },
 };

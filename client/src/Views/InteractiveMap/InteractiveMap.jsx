@@ -20,6 +20,7 @@ export default function InteractiveMap() {
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
   const [selectedNurse, setSelectedNurse] = useState(null);
+  const [selectedSexTypeRoom, setSelectedSexTypeRoom] = useState(null);
   const [selectedHospitalizedPatient, setSelectedHospitalizedPatient] =
     useState(null);
   const [departments, setDepartments] = useState([]);
@@ -40,12 +41,14 @@ export default function InteractiveMap() {
     toBedId: Number | null,
     fromRoomNumber: String,
     toRoomNumber: String | null,
+    isMansRoom: Boolean,
     patientHospitalizedFrom: moment.Moment,
     patientHospitalizedTo: moment.Moment,
   });
   const [moveRoomData, setMoveRoomData] = useState({
     roomNumber: String,
     isWardRoom: Boolean,
+    isManRoom: Boolean,
     departmentName: String,
     doctor: Object,
     nurse: Object,
@@ -137,9 +140,24 @@ export default function InteractiveMap() {
     try {
       const token = localStorage.getItem('hospit-user');
       const headers = { authorization: 'Bearer ' + token };
-      let response = await fetch(`/miestnost/bedAvailability`, { headers });
+      let response = await fetch(`/miestnost/bedAvailability/40`, { headers });
       response = await response.json();
       setBedAvailability(response);
+    } catch (error) {
+      console.error('Error fetching bed data:', error);
+      throw error;
+    }
+  };
+
+  const getPatientBirthNumberFromBedId = async (bedId) => {
+    try {
+      const token = localStorage.getItem('hospit-user');
+      const headers = { authorization: 'Bearer ' + token };
+      let response = await fetch(`/lozko/room/patientBirthNumber/${bedId}`, {
+        headers,
+      });
+      response = await response.json();
+      return response;
     } catch (error) {
       console.error('Error fetching bed data:', error);
       throw error;
@@ -265,6 +283,7 @@ export default function InteractiveMap() {
     bedID,
     hospitalizedFrom,
     hospitalizedTo,
+    isMansRoom,
     roomNumber,
     departmentName,
     doctor,
@@ -275,6 +294,7 @@ export default function InteractiveMap() {
       toBedId: null,
       fromRoomNumber: roomNumber,
       toRoomNumber: null,
+      isMansRoom: Boolean(isMansRoom),
       patientHospitalizedFrom: moment(hospitalizedFrom),
       patientHospitalizedTo: moment(hospitalizedTo),
     });
@@ -342,25 +362,26 @@ export default function InteractiveMap() {
               ></Column>
               <Column
                 field='button'
-                body={(rowData) =>
-                  rowData.MENO ? (
+                body={(rowData) => {
+                  return rowData.MENO ? (
                     <div
                       dangerouslySetInnerHTML={{
                         __html: `
-                        <button class="p-button p-component pi pi-arrow-up-right" onClick="displayPatientMovePopup(
-                          ${rowData.ID_LOZKA}, 
-                          '${rowData.POBYT_OD}', 
-                          '${rowData.POBYT_DO}', 
-                          '${roomNumber}', 
-                          '${departmentName}', 
-                          ${JSON.stringify(doctor)?.replace(/"/g, '&quot;')}, 
-                          ${JSON.stringify(nurse)?.replace(/"/g, '&quot;')}
-                        )"></button>
-                  `,
+                          <button class="p-button p-component pi pi-arrow-up-right" onClick="displayPatientMovePopup(
+                            ${rowData.ID_LOZKA}, 
+                            '${rowData.POBYT_OD}', 
+                            '${rowData.POBYT_DO}', 
+                            '${rowData.POHLAVIE === 'M' ? true : false}',
+                            '${roomNumber}', 
+                            '${departmentName}', 
+                            ${JSON.stringify(doctor)?.replace(/"/g, '&quot;')}, 
+                            ${JSON.stringify(nurse)?.replace(/"/g, '&quot;')}
+                          )"></button>
+                    `,
                       }}
                     ></div>
-                  ) : null
-                }
+                  ) : null;
+                }}
               ></Column>
             </DataTable>
           </div>
@@ -484,6 +505,16 @@ export default function InteractiveMap() {
     );
   };
 
+  const isMensRoom = (roomNumber) => {
+    const selectedRoom = rooms.find(
+      (room) => room.ID_MIESTNOSTI === roomNumber
+    );
+
+    return (
+      selectedRoom?.KAPACITA > 1 && Boolean(selectedRoom?.JE_MUZSKA) === true
+    );
+  };
+
   const filterRooms = (feature) => {
     const selectedFloorFeature = getSelectedFloorFeature(
       feature?.properties.level
@@ -494,6 +525,7 @@ export default function InteractiveMap() {
     const isDoctorRoom = isDoctorsRoom(roomNumber);
     const isNurseRoom = isNursesRoom(roomNumber);
     const isPatientRoom = isHospitalizedPatientRoom(roomNumber);
+    const isMenRoom = isMensRoom(roomNumber);
 
     const isRoomForSelectedDepartment =
       selectedDepartment === null || department === selectedDepartment;
@@ -501,18 +533,47 @@ export default function InteractiveMap() {
     if (selectedDoctor !== null && selectedNurse !== null) {
       // Both doctor and nurse are selected, show rooms for both in the selected department
       return (isDoctorRoom || isNurseRoom) && isRoomForSelectedDepartment;
+    } else if (selectedDoctor !== null && selectedSexTypeRoom !== null) {
+      // Doctor and gender filter are selected, show rooms for the doctor and matching the selected gender
+      if (
+        (isDoctorRoom && selectedSexTypeRoom === 'M' && isMenRoom) ||
+        (isDoctorRoom && selectedSexTypeRoom === 'F' && !isMenRoom)
+      ) {
+        return isRoomForSelectedDepartment;
+      } else {
+        return false;
+      }
     } else if (selectedDoctor !== null) {
       // Only doctor is selected, show only doctor rooms for the selected department
       return isDoctorRoom && isRoomForSelectedDepartment;
+    } else if (selectedNurse !== null && selectedSexTypeRoom !== null) {
+      // Nurse and gender filter are selected, show rooms for the nurse and matching the selected gender
+      if (
+        (isNurseRoom && selectedSexTypeRoom === 'M' && isMenRoom) ||
+        (isNurseRoom && selectedSexTypeRoom === 'F' && !isMenRoom)
+      ) {
+        return isRoomForSelectedDepartment;
+      } else {
+        return false;
+      }
     } else if (selectedNurse !== null) {
       // Only nurse is selected, show only nurse rooms for the selected department
       return isNurseRoom && isRoomForSelectedDepartment;
     } else if (selectedHospitalizedPatient !== null) {
       // Only hospitalized patient is selected, show rooms for the selected patient
       return isPatientRoom && isRoomForSelectedDepartment;
+    } else if (selectedSexTypeRoom !== null) {
+      // Gender filter is selected, show rooms based on selected gender
+      if (selectedSexTypeRoom === 'M') {
+        return isMenRoom && isRoomForSelectedDepartment;
+      } else if (selectedSexTypeRoom === 'F') {
+        return !isMenRoom && isRoomForSelectedDepartment;
+      } else {
+        return false; // Invalid gender selected
+      }
     }
 
-    // Neither doctor nor nurse nor patient is selected, show only the selected floor
+    // Neither doctor nor nurse nor patient nor gender filter is selected, show only the selected floor
     return (
       feature?.properties.level.some((level) => level === selectedFloor) &&
       isRoomForSelectedDepartment
@@ -553,11 +614,13 @@ export default function InteractiveMap() {
 
   const renderPatientMoveDialog = () => {
     const bed = bedAvailability.filter((availableBed) =>
-      rooms.some(
-        (room) =>
+      rooms.some((room) => {
+        return (
           room.ID_MIESTNOSTI === availableBed.ID_MIESTNOSTI &&
-          availableBed.POCET_PACIENTOV <= availableBed.KAPACITA
-      )
+          availableBed.POCET_PACIENTOV <= availableBed.KAPACITA &&
+          Boolean(availableBed.JE_MUZSKA) === patientMoveData.isMansRoom
+        );
+      })
     );
 
     return (
@@ -606,11 +669,22 @@ export default function InteractiveMap() {
             value={patientMoveData.toRoomNumber}
             onChange={(e) => setPatientMoveRoom(e.value || null)}
             options={[
-              { label: 'Do miestnosti', value: null, disabled: true },
-              ...bed.map((room) => ({
-                label: room.ID_MIESTNOSTI,
-                value: room.ID_MIESTNOSTI,
-              })),
+              {
+                label: 'Do miestnosti (Voľné lôžka/Celkovo počet lôžok)',
+                value: null,
+                disabled: true,
+              },
+              ...bed.map((room) => {
+                const occupiedBeds = room.POCET_PACIENTOV || 0;
+                const totalBeds = room.KAPACITA || 0;
+                const freeBeds = totalBeds - occupiedBeds;
+                const label = `${room.ID_MIESTNOSTI} (${freeBeds}/${totalBeds})`;
+
+                return {
+                  label: label,
+                  value: room.ID_MIESTNOSTI,
+                };
+              }),
             ]}
             placeholder='Do miestnosti'
             showClear={true}
@@ -741,6 +815,28 @@ export default function InteractiveMap() {
                 }
                 showClear={true}
               />
+              <Dropdown
+                value={selectedSexTypeRoom}
+                onChange={(e) => handleSexRoomTypeChange(e.value || null)}
+                placeholder='Typ miestnosti podľa pohlavia'
+                className='left-map-menu-container-patient'
+                options={[
+                  {
+                    label: 'Typ miestnosti podľa pohlavia',
+                    value: null,
+                    disabled: true,
+                  },
+                  {
+                    label: 'Mužské miestnosti',
+                    value: 'M',
+                  },
+                  {
+                    label: 'Ženské miestnosti',
+                    value: 'F',
+                  },
+                ]}
+                showClear={true}
+              />
             </div>
           </div>
           <TileLayer url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
@@ -781,6 +877,10 @@ export default function InteractiveMap() {
 
   const handleHospitalizedPatientChange = (hospitalizedPatient) => {
     setSelectedHospitalizedPatient(hospitalizedPatient);
+  };
+
+  const handleSexRoomTypeChange = (roomType) => {
+    setSelectedSexTypeRoom(roomType);
   };
 
   const renderBedData = (rowData, bedInfo) => {

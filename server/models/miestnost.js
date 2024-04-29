@@ -41,7 +41,7 @@ async function getRoomsForHospital(hospitalId) {
   }
 }
 
-async function getWardRoomsAvailability() {
+async function getWardRoomsAvailability(hospitalId) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
@@ -49,7 +49,8 @@ async function getWardRoomsAvailability() {
       SELECT 
           m.id_miestnosti,
           m.kapacita,
-          COUNT(pl.id_lozka) AS pocet_pacientov
+          COUNT(pl.id_lozka) AS pocet_pacientov,
+          m.je_muzska
       FROM 
           miestnost m
       LEFT JOIN 
@@ -62,10 +63,15 @@ async function getWardRoomsAvailability() {
           os_udaje ou ON ou.rod_cislo = p.rod_cislo
       WHERE 
           m.kapacita > 2
+          AND m.id_nemocnice = :hospitalId
       GROUP BY 
           m.id_miestnosti, 
-          m.kapacita
-    `
+          m.kapacita,
+          m.je_muzska
+    `,
+      {
+        hospitalId: hospitalId,
+      }
     );
 
     return result.rows;

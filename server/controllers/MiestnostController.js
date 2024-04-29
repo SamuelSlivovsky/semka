@@ -13,7 +13,7 @@ module.exports = {
   getWardRoomsAvailability: (req, res) => {
     const miestnost = require('../models/miestnost');
     (async () => {
-      ret_val = await miestnost.getWardRoomsAvailability();
+      ret_val = await miestnost.getWardRoomsAvailability(req.params.hospitalId);
       res.status(200).json(ret_val);
     })().catch((err) => {
       // error handling logic 1
