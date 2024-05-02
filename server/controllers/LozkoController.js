@@ -9,7 +9,7 @@ module.exports = {
   getBedsForRoom: (req, res) => {
     const lozko = require('../models/lozko');
     (async () => {
-      ret_val = await lozko.getBedsForRoom(req.params.roomId);
+      ret_val = await lozko.getBedsForRoom(req.params.roomId, req.params.from);
       res.status(200).json(ret_val);
     })().catch((err) => {
       // error handling logic 1

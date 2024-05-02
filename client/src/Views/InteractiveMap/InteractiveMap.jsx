@@ -5,7 +5,8 @@ import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
-import React, { useEffect, useState } from 'react';
+import { Calendar } from 'primereact/calendar';
+import React, { useEffect, useState, useRef } from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import { GeoJSON, MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 
@@ -16,6 +17,8 @@ export default function InteractiveMap() {
     POBYT_OD: 'pobyt_od',
     POBYT_DO: 'pobyt_do',
   };
+  const calendarRef = useRef(null);
+  const [roomsFrom, setRoomsFrom] = useState(moment());
   const [selectedFloor, setSelectedFloor] = useState(1);
   const [selectedDepartment, setSelectedDepartment] = useState(null);
   const [selectedDoctor, setSelectedDoctor] = useState(null);
@@ -44,6 +47,7 @@ export default function InteractiveMap() {
     isMansRoom: Boolean,
     patientHospitalizedFrom: moment.Moment,
     patientHospitalizedTo: moment.Moment,
+    dateWhenMove: moment.Moment,
   });
   const [moveRoomData, setMoveRoomData] = useState({
     roomNumber: String,
@@ -57,6 +61,11 @@ export default function InteractiveMap() {
   useEffect(() => {
     setEquipment([{ equipment: 'Teplomer', quantity: 3 }]);
   }, []);
+
+  useEffect(() => {
+    getWardRoomAvailability();
+    getHospitalMapData();
+  }, [roomsFrom]);
 
   useEffect(() => {
     const token = localStorage.getItem('hospit-user');
@@ -140,7 +149,14 @@ export default function InteractiveMap() {
     try {
       const token = localStorage.getItem('hospit-user');
       const headers = { authorization: 'Bearer ' + token };
-      let response = await fetch(`/miestnost/bedAvailability/40`, { headers });
+      let response = await fetch(
+        `/miestnost/bedAvailability/40/from/${
+          roomsFrom ? moment(roomsFrom).format('DD.MM.YYYY HH:mm') : ''
+        }`,
+        {
+          headers,
+        }
+      );
       response = await response.json();
       setBedAvailability(response);
     } catch (error) {
@@ -168,7 +184,12 @@ export default function InteractiveMap() {
     try {
       const token = localStorage.getItem('hospit-user');
       const headers = { authorization: 'Bearer ' + token };
-      let response = await fetch(`/lozko/room/${roomNumber}`, { headers });
+      let response = await fetch(
+        `/lozko/room/${roomNumber}/from/${moment(
+          calendarRef?.current?.getCurrentDateTime()
+        ).format('DD.MM.YYYY HH:mm')}`,
+        { headers }
+      );
       return await response.json();
     } catch (error) {
       console.error('Error fetching bed data:', error);
@@ -202,7 +223,7 @@ export default function InteractiveMap() {
           'DD.MM.YYYY'
         )}/${moment(patientMoveData.patientHospitalizedTo).format(
           'DD.MM.YYYY'
-        )}`,
+        )}/${moment(patientMoveData.dateWhenMove).format('DD.MM.YYYY HH:mm')}`,
 
         requestOptions
       );
@@ -297,6 +318,7 @@ export default function InteractiveMap() {
       isMansRoom: Boolean(isMansRoom),
       patientHospitalizedFrom: moment(hospitalizedFrom),
       patientHospitalizedTo: moment(hospitalizedTo),
+      dateWhenMove: null,
     });
 
     setMoveRoomData({
@@ -712,6 +734,27 @@ export default function InteractiveMap() {
             showClear={true}
           />
         </div>
+        <div className='patient-move-dialog-inputs'>
+          <label htmlFor='patientMoveDate'>Kedy presunúť</label>
+          <Calendar
+            id='patientMoveDate'
+            value={
+              patientMoveData.dateWhenMove
+                ? moment(patientMoveData.dateWhenMove).toDate()
+                : null
+            }
+            dateFormat='dd.mm.yy'
+            showTime
+            hourFormat='24'
+            onChange={(e) =>
+              setPatientMoveData((prevData) => ({
+                ...prevData,
+                dateWhenMove: moment(e.value),
+              }))
+            }
+            placeholder='Kedy presunúť'
+          />
+        </div>
         <div>
           <Button label='Presunúť pacienta' onClick={movePatient} />
         </div>
@@ -740,6 +783,17 @@ export default function InteractiveMap() {
           <div className='left-map-menu-container'>
             {/* <Button onClick={() => onSubmit()}>Update</Button> */}
             <div className='left-map-menu-container-select-boxes'>
+              <Calendar
+                value={roomsFrom ? moment(roomsFrom).toDate() : null}
+                ref={calendarRef}
+                dateFormat='dd.mm.yy'
+                showTime
+                hourFormat='24'
+                onChange={(e) => {
+                  setRoomsFrom(moment(e.value));
+                }}
+                placeholder='Zobraziť od'
+              ></Calendar>
               <Dropdown
                 value={selectedDepartment}
                 onChange={(e) =>

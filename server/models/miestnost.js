@@ -1,4 +1,5 @@
 const database = require('../database/Database');
+const moment = require('moment');
 
 async function getMiestnosti(id) {
   try {
@@ -41,36 +42,39 @@ async function getRoomsForHospital(hospitalId) {
   }
 }
 
-async function getWardRoomsAvailability(hospitalId) {
+async function getWardRoomsAvailability(hospitalId, roomsFrom) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
       `
       SELECT 
-          m.id_miestnosti,
-          m.kapacita,
-          COUNT(pl.id_lozka) AS pocet_pacientov,
-          m.je_muzska
+        m.id_miestnosti,
+        m.kapacita,
+        COUNT(pl.id_lozka) AS pocet_pacientov,
+        m.je_muzska
       FROM 
-          miestnost m
+        miestnost m
       LEFT JOIN 
-          lozko l ON l.id_miestnost = m.id_miestnosti AND l.id_nemocnice = m.id_nemocnice
+        lozko l ON l.id_miestnost = m.id_miestnosti AND l.id_nemocnice = m.id_nemocnice
       LEFT JOIN 
-          pacient_lozko pl ON pl.id_lozka = l.id_lozka
+        pacient_lozko pl ON pl.id_lozka = l.id_lozka AND pl.pobyt_do >= TO_DATE(:roomsFrom, 'DD.MM.YYYY HH24:MI')
       LEFT JOIN 
-          pacient p ON p.id_pacienta = pl.id_pacienta
+        pacient p ON p.id_pacienta = pl.id_pacienta
       LEFT JOIN 
-          os_udaje ou ON ou.rod_cislo = p.rod_cislo
+        os_udaje ou ON ou.rod_cislo = p.rod_cislo
       WHERE 
-          m.kapacita > 2
-          AND m.id_nemocnice = :hospitalId
+        m.kapacita > 2
+        AND m.id_nemocnice = :hospitalId
       GROUP BY 
-          m.id_miestnosti, 
-          m.kapacita,
-          m.je_muzska
+        m.id_miestnosti, 
+        m.kapacita,
+        m.je_muzska
     `,
       {
         hospitalId: hospitalId,
+        roomsFrom: roomsFrom
+          ? moment(roomsFrom, 'DD.MM.YYYY HH:mm').format('DD.MM.YYYY HH:mm')
+          : moment().format('DD.MM.YYYY HH:mm'),
       }
     );
 
@@ -108,7 +112,8 @@ async function movePatientToAnotherRoom(
   bedIdFrom,
   bedIdTo,
   hospitalizedFrom,
-  hospitalizedTo
+  hospitalizedTo,
+  dateWhenMove
 ) {
   try {
     if (!bedIdFrom || !bedIdTo || !hospitalizedFrom || !hospitalizedTo) {
@@ -118,14 +123,15 @@ async function movePatientToAnotherRoom(
     let conn = await database.getConnection();
     const sqlStatement = `
     BEGIN
-      move_patient_to_another_room(:bedIdFrom, :bedIdTo, TO_DATE(:hospitalizedFrom, 'DD.MM.YYYY'), TO_DATE(:hospitalizedTo, 'DD.MM.YYYY'));
+      move_patient_to_another_room(:bedIdFrom, :bedIdTo, TO_DATE(:hospitalizedFrom, 'DD.MM.YYYY HH24:MI'), TO_DATE(:hospitalizedTo, 'DD.MM.YYYY HH24:MI'), TO_DATE(:dateWhenMove, 'DD.MM.YYYY HH24:MI'));
     END;`;
 
-    const result = await conn.execute(sqlStatement, {
+    await conn.execute(sqlStatement, {
       bedIdFrom: bedIdFrom,
       bedIdTo: bedIdTo,
       hospitalizedFrom: hospitalizedFrom,
       hospitalizedTo: hospitalizedTo,
+      dateWhenMove: dateWhenMove,
     });
 
     console.log(`Patient moved from ${bedIdFrom} to ${bedIdTo}`);

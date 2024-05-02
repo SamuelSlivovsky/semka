@@ -9,7 +9,7 @@ router.get(
   controller.getNeobsadeneLozka
 );
 router.get(
-  '/room/:roomId',
+  '/room/:roomId/from/:from?',
   verify.verifyRoles(0, 2, 3),
   controller.getBedsForRoom
 );

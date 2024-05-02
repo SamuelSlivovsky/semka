@@ -9,12 +9,12 @@ router.get(
   controller.getRoomsByHospital
 );
 router.get(
-  '/bedAvailability/:hospitalId',
+  '/bedAvailability/:hospitalId/from/:from?',
   verify.verifyRoles(0, 2, 3),
   controller.getWardRoomsAvailability
 );
 router.post(
-  '/movePatientToAnotherRoom/:bedIdFrom/:bedIdTo/:hospitalizedFrom/:hospitalizedTo',
+  '/movePatientToAnotherRoom/:bedIdFrom/:bedIdTo/:hospitalizedFrom/:hospitalizedTo/:dateWhenMove',
   verify.verifyRoles(0, 2, 3),
   controller.movePatientToAnotherRoom
 );

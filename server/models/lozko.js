@@ -1,6 +1,7 @@
 const database = require("../database/Database");
+const moment = require('moment');
 
-async function getBedsForRoom(roomId) {
+async function getBedsForRoom(roomId, roomFrom) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
@@ -21,7 +22,7 @@ async function getBedsForRoom(roomId) {
       FROM 
           lozko l
       LEFT JOIN 
-          pacient_lozko pl ON pl.id_lozka = l.id_lozka
+          pacient_lozko pl ON pl.id_lozka = l.id_lozka AND pl.pobyt_do >= TO_DATE(:roomFrom, 'DD.MM.YYYY HH24:MI')
       JOIN
           miestnost m ON (m.id_miestnosti = l.id_miestnost AND m.id_nemocnice = l.id_nemocnice)
       LEFT JOIN 
@@ -35,6 +36,9 @@ async function getBedsForRoom(roomId) {
     `,
       {
         roomId: roomId,
+        roomFrom: roomFrom
+          ? moment(roomFrom, 'DD.MM.YYYY HH:mm').format('DD.MM.YYYY HH:mm')
+          : moment().format('DD.MM.YYYY HH:mm'),
       }
     );
 
@@ -70,7 +74,6 @@ async function getPatientBirthNumberFromBed(bedId) {
 }
 
 async function getNeobsadeneLozka(id) {
-  console.log(id);
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(

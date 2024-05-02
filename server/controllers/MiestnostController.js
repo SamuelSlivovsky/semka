@@ -13,7 +13,7 @@ module.exports = {
   getWardRoomsAvailability: (req, res) => {
     const miestnost = require('../models/miestnost');
     (async () => {
-      ret_val = await miestnost.getWardRoomsAvailability(req.params.hospitalId);
+      ret_val = await miestnost.getWardRoomsAvailability(req.params.hospitalId, req.params.from);
       res.status(200).json(ret_val);
     })().catch((err) => {
       // error handling logic 1
@@ -24,17 +24,12 @@ module.exports = {
   movePatientToAnotherRoom: (req, res) => {
     const miestnost = require('../models/miestnost');
     (async () => {
-      console.log(
-        req.params.bedIdFrom,
-        req.params.bedIdTo,
-        req.params.hospitalizedFrom,
-        req.params.hospitalizedTo
-      );
       ret_val = await miestnost.movePatientToAnotherRoom(
         req.params.bedIdFrom,
         req.params.bedIdTo,
         req.params.hospitalizedFrom,
-        req.params.hospitalizedTo
+        req.params.hospitalizedTo,
+        req.params.dateWhenMove
       );
       res.status(200).json(ret_val);
     })().catch((err) => {
