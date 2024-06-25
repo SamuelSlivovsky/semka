@@ -1,16 +1,110 @@
+import { jsPDF } from 'jspdf';
+import 'jspdf-autotable';
 import 'leaflet/dist/leaflet.css';
 import * as moment from 'moment';
 import { Button } from 'primereact/button';
+import { Calendar } from 'primereact/calendar';
 import { Column } from 'primereact/column';
 import { DataTable } from 'primereact/datatable';
 import { Dialog } from 'primereact/dialog';
 import { Dropdown } from 'primereact/dropdown';
-import { Calendar } from 'primereact/calendar';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as ReactDOMServer from 'react-dom/server';
 import { GeoJSON, MapContainer, TileLayer, ZoomControl } from 'react-leaflet';
 
 export default function InteractiveMap() {
+  const [fontBinary, setFontBinary] = useState(null);
+  const bedState = [
+    {
+      name: 'Oddelenie dlhodobo chorých',
+      nurse: 'Sestrička Mária Meiselova',
+      rooms: [
+        {
+          room: 'Miestnosť MH222',
+          utilization: '34%',
+          data: [
+            {
+              lozko: '2821',
+              pacient: 'Lukas Hurych',
+              pobytOd: '1. 2. 2024',
+              pobytDo: '25. 5. 2024',
+            },
+            {
+              lozko: '2820',
+              pacient: 'Andrej Gunis',
+              pobytOd: '29. 1. 2024',
+              pobytDo: '8. 6. 2024',
+            },
+            { lozko: '2819', pacient: '-', pobytOd: '-', pobytDo: '-' },
+          ],
+        },
+        {
+          room: 'Miestnosť MH223',
+          utilization: '50%',
+          data: [
+            {
+              lozko: '2824',
+              pacient: '-',
+              pobytOd: '-',
+              pobytDo: '-',
+            },
+            {
+              lozko: '2823',
+              pacient: 'Adam Nagy',
+              pobytOd: '1. 4. 2024',
+              pobytDo: '24. 5. 2024',
+            },
+            { lozko: '2822', pacient: '-', pobytOd: '-', pobytDo: '-' },
+          ],
+        },
+      ],
+    },
+    {
+      name: 'Oddelenie gynegologicko-pôrodnícke',
+      nurse: 'Sestrička Jana Paulenova',
+      rooms: [
+        {
+          room: 'Miestnosť MH222',
+          utilization: '38%',
+          data: [
+            {
+              lozko: '2821',
+              pacient: 'Lukas Hurych',
+              pobytOd: '1. 2. 2024',
+              pobytDo: '25. 5. 2024',
+            },
+            {
+              lozko: '2820',
+              pacient: 'Andrej Gunis',
+              pobytOd: '29. 1. 2024',
+              pobytDo: '8. 6. 2024',
+            },
+            { lozko: '2819', pacient: '-', pobytOd: '-', pobytDo: '-' },
+          ],
+        },
+        {
+          room: 'Miestnosť MH223',
+          utilization: '87%',
+          data: [
+            {
+              lozko: '2824',
+              pacient: '-',
+              pobytOd: '-',
+              pobytDo: '-',
+            },
+            {
+              lozko: '2823',
+              pacient: 'Adam Nagy',
+              pobytOd: '1. 4. 2024',
+              pobytDo: '24. 5. 2024',
+            },
+            { lozko: '2822', pacient: '-', pobytOd: '-', pobytDo: '-' },
+          ],
+        },
+      ],
+    },
+  ];
+
   const REFRESH_INTERVAL = 300_000;
   const BedInfo = {
     MENO: 'meno',
@@ -57,6 +151,20 @@ export default function InteractiveMap() {
     doctor: Object,
     nurse: Object,
   });
+
+  useEffect(() => {
+    const fetchFont = async () => {
+      try {
+        const response = await fetch('/Roboto-Regular.ttf');
+        const fontData = await response.blob();
+        setFontBinary(fontData);
+      } catch (error) {
+        console.error('Error fetching font:', error);
+      }
+    };
+
+    fetchFont();
+  }, []);
 
   useEffect(() => {
     setEquipment([{ equipment: 'Teplomer', quantity: 3 }]);
@@ -195,6 +303,53 @@ export default function InteractiveMap() {
       console.error('Error fetching bed data:', error);
       throw error;
     }
+  };
+
+  const generatePDF = (rooms) => {
+    const pdf = new jsPDF();
+    pdf.setLanguage('sk-SK');
+    pdf.setFont('times', 'normal');
+    console.log(pdf.getFontList());
+
+    rooms.forEach((department, departmentIndex) => {
+      if (departmentIndex !== 0) {
+        pdf.addPage();
+      }
+
+      pdf.text(department.name, 10, 10);
+      pdf.text(department.nurse, 10, 20);
+
+      let yPosition = 30;
+
+      department.rooms.forEach((room) => {
+        pdf.text(room.room, 10, yPosition);
+        yPosition += 10;
+        pdf.text('Vyťaženie: ' + room.utilization, 10, yPosition);
+        yPosition += 10;
+
+        const tableData = [];
+        tableData.push(['Lôžko', 'Pacient', 'Pobyt od', 'Pobyt do']);
+        room.data.forEach((item) => {
+          tableData.push([
+            item.lozko,
+            item.pacient,
+            item.pobytOd,
+            item.pobytDo,
+          ]);
+        });
+
+        pdf.autoTable({
+          startY: yPosition,
+          head: [tableData[0]],
+          body: tableData.slice(1),
+          theme: 'grid',
+        });
+
+        yPosition += (tableData.length - 1) * 10 + 10; // Adjust Y position for the next room
+      });
+    });
+
+    pdf.save('oddelenia.pdf');
   };
 
   const movePatient = async () => {
@@ -892,6 +1047,10 @@ export default function InteractiveMap() {
                 showClear={true}
               />
             </div>
+            <Button
+              label='Vyťaženosť miestností nemocnice'
+              onClick={() => generatePDF(bedState)}
+            />
           </div>
           <TileLayer url='https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png' />
           {hospitalMap?.features
