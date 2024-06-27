@@ -12,6 +12,9 @@ const credentials = require("./middleware/credentials");
 // ROUTES
 const lekarRoute = require("./routes/lekarRoute");
 const logRoute = require("./routes/logRoute");
+const pharmacyManagersRoute = require("./routes/pharmacyManagersRoute");
+const pharmacyStorageRoute = require("./routes/pharmacyStorageRoute");
+const pharmacyPrescriptionsRoute = require("./routes/PharmacyPrescriptionsRoute");
 const selectsRoute = require("./routes/selectsRoute");
 const calendarRoute = require("./routes/calendarRoute");
 const patientRoute = require("./routes/patientRoute");
@@ -24,9 +27,30 @@ const lozkoRoute = require("./routes/lozkoRoute");
 const equipmentRoute = require("./routes/equipmentRoute");
 const updateRoute = require("./routes/updateRoute");
 const chatRoute = require("./routes/chatRoute");
+const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
+const poistovnaRoute = require("./routes/poistovnaRoute");
 const ordersRoute = require("./routes/ordersRoute");
 const warehouseTransfersRoute = require("./routes/warehouseTransfersRoute");
-const hospitalizaciaRoute = require("./routes/hospitalizacieRoute");
+const warehouseStatistics = require("./routes/warehouseStatisticsRoute");
+// Set session date format
+async function setSessionDateFormat() {
+  const database = require("./database/Database");
+  try {
+    const connection = await database.getConnection();
+
+    await connection.execute(
+      "ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/YYYY HH24:MI:SS'"
+    );
+
+    console.log("Session date format set successfully.");
+    await connection.close();
+  } catch (err) {
+    console.error("Error setting session date format:", err);
+  }
+}
+
+// Call the function to set session date format
+setSessionDateFormat();
 const vehicleRoute = require("./routes/vehicleRoute");
 const departureRoute = require("./routes/vyjazdyRoute")
 
@@ -45,7 +69,10 @@ app.use("/auth", require("./routes/authRoute"));
 app.use(verifyJWT);
 app.use("/logs", logRoute);
 app.use("/sklad", storageRoute);
+app.use("/lekarenskySklad", pharmacyStorageRoute);
 app.use("/lekar", lekarRoute);
+app.use("/pharmacyManagers", pharmacyManagersRoute);
+app.use("/pharmacyPrescriptions", pharmacyPrescriptionsRoute);
 app.use("/selects", selectsRoute);
 app.use("/calendar", calendarRoute);
 app.use("/patient", patientRoute);
@@ -57,37 +84,60 @@ app.use("/lozko", lozkoRoute);
 app.use("/vybavenie", equipmentRoute);
 app.use("/update", updateRoute);
 app.use("/chat", chatRoute);
+app.use("/hospitalizacia", hospitalizaciaRoute);
+app.use("/poistovna", poistovnaRoute);
 app.use("/objednavky", ordersRoute);
 app.use("/presuny", warehouseTransfersRoute);
-app.use("/hospitalizacia", hospitalizaciaRoute);
+app.use("/skladStatistiky", warehouseStatistics);
+
+const users = {};
 app.use("/vozidla", vehicleRoute);
 app.use("/vyjazdy", departureRoute)
 
 io.on("connection", (socket) => {
   socket.emit("yourSocketId", socket.id);
+
+  socket.on("storeUserData", ({ userId, group }) => {
+    users[userId] = {
+      socketId: socket.id,
+      group: group,
+    };
+  });
+
   socket.on("sendMessage", (message, params) => {
-    io.emit("newMessage", {
-      content: message,
-      image: params.image,
-      sender: params.userId,
-      type: "text",
+    const groupUsers = Object.values(users).filter(
+      (user) => user.group == params.groupId
+    );
+
+    groupUsers.forEach((user) => {
+      io.to(user.socketId).emit("newMessage", {
+        content: message,
+        sender: params.userId,
+        image: params.image,
+        type: "text",
+      });
     });
   });
 
-  // socket.on("sendImage", (image, params) => {
-  //   io.emit("newMessage", {
-  //     content: image,
-  //     sender: params.userId,
-  //     type: "image",
-  //   });
-  // });
-
-  socket.on("disconnect", () => {});
   socket.on("typing", (params) => {
-    io.emit("isTyping", {
-      id: params.userId,
-      isEmpty: params.isEmpty,
+    const groupUsers = Object.values(users).filter(
+      (user) => user.group == params.groupId
+    );
+    groupUsers.forEach((user) => {
+      io.to(user.socketId).emit("isTyping", {
+        id: params.userId,
+        isEmpty: params.isEmpty,
+      });
     });
+  });
+
+  socket.on("disconnect", () => {
+    const userId = Object.keys(users).find(
+      (key) => users[key].socketId === socket.id
+    );
+    if (userId) {
+      delete users[userId];
+    }
   });
 });
 

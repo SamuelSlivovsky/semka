@@ -1,44 +1,84 @@
 const express = require("express");
 const router = express.Router();
-const controller = require("../controllers/warehouseTransfersController");
+const controller = require("../controllers/WarehouseTransfersController");
 const verify = require("../middleware/verifyUser");
-const {verifyRoles} = require("../middleware/verifyUser");
 
 router.get(
-    "/allFin",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.getFinishedTransfers
+  "/allFin/:id",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.getFinishedTransfers
 );
 
 router.get(
-    "/allWait",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.getWaitingTransfers
+  "/allWait/:id",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.getWaitingTransfers
 );
 
 router.get(
-    "/list/:id",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.getListTransfers
+  "/allDec/:id",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.getDeclinedTransfers
 );
 
 router.get(
-    "/getWarehouses",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.getWarehouses
+  "/reqTransfers/:id",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.getRequestedTransfers
 );
 
 router.get(
-    "/hospitalMedications/:id",
-    verify.verifyRoles(0, 2, 3, 5),
-    controller.getHospitalMedication
+  "/list/:id",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.getListTransfers
 );
 
-//@TODO add this router and function so new transfers could be added under pharmacy (will be called at same time with addTransfer)
 router.get(
-    "/addPharmacyTransfer/:id",
-    verify.verifyRoles(0, 2, 3, 10),
-    //controller.addPharmacyTransfer
+  "/getWarehouses",
+  verify.verifyRoles(0, 2, 3, 5, 10),
+  controller.getWarehouses
+);
+
+router.get(
+  "/hospitalMedications/:id",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.getHospitalMedication
+);
+
+router.get(
+  "/selectedMedications/:id/:exp_date/:usr_id",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.getSelectedMedications
+);
+
+router.post(
+  "/deleteTransfer",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.deleteTransfer
+);
+
+router.post(
+  "/createTransfer",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.createTransfer
+);
+
+router.post(
+  "/deniedTransfer",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.deniedTransfer
+);
+
+router.post(
+  "/confirmTransfer",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.confirmTransfer
+);
+
+router.post(
+  "/createTransferSelMedAmount",
+  verify.verifyRoles(0, 2, 3, 5),
+  controller.createTransferSelMedAmount
 );
 
 module.exports = router;

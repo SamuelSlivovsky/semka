@@ -4,41 +4,48 @@ const controller = require("../controllers/LekarController");
 const verify = require("../middleware/verifyUser");
 
 router.get(
-    "/lekari/:id",
-    verify.verifyRoles(0, 3),
-    verify.checkForCorrectId(),
-    controller.getLekari
+  "/lekari/:id",
+  verify.verifyRoles(0, 3),
+  verify.checkForCorrectId(),
+  controller.getLekari
+);
+
+router.get(
+  "/zamestnanci/:id",
+  verify.verifyRoles(0, 3),
+  verify.checkForCorrectId(),
+  controller.getZamestnanci
 );
 router.get(
-    "/operacie/:id",
-    verify.verifyRoles(0, 2, 3),
-    verify.checkForCorrectId(),
-    controller.getOperacie
+  "/operacie/:id",
+  verify.verifyRoles(0, 1, 3),
+  verify.checkForCorrectId(),
+  controller.getOperacie
 );
 router.get(
-    "/vysetrenia/:id",
-    verify.verifyRoles(0, 2, 3),
-    verify.checkForCorrectId(),
-    controller.getVysetrenia
+  "/vysetrenia/:id",
+  verify.verifyRoles(0, 1, 3),
+  verify.checkForCorrectId(),
+  controller.getVysetrenia
 );
 router.get(
-    "/hospitalizacie/:id",
-    verify.verifyRoles(0, 2, 3),
-    verify.checkForCorrectId(),
-    controller.getHospitalizacie
+  "/hospitalizacie/:id",
+  verify.verifyRoles(0, 1, 3),
+  verify.checkForCorrectId(),
+  controller.getHospitalizacie
 );
 router.get(
-    "/pacienti/:id",
-    verify.verifyRoles(0, 2, 3),
-    verify.checkForCorrectId(),
-    controller.getPacienti
+  "/pacienti/:id",
+  verify.verifyRoles(0, 1, 3),
+  verify.checkForCorrectId(),
+  controller.getPacienti
 );
 
 router.get("/info/:id", verify.verifyRoles(0, 3), controller.getLekarInfo);
 router.get(
-    "/oddelenia/:id",
-    verify.verifyRoles(0, 3),
-    controller.getNemocnicaOddelenia
+  "/oddelenia/:id",
+  verify.verifyRoles(0, 3),
+  controller.getNemocnicaOddelenia
 );
 
 router.get(
@@ -65,10 +72,26 @@ router.get(
   controller.getMiestnosti
 );
 
+router.get("/lozka/:id", verify.verifyRoles(0, 1, 2, 3), controller.getLozka);
+
 router.get(
-  "/neobsadeneLozka/:id",
-  verify.verifyRoles(0, 1, 2, 3),
-  controller.getNeobsadeneLozka
+  "/oddeleniePrimara/:id",
+  verify.verifyRoles(0, 3),
+  controller.getOddeleniePrimara
+);
+
+router.get("/kolegovia/:id", verify.verifyRoles(0, 3), controller.getKolegovia);
+
+router.get(
+  "/zoznamVydanychReceptov/:id/:datum",
+  verify.verifyRoles(0, 1, 3),
+  controller.getZoznamVydanychReceptov
+);
+
+router.get(
+  "/pacient/:rod_cislo/:id",
+  verify.verifyRoles(0, 1, 3),
+  controller.getPacient
 );
 
 module.exports = router;

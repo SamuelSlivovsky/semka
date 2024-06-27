@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Form, Field } from "react-final-form";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
@@ -8,9 +8,15 @@ import { Calendar } from "primereact/calendar";
 import GetUserData from "../Auth/GetUserData";
 import { InputTextarea } from "primereact/inputtextarea";
 import { InputText } from "primereact/inputtext";
+import {Toast} from "primereact/toast";
+import {useNavigate} from "react-router";
+
+
 export default function MeetingForm() {
+    const toast = useRef(null);
   const [showMessage, setShowMessage] = useState(false);
   const [zaznamy, setZaznamy] = useState([]);
+    const navigate = useNavigate();
   const [doctors, setDoctors] = useState([]);
   const [filteredZaznamy, setFilteredZaznamy] = useState([]);
   const [filteredDoctors, setFilteredDoctors] = useState([]);
@@ -105,7 +111,22 @@ export default function MeetingForm() {
     const userData = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
     fetch(`/lekar/zaznamy/${userData.UserInfo.userid}`, { headers })
-      .then((response) => response.json())
+      .then((response) => {
+          if (response.ok) {
+              return response.json();
+              // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+              // Token expiroval redirect na logout
+              toast.current.show({
+                  severity: "error",
+                  summary: "Session timeout redirecting to login page",
+                  life: 999999999,
+              });
+              setTimeout(() => {
+                  navigate("/logout");
+              }, 3000);
+          }
+      })
       .then((res) => {
         setZaznamy(res);
       });
@@ -113,8 +134,9 @@ export default function MeetingForm() {
 
   const getDoctors = () => {
     const token = localStorage.getItem("hospit-user");
+    const userData = GetUserData(token);
     const headers = { authorization: "Bearer " + token };
-    fetch("/selects/zoznamLekarov", { headers })
+    fetch(`/selects/zoznamLekarov/${userData.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setDoctors(data);
@@ -152,179 +174,181 @@ export default function MeetingForm() {
   };
 
   return (
-    <div
-      style={{ width: "100%", marginTop: "2rem", marginLeft: "10px" }}
-      className="p-fluid grid formgrid"
-    >
-      <Dialog
-        visible={showMessage}
-        onHide={() => setShowMessage(false)}
-        position="top"
-        footer={dialogFooter}
-        showHeader={false}
-        breakpoints={{ "960px": "80vw" }}
-        style={{ width: "30vw" }}
+      <div
+
+          style={{width: "100%", marginTop: "2rem", marginLeft: "10px"}}
+          className="p-fluid grid formgrid"
       >
-        <div className="flex align-items-center flex-column pt-6 px-3">
-          <i
-            className="pi pi-check-circle"
-            style={{ fontSize: "5rem", color: "var(--green-500)" }}
-          ></i>
-          <h5>Úspešné odoslanie údajov</h5>
-        </div>
-      </Dialog>
-
-      <div className="field col-12">
-        <Form
-          onSubmit={onSubmit}
-          initialValues={{
-            datum: "",
-            popis: "",
-            sprava: "",
-            zaznam: null,
-            lekari: null,
-          }}
-          validate={validate}
-          render={({ handleSubmit, form, values }) => (
-            <form onSubmit={handleSubmit} className="p-fluid">
-              <Field
-                name="popis"
-                render={({ input, meta }) => (
-                  <div className="field col-12">
-                    <label
-                      htmlFor="popis"
-                      className={classNames({
-                        "p-error": isFormFieldValid(meta),
-                      })}
-                    >
-                      Popis*
-                    </label>
-                    <InputText
-                      {...input}
-                      className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
-                      })}
-                    />
-                    {getFormErrorMessage(meta)}
-                  </div>
-                )}
-              />
-              <Field
-                name="datum"
-                render={({ input, meta }) => (
-                  <div className="field col-12">
-                    <label
-                      htmlFor="datum"
-                      className={classNames({
-                        "p-error": isFormFieldValid(meta),
-                      })}
-                    >
-                      Dátum*
-                    </label>
-                    <Calendar
-                      id="datum"
-                      {...input}
-                      showTime
-                      className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
-                      })}
-                    />
-
-                    {getFormErrorMessage(meta)}
-                  </div>
-                )}
-              />
-              <Field
-                name="zaznam"
-                render={({ input, meta }) => (
-                  <div className="field col-12">
-                    <label
-                      htmlFor="zaznam"
-                      className={classNames({
-                        "p-error": isFormFieldValid(meta),
-                      })}
-                    >
-                      Zdravotný záznam*
-                    </label>
-                    <AutoComplete
-                      {...input}
-                      suggestions={filteredZaznamy}
-                      completeMethod={searchZaznamy}
-                      field="NAZOV"
-                      className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
-                      })}
-                    />
-                    {getFormErrorMessage(meta)}
-                  </div>
-                )}
-              />
-              <Field
-                name="lekari"
-                render={({ input, meta }) => (
-                  <div className="field col-12">
-                    <label
-                      htmlFor="lekari"
-                      className={classNames({
-                        "p-error": isFormFieldValid(meta),
-                      })}
-                    >
-                      Lekári*
-                    </label>
-                    <AutoComplete
-                      {...input}
-                      suggestions={filteredDoctors}
-                      multiple
-                      completeMethod={searchDoctors}
-                      field="meno"
-                      className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
-                      })}
-                    />
-                    {getFormErrorMessage(meta)}
-                  </div>
-                )}
-              />
-              <Field
-                name="sprava"
-                render={({ input, meta }) => (
-                  <div className="field col-12">
-                    <label
-                      htmlFor="sprava"
-                      className={classNames({
-                        "p-error": isFormFieldValid(meta),
-                      })}
-                    >
-                      Záverečná správa
-                    </label>
-                    <InputTextarea
-                      id="sprava"
-                      {...input}
-                      className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
-                      })}
-                    />
-                    {getFormErrorMessage(meta)}
-                  </div>
-                )}
-              />
-              <div
-                className="field col-12 "
-                style={{ justifyContent: "center", display: "grid" }}
-              >
-                <Button
-                  type="submit"
-                  style={{ width: "50vh" }}
-                  className="p-button-lg"
-                  label="Odoslať"
-                  icon="pi pi-check"
-                  iconPos="right"
-                />
+          <div><Toast ref={toast} position="top-center"/></div>
+          <Dialog
+              visible={showMessage}
+              onHide={() => setShowMessage(false)}
+              position="top"
+              footer={dialogFooter}
+              showHeader={false}
+              breakpoints={{"960px": "80vw"}}
+              style={{width: "30vw"}}
+          >
+              <div className="flex align-items-center flex-column pt-6 px-3">
+                  <i
+                      className="pi pi-check-circle"
+                      style={{fontSize: "5rem", color: "var(--green-500)"}}
+                  ></i>
+                  <h5>Úspešné odoslanie údajov</h5>
               </div>
-            </form>
-          )}
-        />
+          </Dialog>
+
+          <div className="field col-12">
+              <Form
+                  onSubmit={onSubmit}
+                  initialValues={{
+                      datum: "",
+                      popis: "",
+                      sprava: "",
+                      zaznam: null,
+                      lekari: null,
+                  }}
+                  validate={validate}
+                  render={({handleSubmit, form, values}) => (
+                      <form onSubmit={handleSubmit} className="p-fluid">
+                          <Field
+                              name="popis"
+                              render={({input, meta}) => (
+                                  <div className="field col-12">
+                                      <label
+                                          htmlFor="popis"
+                                          className={classNames({
+                                              "p-error": isFormFieldValid(meta),
+                                          })}
+                                      >
+                                          Popis*
+                                      </label>
+                                      <InputText
+                                          {...input}
+                                          className={classNames({
+                                              "p-invalid": isFormFieldValid(meta),
+                                          })}
+                                      />
+                                      {getFormErrorMessage(meta)}
+                                  </div>
+                              )}
+                          />
+                          <Field
+                              name="datum"
+                              render={({input, meta}) => (
+                                  <div className="field col-12">
+                                      <label
+                                          htmlFor="datum"
+                                          className={classNames({
+                                              "p-error": isFormFieldValid(meta),
+                                          })}
+                                      >
+                                          Dátum*
+                                      </label>
+                                      <Calendar
+                                          id="datum"
+                                          {...input}
+                                          showTime
+                                          className={classNames({
+                                              "p-invalid": isFormFieldValid(meta),
+                                          })}
+                                      />
+
+                                      {getFormErrorMessage(meta)}
+                                  </div>
+                              )}
+                          />
+                          <Field
+                              name="zaznam"
+                              render={({input, meta}) => (
+                                  <div className="field col-12">
+                                      <label
+                                          htmlFor="zaznam"
+                                          className={classNames({
+                                              "p-error": isFormFieldValid(meta),
+                                          })}
+                                      >
+                                          Zdravotný záznam*
+                                      </label>
+                                      <AutoComplete
+                                          {...input}
+                                          suggestions={filteredZaznamy}
+                                          completeMethod={searchZaznamy}
+                                          field="NAZOV"
+                                          className={classNames({
+                                              "p-invalid": isFormFieldValid(meta),
+                                          })}
+                                      />
+                                      {getFormErrorMessage(meta)}
+                                  </div>
+                              )}
+                          />
+                          <Field
+                              name="lekari"
+                              render={({input, meta}) => (
+                                  <div className="field col-12">
+                                      <label
+                                          htmlFor="lekari"
+                                          className={classNames({
+                                              "p-error": isFormFieldValid(meta),
+                                          })}
+                                      >
+                                          Lekári*
+                                      </label>
+                                      <AutoComplete
+                                          {...input}
+                                          suggestions={filteredDoctors}
+                                          multiple
+                                          completeMethod={searchDoctors}
+                                          field="meno"
+                                          className={classNames({
+                                              "p-invalid": isFormFieldValid(meta),
+                                          })}
+                                      />
+                                      {getFormErrorMessage(meta)}
+                                  </div>
+                              )}
+                          />
+                          <Field
+                              name="sprava"
+                              render={({input, meta}) => (
+                                  <div className="field col-12">
+                                      <label
+                                          htmlFor="sprava"
+                                          className={classNames({
+                                              "p-error": isFormFieldValid(meta),
+                                          })}
+                                      >
+                                          Záverečná správa
+                                      </label>
+                                      <InputTextarea
+                                          id="sprava"
+                                          {...input}
+                                          className={classNames({
+                                              "p-invalid": isFormFieldValid(meta),
+                                          })}
+                                      />
+                                      {getFormErrorMessage(meta)}
+                                  </div>
+                              )}
+                          />
+                          <div
+                              className="field col-12 "
+                              style={{justifyContent: "center", display: "grid"}}
+                          >
+                              <Button
+                                  type="submit"
+                                  style={{width: "50vh"}}
+                                  className="p-button-lg"
+                                  label="Odoslať"
+                                  icon="pi pi-check"
+                                  iconPos="right"
+                              />
+                          </div>
+                      </form>
+                  )}
+              />
+          </div>
       </div>
-    </div>
   );
 }

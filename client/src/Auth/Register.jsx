@@ -183,8 +183,8 @@ export const Register = () => {
                     control={control}
                     rules={{
                         required: "Email je povinnný.", pattern: {
-                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}$/i,
-                            message: "Nesprávny tvar e-mail adresa, napríklad: meno@email.com",
+                            value: /@/,
+                            message: "Nesprávny tvar e-mail adresa, musí obsahovať @, napríklad: meno@email.com ",
                         },
                     }}
                     render={({field, fieldState}) => (<InputText

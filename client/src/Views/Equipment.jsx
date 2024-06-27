@@ -11,6 +11,7 @@ import { Dropdown } from "primereact/dropdown";
 import { FilterMatchMode } from "primereact/api";
 import GetUserData from "../Auth/GetUserData";
 import "../App.css";
+import {useNavigate} from "react-router";
 
 export default function Equipment() {
   let emptyProduct = {
@@ -33,12 +34,28 @@ export default function Equipment() {
   const [department, setDepartment] = useState(null);
   const [departments, setDepartments] = useState([]);
   const toast = useRef(null);
+  const navigate = useNavigate();
   const token = localStorage.getItem("hospit-user");
   const userDataHelper = GetUserData(token);
   useEffect(() => {
     const headers = { authorization: "Bearer " + token };
     fetch(`vybavenie/all/${userDataHelper.UserInfo.userid}`, { headers })
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+          // Kontrola ci je token expirovany (status:410)
+        } else if (response.status === 410) {
+          // Token expiroval redirect na logout
+          toast.current.show({
+            severity: "error",
+            summary: "Session timeout redirecting to login page",
+            life: 999999999,
+          });
+          setTimeout(() => {
+            navigate("/logout");
+          }, 3000);
+        }
+      })
       .then((data) => {
         setProducts(data);
       });
@@ -247,7 +264,22 @@ export default function Equipment() {
     if (departments.length < 1) {
       const headers = { authorization: "Bearer " + token };
       fetch(`lekar/oddelenia/${userDataHelper.UserInfo.userid}`, { headers })
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.ok) {
+            return response.json();
+            // Kontrola ci je token expirovany (status:410)
+          } else if (response.status === 410) {
+            // Token expiroval redirect na logout
+            toast.current.show({
+              severity: "error",
+              summary: "Session timeout redirecting to login page",
+              life: 999999999,
+            });
+            setTimeout(() => {
+              navigate("/logout");
+            }, 3000);
+          }
+        })
         .then((data) => {
           //setDepartments(data);
           let array = data.map((item) => {

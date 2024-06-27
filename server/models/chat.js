@@ -124,7 +124,7 @@ async function getUnread(id) {
   try {
     let conn = await database.getConnection();
     const result = await conn.execute(
-      `SELECT count(userid) as pocet from user_sprava where userid =:id and precital = 'N'`,
+      `SELECT count(userid) as pocet from user_sprava where userid =:id`,
       { id }
     );
 
@@ -167,7 +167,7 @@ async function insertSprava(body) {
         id_skupiny: body.id_skupiny,
         sprava: body.sprava,
         datum: body.datum,
-        priloha: "EMPTY_BLOB()",
+        priloha: buffer,
       },
       { autoCommit: true }
     );
@@ -180,17 +180,22 @@ async function insertSprava(body) {
 async function insertUser(body) {
   try {
     let conn = await database.getConnection();
-    const sqlStatement = `insert into user_chat values(:userid, :id_skupiny)`;
+    const sqlStatement = `begin chat_user_insert(:id_skupiny, :userid, 0, :historia); end;`;
 
     let result = await conn.execute(sqlStatement, {
       userid: body.userid,
       id_skupiny: body.id_skupiny,
+      historia: body.historia,
     });
 
-    await conn.execute("commit");
     console.log("Rows inserted " + result.rowsAffected);
   } catch (err) {
-    throw new Error("Database error: " + err);
+    if (err.errorNum && err.errorNum === 20001) {
+      console.error("Používateľ už je v skupine");
+      throw new Error("Používateľ už je v skupine");
+    } else {
+      throw new Error(err.message || err);
+    }
   }
 }
 
@@ -267,6 +272,38 @@ async function updateHistory(body) {
   }
 }
 
+async function createGroup(body) {
+  try {
+    let conn = await database.getConnection();
+    const groupId = await conn.execute(
+      "select max(id_skupiny) as MAXID from chat_skupina"
+    );
+    await conn.execute(
+      "insert into chat_skupina values(:groupId, :nazov)",
+      {
+        groupId: groupId.rows[0].MAXID + 1,
+        nazov: body.nazov,
+      },
+      { autoCommit: true }
+    );
+    await conn.execute("begin chat_user_insert(:groupId, :userid, 1,1); end;", {
+      groupId: groupId.rows[0].MAXID + 1,
+      userid: body.userid,
+    });
+    const users = body.lekari;
+    await users.forEach((element) => {
+      conn.execute("begin chat_user_insert(:groupId, :userid, 0,1); end;", {
+        groupId: groupId.rows[0].MAXID + 1,
+        userid: element.CISLO_ZAM,
+      });
+    });
+
+    console.log("inserted new group");
+  } catch (err) {
+    throw new Error("Database error: " + err);
+  }
+}
+
 module.exports = {
   getSpravy,
   insertSprava,
@@ -279,4 +316,5 @@ module.exports = {
   isAdmin,
   getOtherUsers,
   updateHistory,
+  createGroup,
 };

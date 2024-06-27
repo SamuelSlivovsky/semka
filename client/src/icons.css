@@ -168,8 +168,20 @@
   width: 20px;
 }
 
+.bed-icon {
+  content: url("./images/bed-black.png");
+  height: 44px;
+  width: 44px;
+}
+
+.bed-icon-small {
+  content: url("./images/bed-black.png");
+  height: 20px;
+  width: 20px;
+}
+
 .chat-icon {
-  content: url("./images/chat.png");
+  content: url("./images/chat-black.png");
   height: 44px;
   width: 44px;
 }
@@ -180,14 +192,71 @@
   width: 15px;
 }
 
+.pharmacy-storage-icon {
+  content: url("./images/pharmacy_storage_black.png");
+  height: 44px;
+  width: 44px;
+}
+.pharmacy-manager-icon {
+  content: url("./images/pharmacist_manager_black.png");
+  height: 44px;
+  width: 44px;
+}
+.pharmacist-icon {
+  content: url("./images/pharmacist_black.png");
+  height: 44px;
+  width: 44px;
+}
+.prescriptions-icon {
+  content: url("./images/prescriptions_black.png");
+  height: 44px;
+  width: 44px;
+}
+.medicaments-icon {
+  content: url("./images/medicaments_black.png");
+  height: 44px;
+  width: 44px;
+}
+.active-substance-icon {
+  content: url("./images/active_substances_black.png");
+  height: 44px;
+  width: 44px;
+}
+.medical-aids-icon {
+  content: url("./images/medical_aids_black.png");
+  height: 44px;
+  width: 44px;
+}
+.aboutMe-icon {
+  content: url("./images/about_me_black.png");
+  height: 44px;
+  width: 44px;
+}
+
+.pharmacy-employee-icon {
+  content: url("./images/emloyee_black.png");
+  height: 44px;
+  width: 44px;
+}
+.dispensing-medicines-icon {
+  content: url("./images/dispense_medicaments_black.png");
+  height: 44px;
+  width: 44px;
+}
+.reservations-icon {
+  content: url("./images/reservations_black.png");
+  height: 44px;
+  width: 44px;
+}
+
 .warehouse-move-icon {
-  content: url("./images/warehouse-move.png");
+  content: url("./images/warehouse-move_black.png");
   height: 44px;
   width: 44px;
 }
 
 .order-icon {
-  content: url("./images/order.png");
+  content: url("./images/order_black.png");
   height: 44px;
   width: 44px;
 }
