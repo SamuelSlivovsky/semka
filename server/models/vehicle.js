@@ -72,7 +72,7 @@ async function getVehiclesECVPlan(vehicle_ecv) {
 async function getVehicleByHospital(id_hospital) {
   try {
     let conn = await database.getConnection();
-    console.log(id_hospital);
+
     const result = await conn.execute(
       `SELECT ecv, typ_vozidla, COUNT(id_plan_vyjazdu) AS pocet
       FROM vozidla

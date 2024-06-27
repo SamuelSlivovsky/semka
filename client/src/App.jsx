@@ -35,6 +35,7 @@ import socketService from "./service/socketService";
 import Vehicle from "./Views/Vehicle";
 import DeparturePlans from "./Views/DeparturePlans";
 import Departures from "./Views/Departures";
+import VehicleService from "./Views/VehicleService";
 
 function App() {
   const [visibleLeft, setVisibleLeft] = useState(false);
@@ -319,6 +320,13 @@ function App() {
       path="/departure"
       label="Výjazdy"
       icon="departures-icon"
+    />,
+    <SidebarButton
+      key="5"
+      visibleLeft={visibleLeft}
+      path="/vehicleService"
+      label="Servis"
+      icon="repair-icon"
     />
   ]
 
@@ -421,6 +429,10 @@ function App() {
         <Route
         path="/departure"
         element={<Departures></Departures>}
+        ></Route> 
+        <Route
+        path="/vehicleService"
+        element={<VehicleService></VehicleService>}
         ></Route> 
       </>
     );

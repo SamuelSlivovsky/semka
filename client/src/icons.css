@@ -206,3 +206,8 @@
   height: 44px;
   width: 44px;
 }
+.repair-icon {
+  content: url('./images/repair-icon.png');
+  height: 44px;
+  width: 44px;
+}

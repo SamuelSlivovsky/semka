@@ -18,6 +18,7 @@ import meetingIcon from "../images/meeting.png";
 import vehicleIcon from "../images/vehicle-icon.png"
 import departurePlansIcon from "../images/departure-plans-icon.png";
 import departureIcon from "../images/departures-icon.png"
+import repairIcon from "../images/repair-icon.png"
 import "../styles/homepage.css";
 
 function Home() {
@@ -176,6 +177,13 @@ function Home() {
       icon={departureIcon}
       key="4"
     ></HomeCard>,
+    <HomeCard
+      title="Servis"
+      isCalendar={false}
+      path="/vehicleService"
+      icon={repairIcon}
+      key="5"
+    ></HomeCard>
   ]
 
   const patientCards = [
