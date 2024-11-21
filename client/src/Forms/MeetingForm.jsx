@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
-import { Form, Field } from "react-final-form";
-import { Button } from "primereact/button";
-import { Dialog } from "primereact/dialog";
-import { classNames } from "primereact/utils";
-import { AutoComplete } from "primereact/autocomplete";
-import { Calendar } from "primereact/calendar";
-import GetUserData from "../Auth/GetUserData";
-import { InputTextarea } from "primereact/inputtextarea";
-import { InputText } from "primereact/inputtext";
+import React, { useState, useEffect } from 'react';
+import { Form, Field } from 'react-final-form';
+import { Button } from 'primereact/button';
+import { Dialog } from 'primereact/dialog';
+import { classNames } from 'primereact/utils';
+import { AutoComplete } from 'primereact/autocomplete';
+import { Calendar } from 'primereact/calendar';
+import GetUserData from '../Auth/GetUserData';
+import { InputTextarea } from 'primereact/inputtextarea';
+import { InputText } from 'primereact/inputtext';
 export default function MeetingForm() {
   const [showMessage, setShowMessage] = useState(false);
   const [zaznamy, setZaznamy] = useState([]);
@@ -24,48 +24,48 @@ export default function MeetingForm() {
     let errors = {};
 
     if (!data.datum) {
-      errors.datum = "Dátum je povinný";
+      errors.datum = 'Dátum je povinný';
     }
     if (!data.zaznam) {
-      errors.zaznam = "Záznam je povinný";
+      errors.zaznam = 'Záznam je povinný';
     }
 
     if (!data.lekari) {
-      errors.lekari = "Lekári sú povinní";
+      errors.lekari = 'Lekári sú povinní';
     }
 
     if (!data.popis) {
-      errors.popis = "Popis je povinný";
+      errors.popis = 'Popis je povinný';
     }
     return errors;
   };
 
   const onSubmit = async (data, form) => {
-    const token = localStorage.getItem("hospit-user");
+    const token = localStorage.getItem('hospit-user');
     const userData = GetUserData(token);
     const requestOptionsMeeting = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + token,
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
       },
 
       body: JSON.stringify({
-        datum: data.datum.toLocaleString("en-GB").replace(",", ""),
+        datum: data.datum.toLocaleString('en-GB').replace(',', ''),
         id_zaznamu: data.zaznam.ID_ZAZNAMU,
         sprava: data.sprava,
         popis: data.popis,
       }),
     };
-    await fetch("/add/konzilium", requestOptionsMeeting).then(() =>
+    await fetch('/api/add/konzilium', requestOptionsMeeting).then(() =>
       setShowMessage(true)
     );
 
     const requestOptionsDoctorMeeting = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + token,
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
       },
       body: JSON.stringify({
         lekari: [
@@ -75,8 +75,8 @@ export default function MeetingForm() {
         id_zaznamu: data.zaznam.ID_ZAZNAMU,
       }),
     };
-    await fetch("/add/konzilium/user", requestOptionsDoctorMeeting).then(() =>
-      setShowMessage(true)
+    await fetch('/api/add/konzilium/user', requestOptionsDoctorMeeting).then(
+      () => setShowMessage(true)
     );
 
     form.restart();
@@ -85,15 +85,15 @@ export default function MeetingForm() {
   const isFormFieldValid = (meta) => !!(meta.touched && meta.error);
   const getFormErrorMessage = (meta) => {
     return (
-      isFormFieldValid(meta) && <small className="p-error">{meta.error}</small>
+      isFormFieldValid(meta) && <small className='p-error'>{meta.error}</small>
     );
   };
 
   const dialogFooter = (
-    <div className="flex justify-content-center">
+    <div className='flex justify-content-center'>
       <Button
-        label="OK"
-        className="p-button-text"
+        label='OK'
+        className='p-button-text'
         autoFocus
         onClick={() => setShowMessage(false)}
       />
@@ -101,10 +101,10 @@ export default function MeetingForm() {
   );
 
   const getZaznamy = () => {
-    const token = localStorage.getItem("hospit-user");
+    const token = localStorage.getItem('hospit-user');
     const userData = GetUserData(token);
-    const headers = { authorization: "Bearer " + token };
-    fetch(`/lekar/zaznamy/${userData.UserInfo.userid}`, { headers })
+    const headers = { authorization: 'Bearer ' + token };
+    fetch(`/api/lekar/zaznamy/${userData.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((res) => {
         setZaznamy(res);
@@ -112,9 +112,9 @@ export default function MeetingForm() {
   };
 
   const getDoctors = () => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
-    fetch("/selects/zoznamLekarov", { headers })
+    const token = localStorage.getItem('hospit-user');
+    const headers = { authorization: 'Bearer ' + token };
+    fetch('/api/selects/zoznamLekarov', { headers })
       .then((response) => response.json())
       .then((data) => {
         setDoctors(data);
@@ -153,48 +153,48 @@ export default function MeetingForm() {
 
   return (
     <div
-      style={{ width: "100%", marginTop: "2rem", marginLeft: "10px" }}
-      className="p-fluid grid formgrid"
+      style={{ width: '100%', marginTop: '2rem', marginLeft: '10px' }}
+      className='p-fluid grid formgrid'
     >
       <Dialog
         visible={showMessage}
         onHide={() => setShowMessage(false)}
-        position="top"
+        position='top'
         footer={dialogFooter}
         showHeader={false}
-        breakpoints={{ "960px": "80vw" }}
-        style={{ width: "30vw" }}
+        breakpoints={{ '960px': '80vw' }}
+        style={{ width: '30vw' }}
       >
-        <div className="flex align-items-center flex-column pt-6 px-3">
+        <div className='flex align-items-center flex-column pt-6 px-3'>
           <i
-            className="pi pi-check-circle"
-            style={{ fontSize: "5rem", color: "var(--green-500)" }}
+            className='pi pi-check-circle'
+            style={{ fontSize: '5rem', color: 'var(--green-500)' }}
           ></i>
           <h5>Úspešné odoslanie údajov</h5>
         </div>
       </Dialog>
 
-      <div className="field col-12">
+      <div className='field col-12'>
         <Form
           onSubmit={onSubmit}
           initialValues={{
-            datum: "",
-            popis: "",
-            sprava: "",
+            datum: '',
+            popis: '',
+            sprava: '',
             zaznam: null,
             lekari: null,
           }}
           validate={validate}
           render={({ handleSubmit, form, values }) => (
-            <form onSubmit={handleSubmit} className="p-fluid">
+            <form onSubmit={handleSubmit} className='p-fluid'>
               <Field
-                name="popis"
+                name='popis'
                 render={({ input, meta }) => (
-                  <div className="field col-12">
+                  <div className='field col-12'>
                     <label
-                      htmlFor="popis"
+                      htmlFor='popis'
                       className={classNames({
-                        "p-error": isFormFieldValid(meta),
+                        'p-error': isFormFieldValid(meta),
                       })}
                     >
                       Popis*
@@ -202,7 +202,7 @@ export default function MeetingForm() {
                     <InputText
                       {...input}
                       className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
+                        'p-invalid': isFormFieldValid(meta),
                       })}
                     />
                     {getFormErrorMessage(meta)}
@@ -210,23 +210,23 @@ export default function MeetingForm() {
                 )}
               />
               <Field
-                name="datum"
+                name='datum'
                 render={({ input, meta }) => (
-                  <div className="field col-12">
+                  <div className='field col-12'>
                     <label
-                      htmlFor="datum"
+                      htmlFor='datum'
                       className={classNames({
-                        "p-error": isFormFieldValid(meta),
+                        'p-error': isFormFieldValid(meta),
                       })}
                     >
                       Dátum*
                     </label>
                     <Calendar
-                      id="datum"
+                      id='datum'
                       {...input}
                       showTime
                       className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
+                        'p-invalid': isFormFieldValid(meta),
                       })}
                     />
 
@@ -235,13 +235,13 @@ export default function MeetingForm() {
                 )}
               />
               <Field
-                name="zaznam"
+                name='zaznam'
                 render={({ input, meta }) => (
-                  <div className="field col-12">
+                  <div className='field col-12'>
                     <label
-                      htmlFor="zaznam"
+                      htmlFor='zaznam'
                       className={classNames({
-                        "p-error": isFormFieldValid(meta),
+                        'p-error': isFormFieldValid(meta),
                       })}
                     >
                       Zdravotný záznam*
@@ -250,9 +250,9 @@ export default function MeetingForm() {
                       {...input}
                       suggestions={filteredZaznamy}
                       completeMethod={searchZaznamy}
-                      field="NAZOV"
+                      field='NAZOV'
                       className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
+                        'p-invalid': isFormFieldValid(meta),
                       })}
                     />
                     {getFormErrorMessage(meta)}
@@ -260,13 +260,13 @@ export default function MeetingForm() {
                 )}
               />
               <Field
-                name="lekari"
+                name='lekari'
                 render={({ input, meta }) => (
-                  <div className="field col-12">
+                  <div className='field col-12'>
                     <label
-                      htmlFor="lekari"
+                      htmlFor='lekari'
                       className={classNames({
-                        "p-error": isFormFieldValid(meta),
+                        'p-error': isFormFieldValid(meta),
                       })}
                     >
                       Lekári*
@@ -276,9 +276,9 @@ export default function MeetingForm() {
                       suggestions={filteredDoctors}
                       multiple
                       completeMethod={searchDoctors}
-                      field="meno"
+                      field='meno'
                       className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
+                        'p-invalid': isFormFieldValid(meta),
                       })}
                     />
                     {getFormErrorMessage(meta)}
@@ -286,22 +286,22 @@ export default function MeetingForm() {
                 )}
               />
               <Field
-                name="sprava"
+                name='sprava'
                 render={({ input, meta }) => (
-                  <div className="field col-12">
+                  <div className='field col-12'>
                     <label
-                      htmlFor="sprava"
+                      htmlFor='sprava'
                       className={classNames({
-                        "p-error": isFormFieldValid(meta),
+                        'p-error': isFormFieldValid(meta),
                       })}
                     >
                       Záverečná správa
                     </label>
                     <InputTextarea
-                      id="sprava"
+                      id='sprava'
                       {...input}
                       className={classNames({
-                        "p-invalid": isFormFieldValid(meta),
+                        'p-invalid': isFormFieldValid(meta),
                       })}
                     />
                     {getFormErrorMessage(meta)}
@@ -309,16 +309,16 @@ export default function MeetingForm() {
                 )}
               />
               <div
-                className="field col-12 "
-                style={{ justifyContent: "center", display: "grid" }}
+                className='field col-12 '
+                style={{ justifyContent: 'center', display: 'grid' }}
               >
                 <Button
-                  type="submit"
-                  style={{ width: "50vh" }}
-                  className="p-button-lg"
-                  label="Odoslať"
-                  icon="pi pi-check"
-                  iconPos="right"
+                  type='submit'
+                  style={{ width: '50vh' }}
+                  className='p-button-lg'
+                  label='Odoslať'
+                  icon='pi pi-check'
+                  iconPos='right'
                 />
               </div>
             </form>

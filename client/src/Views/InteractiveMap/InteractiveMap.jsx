@@ -178,7 +178,7 @@ export default function InteractiveMap() {
   useEffect(() => {
     const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
-    fetch(`/nemocnica/oddelenia/40`, { headers })
+    fetch(`/api/nemocnica/oddelenia/40`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setDepartments(data);
@@ -188,7 +188,7 @@ export default function InteractiveMap() {
   useEffect(() => {
     const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
-    fetch(`/miestnost/hospital/40`, { headers })
+    fetch(`/api/miestnost/hospital/40`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setRooms(data);
@@ -198,7 +198,7 @@ export default function InteractiveMap() {
   useEffect(() => {
     const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
-    fetch(`/nemocnica/doctors/40`, { headers })
+    fetch(`/api/nemocnica/doctors/40`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setDoctors(data);
@@ -208,7 +208,7 @@ export default function InteractiveMap() {
   useEffect(() => {
     const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
-    fetch(`/nemocnica/nurses/40`, { headers })
+    fetch(`/api/nemocnica/nurses/40`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setNurses(data);
@@ -218,7 +218,7 @@ export default function InteractiveMap() {
   useEffect(() => {
     const token = localStorage.getItem('hospit-user');
     const headers = { authorization: 'Bearer ' + token };
-    fetch(`/nemocnica/hospitalized/40`, { headers })
+    fetch(`/api/nemocnica/hospitalized/40`, { headers })
       .then((response) => response.json())
       .then((data) => {
         setHospitalizedPatients(data);
@@ -244,7 +244,7 @@ export default function InteractiveMap() {
     try {
       const token = localStorage.getItem('hospit-user');
       const headers = { authorization: 'Bearer ' + token };
-      let response = await fetch(`/nemocnica/mapa/40`, { headers });
+      let response = await fetch(`/api/nemocnica/mapa/40`, { headers });
       response = await response.json();
       setHospitalMap(JSON.parse(response.MAPA));
     } catch (error) {
@@ -258,7 +258,7 @@ export default function InteractiveMap() {
       const token = localStorage.getItem('hospit-user');
       const headers = { authorization: 'Bearer ' + token };
       let response = await fetch(
-        `/miestnost/bedAvailability/40/from/${
+        `/api/miestnost/bedAvailability/40/from/${
           roomsFrom ? moment(roomsFrom).format('DD.MM.YYYY HH:mm') : ''
         }`,
         {
@@ -277,9 +277,12 @@ export default function InteractiveMap() {
     try {
       const token = localStorage.getItem('hospit-user');
       const headers = { authorization: 'Bearer ' + token };
-      let response = await fetch(`/lozko/room/patientBirthNumber/${bedId}`, {
-        headers,
-      });
+      let response = await fetch(
+        `/api/lozko/room/patientBirthNumber/${bedId}`,
+        {
+          headers,
+        }
+      );
       response = await response.json();
       return response;
     } catch (error) {
@@ -293,7 +296,7 @@ export default function InteractiveMap() {
       const token = localStorage.getItem('hospit-user');
       const headers = { authorization: 'Bearer ' + token };
       let response = await fetch(
-        `/lozko/room/${roomNumber}/from/${moment(
+        `/api/lozko/room/${roomNumber}/from/${moment(
           calendarRef?.current?.getCurrentDateTime()
         ).format('DD.MM.YYYY HH:mm')}`,
         { headers }
@@ -372,7 +375,7 @@ export default function InteractiveMap() {
         },
       };
       await fetch(
-        `/miestnost/movePatientToAnotherRoom/${patientMoveData.fromBedId}/${
+        `/api/miestnost/movePatientToAnotherRoom/${patientMoveData.fromBedId}/${
           patientMoveData.toBedId
         }/${moment(patientMoveData.patientHospitalizedFrom).format(
           'DD.MM.YYYY'

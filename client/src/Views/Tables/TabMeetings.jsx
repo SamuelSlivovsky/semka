@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
-import GetUserData from "../../Auth/GetUserData";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { InputText } from "primereact/inputtext";
-import { FilterMatchMode, FilterOperator } from "primereact/api";
-import { Dialog } from "primereact/dialog";
-import { Button } from "primereact/button";
-import { useNavigate } from "react-router";
-import { InputTextarea } from "primereact/inputtextarea";
+import React, { useEffect, useState } from 'react';
+import GetUserData from '../../Auth/GetUserData';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { InputText } from 'primereact/inputtext';
+import { FilterMatchMode, FilterOperator } from 'primereact/api';
+import { Dialog } from 'primereact/dialog';
+import { Button } from 'primereact/button';
+import { useNavigate } from 'react-router';
+import { InputTextarea } from 'primereact/inputtextarea';
 function TabMeetings() {
   const navigate = useNavigate();
   const [meetings, setMeetings] = useState([]);
-  const [globalFilterValue, setGlobalFilterValue] = useState("");
+  const [globalFilterValue, setGlobalFilterValue] = useState('');
   const [filters, setFilters] = useState(null);
   const [show, setShow] = useState(false);
   const [selectedRow, setSelectedRow] = useState(null);
@@ -19,10 +19,12 @@ function TabMeetings() {
 
   useEffect(
     () => {
-      const token = localStorage.getItem("hospit-user");
+      const token = localStorage.getItem('hospit-user');
       const userDataHelper = GetUserData(token);
-      const headers = { authorization: "Bearer " + token };
-      fetch(`/lekar/konzilia/${userDataHelper.UserInfo.userid}`, { headers })
+      const headers = { authorization: 'Bearer ' + token };
+      fetch(`/api/lekar/konzilia/${userDataHelper.UserInfo.userid}`, {
+        headers,
+      })
         .then((response) => response.json())
         .then((data) => {
           setMeetings(data);
@@ -53,15 +55,15 @@ function TabMeetings() {
         constraints: [{ value: null, matchMode: FilterMatchMode.EQUALS }],
       },
     });
-    setGlobalFilterValue("");
+    setGlobalFilterValue('');
   };
 
   const dateBodyTemplate = (option) => {
     return (
       <span>
-        {new Date(option.DATUM).toLocaleString("sk-SK", {
-          dateStyle: "short",
-          timeStyle: "short",
+        {new Date(option.DATUM).toLocaleString('sk-SK', {
+          dateStyle: 'short',
+          timeStyle: 'short',
         })}
       </span>
     );
@@ -77,15 +79,15 @@ function TabMeetings() {
 
   const renderHeader = () => {
     return (
-      <div className="flex justify-content-between">
-        <div className="table-header" style={{ gap: "10px" }}>
+      <div className='flex justify-content-between'>
+        <div className='table-header' style={{ gap: '10px' }}>
           Pacienti
-          <span className="p-input-icon-left">
-            <i className="pi pi-search" />
+          <span className='p-input-icon-left'>
+            <i className='pi pi-search' />
             <InputText
               value={globalFilterValue}
               onChange={onGlobalFilterChange}
-              placeholder="Keyword Search"
+              placeholder='Keyword Search'
             />
           </span>
         </div>
@@ -96,63 +98,63 @@ function TabMeetings() {
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filters = { ...filters };
-    _filters["global"].value = value;
+    _filters['global'].value = value;
     setFilters(_filters);
     setGlobalFilterValue(value);
   };
 
   const getImages = (row) => {
-    const token = localStorage.getItem("hospit-user");
-    const headers = { authorization: "Bearer " + token };
-    fetch(`/zaznamy/priloha/${row.ID_ZAZNAMU}`, { headers })
+    const token = localStorage.getItem('hospit-user');
+    const headers = { authorization: 'Bearer ' + token };
+    fetch(`/api/zaznamy/priloha/${row.ID_ZAZNAMU}`, { headers })
       .then((res) => res.blob())
       .then((result) => {
         return result.map((item) => (
-          <img src={URL.createObjectURL(item)} alt="zaznam"></img>
+          <img src={URL.createObjectURL(item)} alt='zaznam'></img>
         ));
       });
   };
 
   const updateMeeting = () => {
-    const token = localStorage.getItem("hospit-user");
+    const token = localStorage.getItem('hospit-user');
     const requestOptions = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + token,
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
       },
       body: JSON.stringify({
         id_konzilia: selectedRow.ID_KONZILIA,
         sprava: selectedRow.ZAVERECNA_SPRAVA,
       }),
     };
-    fetch("/lekar/konzilia/update", requestOptions);
+    fetch('/api/lekar/konzilia/update', requestOptions);
   };
 
   return (
-    <div className="card">
+    <div className='card'>
       <DataTable
         header={renderHeader}
         value={meetings}
         scrollable
-        selectionMode="single"
+        selectionMode='single'
         scrollHeight={`${window.innerHeight - 100}px`}
-        filterDisplay="menu"
+        filterDisplay='menu'
         filters={filters}
         paginator
         rows={25}
-        globalFilterFields={["ROD_CISLO", "MENO", "PRIEZVISKO"]}
-        emptyMessage="Žiadne výsledky nevyhovujú vyhľadávaniu"
+        globalFilterFields={['ROD_CISLO', 'MENO', 'PRIEZVISKO']}
+        emptyMessage='Žiadne výsledky nevyhovujú vyhľadávaniu'
         onSelectionChange={(e) => {
           setSelectedRow(e.value);
           getImages(e.value);
           setShow(true);
         }}
       >
-        <Column field="DOVOD" header="Dôvod"></Column>
-        <Column body={dateBodyTemplate} header="Dátum"></Column>
-        <Column body={patientBodyTemplate} header="Pacient"></Column>
-        <Column field="ROD_CISLO" header="Rodné číslo"></Column>
+        <Column field='DOVOD' header='Dôvod'></Column>
+        <Column body={dateBodyTemplate} header='Dátum'></Column>
+        <Column body={patientBodyTemplate} header='Pacient'></Column>
+        <Column field='ROD_CISLO' header='Rodné číslo'></Column>
       </DataTable>
       <Dialog
         visible={show}
@@ -161,17 +163,17 @@ function TabMeetings() {
           setShow(false);
           setImages([]);
         }}
-        style={{ maxWidth: "80%", minWidth: "600px", wordBreak: "break-all" }}
+        style={{ maxWidth: '80%', minWidth: '600px', wordBreak: 'break-all' }}
       >
         {selectedRow ? (
-          <div style={{ display: "flex", flexDirection: "column" }}>
+          <div style={{ display: 'flex', flexDirection: 'column' }}>
             <h1>
               Konzílium {selectedRow.MENO} {selectedRow.PRIEZVISKO}
               <Button
-                label="Karta pacienta"
-                style={{ float: "right" }}
+                label='Karta pacienta'
+                style={{ float: 'right' }}
                 onClick={() =>
-                  navigate("/patient", { state: selectedRow.ID_PACIENTA })
+                  navigate('/patient', { state: selectedRow.ID_PACIENTA })
                 }
               ></Button>
             </h1>
@@ -191,13 +193,13 @@ function TabMeetings() {
               }
             ></InputTextarea>
             <Button
-              label="Pridaj záverečnú správu"
-              style={{ marginTop: "10px" }}
+              label='Pridaj záverečnú správu'
+              style={{ marginTop: '10px' }}
               onClick={() => updateMeeting()}
             ></Button>
           </div>
         ) : (
-          ""
+          ''
         )}
       </Dialog>
     </div>

@@ -1,18 +1,18 @@
-const oracledb = require("oracledb");
+const oracledb = require('oracledb');
 try {
-  oracledb.initOracleClient({ libDir: "C:\\oracle\\instantclient_21_7" });
+  oracledb.initOracleClient({ libDir: 'C:\\oracle\\instantclient_23_5' });
 } catch (err) {
-  console.error("Whoops!");
+  console.error('Whoops!');
   console.error(err);
   process.exit(1);
 }
 oracledb.outFormat = oracledb.OUT_FORMAT_OBJECT;
-const fs = require("fs");
-const path = require("path");
+const fs = require('fs');
+const path = require('path');
 
-const configFilePath = path.join(__dirname, "../config/dbConfig.json");
+const configFilePath = path.join(__dirname, '../config/dbConfig.json');
 
-const dbConfig = JSON.parse(fs.readFileSync(configFilePath, "UTF-8"));
+const dbConfig = JSON.parse(fs.readFileSync(configFilePath, 'UTF-8'));
 
 async function getConnection() {
   try {

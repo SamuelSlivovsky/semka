@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useRef } from "react";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import { Toast } from "primereact/toast";
-import { Button } from "primereact/button";
-import { Toolbar } from "primereact/toolbar";
-import { InputText } from "primereact/inputtext";
-import { Dialog } from "primereact/dialog";
-import { Calendar } from "primereact/calendar";
-import { Dropdown } from "primereact/dropdown";
-import { FilterMatchMode } from "primereact/api";
-import GetUserData from "../Auth/GetUserData";
-import "../App.css";
+import React, { useState, useEffect, useRef } from 'react';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import { Toast } from 'primereact/toast';
+import { Button } from 'primereact/button';
+import { Toolbar } from 'primereact/toolbar';
+import { InputText } from 'primereact/inputtext';
+import { Dialog } from 'primereact/dialog';
+import { Calendar } from 'primereact/calendar';
+import { Dropdown } from 'primereact/dropdown';
+import { FilterMatchMode } from 'primereact/api';
+import GetUserData from '../Auth/GetUserData';
+import '../App.css';
 
 export default function Equipment() {
   let emptyProduct = {
@@ -28,15 +28,15 @@ export default function Equipment() {
   const [deleteProductsDialog, setDeleteProductsDialog] = useState(false);
   const [product, setProduct] = useState(emptyProduct);
   const [selectedProducts, setSelectedProducts] = useState(null);
-  const [globalFilter, setGlobalFilter] = useState("");
+  const [globalFilter, setGlobalFilter] = useState('');
   const [filter, setFilter] = useState(null);
   const [department, setDepartment] = useState(null);
   const [departments, setDepartments] = useState([]);
   const toast = useRef(null);
-  const token = localStorage.getItem("hospit-user");
+  const token = localStorage.getItem('hospit-user');
   const userDataHelper = GetUserData(token);
   useEffect(() => {
-    const headers = { authorization: "Bearer " + token };
+    const headers = { authorization: 'Bearer ' + token };
     fetch(`vybavenie/all/${userDataHelper.UserInfo.userid}`, { headers })
       .then((response) => response.json())
       .then((data) => {
@@ -49,13 +49,13 @@ export default function Equipment() {
     setFilter({
       global: { value: null, matchMode: FilterMatchMode.STARTS_WITH },
     });
-    setGlobalFilter("");
+    setGlobalFilter('');
   };
 
   const onGlobalFilterChange = (e) => {
     const value = e.target.value;
     let _filter = { ...filter };
-    _filter["global"].value = value;
+    _filter['global'].value = value;
 
     setFilter(_filter);
     setGlobalFilter(value);
@@ -88,25 +88,26 @@ export default function Equipment() {
   };
 
   async function insertData() {
-    const token = localStorage.getItem("hospit-user");
+    const token = localStorage.getItem('hospit-user');
     const requestOptions = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + token,
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
       },
       body: JSON.stringify({
         cis_zam: userDataHelper.UserInfo.userid,
         typ: product.TYP,
-        dat_zaobstarania: product.ZAOBSTARANIE.toLocaleString("en-GB").replace(
-          ",",
-          ""
+        dat_zaobstarania: product.ZAOBSTARANIE.toLocaleString('en-GB').replace(
+          ',',
+          ''
         ),
       }),
     };
-    const response = await fetch("/vybavenie/addEquip", requestOptions).catch(
-      (err) => console.log(err)
-    );
+    const response = await fetch(
+      '/api/vybavenie/addEquip',
+      requestOptions
+    ).catch((err) => console.log(err));
   }
 
   const saveProduct = () => {
@@ -122,15 +123,15 @@ export default function Equipment() {
       insertData();
       _product.ZAOBSTARANIE =
         product.ZAOBSTARANIE.getDate() +
-        "." +
+        '.' +
         (product.ZAOBSTARANIE.getMonth() + 1) +
-        "." +
+        '.' +
         product.ZAOBSTARANIE.getFullYear();
       _products.push(_product);
       toast.current.show({
-        severity: "success",
-        summary: "Successful",
-        detail: "Liek bol pridaný",
+        severity: 'success',
+        summary: 'Successful',
+        detail: 'Liek bol pridaný',
         life: 3000,
       });
       filledCells = true;
@@ -138,9 +139,9 @@ export default function Equipment() {
       setSelectedEquipment(null);
     } else {
       toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Je potrebné vyplniť všetky polia",
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Je potrebné vyplniť všetky polia',
         life: 3000,
       });
     }
@@ -169,9 +170,9 @@ export default function Equipment() {
     setDeleteProductDialog(false);
     setProduct(emptyProduct);
     toast.current.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Liek odstránený",
+      severity: 'success',
+      summary: 'Successful',
+      detail: 'Liek odstránený',
       life: 3000,
     });
   };
@@ -187,9 +188,9 @@ export default function Equipment() {
     setDeleteProductsDialog(false);
     setSelectedProducts(null);
     toast.current.show({
-      severity: "success",
-      summary: "Successful",
-      detail: "Products Deleted",
+      severity: 'success',
+      summary: 'Successful',
+      detail: 'Products Deleted',
       life: 3000,
     });
   };
@@ -209,43 +210,43 @@ export default function Equipment() {
   };
 
   async function editEquipment(_product) {
-    const token = localStorage.getItem("hospit-user");
+    const token = localStorage.getItem('hospit-user');
 
     const requestOptions = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + token,
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
       },
       body: JSON.stringify({
         id_vybavenia: product.ID_VYBAVENIA,
-        dat_zaobstarania: product.ZAOBSTARANIE.toLocaleString("en-GB").replace(
-          ",",
-          ""
+        dat_zaobstarania: product.ZAOBSTARANIE.toLocaleString('en-GB').replace(
+          ',',
+          ''
         ),
       }),
     };
-    await fetch("/sklad/updateEquipment", requestOptions);
+    await fetch('/api/sklad/updateEquipment', requestOptions);
   }
 
   async function deleteEquip(_product) {
-    const token = localStorage.getItem("hospit-user");
+    const token = localStorage.getItem('hospit-user');
     const requestOptions = {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-Type": "application/json",
-        authorization: "Bearer " + token,
+        'Content-Type': 'application/json',
+        authorization: 'Bearer ' + token,
       },
       body: JSON.stringify({
         id_vybavenia: _product.ID_VYBAVENIA,
       }),
     };
-    await fetch("/vybavenie/deleteEquip", requestOptions);
+    await fetch('/api/vybavenie/deleteEquip', requestOptions);
   }
 
   const openNew = () => {
     if (departments.length < 1) {
-      const headers = { authorization: "Bearer " + token };
+      const headers = { authorization: 'Bearer ' + token };
       fetch(`lekar/oddelenia/${userDataHelper.UserInfo.userid}`, { headers })
         .then((response) => response.json())
         .then((data) => {
@@ -268,15 +269,15 @@ export default function Equipment() {
     return (
       <React.Fragment>
         <Button
-          label="New"
-          icon="pi pi-plus"
-          className="p-button-success mr-2"
+          label='New'
+          icon='pi pi-plus'
+          className='p-button-success mr-2'
           onClick={() => openNew()}
         />
         <Button
-          label="Delete"
-          icon="pi pi-trash"
-          className="p-button-danger"
+          label='Delete'
+          icon='pi pi-trash'
+          className='p-button-danger'
           onClick={confirmDeleteSelected}
           disabled={!selectedProducts || !selectedProducts.length}
         />
@@ -288,13 +289,13 @@ export default function Equipment() {
     return (
       <React.Fragment>
         <Button
-          icon="pi pi-pencil"
-          className="p-button-rounded p-button-success mr-2"
+          icon='pi pi-pencil'
+          className='p-button-rounded p-button-success mr-2'
           onClick={() => editProduct(rowData)}
         />
         <Button
-          icon="pi pi-trash"
-          className="p-button-rounded p-button-warning"
+          icon='pi pi-trash'
+          className='p-button-rounded p-button-warning'
           onClick={() => confirmDeleteProduct(rowData)}
         />
       </React.Fragment>
@@ -302,17 +303,17 @@ export default function Equipment() {
   };
 
   const header = (
-    <div className="table-header">
-      <h5 className="mx-0 my-1">Lieky</h5>
-      <span className="p-input-icon-left">
-        <i className="pi pi-search" />
+    <div className='table-header'>
+      <h5 className='mx-0 my-1'>Lieky</h5>
+      <span className='p-input-icon-left'>
+        <i className='pi pi-search' />
         <InputText
-          type="search"
+          type='search'
           value={globalFilter}
           onInput={(e) => {
             onGlobalFilterChange(e);
           }}
-          placeholder="Search..."
+          placeholder='Search...'
         />
       </span>
     </div>
@@ -320,15 +321,15 @@ export default function Equipment() {
   const productDialogFooter = (
     <React.Fragment>
       <Button
-        label="Cancel"
-        icon="pi pi-times"
-        className="p-button-text"
+        label='Cancel'
+        icon='pi pi-times'
+        className='p-button-text'
         onClick={hideDialog}
       />
       <Button
-        label="Save"
-        icon="pi pi-check"
-        className="p-button-text"
+        label='Save'
+        icon='pi pi-check'
+        className='p-button-text'
         onClick
       />
     </React.Fragment>
@@ -336,15 +337,15 @@ export default function Equipment() {
   const deleteProductDialogFooter = (
     <React.Fragment>
       <Button
-        label="No"
-        icon="pi pi-times"
-        className="p-button-text"
+        label='No'
+        icon='pi pi-times'
+        className='p-button-text'
         onClick={hideDeleteProductDialog}
       />
       <Button
-        label="Yes"
-        icon="pi pi-check"
-        className="p-button-text"
+        label='Yes'
+        icon='pi pi-check'
+        className='p-button-text'
         onClick={deleteProduct}
       />
     </React.Fragment>
@@ -352,85 +353,85 @@ export default function Equipment() {
   const deleteProductsDialogFooter = (
     <React.Fragment>
       <Button
-        label="No"
-        icon="pi pi-times"
-        className="p-button-text"
+        label='No'
+        icon='pi pi-times'
+        className='p-button-text'
         onClick={hideDeleteProductsDialog}
       />
       <Button
-        label="Yes"
-        icon="pi pi-check"
-        className="p-button-text"
+        label='Yes'
+        icon='pi pi-check'
+        className='p-button-text'
         onClick={deleteSelectedProducts}
       />
     </React.Fragment>
   );
 
   return (
-    <div className="storage-table">
+    <div className='storage-table'>
       <Toast ref={toast} />
 
-      <div className="card">
-        <Toolbar className="mb-4" left={leftToolbarTemplate}></Toolbar>
+      <div className='card'>
+        <Toolbar className='mb-4' left={leftToolbarTemplate}></Toolbar>
 
         <DataTable
           value={products}
           selection={selectedProducts}
           onSelectionChange={(e) => setSelectedProducts(e.value)}
-          dataKey="ID_VYBAVENIA"
+          dataKey='ID_VYBAVENIA'
           globalFilter={globalFilter}
-          globalFilterFields={["ID_VYBAVENIA", "TYP", "ZAOBSTARANIE"]}
+          globalFilterFields={['ID_VYBAVENIA', 'TYP', 'ZAOBSTARANIE']}
           filters={filter}
           header={header}
-          responsiveLayout="scroll"
+          responsiveLayout='scroll'
         >
           <Column
-            selectionMode="multiple"
-            headerStyle={{ width: "3rem" }}
+            selectionMode='multiple'
+            headerStyle={{ width: '3rem' }}
           ></Column>
           <Column
-            field="ID_VYBAVENIA"
-            header="Id vybavenia"
-            style={{ minWidth: "12rem" }}
+            field='ID_VYBAVENIA'
+            header='Id vybavenia'
+            style={{ minWidth: '12rem' }}
           ></Column>
           <Column
-            field="TYP"
-            header="Typ"
-            style={{ minWidth: "16rem" }}
+            field='TYP'
+            header='Typ'
+            style={{ minWidth: '16rem' }}
           ></Column>
           <Column
-            field="ZAOBSTARANIE"
-            header="Dátum zaobstarania"
-            style={{ minWidth: "10rem" }}
+            field='ZAOBSTARANIE'
+            header='Dátum zaobstarania'
+            style={{ minWidth: '10rem' }}
           ></Column>
           <Column
-            field="MIESTO"
-            header="Miesto"
-            style={{ minWidth: "10rem" }}
+            field='MIESTO'
+            header='Miesto'
+            style={{ minWidth: '10rem' }}
           ></Column>
           <Column
             body={actionBodyTemplate}
-            style={{ minWidth: "8rem" }}
+            style={{ minWidth: '8rem' }}
           ></Column>
         </DataTable>
       </div>
 
       <Dialog
         visible={addProductDialog}
-        style={{ width: "500px" }}
-        header="Pridať liek"
+        style={{ width: '500px' }}
+        header='Pridať liek'
         modal
-        className="p-fluid"
+        className='p-fluid'
         footer={productDialogFooter}
         onHide={hideDialog}
       >
-        <div className="formgrid grid">
-          {" "}
-          <div className="field col">
-            <label htmlFor="oddelenie">Oddelenie</label>
+        <div className='formgrid grid'>
+          {' '}
+          <div className='field col'>
+            <label htmlFor='oddelenie'>Oddelenie</label>
             <Dropdown
-              id="oddelenieDrop"
-              value={department !== null ? department : ""}
+              id='oddelenieDrop'
+              value={department !== null ? department : ''}
               options={departments}
               onChange={(e) => {
                 setDepartment(e.target.value);
@@ -438,24 +439,24 @@ export default function Equipment() {
             />
           </div>
         </div>
-        <div className="formgrid grid">
-          <div className="field col">
-            <label htmlFor="ECV">EČV</label>
+        <div className='formgrid grid'>
+          <div className='field col'>
+            <label htmlFor='ECV'>EČV</label>
             <InputText
-              id="ECV"
+              id='ECV'
               value={product.ECV}
-              onValueChange={(e) => onInputTextChange(e, "ECV")}
+              onValueChange={(e) => onInputTextChange(e, 'ECV')}
               integeronly
             />
           </div>
         </div>
-        <div className="formgird grid">
-          <div className="field col">
-            <label htmlFor="ZAOBSTARANIE">Dátum zaobstarania</label>
+        <div className='formgird grid'>
+          <div className='field col'>
+            <label htmlFor='ZAOBSTARANIE'>Dátum zaobstarania</label>
             <Calendar
               value={product.ZAOBSTARANIE}
-              dateFormat="dd.mm.yy"
-              onChange={(e) => onInputChange(e.value, "ZAOBSTARANIE")}
+              dateFormat='dd.mm.yy'
+              onChange={(e) => onInputChange(e.value, 'ZAOBSTARANIE')}
             ></Calendar>
           </div>
         </div>
@@ -463,32 +464,32 @@ export default function Equipment() {
 
       <Dialog
         visible={changeProductDialog}
-        style={{ width: "500px" }}
+        style={{ width: '500px' }}
         header={product.TYP}
         modal
-        className="p-fluid"
+        className='p-fluid'
         footer={productDialogFooter}
         onHide={hideDialog}
       >
-        <div className="formgrid grid">
-          <div className="field col">
-            <label htmlFor="ECV">Počet</label>
+        <div className='formgrid grid'>
+          <div className='field col'>
+            <label htmlFor='ECV'>Počet</label>
           </div>
         </div>
       </Dialog>
 
       <Dialog
         visible={deleteProductDialog}
-        style={{ width: "450px" }}
-        header="Confirm"
+        style={{ width: '450px' }}
+        header='Confirm'
         modal
         footer={deleteProductDialogFooter}
         onHide={hideDeleteProductDialog}
       >
-        <div className="confirmation-content">
+        <div className='confirmation-content'>
           <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
+            className='pi pi-exclamation-triangle mr-3'
+            style={{ fontSize: '2rem' }}
           />
           {product && (
             <span>
@@ -500,16 +501,16 @@ export default function Equipment() {
 
       <Dialog
         visible={deleteProductsDialog}
-        style={{ width: "450px" }}
-        header="Confirm"
+        style={{ width: '450px' }}
+        header='Confirm'
         modal
         footer={deleteProductsDialogFooter}
         onHide={hideDeleteProductsDialog}
       >
-        <div className="confirmation-content">
+        <div className='confirmation-content'>
           <i
-            className="pi pi-exclamation-triangle mr-3"
-            style={{ fontSize: "2rem" }}
+            className='pi pi-exclamation-triangle mr-3'
+            style={{ fontSize: '2rem' }}
           />
           {product && <span>Naozaj chcete odstrániť zvolené vybavenie?</span>}
         </div>

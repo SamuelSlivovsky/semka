@@ -1,14 +1,14 @@
-import React, { useState, useRef } from "react";
-import { Chart } from "primereact/chart";
-import { Button } from "primereact/button";
-import { Toast } from "primereact/toast";
-import { ProgressBar } from "primereact/progressbar";
-import { Calendar } from "primereact/calendar";
-import { DataTable } from "primereact/datatable";
-import { Column } from "primereact/column";
-import GetUserData from "../Auth/GetUserData.jsx";
+import React, { useState, useRef } from 'react';
+import { Chart } from 'primereact/chart';
+import { Button } from 'primereact/button';
+import { Toast } from 'primereact/toast';
+import { ProgressBar } from 'primereact/progressbar';
+import { Calendar } from 'primereact/calendar';
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import GetUserData from '../Auth/GetUserData.jsx';
 
-import "../styles/stat.css";
+import '../styles/stat.css';
 export default function Statistics() {
   const toast = useRef(null);
   const [render, setRender] = useState(false);
@@ -21,7 +21,7 @@ export default function Statistics() {
   const [pocetHosp, setPocetHosp] = useState(null);
   const [pocetVys, setPocetVys] = useState(null);
   const [krv, setKrv] = useState(null);
-  const [year, setYear] = useState("");
+  const [year, setYear] = useState('');
   const [pacientiVek, setPacientiVek] = useState(null);
   const [pacientiVekOptions, setPacientiVekOptions] = useState(null);
   const [sumaVyplat, setSumaVyplat] = useState(null);
@@ -29,29 +29,29 @@ export default function Statistics() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = () => {
-    const token = localStorage.getItem("hospit-user");
+    const token = localStorage.getItem('hospit-user');
     const userId = GetUserData(token).UserInfo.userid;
-    const headers = { authorization: "Bearer " + token };
+    const headers = { authorization: 'Bearer ' + token };
     if (year !== null) {
       setRender(true);
       setLoading(true);
-      fetch(`/selects/pomerMuziZeny/${userId}`, { headers })
+      fetch(`/api/selects/pomerMuziZeny/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setMuziZeny({
-            labels: ["Muzi", "Zeny"],
+            labels: ['Muzi', 'Zeny'],
             datasets: [
               {
-                label: "%",
+                label: '%',
                 data: [result[0].MUZI, result[0].ZENY],
-                backgroundColor: ["#42A5F5", "#66BB6A", "#FFA726"],
-                hoverBackgroundColor: ["#64B5F6", "#81C784", "#FFB74D"],
+                backgroundColor: ['#42A5F5', '#66BB6A', '#FFA726'],
+                hoverBackgroundColor: ['#64B5F6', '#81C784', '#FFB74D'],
               },
             ],
           });
         });
 
-      fetch(`/selects/krvneSkupinyOddelenia/${userId}`, { headers })
+      fetch(`/api/selects/krvneSkupinyOddelenia/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setLoading(false);
@@ -61,35 +61,35 @@ export default function Statistics() {
               {
                 data: result.map((item) => item.POCET),
                 backgroundColor: [
-                  "#ff595e",
-                  "#ffca3a",
-                  "#8ac926",
-                  "#82A5F5",
-                  "#1982c4",
-                  "#6a4c93",
-                  "#BBDEF0",
-                  "#00A6A6",
+                  '#ff595e',
+                  '#ffca3a',
+                  '#8ac926',
+                  '#82A5F5',
+                  '#1982c4',
+                  '#6a4c93',
+                  '#BBDEF0',
+                  '#00A6A6',
                 ],
                 hoverBackgroundColor: [
-                  "#ff595e",
-                  "#ffca3a",
-                  "#8ac926",
-                  "#82A5F5",
-                  "#1982c4",
-                  "#6a4c93",
-                  "#BBDEF0",
-                  "#00A6A6",
+                  '#ff595e',
+                  '#ffca3a',
+                  '#8ac926',
+                  '#82A5F5',
+                  '#1982c4',
+                  '#6a4c93',
+                  '#BBDEF0',
+                  '#00A6A6',
                 ],
               },
             ],
           });
         });
 
-      fetch(`/selects/priemernyVek`, { headers })
+      fetch(`/api/selects/priemernyVek`, { headers })
         .then((res) => res.json())
         .then((result) => {});
 
-      fetch(`/selects/pocetZamOddelenia/${userId}/${year.getFullYear()}`, {
+      fetch(`/api/selects/pocetZamOddelenia/${userId}/${year.getFullYear()}`, {
         headers,
       })
         .then((res) => res.json())
@@ -97,7 +97,7 @@ export default function Statistics() {
           setPocetZam(result[0].POCET_ZAMESTNANCOV);
         });
 
-      fetch(`/selects/pocetOperOddelenia/${userId}/${year.getFullYear()}`, {
+      fetch(`/api/selects/pocetOperOddelenia/${userId}/${year.getFullYear()}`, {
         headers,
       })
         .then((res) => res.json())
@@ -105,15 +105,18 @@ export default function Statistics() {
           setPocetOpe(result[0].POC_OPERACII);
         });
 
-      fetch(`/selects/pocetHospitOddelenia/${userId}/${year.getFullYear()}`, {
-        headers,
-      })
+      fetch(
+        `/api/selects/pocetHospitOddelenia/${userId}/${year.getFullYear()}`,
+        {
+          headers,
+        }
+      )
         .then((res) => res.json())
         .then((result) => {
           setPocetHosp(result[0].POC_HOSPITALIZACII);
         });
 
-      fetch(`/selects/pocetVyseOddelenia/${userId}/${year.getFullYear()}`, {
+      fetch(`/api/selects/pocetVyseOddelenia/${userId}/${year.getFullYear()}`, {
         headers,
       })
         .then((res) => res.json())
@@ -121,7 +124,7 @@ export default function Statistics() {
           setPocetVys(result[0].POC_VYS);
         });
 
-      fetch(`/selects/pocetPacOddelenia/${userId}`, { headers })
+      fetch(`/api/selects/pocetPacOddelenia/${userId}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPocetPac(result[0].POCET_PACIENTOV);
@@ -136,7 +139,7 @@ export default function Statistics() {
           loadColumnsHeaders(result);
         });
 
-      fetch(`/selects/sumaVyplatRoka/${id}/${year.getFullYear()}`, { headers })
+      fetch(`/api/selects/sumaVyplatRoka/${id}/${year.getFullYear()}`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setSumaVyplat({
@@ -200,15 +203,15 @@ export default function Statistics() {
           });
         });
 */
-      fetch(`/selects/pocetPacientiPodlaVeku`, { headers })
+      fetch(`/api/selects/pocetPacientiPodlaVeku`, { headers })
         .then((res) => res.json())
         .then((result) => {
           setPacientiVek({
             labels: result.map((item) => item.VEK),
             datasets: [
               {
-                label: "Pacienti",
-                backgroundColor: "#42A5F5",
+                label: 'Pacienti',
+                backgroundColor: '#42A5F5',
                 data: result.map((item) => item.POCET),
               },
             ],
@@ -217,7 +220,7 @@ export default function Statistics() {
             plugins: {
               legend: {
                 labels: {
-                  color: "#495057",
+                  color: '#495057',
                 },
               },
             },
@@ -225,13 +228,13 @@ export default function Statistics() {
               y: {
                 title: {
                   display: true,
-                  text: "Počet",
+                  text: 'Počet',
                 },
               },
               x: {
                 title: {
                   display: true,
-                  text: "Vek",
+                  text: 'Vek',
                 },
               },
             },
@@ -239,8 +242,8 @@ export default function Statistics() {
         });
     } else {
       toast.current.show({
-        severity: "error",
-        summary: "Zadajte ID oddelenia",
+        severity: 'error',
+        summary: 'Zadajte ID oddelenia',
         life: 3000,
       });
     }
@@ -253,7 +256,7 @@ export default function Statistics() {
   };
 
   const loadColumns = (keys) => {
-    let array = "";
+    let array = '';
     keys.forEach((element) => {
       array = [
         ...array,
@@ -270,120 +273,120 @@ export default function Statistics() {
 
   return (
     <div>
-      <div className="grid" style={{ marginTop: "1rem" }}>
+      <div className='grid' style={{ marginTop: '1rem' }}>
         <Toast ref={toast} />
-        <div className="field col-4 md:col-3">
-          <label htmlFor="withoutgrouping" style={{ marginRight: "1rem" }}>
+        <div className='field col-4 md:col-3'>
+          <label htmlFor='withoutgrouping' style={{ marginRight: '1rem' }}>
             Zadajte rok
           </label>
           <Calendar
-            id="range"
+            id='range'
             value={year}
             onChange={(e) => {
               setYear(e.value);
             }}
-            view="year"
-            dateFormat="yy"
+            view='year'
+            dateFormat='yy'
             readOnlyInput
           />
         </div>
-        <div className="field col-4 md:col-3">
+        <div className='field col-4 md:col-3'>
           <Button
-            icon="pi pi-check"
-            label="Zadaj"
+            icon='pi pi-check'
+            label='Zadaj'
             onClick={handleSubmit}
           ></Button>
         </div>
         {render && !loading ? (
           <>
-            <div className="xl:col-12">
-              <div className="grid">
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+            <div className='xl:col-12'>
+              <div className='grid'>
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet pacientov
                   <p>{pocetPac}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet zamestnancov
                   <p>{pocetZam}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet vykonaných operácií
                   <p>{pocetOpe}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet vykonaných hospitalizácií
                   <p>{pocetHosp}</p>
                 </div>
-                <div className="col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card">
+                <div className='col h-8rem text-center m-3 border-round-lg text-50 font-bold text-xl count-card'>
                   Počet vykonaných vyšetrení
                   <p>{pocetVys}</p>
                 </div>
               </div>
             </div>
-            <div className="xl:col-12 justify-content-center align-content-center flex">
+            <div className='xl:col-12 justify-content-center align-content-center flex'>
               <Chart
-                type="bar"
+                type='bar'
                 data={pacientiVek}
                 options={pacientiVekOptions}
-                style={{ width: "35%" }}
+                style={{ width: '35%' }}
               />
               <Chart
-                type="bar"
+                type='bar'
                 data={sumaVyplat}
                 options={sumaVyplatOptions}
-                style={{ width: "35%" }}
+                style={{ width: '35%' }}
               />
               <DataTable
-                size="small"
+                size='small'
                 value={valuesInTable}
-                style={{ width: "25%", marginLeft: "1rem" }}
+                style={{ width: '25%', marginLeft: '1rem' }}
                 scrollable
                 showGridlines
-                responsiveLayout="scroll"
+                responsiveLayout='scroll'
               >
                 {columns}
               </DataTable>
             </div>
-            <div className="xl:col-12 justify-content-center align-content-center flex h-auto">
+            <div className='xl:col-12 justify-content-center align-content-center flex h-auto'>
               <Chart
-                type="pie"
+                type='pie'
                 data={muziZeny}
                 options={{
                   plugins: {
                     title: {
                       display: true,
-                      text: "Podiel pohlaví pacientov (%)",
+                      text: 'Podiel pohlaví pacientov (%)',
                     },
                   },
                 }}
-                style={{ position: "relative", width: "30%" }}
+                style={{ position: 'relative', width: '30%' }}
               />
               <Chart
-                type="pie"
+                type='pie'
                 options={{
                   plugins: {
                     title: {
                       display: true,
-                      text: "Podiel typu krvi u pacientov",
+                      text: 'Podiel typu krvi u pacientov',
                     },
                   },
                 }}
                 data={krv}
-                style={{ position: "relative", width: "30%" }}
+                style={{ position: 'relative', width: '30%' }}
               />
-            </div>{" "}
+            </div>{' '}
           </>
         ) : (
-          ""
+          ''
         )}
       </div>
       {loading ? (
         <ProgressBar
-          mode="indeterminate"
-          style={{ height: "6px", width: "99%" }}
+          mode='indeterminate'
+          style={{ height: '6px', width: '99%' }}
         ></ProgressBar>
       ) : (
-        ""
+        ''
       )}
     </div>
   );
